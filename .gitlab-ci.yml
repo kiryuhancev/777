@@ -1,0 +1,6 @@
+create-pages:
+  stage: deploy
+  script:
+    - mkdir -p public
+    - cp index.html public/index.html
+  pages: true
