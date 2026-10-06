@@ -4,13 +4,13 @@
       "width": 320,
       "height": 568,
       "size": 5,
-      "gridWidth": 256
+      "gridWidth": 276
     },
     {
       "width": 320,
       "height": 568,
       "size": 8,
-      "gridWidth": 260
+      "gridWidth": 276
     },
     {
       "width": 360,
@@ -64,49 +64,49 @@
       "width": 568,
       "height": 320,
       "size": 5,
-      "gridWidth": 147
+      "gridWidth": 157
     },
     {
       "width": 568,
       "height": 320,
       "size": 8,
-      "gridWidth": 109
+      "gridWidth": 157
     },
     {
       "width": 667,
       "height": 375,
       "size": 5,
-      "gridWidth": 207
+      "gridWidth": 157
     },
     {
       "width": 667,
       "height": 375,
       "size": 8,
-      "gridWidth": 165
+      "gridWidth": 157
     },
     {
       "width": 852,
       "height": 393,
       "size": 5,
-      "gridWidth": 222
+      "gridWidth": 172
     },
     {
       "width": 852,
       "height": 393,
       "size": 8,
-      "gridWidth": 189
+      "gridWidth": 157
     },
     {
       "width": 768,
       "height": 1024,
       "size": 5,
-      "gridWidth": 424
+      "gridWidth": 418
     },
     {
       "width": 768,
       "height": 1024,
       "size": 8,
-      "gridWidth": 433
+      "gridWidth": 417
     },
     {
       "width": 1024,

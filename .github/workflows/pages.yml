@@ -24,7 +24,7 @@ jobs:
         id: site
         run: |
           python3 tools/build-site.py
-          node --check /tmp/football-cascade-release.js
+          node --check /tmp/digital-derby-release.js
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site

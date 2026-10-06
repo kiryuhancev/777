@@ -11,12 +11,15 @@ with sync_playwright() as p:
     page=ctx.new_page()
     page.on('pageerror',lambda e:report['pageErrors'].append(str(e)))
     page.set_content((ROOT/'index.html').read_text(),wait_until='load')
+    assert 'DIGITAL DERBY' in page.title()
     page.locator('#openMainGame').tap()
+    assert page.locator('#derbyLogo').evaluate('(e)=>e.complete&&e.naturalWidth>0')
     for w,h in [(320,568),(360,640),(375,812),(390,844),(430,932),(568,320),(667,375),(852,393),(768,1024),(1024,768),(1440,900)]:
         page.set_viewport_size({'width':w,'height':h})
         page.wait_for_timeout(100)
         for size in [5,8]:
             page.evaluate('''size=>{state.bonus=size===8;state.bonusType='super';state.slotProfile=size===8?'super':'base';state.size=size;state.grid=blankGrid(size);state.sticky.clear();document.body.classList.toggle('bonus',size===8);fillGrid();render();updateUI();}''',size)
+            assert page.evaluate('''()=>{const l=document.querySelector('#derbyLogo').getBoundingClientRect(),g=document.querySelector('#grid').getBoundingClientRect(),f=document.querySelector('#fieldShell').getBoundingClientRect();return l.bottom<=g.top&&Math.abs((l.left+l.right)/2-(f.left+f.right)/2)<1}'''),(w,h,size,'logo placement')
             result=page.evaluate('''()=>{const g=document.querySelector('#grid'),r=g.getBoundingClientRect();return {pageWidth:document.documentElement.scrollWidth,gridWidth:g.clientWidth,gridScroll:g.scrollWidth,left:r.left,right:r.right,width:r.width,height:r.height,buttons:['settingsBtn','autoBtn','maxBetBtn','spinBtn','buyBtn'].map(id=>{const r=document.getElementById(id).getBoundingClientRect();return {id,width:r.width,height:r.height,left:r.left,right:r.right,top:r.top,bottom:r.bottom}})}}''')
             assert result['pageWidth']<=w,(w,h,size,result)
             assert result['gridScroll']<=result['gridWidth']+1,(w,h,size,result)

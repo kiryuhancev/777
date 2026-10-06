@@ -16,7 +16,7 @@ url += ('&' if '?' in url else '?') + urllib.parse.urlencode({
 for attempt in range(12):
     try:
         request = urllib.request.Request(url, headers={
-            'User-Agent': 'Football-Cascade-deployment-check',
+            'User-Agent': 'Digital-Derby-deployment-check',
             'Cache-Control': 'no-cache',
         })
         with urllib.request.urlopen(request, timeout=30) as response:

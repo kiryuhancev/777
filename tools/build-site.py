@@ -11,9 +11,9 @@ ROOT = Path(__file__).resolve().parent.parent
 html = ROOT / 'index.html'
 source = html.read_text()
 scripts = re.findall(r'<script\b[^>]*>(.*?)</script>', source, re.S | re.I)
-if not scripts or '<title>UT Cascade v45' not in source:
+if not scripts or '<title>DIGITAL DERBY' not in source:
     raise SystemExit('Expected the v45 standalone game with embedded JavaScript')
-Path('/tmp/football-cascade-release.js').write_text('\n'.join(scripts))
+Path('/tmp/digital-derby-release.js').write_text('\n'.join(scripts))
 site = ROOT / '_site'
 site.mkdir(exist_ok=True)
 shutil.copyfile(html, site / 'index.html')
