@@ -35,6 +35,11 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
+      - name: Verify currently published game
+        env:
+          GAME_URL: https://kiryuhancev.github.io/777/
+          HTML_SHA256: ${{ steps.site.outputs.html_sha256 }}
+        run: python3 tools/verify-site.py
 
   deploy:
     environment:
