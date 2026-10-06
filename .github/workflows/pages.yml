@@ -16,6 +16,8 @@ concurrency:
 
 jobs:
   build:
+    outputs:
+      html_sha256: ${{ steps.site.outputs.html_sha256 }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out game
@@ -23,6 +25,7 @@ jobs:
       - name: Check game mathematics
         run: node tools/math-tests.cjs
       - name: Build standalone site
+        id: site
         run: |
           python3 tools/build-site.py
           node --check /tmp/football-cascade-release.js
@@ -40,6 +43,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - name: Check out deployment verifier
+        uses: actions/checkout@v4
       - name: Deploy site
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify published game
+        env:
+          GAME_URL: ${{ steps.deployment.outputs.page_url }}
+          HTML_SHA256: ${{ needs.build.outputs.html_sha256 }}
+        run: python3 tools/verify-site.py

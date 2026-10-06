@@ -25,3 +25,7 @@ commit = os.environ.get('GITHUB_SHA') or subprocess.check_output(
     'htmlSha256': hashlib.sha256(html.read_bytes()).hexdigest(),
 }, indent=2) + '\n')
 print(f'Built {html.stat().st_size} bytes of standalone HTML in {site}')
+output = os.environ.get('GITHUB_OUTPUT')
+if output:
+    with open(output, 'a') as stream:
+        stream.write('html_sha256=' + hashlib.sha256(html.read_bytes()).hexdigest() + '\n')
