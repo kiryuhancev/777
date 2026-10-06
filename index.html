@@ -930,20 +930,23 @@ body.lobby-mode .bird-app{display:none!important}
 body.slot-active .grid{transition:none;max-width:none}
 body.slot-active .topbar #backLobby{position:static;flex-shrink:0;margin:0}
 body.slot-active .topbar .brand{margin-right:auto}
-body.slot-active .field-shell{transition:border-color .3s,box-shadow .3s;padding-top:154px;border:1px solid #69d8ff65;background:linear-gradient(180deg,#0b2639f2 0,#071a20ec 145px,#062317df 100%);box-shadow:0 0 0 3px #061117,0 0 0 4px #76d5ff30,inset 0 0 30px #39afff14,0 16px 45px #0008}
-body.slot-active .field-shell::before{content:'';position:absolute;left:12%;right:12%;top:142px;height:1px;background:linear-gradient(90deg,transparent,#90f73e99,#60d9ff99,transparent)}
+body.slot-active .field-shell{--derby-frame-top:76px;transition:none;padding-top:154px;border:1px solid transparent;background:none;box-shadow:none;isolation:isolate}
+body.slot-active .field-shell::after{content:'';position:absolute;z-index:0;top:var(--derby-frame-top);left:0;right:0;bottom:0;border:6px solid #254754;border-radius:26px;background:linear-gradient(180deg,#0b2639f5,#071a20f2 145px,#062317ed);box-shadow:0 0 0 2px #071218,0 0 0 3px #68c7e050,inset 0 0 0 2px #6bddf890,inset 0 0 24px #39afff16,0 14px 36px #0009;pointer-events:none}
+body.slot-active .field-shell .pitch{z-index:1}
+body.slot-active.bonus .field-shell::after{border-color:#43523c;background:linear-gradient(180deg,#0b2639f5,#08191ff2 145px,#24070af2);box-shadow:0 0 0 2px #071218,0 0 0 3px #b5e77550,inset 0 0 0 2px #c9f87990,inset 0 0 24px #bfff3916,0 14px 36px #0009}
+body.slot-active .field-shell::before{z-index:2;content:'';position:absolute;left:12%;right:12%;top:142px;height:1px;background:linear-gradient(90deg,transparent,#90f73e99,#60d9ff99,transparent)}
 body.slot-active .derby-logo{position:absolute;z-index:16;top:8px;left:50%;transform:translateX(-50%);width:min(240px,calc(100% - 24px));height:136px;object-fit:contain;pointer-events:none;user-select:none;filter:drop-shadow(0 3px 12px #008aff33)}
 body.slot-active .field-shell .pitch{top:154px}
-body.slot-active.bonus .field-shell{border-color:#cffb5580;background:linear-gradient(180deg,#0b2639f2 0,#08191fec 145px,#24070aee 100%)}
+body.slot-active.bonus .field-shell{border-color:transparent;background:none;box-shadow:none}
 @media(max-width:760px), (max-width:1100px) and (max-height:540px) and (orientation:landscape){
   body.slot-active .brand{font-size:clamp(12px,3.65vw,17px);letter-spacing:-.035em}
-  body.slot-active .field-shell{padding-top:112px}
+  body.slot-active .field-shell{--derby-frame-top:56px;padding-top:112px}
   body.slot-active .field-shell::before{top:104px}
   body.slot-active .derby-logo{top:5px;width:min(185px,calc(100% - 16px));height:102px}
   body.slot-active .field-shell .pitch{top:112px}
 }
 @media(max-width:1100px) and (max-height:540px) and (orientation:landscape){
-  body.slot-active .field-shell{padding-top:62px}
+  body.slot-active .field-shell{--derby-frame-top:30px;padding-top:62px}
   body.slot-active .field-shell::before{top:56px}
   body.slot-active .derby-logo{top:2px;width:min(102px,calc(100% - 12px));height:56px}
   body.slot-active .field-shell .pitch{top:62px}
