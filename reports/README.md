@@ -62,3 +62,29 @@ touch control sizes and actual settings, autoplay, rules, bonus shop and spin ch
 Run `python3 tools/mobile-check.py` with Playwright and Chromium installed.
 Slot mathematics and embedded images are unchanged from v44; earlier simulation
 checksums identify the HTML used for those historical runs.
+
+v45 updates the behavior observed during play:
+- A base-game Wild locks only when it participates in a winning cluster. It stays
+  in place through that cascade and releases afterward; bonus Wilds persist
+  across free spins. Browser and headless settlement use the same rule.
+- Scatter anticipation skips columns with an already landed Scatter, including
+  refill. After a new Scatter lands, remaining symbols in its column use normal
+  drop speed. `browser-v45.json` records actual DOM animation durations and
+  base/bonus live-to-simulator payout parity.
+- Bonus ordinary-symbol weights are less skewed, with fixed correlation settings
+  for each field size. There is no guaranteed winning cluster or payout feedback.
+- Bonus Wild rates total 2.06% per eligible isolated cell, versus 0.135% in v44.
+  Within Manhattan distance two of another Wild, rates are multiplied by 0.02.
+  Existing local density and infinite-cascade topology checks remain in place.
+  The quoted probabilities precede placement rejection and Scatter replacement.
+
+`simulation-v45.json` contains 100,000 sessions per bonus and 200,000 base spins
+per wager mode. `bonus-behavior-v45.json` separately follows 10,000 sessions per
+bonus: roughly 16% of 5×5 free spins and 20% of 6×6 free spins pay nothing.
+The naturally reached 8×8 sample is small; a separate 10,000-board fixture with
+seven separated Sticky Wilds has 35.89% boards without a winning cluster.
+Observed sessions reach 8–9 Sticky Wilds; these are observations, not limits.
+
+Verification: `node tools/math-tests.cjs`, `node tools/simulate.cjs 100000`,
+`node tools/bonus-behavior.cjs`, `python3 tools/behavior-check.py`, site build and
+JavaScript syntax check. Mobile layout checks continue to cover both field sizes.

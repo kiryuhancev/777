@@ -27,9 +27,12 @@ test('every Super uses the declared profile without a secret session lottery',()
  let draws=0;const m=math.newBonus('super',()=>{draws++;return 0});assert.equal(m.profile,'super');assert.equal(draws,0);
  assert.ok(!('rare' in math.CONFIG));assert.ok(!('rareSuperProbability' in math.CONFIG));
 });
-test('normal Wild removed; bonus Wild becomes persistent',()=>{
- const normal=board();normal.grid[0]=9;for(let i=1;i<5;i++)normal.grid[i]=0;assert.equal(math.lockWilds(normal),false);math.removeWins(normal,math.findWins(normal));assert.equal(normal.grid[0],-1);assert.ok(normal.sticky.every(x=>x===-1));
- const bonus=board(5,true);bonus.grid[0]=9;for(let i=1;i<5;i++)bonus.grid[i]=0;assert.equal(math.lockWilds(bonus),true);math.removeWins(bonus,math.findWins(bonus));assert.equal(bonus.sticky[0],9);
+test('winning base Wild locks through gravity and releases after cascade; losing Wild stays movable',()=>{
+ const m=board();m.grid[0]=10;m.grid[24]=9;for(let i=1;i<5;i++)m.grid[i]=0;
+ const wins=math.findWins(m);math.removeWins(m,wins);assert.equal(m.sticky[0],10);assert.equal(m.sticky[24],-1);
+ math.gravity(m);assert.equal(m.sticky[0],10);math.generate(m,rng,{refill:true});assert.equal(m.sticky[0],10);
+ math.releaseCascadeWilds(m);assert.equal(m.grid[0],10);assert.ok(m.sticky.every(x=>x===-1));
+ const bonus=board(5,true);bonus.grid[0]=9;math.lockWilds(bonus);math.releaseCascadeWilds(bonus);assert.equal(bonus.sticky[0],9);
 });
 test('every 3x3 window, including an off-centre candidate, respects the cap',()=>{
  const m=board();for(const i of [0,1,5])m.grid[i]=9;assert.equal(math.canPlaceWild(m,12),false);m.grid[12]=9;math.enforceWildCap(m,rng);

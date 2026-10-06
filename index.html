@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#07100c" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<title>UT Cascade v44 — Football Slot Prototype</title>
+<title>UT Cascade v45 — Football Slot Prototype</title>
 <style>
 :root{
   --grid-size:5;
@@ -1093,7 +1093,7 @@ body.lobby-mode .bird-app{display:none!important}
       </section>
       <section class="panel">
         <h3>Правила прототипа</h3>
-        <div class="help"><b>5+</b> одинаковых, соприкасающихся боковыми гранями по горизонтали или вертикали, запускают сыгровку. Удаляются только символы выигрышного кластера, затем остальные опадают вниз. <b>3 WL</b> запускают BONUS (8 спинов), <b>4 WL</b> — SUPER BONUS (12 спинов). В одном столбце может быть только один WL. Sticky Wild остаются на месте, а новые символы проходят через их позиции.</div>
+        <div class="help"><b>5+</b> одинаковых, соприкасающихся боковыми гранями по горизонтали или вертикали, запускают сыгровку. Удаляются только символы выигрышного кластера, затем остальные опадают вниз. <b>3 WL</b> запускают BONUS (8 спинов), <b>4 WL</b> — SUPER BONUS (12 спинов). В одном столбце может быть только один WL. В обычной игре Wild закрепляется после участия в выигрыше и остаётся до конца каскада. В бонусе Wild остаются между Free Spins. Новые символы проходят через закреплённые позиции. Free Spin может закончиться без выигрыша.</div>
       </section>
       </details>
     </aside>
@@ -1427,15 +1427,15 @@ const SLOT_MATH = (() => {
   const names = [...REGULAR, ...WILDS, 'scatter'];
   const SCATTER = 13, WILD_START = 9;
   const CONFIG = Object.freeze({
-    version: 'v44',
+    version: 'v45',
     maxCascadesNormal: 256, maxCascadesBonus: 1024, maxFreeSpins: 65536,
-    // Probabilities stay fixed throughout a session; payouts never feed back into RNG.
-    base: { affinity: .130, refillAffinity: .015, scatterRate: .020, boostScatterRate: .0265,
+    // Fixed profiles by mode and field size; payouts never feed back into RNG.
+    base: { affinity: .123, refillAffinity: .015, scatterRate: .020, boostScatterRate: .0265,
       wildRates: [.0060, .0022, .0012, .0004], weights: [24,20,16,12,10,8,5,3,2] },
-    normal: { affinity: .548, refillAffinity: .025, scatterCounts: [.90,.09,.009,.001],
-      wildRates: [.0008,.00035,.00015,.00005], weights: [24,20,16,12,10,8,5,3,2] },
-    super: { affinity: .537, refillAffinity: .025, scatterCounts: [.90,.09,.009,.001],
-      wildRates: [.0008,.00035,.00015,.00005], weights: [24,20,16,12,10,8,5,3,2] },
+    normal: { affinity: .386, growthAffinity: [.20,.08,0], refillAffinity: .025, scatterCounts: [.90,.09,.009,.001],
+      wildRates: [.018,.002,.0005,.0001], weights: [12,12,12,12,12,12,10,9,9] },
+    super: { affinity: .365, growthAffinity: [.18,.07,0], refillAffinity: .025, scatterCounts: [.90,.09,.009,.001],
+      wildRates: [.018,.002,.0005,.0001], weights: [12,12,12,12,12,12,10,9,9] },
     nearWildFactor: .02
   });
   const pays = REGULAR.map(k => SYMBOLS[k].pay), multipliers = [1,2,3,5];
@@ -1478,7 +1478,7 @@ const SLOT_MATH = (() => {
   function canPlaceWild(m,i){
     const l=layout(m.size);
     for(const wi of l.containing[i]){let count=1;for(const j of l.windows[wi])if(j!==i&&isWild(at(m,j)))count++;if(count>3)return false;}
-    return !m.bonus || !wildTrap(m,i);
+    return !wildTrap(m,i);
   }
   function wildTrap(m,candidate=-1){
     // Four connected Sticky Wilds (or four joined by ONE ordinary cell)
@@ -1509,7 +1509,8 @@ const SLOT_MATH = (() => {
     for(let j=0;j<4;j++){const rate=p.wildRates[j]*factor;if(x<rate)return canPlaceWild(m,i)?WILD_START+j:ordinary(m,rng);x-=rate;}
     // Stationary cluster correlation. Only NEW cells are sampled, never surviving symbols.
     // Copy only an ordinary neighbour; Wild/Scatter keep their independent rates.
-    if(rng()<(refill?p.refillAffinity:p.affinity)){
+    const affinity=m.bonus&&m.size>5?p.growthAffinity[Math.min(2,m.size-6)]:p.affinity;
+    if(rng()<(refill?p.refillAffinity:affinity)){
       const choices=layout(m.size).adjacent[i].filter(j=>at(m,j)>=0&&at(m,j)<WILD_START);
       if(choices.length)return at(m,choices[Math.floor(rng()*choices.length)]);
     }
@@ -1569,7 +1570,20 @@ const SLOT_MATH = (() => {
     }
     return out;
   }
+  function lockWinningWilds(m,wins){
+    if(m.bonus)return lockWilds(m);
+    let changed=false;
+    for(const w of wins)for(const i of w.cells)if(isWild(m.grid[i])){
+      m.sticky[i]=m.grid[i];m.grid[i]=-1;changed=true;
+    }
+    return changed;
+  }
+  function releaseCascadeWilds(m){
+    if(m.bonus)return;
+    for(let i=0;i<m.sticky.length;i++)if(m.sticky[i]>=0){m.grid[i]=m.sticky[i];m.sticky[i]=-1;}
+  }
   function removeWins(m,wins){
+    lockWinningWilds(m,wins);
     const removed=new Set();for(const w of wins)for(const i of w.cells)if(m.sticky[i]<0)removed.add(i);
     for(const i of removed)m.grid[i]=-1;return removed;
   }
@@ -1601,7 +1615,7 @@ const SLOT_MATH = (() => {
       const removed=removeWins(m,wins);if(!removed.size)throw new Error('Winning cluster did not remove a base symbol');
       gravity(m);generate(m,rng,{refill:true});
     }
-    m.totalX+=total;if(m.stopReason==='no-win')creditScatters(m,rng);return {totalX:total,cascades,clusters,stopReason:m.stopReason};
+    m.totalX+=total;if(m.stopReason==='no-win')creditScatters(m,rng);releaseCascadeWilds(m);return {totalX:total,cascades,clusters,stopReason:m.stopReason};
   }
   function bonusSpin(m,rng=liveRandom){
     if(!m.bonus||m.freeSpins<=0)throw new Error('No free spins');
@@ -1633,7 +1647,7 @@ const SLOT_MATH = (() => {
     const cost=boost?1.5:1;return {count,seed,boost,baseMeanX:total/count,totalRtpPercent:(total+bonusX)/count/cost*100,hitPercent:hits/count*100,
       bonusTriggerPercent:(normal+superCount)/count*100,normalTriggers:normal,superTriggers:superCount,guardHits};
   }
-  return {CONFIG,names,layout,seededRandom,liveRandom,newBoard,newBonus,generate,lockWilds,findWins,removeWins,gravity,grow,creditScatters,
+  return {CONFIG,names,layout,seededRandom,liveRandom,newBoard,newBonus,generate,lockWilds,lockWinningWilds,releaseCascadeWilds,findWins,removeWins,gravity,grow,creditScatters,
     canPlaceWild,enforceWildCap,repairWildTraps,wildTrap,ordinary,settle,bonusSpin,simulateOne,runBonusSimulation,runBaseSimulation};
 })();
 function runBonusSimulation(count=100000,type='super',options={}){const result=SLOT_MATH.runBonusSimulation(count,type,options);console.table(result);return result;}
@@ -1798,8 +1812,7 @@ function render({enter=false,enterCells=new Set(),wins=new Set(),scatterHits=new
     }
     if(!rows.length)continue;
 
-    // A Scatter already lying in the column does not erase the global zoom state.
-    // It only means that this particular column starts closer to normal speed.
+    // Columns with a landed Scatter cannot receive another: no suspense there.
     let staticScatterInColumn=false;
     for(let r=0;r<state.size;r++){
       const k=key(r,c);
@@ -1811,47 +1824,22 @@ function render({enter=false,enterCells=new Set(),wins=new Set(),scatterHits=new
 
     if(landedScatters>=2 && zoomOriginCol===null)zoomOriginCol=c;
 
-    const globalZoomDuration=landedScatters>=2?zoomDurationForColumn(c):baseDuration;
-    let recoveryAfterScatter=false;
-    let recoveryStartIndex=-1;
-    let recoveryStartDuration=globalZoomDuration;
+    let scatterLandedInColumn=staticScatterInColumn;
 
     for(let idx=0;idx<rows.length;idx++){
       const item=rows[idx];
       const isScatter=item.type==='scatter';
       let duration=baseDuration;
-      let zoomEligible=landedScatters>=2;
+      let zoomEligible=landedScatters>=2&&!scatterLandedInColumn;
 
       if(zoomEligible){
         if(zoomOriginCol===null)zoomOriginCol=c;
         const colZoom=zoomDurationForColumn(c);
 
-        if(recoveryAfterScatter && !isScatter){
-          // After Scatter: progressively accelerate through the rest of THIS column.
-          // We do not jump to normal speed instantly.
-          const remaining=Math.max(1,rows.length-recoveryStartIndex-1);
-          const pos=idx-recoveryStartIndex;
-          const p=Math.max(0,Math.min(1,pos/remaining));
-          duration=Math.round(recoveryStartDuration+(baseDuration-recoveryStartDuration)*p);
-        }else if(staticScatterInColumn && !isScatter){
-          // Static Scatter from a previous cascade: keep a gentle suspense rather than
-          // fully cancelling zoom for the whole column.
-          duration=Math.max(baseDuration,Math.round(colZoom*.72));
-        }else{
-          duration=colZoom;
-        }
-
-        // A falling Scatter itself keeps the current suspense speed.
-        // Only the symbols AFTER it begin accelerating toward normal.
-        if(isScatter){
-          duration=colZoom;
-          recoveryAfterScatter=true;
-          recoveryStartIndex=idx;
-          recoveryStartDuration=colZoom;
-        }
+        duration=colZoom;
 
         // If there is no Scatter interruption, preserve the 0.5 s final zoom symbol rule.
-        if(!recoveryAfterScatter&&c===lastAnimatedCol&&idx===rows.length-1&&!isScatter){
+        if(!scatterLandedInColumn&&c===lastAnimatedCol&&idx===rows.length-1&&!isScatter){
           duration=finalZoomDuration;
         }
       }
@@ -1868,7 +1856,7 @@ function render({enter=false,enterCells=new Set(),wins=new Set(),scatterHits=new
         delay+=duration+gap;
       }
 
-      if(isScatter)landedScatters++;
+      if(isScatter){landedScatters++;scatterLandedInColumn=true;}
     }
 
     // New column: local acceleration is over; global left-to-right zoom resumes.
@@ -2608,8 +2596,7 @@ async function settleSpin(){
   state.cascadeStopReason='no-win';
 
   for(;;){
-    // Sticky Wild conversion remains a bonus rule, but Scatter handling
-    // is intentionally delayed until we know whether the board has a win.
+    // Bonus Wilds persist across free spins; base Wilds lock only after a win.
     if(state.bonus)await convertBonusWilds();
 
     const wins=findWins();
@@ -2644,6 +2631,10 @@ async function settleSpin(){
 
     if(state.cascade>=limit){state.cascadeStopReason='cascade-limit';throw new Error('Достигнут защитный лимит каскадов; автоматическая игра остановлена');}
     state.cascade++;if(state.bonus)state.bonusCascades++;
+
+    if(!state.bonus){
+      const m=readSlotModel();SLOT_MATH.lockWinningWilds(m,SLOT_MATH.findWins(m));writeSlotModel(m);
+    }
 
     // Winning symbols to remove.
     const removeMap=new Map();
@@ -2698,6 +2689,7 @@ async function settleSpin(){
     await waitAfterFullDrop();
   }
 
+  if(!state.bonus){const m=readSlotModel();SLOT_MATH.releaseCascadeWilds(m);writeSlotModel(m);render();}
   state.lastWin=total;
   if(total===0){
     msg.textContent=state.bonus?'Free Spin завершён':'Нет сыгровки — ещё раз?';

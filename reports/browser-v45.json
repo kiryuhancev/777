@@ -1,0 +1,170 @@
+{
+  "scatterZoom": [
+    {
+      "r": 0,
+      "c": 0,
+      "enter": false,
+      "ms": 680
+    },
+    {
+      "r": 0,
+      "c": 1,
+      "enter": false,
+      "ms": 680
+    },
+    {
+      "r": 0,
+      "c": 2,
+      "enter": true,
+      "ms": 52
+    },
+    {
+      "r": 0,
+      "c": 3,
+      "enter": true,
+      "ms": 396
+    },
+    {
+      "r": 0,
+      "c": 4,
+      "enter": true,
+      "ms": 500
+    },
+    {
+      "r": 1,
+      "c": 0,
+      "enter": true,
+      "ms": 52
+    },
+    {
+      "r": 1,
+      "c": 1,
+      "enter": true,
+      "ms": 52
+    },
+    {
+      "r": 1,
+      "c": 2,
+      "enter": true,
+      "ms": 52
+    },
+    {
+      "r": 1,
+      "c": 3,
+      "enter": true,
+      "ms": 396
+    },
+    {
+      "r": 1,
+      "c": 4,
+      "enter": true,
+      "ms": 500
+    },
+    {
+      "r": 2,
+      "c": 0,
+      "enter": true,
+      "ms": 52
+    },
+    {
+      "r": 2,
+      "c": 1,
+      "enter": true,
+      "ms": 52
+    },
+    {
+      "r": 2,
+      "c": 2,
+      "enter": true,
+      "ms": 52
+    },
+    {
+      "r": 2,
+      "c": 3,
+      "enter": true,
+      "ms": 396
+    },
+    {
+      "r": 2,
+      "c": 4,
+      "enter": true,
+      "ms": 500
+    },
+    {
+      "r": 3,
+      "c": 0,
+      "enter": true,
+      "ms": 52
+    },
+    {
+      "r": 3,
+      "c": 1,
+      "enter": true,
+      "ms": 52
+    },
+    {
+      "r": 3,
+      "c": 2,
+      "enter": true,
+      "ms": 52
+    },
+    {
+      "r": 3,
+      "c": 3,
+      "enter": true,
+      "ms": 396
+    },
+    {
+      "r": 3,
+      "c": 4,
+      "enter": true,
+      "ms": 500
+    },
+    {
+      "r": 4,
+      "c": 0,
+      "enter": true,
+      "ms": 52
+    },
+    {
+      "r": 4,
+      "c": 1,
+      "enter": true,
+      "ms": 52
+    },
+    {
+      "r": 4,
+      "c": 2,
+      "enter": true,
+      "ms": 291
+    },
+    {
+      "r": 4,
+      "c": 3,
+      "enter": true,
+      "ms": 396
+    },
+    {
+      "r": 4,
+      "c": 4,
+      "enter": true,
+      "ms": 500
+    }
+  ],
+  "cascadeChecks": {
+    "lockedDuringGravity": true,
+    "sessions": [
+      {
+        "type": "normal",
+        "spins": 8,
+        "totalX": 29.29
+      },
+      {
+        "type": "super",
+        "spins": 12,
+        "totalX": 61.36000000000001
+      }
+    ]
+  },
+  "pageErrors": []
+}

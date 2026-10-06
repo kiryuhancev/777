@@ -1,0 +1,104 @@
+{
+  "version": "v45",
+  "sessionsPerType": 10000,
+  "types": {
+    "normal": {
+      "levels": [
+        {
+          "spins": 78614,
+          "empty": 12566,
+          "wildSum": 141935,
+          "maxWilds": 6,
+          "threePlus": 21925,
+          "emptyPercent": 15.984430254153205,
+          "meanWilds": 1.8054672195792099,
+          "threePlusPercent": 27.8894344518788
+        },
+        {
+          "spins": 3327,
+          "empty": 666,
+          "wildSum": 10666,
+          "maxWilds": 7,
+          "threePlus": 2475,
+          "emptyPercent": 20.018034265103697,
+          "meanWilds": 3.205891193267208,
+          "threePlusPercent": 74.39134355275023
+        },
+        {
+          "spins": 115,
+          "empty": 36,
+          "wildSum": 507,
+          "maxWilds": 8,
+          "threePlus": 107,
+          "emptyPercent": 31.304347826086957,
+          "meanWilds": 4.408695652173913,
+          "threePlusPercent": 93.04347826086956
+        },
+        {
+          "spins": 8,
+          "empty": 2,
+          "wildSum": 43,
+          "maxWilds": 6,
+          "threePlus": 8,
+          "emptyPercent": 25,
+          "meanWilds": 5.375,
+          "threePlusPercent": 100
+        }
+      ],
+      "eightByEightSevenWildFixture": {
+        "count": 10000,
+        "empty": 3589,
+        "emptyPercent": 35.89
+      }
+    },
+    "super": {
+      "levels": [
+        {
+          "spins": 114336,
+          "empty": 18802,
+          "wildSum": 250228,
+          "maxWilds": 7,
+          "threePlus": 47955,
+          "emptyPercent": 16.44451441365799,
+          "meanWilds": 2.188532045899804,
+          "threePlusPercent": 41.9421704450042
+        },
+        {
+          "spins": 10280,
+          "empty": 2096,
+          "wildSum": 37181,
+          "maxWilds": 8,
+          "threePlus": 8715,
+          "emptyPercent": 20.389105058365757,
+          "meanWilds": 3.616828793774319,
+          "threePlusPercent": 84.77626459143968
+        },
+        {
+          "spins": 563,
+          "empty": 159,
+          "wildSum": 2759,
+          "maxWilds": 8,
+          "threePlus": 550,
+          "emptyPercent": 28.241563055062166,
+          "meanWilds": 4.900532859680284,
+          "threePlusPercent": 97.69094138543517
+        },
+        {
+          "spins": 29,
+          "empty": 8,
+          "wildSum": 194,
+          "maxWilds": 9,
+          "threePlus": 29,
+          "emptyPercent": 27.586206896551722,
+          "meanWilds": 6.689655172413793,
+          "threePlusPercent": 100
+        }
+      ],
+      "eightByEightSevenWildFixture": {
+        "count": 10000,
+        "empty": 3589,
+        "emptyPercent": 35.89
+      }
+    }
+  }
+}

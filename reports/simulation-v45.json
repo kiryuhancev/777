@@ -1,0 +1,190 @@
+{
+  "version": "v45",
+  "seed": 77743,
+  "htmlSha256": "be56e28c0d36446e81ac08d02ddc4e2632e3ee8c20e20021d1c5278fd3cac206",
+  "configuration": {
+    "version": "v45",
+    "maxCascadesNormal": 256,
+    "maxCascadesBonus": 1024,
+    "maxFreeSpins": 65536,
+    "base": {
+      "affinity": 0.123,
+      "refillAffinity": 0.015,
+      "scatterRate": 0.02,
+      "boostScatterRate": 0.0265,
+      "wildRates": [
+        0.006,
+        0.0022,
+        0.0012,
+        0.0004
+      ],
+      "weights": [
+        24,
+        20,
+        16,
+        12,
+        10,
+        8,
+        5,
+        3,
+        2
+      ]
+    },
+    "normal": {
+      "affinity": 0.386,
+      "growthAffinity": [
+        0.2,
+        0.08,
+        0
+      ],
+      "refillAffinity": 0.025,
+      "scatterCounts": [
+        0.9,
+        0.09,
+        0.009,
+        0.001
+      ],
+      "wildRates": [
+        0.018,
+        0.002,
+        0.0005,
+        0.0001
+      ],
+      "weights": [
+        12,
+        12,
+        12,
+        12,
+        12,
+        12,
+        10,
+        9,
+        9
+      ]
+    },
+    "super": {
+      "affinity": 0.365,
+      "growthAffinity": [
+        0.18,
+        0.07,
+        0
+      ],
+      "refillAffinity": 0.025,
+      "scatterCounts": [
+        0.9,
+        0.09,
+        0.009,
+        0.001
+      ],
+      "wildRates": [
+        0.018,
+        0.002,
+        0.0005,
+        0.0001
+      ],
+      "weights": [
+        12,
+        12,
+        12,
+        12,
+        12,
+        12,
+        10,
+        9,
+        9
+      ]
+    },
+    "nearWildFactor": 0.02
+  },
+  "checks": {
+    "normal": {
+      "version": "v45",
+      "type": "normal",
+      "count": 100000,
+      "seed": 77743,
+      "buyCostX": 40,
+      "meanX": 38.42454885000039,
+      "medianX": 32.005,
+      "buyRtpPercent": 96.06137212500097,
+      "recoupPercent": 33.033,
+      "p90X": 64.81,
+      "p95X": 83.18,
+      "p99X": 143.95,
+      "maxX": 2248.4949999999985,
+      "meanFreeSpins": 8.21786,
+      "meanCascades": 9.88664,
+      "meanClusters": 13.84463,
+      "mean95CI": [
+        38.24167111619046,
+        38.60742658381032
+      ],
+      "thresholdProbabilities": {
+        "100x": 0.02946,
+        "500x": 0.00021,
+        "1000x": 0.00002,
+        "5000x": 0,
+        "10000x": 0,
+        "50000x": 0
+      },
+      "guardHits": 0,
+      "unfinished": 0
+    },
+    "super": {
+      "version": "v45",
+      "type": "super",
+      "count": 100000,
+      "seed": 77743,
+      "buyCostX": 65,
+      "meanX": 61.563395150000424,
+      "medianX": 50.964999999999996,
+      "buyRtpPercent": 94.71291561538527,
+      "recoupPercent": 30.678,
+      "p90X": 102.24,
+      "p95X": 132.37,
+      "p99X": 228.27,
+      "maxX": 8152.335000000006,
+      "meanFreeSpins": 12.50901,
+      "meanCascades": 15.65617,
+      "meanClusters": 22.04935,
+      "mean95CI": [
+        61.229645109142524,
+        61.897145190858325
+      ],
+      "thresholdProbabilities": {
+        "100x": 0.10567,
+        "500x": 0.00103,
+        "1000x": 0.00019,
+        "5000x": 0.00001,
+        "10000x": 0,
+        "50000x": 0
+      },
+      "guardHits": 0,
+      "unfinished": 0
+    },
+    "base": {
+      "count": 200000,
+      "seed": 77743,
+      "boost": false,
+      "baseMeanX": 0.5373086999999006,
+      "totalRtpPercent": 95.29910749999,
+      "hitPercent": 40.2905,
+      "bonusTriggerPercent": 1.0625,
+      "normalTriggers": 2010,
+      "superTriggers": 115,
+      "guardHits": 0
+    },
+    "baseBoost": {
+      "count": 200000,
+      "seed": 77743,
+      "boost": true,
+      "baseMeanX": 0.5247196999999121,
+      "totalRtpPercent": 94.57699666666089,
+      "hitPercent": 39.7115,
+      "bonusTriggerPercent": 2.268,
+      "normalTriggers": 4159,
+      "superTriggers": 377,
+      "guardHits": 0
+    }
+  },
+  "seconds": 43.41912397
+}

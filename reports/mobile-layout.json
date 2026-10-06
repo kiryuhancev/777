@@ -16,13 +16,13 @@
       "width": 360,
       "height": 640,
       "size": 5,
-      "gridWidth": 311
+      "gridWidth": 316
     },
     {
       "width": 360,
       "height": 640,
       "size": 8,
-      "gridWidth": 308
+      "gridWidth": 316
     },
     {
       "width": 375,
@@ -100,13 +100,13 @@
       "width": 768,
       "height": 1024,
       "size": 5,
-      "gridWidth": 423
+      "gridWidth": 424
     },
     {
       "width": 768,
       "height": 1024,
       "size": 8,
-      "gridWidth": 438
+      "gridWidth": 433
     },
     {
       "width": 1024,
