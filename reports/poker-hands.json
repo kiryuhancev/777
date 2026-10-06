@@ -1,0 +1,9 @@
+{
+  "checks": [
+    "1280×900: 4 phases, guide state isolation, payouts, card groups, scroll, keyboard, full deal, CHANGE, FOLD",
+    "390×844: 4 phases, guide state isolation, payouts, card groups, scroll, keyboard, full deal, CHANGE, FOLD",
+    "320×640: 4 phases, guide state isolation, payouts, card groups, scroll, keyboard, full deal, CHANGE, FOLD",
+    "844×390: 4 phases, guide state isolation, payouts, card groups, scroll, keyboard, full deal, CHANGE, FOLD"
+  ],
+  "errors": []
+}

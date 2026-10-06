@@ -952,6 +952,35 @@ body.slot-active.bonus .field-shell{border-color:transparent;background:none;box
   body.slot-active .field-shell .pitch{top:62px}
 }
 
+
+.poker-hands-button{margin-left:auto;min-height:44px;padding:0 14px;border:1px solid #c8a85688;border-radius:10px;background:#211b16;color:#f6d581;font-family:inherit;font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer}
+body.poker-hands-open{overflow:hidden}
+.poker-hands-modal[hidden]{display:none}
+.poker-hands-modal{position:fixed;inset:0;z-index:1000;background:#000b;display:grid;place-items:center;padding:16px;backdrop-filter:blur(8px)}
+.poker-hands-dialog{width:min(660px,100%);max-height:calc(100dvh - 32px);display:flex;flex-direction:column;background:linear-gradient(145deg,#201f25,#101119);border:1px solid #b59856;border-radius:20px;box-shadow:0 24px 100px #000b;color:#eee;overflow:hidden}
+.poker-hands-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #b5985633;flex-shrink:0}
+.poker-hands-header h2{margin:0;font-size:20px;letter-spacing:2px;color:#f6d581}
+.poker-hands-close{width:44px;height:44px;border:1px solid #ffffff33;border-radius:12px;background:#ffffff0a;color:#fff;font-size:28px;cursor:pointer}
+.poker-hands-scroll{overflow:auto;overscroll-behavior:contain;padding:8px 18px 18px}
+.poker-hands-note{font-size:12px;line-height:1.6;color:#bdb8ac;margin:8px 0 14px}
+.poker-hand-row{margin-bottom:8px;border:1px solid #ffffff14;border-radius:13px;background:#ffffff03;overflow:hidden}
+.poker-hand-trigger{display:block;width:100%;padding:12px 14px;background:transparent;border:0;color:inherit;text-align:left;cursor:pointer}
+.poker-hand-heading{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:15px;font-weight:700}
+.poker-hand-number{color:#938976;font-size:11px;min-width:18px}
+.poker-hand-payout{margin-left:auto;color:#f5d17b;font-size:16px}
+.poker-hand-cards{display:flex;gap:8px;padding:3px 0 8px}
+.poker-hand-cards .playing-card{display:block;flex:0 0 auto;width:58px;height:80px;border-radius:8px;box-shadow:none}
+.poker-hand-cards .corner{font-size:14px;left:5px;top:4px}.poker-hand-cards .corner.bottom{left:auto;top:auto;right:5px;bottom:4px}.poker-hand-cards .pip{font-size:25px}
+.poker-hand-cards .hand-primary{border:2px solid #e5bc5b;box-shadow:0 0 12px #ecc56866;background:linear-gradient(#fffced,#f7e6ba)}
+.poker-hand-cards .hand-secondary{border:2px solid #6ec3ef;box-shadow:0 0 10px #56b5e944;background:linear-gradient(#f3fcff,#d1e8f3)}
+.poker-hand-cards .hand-kicker{filter:saturate(.35);opacity:.6}
+.poker-hand-structure{display:block;color:#ccb77f;font-size:12px;line-height:1.5}.poker-hand-structure em{color:#83ccec;font-style:normal}
+.poker-hand-description{margin:0;padding:0 14px 14px;font-size:13px;line-height:1.6;color:#d4d3d9}
+.poker-hand-row:has([aria-expanded="true"]){border-color:#c6a45a88;background:#c6a45a09}
+.poker-hand-trigger:hover{background:#f2d27e09}
+.poker-hand-trigger:focus-visible,.poker-hands-close:focus-visible,.poker-hands-button:focus-visible{outline:2px solid #8bceff;outline-offset:-3px}
+.poker-actions [hidden]{display:none}
+@media(max-width:480px){.poker-hands-modal{padding:8px}.poker-hands-dialog{max-height:calc(100dvh - 16px);border-radius:16px}.poker-hands-scroll{padding:8px 10px 12px}.poker-hand-trigger{padding:12px 10px}.poker-hand-cards{gap:6px}.poker-hand-cards .playing-card{width:46px;height:66px}.poker-hand-cards .corner{font-size:12px}.poker-hand-cards .pip{font-size:22px}.poker-hand-heading{font-size:14px}.poker-hands-header{padding:10px 14px}}
 </style>
 </head>
 <body class="lobby-mode">
@@ -1161,7 +1190,7 @@ body.slot-active.bonus .field-shell{border-color:transparent;background:none;box
           </section>
 
           <section>
-            <div class="zone-label"><span>Игрок</span><small id="playerHandName">—</small></div>
+            <div class="zone-label"><span>Игрок</span><small id="playerHandName">—</small><button class="poker-hands-button" id="pokerHandsBtn" aria-haspopup="dialog" aria-controls="pokerHandsModal">HANDS</button></div>
             <div class="card-row" id="playerCards"></div>
           </section>
         </div>
@@ -1173,10 +1202,10 @@ body.slot-active.bonus .field-shell{border-color:transparent;background:none;box
         </div>
 
         <div class="poker-actions">
-          <button class="btn secondary" id="pokerFoldBtn">СБРОСИТЬ</button>
-          <button class="btn secondary" id="pokerDealBtn">РАЗДАТЬ НА СТОЛ</button>
-          <button class="btn buy" id="tacticalBtn">ТАКТИЧЕСКОЕ ДЕЙСТВИЕ · 1</button>
-          <button class="btn secondary" id="peekDealerBtn">ПОДСМОТРЕТЬ КАРТУ</button>
+          <button class="btn secondary" id="pokerFoldBtn">FOLD</button>
+
+          <button class="btn buy" id="tacticalBtn">CHANGE · 1</button>
+
         </div>
       </main>
 
@@ -1256,6 +1285,12 @@ body.slot-active.bonus .field-shell{border-color:transparent;background:none;box
   </div>
 </div>
 
+<div class="poker-hands-modal" id="pokerHandsModal" hidden>
+  <section class="poker-hands-dialog" role="dialog" aria-modal="true" aria-labelledby="pokerHandsTitle">
+    <header class="poker-hands-header"><h2 id="pokerHandsTitle">POKER HANDS</h2><button class="poker-hands-close" id="pokerHandsClose" aria-label="Закрыть справочник">×</button></header>
+    <div class="poker-hands-scroll"><p class="poker-hands-note">От сильнейшей к слабейшей. Золото выделяет основу комбинации, голубой — вторую группу, приглушённые карты — дополнительные. Нажми на руку, чтобы узнать подробнее.<br>Коэффициент — полная выплата от ставки при победе над дилером. При ничьей ставка возвращается. Royal Flush оплачивается как Straight Flush.</p><div id="pokerHandsList"></div></div>
+  </section>
+</div>
 <div class="topup-modal" id="tacticalModal" aria-hidden="true">
   <div class="topup-card">
     <button class="topup-close" id="tacticalClose" aria-label="Закрыть">×</button>
@@ -2185,12 +2220,12 @@ function openTactical(){
   if(pokerState.tacticalUsed || pokerState.phase==='idle' || pokerState.phase==='draft' || pokerState.phase==='finished')return;
   if(pokerState.community.length>=5)return;
   const m=el('tacticalModal');
-  m.classList.add('open');
+  m.classList.add('show');
   m.setAttribute('aria-hidden','false');
 }
 function closeTactical(){
   const m=el('tacticalModal');
-  m.classList.remove('open');
+  m.classList.remove('show');
   m.setAttribute('aria-hidden','true');
 }
 function useTacticalReplaceOwn(index){
@@ -2269,6 +2304,55 @@ async function showdownPoker(){
   sound(cmp>0?860:320,.18,cmp>0?'triangle':'sine',.04);
   updatePokerUI();
 }
+
+// Read-only examples: no deck draws or gameplay state changes.
+const POKER_HAND_INFO = [
+ ['royal','Royal Flush',8,['10♠','J♠','Q♠','K♠','A♠'],'11111','5 старших карт одной масти','Десятка, валет, дама, король и туз одной масти. Самая сильная рука.'],
+ ['straight-flush','Straight Flush',8,['5♥','6♥','7♥','8♥','9♥'],'11111','5 подряд · одна масть','Пять карт подряд одной масти.'],
+ ['quads','Four of a Kind',7,['Q♠','Q♥','Q♦','Q♣','7♠'],'11110','4 одинаковые + 1 дополнительная','Четыре карты одного достоинства. Пятая карта помогает решить ничью.'],
+ ['full-house','Full House',6,['J♠','J♥','J♦','4♣','4♠'],'11122','3 одинаковые + <em>2 одинаковые</em>','Три карты одного достоинства и две другого. Сначала сравниваются тройки, затем пары.'],
+ ['flush','Flush',5,['2♦','5♦','8♦','J♦','K♦'],'11111','5 карт одной масти','Пять карт одной масти, не обязательно подряд. При равенстве сравниваются старшие карты.'],
+ ['straight','Straight',4,['5♣','6♦','7♠','8♥','9♣'],'11111','5 карт подряд','Пять карт подряд разных мастей. Туз может быть старшим или младшим в A–2–3–4–5.'],
+ ['trips','Three of a Kind',3,['8♠','8♥','8♦','K♣','3♠'],'11100','3 одинаковые + 2 дополнительные','Три карты одного достоинства. Остальные две — дополнительные карты.'],
+ ['two-pair','Two Pair',2,['A♠','A♥','7♦','7♣','3♠'],'11220','2 одинаковые + <em>2 одинаковые</em> + 1','Две разные пары. Сравниваются старшая пара, младшая пара, затем пятая карта.'],
+ ['pair','One Pair',1,['K♠','K♥','9♦','5♣','2♠'],'11000','2 одинаковые + 3 дополнительные','Две карты одного достоинства. При одинаковой паре сравниваются остальные карты.'],
+ ['high','High Card',0,['A♠','J♥','8♦','5♣','2♠'],'10000','1 старшая карта + 4 дополнительные','Когда других комбинаций нет, побеждает старшая карта. При равенстве сравниваются следующие.']
+].map(([id,name,cat,cards,groups,structure,description])=>({id,name,cat,cards,groups,structure,description}));
+let pokerHandsReturnFocus=null;
+function setPokerHandDescription(id){
+ document.querySelectorAll('.poker-hand-trigger').forEach(btn=>{const active=btn.dataset.hand===id;btn.setAttribute('aria-expanded',String(active));document.getElementById(btn.getAttribute('aria-controls')).hidden=!active;});
+}
+function openPokerHands(){
+ pokerHandsReturnFocus=document.activeElement;
+ el('pokerHandsList').innerHTML=POKER_HAND_INFO.map((hand,index)=>{
+  const cards=hand.cards.map((text,i)=>{
+   const suit=text.slice(-1),label=text.slice(0,-1),rank=RANKS.find(r=>r[1]===label)[0];
+   const card={rank,label,suit,color:(suit==='♥'||suit==='♦')?'red':'black'};
+   return renderPlayingCard(card).replace(/<div/g,'<span').replace(/<\/div>/g,'</span>').replace('playing-card',`playing-card ${hand.groups[i]==='1'?'hand-primary':hand.groups[i]==='2'?'hand-secondary':'hand-kicker'}`);
+  }).join('');
+  return `<article class="poker-hand-row"><button class="poker-hand-trigger" data-hand="${hand.id}" aria-expanded="false" aria-controls="hand-desc-${hand.id}"><span class="poker-hand-heading"><span class="poker-hand-number">${String(index+1).padStart(2,'0')}</span>${hand.name}<span class="poker-hand-payout">×${POKER_PAYOUTS[hand.cat]}</span></span><span class="poker-hand-cards" aria-label="${hand.cards.join(' ')}">${cards}</span><span class="poker-hand-structure">${hand.structure}</span></button><p class="poker-hand-description" id="hand-desc-${hand.id}" hidden>${hand.description}</p></article>`;
+ }).join('');
+ let pinnedHand=null,hoverTimer=null;
+ document.querySelectorAll('.poker-hand-trigger').forEach(btn=>{
+  btn.onclick=()=>{clearTimeout(hoverTimer);pinnedHand=pinnedHand===btn.dataset.hand?null:btn.dataset.hand;setPokerHandDescription(pinnedHand);};
+  btn.onpointerenter=()=>{if(!pinnedHand&&matchMedia('(hover:hover)').matches)hoverTimer=setTimeout(()=>setPokerHandDescription(btn.dataset.hand),400);};
+  btn.onpointerleave=()=>clearTimeout(hoverTimer);
+  btn.onfocus=()=>{if(btn.matches(':focus-visible'))setPokerHandDescription(btn.dataset.hand);};
+ });
+ el('pokerHandsModal').hidden=false;document.body.classList.add('poker-hands-open');el('pokerHandsClose').focus();
+}
+function closePokerHands(){el('pokerHandsModal').hidden=true;document.body.classList.remove('poker-hands-open');pokerHandsReturnFocus?.focus();}
+el('pokerHandsBtn').onclick=openPokerHands;
+el('pokerHandsClose').onclick=closePokerHands;
+el('pokerHandsModal').onclick=e=>{if(e.target===el('pokerHandsModal'))closePokerHands();};
+el('pokerHandsModal').addEventListener('keydown',e=>{
+ if(e.key==='Escape'){e.preventDefault();closePokerHands();}
+ if(e.key==='Tab'){
+  const items=[el('pokerHandsClose'),...document.querySelectorAll('.poker-hand-trigger')],first=items[0],last=items[items.length-1];
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+ }
+});
+
 function nextPokerActionLabel(){
   if(pokerState.community.length===0) return 'РАЗДАТЬ ФЛОП';
   if(pokerState.community.length===3) return 'РАЗДАТЬ ТЁРН';
@@ -2315,17 +2399,16 @@ function updatePokerUI(){
   });
   el('choiceHint').textContent = draftActive ? `Выбор ${pokerState.player.length+1}-й закрытой карты` : (pokerState.resolved ? 'Раздача завершена' : 'На этом этапе скрытых карт нет');
 
-  el('pokerStartBtn').textContent = pokerState.phase==='idle' || pokerState.resolved ? 'НОВАЯ РАЗДАЧА' : 'ПЕРЕРАЗДАТЬ';
-  if(el('tacticalBtn')) el('tacticalBtn').textContent=pokerState.tacticalUsed?'ТАКТИЧЕСКОЕ ДЕЙСТВИЕ · ИСПОЛЬЗОВАНО':'ТАКТИЧЕСКОЕ ДЕЙСТВИЕ · 1';
-  el('pokerStartBtn').disabled = state.balance < pokerBet() && (pokerState.phase==='idle' || pokerState.resolved);
-
   const actionLive = pokerState.phase==='actions' && !pokerState.resolved;
+  const ready = pokerState.phase==='idle' || pokerState.resolved;
+  el('pokerStartBtn').textContent = ready ? 'DEAL · НОВАЯ РАЗДАЧА' : pokerState.phase==='draft' ? 'ВЫБЕРИ КАРТУ' : pokerState.community.length===0 ? 'PLAY · ФЛОП' : pokerState.community.length===3 ? 'PLAY · ТЁРН' : pokerState.community.length===4 ? 'SHOWDOWN' : 'ВСКРЫТИЕ…';
+  el('pokerStartBtn').disabled = ready ? state.balance < pokerBet() : !actionLive || pokerState.community.length>=5;
+  el('pokerFoldBtn').hidden = !actionLive || pokerState.community.length>=5;
   el('pokerFoldBtn').disabled = !actionLive || pokerState.community.length>=5;
   const tacticalLive = actionLive && !pokerState.tacticalUsed && pokerState.community.length<5;
+  el('tacticalBtn').hidden = !actionLive || pokerState.community.length>=5;
   el('tacticalBtn').disabled = !tacticalLive;
-  el('peekDealerBtn').disabled = !tacticalLive;
-  el('pokerDealBtn').disabled = !actionLive || pokerState.community.length>=5;
-  el('pokerDealBtn').textContent = nextPokerActionLabel();
+  el('tacticalBtn').textContent = pokerState.tacticalUsed ? 'CHANGE · ИСПОЛЬЗОВАНО' : 'CHANGE · 1';
 
   el('pokerBetMinus').disabled = !(pokerState.phase==='idle' || pokerState.resolved);
   el('pokerBetPlus').disabled = !(pokerState.phase==='idle' || pokerState.resolved);
@@ -3391,18 +3474,18 @@ el('backLobby').onclick=openLobby;
 el('backLobbyPoker').onclick=openLobby;
 
 
-el('pokerStartBtn').onclick=()=>{ if(pokerState.phase==='idle' || pokerState.resolved) startPokerRound(); else startPokerRound(); };
+el('pokerStartBtn').onclick=()=>{ if(pokerState.phase==='idle' || pokerState.resolved) startPokerRound(); else if(pokerState.phase==='actions') dealCommunity(); };
 el('choice0').onclick=()=>chooseDraftCard(0);
 el('choice1').onclick=()=>chooseDraftCard(1);
 el('pokerFoldBtn').onclick=foldPoker;
 el('tacticalBtn').onclick=openTactical;
-el('peekDealerBtn').onclick=useTacticalPeek;
+
 el('tacticalClose').onclick=closeTactical;
 el('replaceOwn1').onclick=()=>useTacticalReplaceOwn(0);
 el('replaceOwn2').onclick=()=>useTacticalReplaceOwn(1);
 el('replaceDealerOpen').onclick=useTacticalReplaceDealerOpen;
 el('peekHidden').onclick=useTacticalPeek;
-el('pokerDealBtn').onclick=dealCommunity;
+
 el('pokerBetMinus').onclick=()=>{ if(pokerState.phase==='idle' || pokerState.resolved){ pokerState.betIndex=Math.max(0,pokerState.betIndex-1); updatePokerUI(); } };
 el('pokerBetPlus').onclick=()=>{ if(pokerState.phase==='idle' || pokerState.resolved){ pokerState.betIndex=Math.min(BETS.length-1,pokerState.betIndex+1); updatePokerUI(); } };
 el('pokerMaxBet').onclick=()=>{ if(pokerState.phase==='idle' || pokerState.resolved){ pokerState.betIndex=BETS.length-1; updatePokerUI(); } };
