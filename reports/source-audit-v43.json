@@ -1,0 +1,10 @@
+{
+  "embeddedImageOccurrences": 23,
+  "allEmbeddedAssetsByteIdentical": true,
+  "unchangedGameSections": {
+    "poker": true,
+    "bird": true
+  },
+  "sourceSha256": "f47d2aadde8faf6fab229bf66cf7dd214297bc9bb4cab2a5ab1d399bc34e53a1",
+  "resultSha256": "cef32053d10cd25e65d1a401ceba863e6a2880822c28faa33a7a1a5e143d209e"
+}

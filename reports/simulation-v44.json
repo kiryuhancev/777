@@ -1,0 +1,180 @@
+{
+  "version": "v44",
+  "seed": 77743,
+  "htmlSha256": "009671cee5662b2f948822e822d43af2ed6d9989e6981a62b549fff82263982a",
+  "configuration": {
+    "version": "v44",
+    "maxCascadesNormal": 256,
+    "maxCascadesBonus": 1024,
+    "maxFreeSpins": 65536,
+    "base": {
+      "affinity": 0.13,
+      "refillAffinity": 0.015,
+      "scatterRate": 0.02,
+      "boostScatterRate": 0.0265,
+      "wildRates": [
+        0.006,
+        0.0022,
+        0.0012,
+        0.0004
+      ],
+      "weights": [
+        24,
+        20,
+        16,
+        12,
+        10,
+        8,
+        5,
+        3,
+        2
+      ]
+    },
+    "normal": {
+      "affinity": 0.548,
+      "refillAffinity": 0.025,
+      "scatterCounts": [
+        0.9,
+        0.09,
+        0.009,
+        0.001
+      ],
+      "wildRates": [
+        0.0008,
+        0.00035,
+        0.00015,
+        0.00005
+      ],
+      "weights": [
+        24,
+        20,
+        16,
+        12,
+        10,
+        8,
+        5,
+        3,
+        2
+      ]
+    },
+    "super": {
+      "affinity": 0.537,
+      "refillAffinity": 0.025,
+      "scatterCounts": [
+        0.9,
+        0.09,
+        0.009,
+        0.001
+      ],
+      "wildRates": [
+        0.0008,
+        0.00035,
+        0.00015,
+        0.00005
+      ],
+      "weights": [
+        24,
+        20,
+        16,
+        12,
+        10,
+        8,
+        5,
+        3,
+        2
+      ]
+    },
+    "nearWildFactor": 0.02
+  },
+  "checks": {
+    "normal": {
+      "version": "v44",
+      "type": "normal",
+      "count": 100000,
+      "seed": 77743,
+      "buyCostX": 40,
+      "meanX": 38.464000299999995,
+      "medianX": 32.56,
+      "buyRtpPercent": 96.16000074999998,
+      "recoupPercent": 29.942999999999998,
+      "p90X": 59.96000000000001,
+      "p95X": 76.565,
+      "p99X": 132.405,
+      "maxX": 1233.9550000000002,
+      "meanFreeSpins": 8.2181,
+      "meanCascades": 11.73531,
+      "meanClusters": 17.58962,
+      "mean95CI": [
+        38.31457372710055,
+        38.61342687289944
+      ],
+      "thresholdProbabilities": {
+        "100x": 0.02361,
+        "500x": 0.00006,
+        "1000x": 0.00001,
+        "5000x": 0,
+        "10000x": 0,
+        "50000x": 0
+      },
+      "guardHits": 0,
+      "unfinished": 0
+    },
+    "super": {
+      "version": "v44",
+      "type": "super",
+      "count": 100000,
+      "seed": 77743,
+      "buyCostX": 65,
+      "meanX": 62.05738529999855,
+      "medianX": 50.779999999999994,
+      "buyRtpPercent": 95.47290046153624,
+      "recoupPercent": 28.193,
+      "p90X": 99.06499999999998,
+      "p95X": 130.04999999999998,
+      "p99X": 228.82500000000002,
+      "maxX": 1543.6100000000001,
+      "meanFreeSpins": 12.50931,
+      "meanCascades": 18.17444,
+      "meanClusters": 27.54062,
+      "mean95CI": [
+        61.80060442563471,
+        62.31416617436239
+      ],
+      "thresholdProbabilities": {
+        "100x": 0.0978,
+        "500x": 0.00071,
+        "1000x": 0.00003,
+        "5000x": 0,
+        "10000x": 0,
+        "50000x": 0
+      },
+      "guardHits": 0,
+      "unfinished": 0
+    },
+    "base": {
+      "count": 200000,
+      "seed": 77743,
+      "boost": false,
+      "baseMeanX": 0.5204225499999111,
+      "totalRtpPercent": 95.83766749999107,
+      "hitPercent": 41.475,
+      "bonusTriggerPercent": 1.1055000000000001,
+      "normalTriggers": 2086,
+      "superTriggers": 125,
+      "guardHits": 0
+    },
+    "baseBoost": {
+      "count": 200000,
+      "seed": 77743,
+      "boost": true,
+      "baseMeanX": 0.5064975499999169,
+      "totalRtpPercent": 92.04561499999436,
+      "hitPercent": 40.671,
+      "bonusTriggerPercent": 2.2009999999999996,
+      "normalTriggers": 4088,
+      "superTriggers": 314,
+      "guardHits": 0
+    }
+  },
+  "seconds": 47.87429659
+}

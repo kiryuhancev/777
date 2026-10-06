@@ -1,0 +1,40 @@
+{
+  "checks": [
+    "offline inline script, embedded images, lobby and 25-cell grid",
+    "real animated base spin, normal Wild never sticky",
+    "Super purchase cost, rules modal, first automatic FS after one second",
+    "complete Bonus and Super: live/simulator parity, 5x5 reset",
+    "Poker Duel draft and Bird Siege startup"
+  ],
+  "pageErrors": [],
+  "externalRequests": [],
+  "firstFreeSpinDelayMs": 1182.8999999999069,
+  "parity": {
+    "sessions": [
+      {
+        "type": "normal",
+        "x": 26.880000000000003,
+        "spins": 8,
+        "cascades": 11
+      },
+      {
+        "type": "super",
+        "x": 52.995000000000005,
+        "spins": 12,
+        "cascades": 17
+      }
+    ],
+    "paytableFixtures": [
+      {
+        "large": false,
+        "firstCascadeX": 0.4,
+        "totalX": 0.4
+      },
+      {
+        "large": true,
+        "firstCascadeX": 81.25,
+        "totalX": 81.25
+      }
+    ]
+  }
+}

@@ -1,0 +1,256 @@
+{
+  "version": "v43",
+  "seed": 77743,
+  "configuration": {
+    "version": "v43",
+    "maxCascadesNormal": 256,
+    "maxCascadesBonus": 1024,
+    "maxFreeSpins": 65536,
+    "bonusMinClusterX": 1,
+    "bonusMaxClusterX": 50,
+    "rareSuperProbability": 1e-05,
+    "base": {
+      "affinity": 0.13,
+      "refillAffinity": 0.015,
+      "scatterRate": 0.02,
+      "boostScatterRate": 0.0265,
+      "wildRates": [
+        0.006,
+        0.0022,
+        0.0012,
+        0.0004
+      ],
+      "weights": [
+        24,
+        20,
+        16,
+        12,
+        10,
+        8,
+        5,
+        3,
+        2
+      ]
+    },
+    "normal": {
+      "affinity": 0.531,
+      "refillAffinity": 0.025,
+      "scatterCounts": [
+        0.9,
+        0.09,
+        0.009,
+        0.001
+      ],
+      "wildRates": [
+        0.0008,
+        0.00035,
+        0.00015,
+        5e-05
+      ],
+      "weights": [
+        24,
+        20,
+        16,
+        12,
+        10,
+        8,
+        5,
+        3,
+        2
+      ]
+    },
+    "super": {
+      "affinity": 0.527,
+      "refillAffinity": 0.025,
+      "scatterCounts": [
+        0.9,
+        0.09,
+        0.009,
+        0.001
+      ],
+      "wildRates": [
+        0.0008,
+        0.00035,
+        0.00015,
+        5e-05
+      ],
+      "weights": [
+        24,
+        20,
+        16,
+        12,
+        10,
+        8,
+        5,
+        3,
+        2
+      ]
+    },
+    "rare": {
+      "affinity": 0.48,
+      "refillAffinity": 0.06,
+      "scatterCounts": [
+        0.1,
+        0.82,
+        0.08
+      ],
+      "wildRates": [
+        0.004,
+        0.002,
+        0.001,
+        0.0005
+      ],
+      "weights": [
+        4,
+        6,
+        8,
+        10,
+        12,
+        14,
+        14,
+        15,
+        17
+      ]
+    },
+    "maxPersistentWilds": 6,
+    "nearWildFactor": 0.02
+  },
+  "checks": {
+    "normal": {
+      "version": "v43",
+      "type": "normal",
+      "count": 100000,
+      "seed": 77743,
+      "forcedRare": false,
+      "rareDisabled": false,
+      "buyCostX": 40,
+      "meanX": 38.25926989999962,
+      "medianX": 33.14,
+      "buyRtpPercent": 95.64817474999906,
+      "recoupPercent": 30.166999999999998,
+      "p90X": 58.650000000000006,
+      "p95X": 73.855,
+      "p99X": 120.76000000000002,
+      "maxX": 501.17,
+      "meanFreeSpins": 8.21327,
+      "meanCascades": 11.5826,
+      "meanClusters": 17.17405,
+      "mean95CI": [
+        38.13334821182452,
+        38.38519158817473
+      ],
+      "rareSessions": 0,
+      "thresholdProbabilities": {
+        "100x": 0.01907,
+        "500x": 1e-05,
+        "1000x": 0,
+        "5000x": 0,
+        "10000x": 0,
+        "50000x": 0
+      },
+      "guardHits": 0,
+      "unfinished": 0
+    },
+    "super": {
+      "version": "v43",
+      "type": "super",
+      "count": 100000,
+      "seed": 77743,
+      "forcedRare": false,
+      "rareDisabled": false,
+      "buyCostX": 65,
+      "meanX": 63.20462875000144,
+      "medianX": 52.955,
+      "buyRtpPercent": 97.2378903846176,
+      "recoupPercent": 30.525000000000002,
+      "p90X": 98.88,
+      "p95X": 127.42999999999998,
+      "p99X": 208.64,
+      "maxX": 794.93,
+      "meanFreeSpins": 12.50469,
+      "meanCascades": 18.05207,
+      "meanClusters": 27.1448,
+      "mean95CI": [
+        62.979227030875805,
+        63.430030469127075
+      ],
+      "rareSessions": 0,
+      "thresholdProbabilities": {
+        "100x": 0.09726,
+        "500x": 0.00025,
+        "1000x": 0,
+        "5000x": 0,
+        "10000x": 0,
+        "50000x": 0
+      },
+      "guardHits": 0,
+      "unfinished": 0
+    },
+    "base": {
+      "count": 200000,
+      "seed": 77743,
+      "boost": false,
+      "baseMeanX": 0.5215589499999074,
+      "totalRtpPercent": 97.27513999999067,
+      "hitPercent": 41.5925,
+      "bonusTriggerPercent": 1.1125,
+      "normalTriggers": 2087,
+      "superTriggers": 138,
+      "guardHits": 0
+    },
+    "baseBoost": {
+      "count": 200000,
+      "seed": 77743,
+      "boost": true,
+      "baseMeanX": 0.5076137749999137,
+      "totalRtpPercent": 94.69531499999428,
+      "hitPercent": 40.796,
+      "bonusTriggerPercent": 2.2560000000000002,
+      "normalTriggers": 4148,
+      "superTriggers": 364,
+      "guardHits": 0
+    },
+    "rareConditional": {
+      "version": "v43",
+      "type": "super",
+      "count": 2000,
+      "seed": 77743,
+      "forcedRare": true,
+      "rareDisabled": false,
+      "buyCostX": 65,
+      "meanX": 42180.0696074999,
+      "medianX": 27388.23499999999,
+      "buyRtpPercent": 64892.41478076908,
+      "recoupPercent": 100,
+      "p90X": 90100.37500000006,
+      "p95X": 123126.29000000004,
+      "p99X": 224703.71500000055,
+      "maxX": 554860.7849999983,
+      "meanFreeSpins": 502.5015,
+      "meanCascades": 1475.2965,
+      "meanClusters": 3882.4865,
+      "mean95CI": [
+        40138.69184068111,
+        44221.44737431869
+      ],
+      "rareSessions": 2000,
+      "thresholdProbabilities": {
+        "100x": 1,
+        "500x": 1,
+        "1000x": 1,
+        "5000x": 0.9695,
+        "10000x": 0.8685,
+        "50000x": 0.2615
+      },
+      "guardHits": 0,
+      "unfinished": 0
+    }
+  },
+  "estimatedRareContribution50k": 2.6150000000000004e-06,
+  "seconds": 126.50232074,
+  "htmlSha256AtSimulationStart": "125a47c25965fe87c07aa05e27f520677b2ee1ebb1d5670fa7601661680b9395",
+  "mathSha256": "efcf9b9814f30b18f34a6fd7c2df3e6160011920d0d1d67b7adc80eb445188de",
+  "finalHtmlSha256": "cef32053d10cd25e65d1a401ceba863e6a2880822c28faa33a7a1a5e143d209e",
+  "postSimulationChange": "Only UI error recovery for bonus purchases; mathematical core and CONFIG unchanged. Final browser checks and syntax check repeated.",
+  "rareFrequencyNote": "rareConditional is a forced-profile sample, NOT 2000 naturally occurring Super Bonuses. The estimate describes only the rare-profile contribution to >=50000x, not a verified unconditional rate."
+}

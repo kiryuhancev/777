@@ -1,0 +1,10 @@
+{
+  "version": "v44",
+  "embeddedImageOccurrences": 23,
+  "allEmbeddedAssetsByteIdentical": true,
+  "unchangedGameSections": {
+    "poker": true,
+    "bird": true
+  },
+  "resultSha256": "009671cee5662b2f948822e822d43af2ed6d9989e6981a62b549fff82263982a"
+}
