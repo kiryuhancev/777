@@ -1,0 +1,144 @@
+{
+  "viewports": [
+    {
+      "width": 320,
+      "height": 568,
+      "size": 5,
+      "gridWidth": 256
+    },
+    {
+      "width": 320,
+      "height": 568,
+      "size": 8,
+      "gridWidth": 260
+    },
+    {
+      "width": 360,
+      "height": 640,
+      "size": 5,
+      "gridWidth": 311
+    },
+    {
+      "width": 360,
+      "height": 640,
+      "size": 8,
+      "gridWidth": 308
+    },
+    {
+      "width": 375,
+      "height": 812,
+      "size": 5,
+      "gridWidth": 331
+    },
+    {
+      "width": 375,
+      "height": 812,
+      "size": 8,
+      "gridWidth": 324
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "size": 5,
+      "gridWidth": 346
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "size": 8,
+      "gridWidth": 340
+    },
+    {
+      "width": 430,
+      "height": 932,
+      "size": 5,
+      "gridWidth": 386
+    },
+    {
+      "width": 430,
+      "height": 932,
+      "size": 8,
+      "gridWidth": 380
+    },
+    {
+      "width": 568,
+      "height": 320,
+      "size": 5,
+      "gridWidth": 147
+    },
+    {
+      "width": 568,
+      "height": 320,
+      "size": 8,
+      "gridWidth": 109
+    },
+    {
+      "width": 667,
+      "height": 375,
+      "size": 5,
+      "gridWidth": 207
+    },
+    {
+      "width": 667,
+      "height": 375,
+      "size": 8,
+      "gridWidth": 165
+    },
+    {
+      "width": 852,
+      "height": 393,
+      "size": 5,
+      "gridWidth": 222
+    },
+    {
+      "width": 852,
+      "height": 393,
+      "size": 8,
+      "gridWidth": 189
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "size": 5,
+      "gridWidth": 423
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "size": 8,
+      "gridWidth": 438
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "size": 5,
+      "gridWidth": 283
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "size": 8,
+      "gridWidth": 281
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "size": 5,
+      "gridWidth": 438
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "size": 8,
+      "gridWidth": 457
+    }
+  ],
+  "pageErrors": [],
+  "touchChecks": [
+    "settings",
+    "autoplay menu",
+    "rules disclosure",
+    "bonus shop",
+    "real spin"
+  ]
+}

@@ -55,3 +55,10 @@ python3 tools/browser-check.py
 В консоли браузера: `runBonusSimulation(100000, "super", {seed: 77743})`. Поддерживаются 10 000, 100 000 и 1 000 000 сессий; большие синхронные выборки занимают время и могут временно блокировать вкладку.
 
 Вероятности собраны в `SLOT_MATH.CONFIG`, цены символов в `SYMBOLS`; после их изменения повторяйте симуляцию. `DEBUG=false` по умолчанию.
+
+Mobile layout update: tested 11 portrait, landscape, tablet and desktop viewports,
+with both 5×5 and 8×8 fields. `mobile-layout.json` records overflow, field geometry,
+touch control sizes and actual settings, autoplay, rules, bonus shop and spin checks.
+Run `python3 tools/mobile-check.py` with Playwright and Chromium installed.
+Slot mathematics and embedded images are unchanged from v44; earlier simulation
+checksums identify the HTML used for those historical runs.
