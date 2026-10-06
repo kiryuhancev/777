@@ -1,0 +1,36 @@
+{
+  "checks": [
+    "off-centre hit rotates light board; bird remains dynamic after impact",
+    "same-size stone moves less than light wood and removes more forward bird velocity",
+    "density scales mass with area; rectangle inertia follows physical formula",
+    "stable tower sleeps; removing a support wakes it and tumbles the pig",
+    "tangential bird/pig contact generates translation and angular motion",
+    "bird rebounds from a wall and damages a second pig through another actual contact",
+    "falling stone beam delivers lethal impulse without a bird",
+    "rotated rectangle contacts exchange momentum and angular impulse",
+    "bird bounces repeatedly on ground, then the contact island sleeps",
+    "fast bird cannot tunnel through a thin rotated plank",
+    "all body shapes stay above the ground and settle without energy growth"
+  ],
+  "metrics": {
+    "light": {
+      "speed": 423.2869899559284,
+      "omega": 7.091222554623063,
+      "birdSpeed": 292.67248864441217
+    },
+    "stone": {
+      "speed": 125.32489147972875,
+      "omega": 2.7452852283650935,
+      "birdVx": -105.50988875756143
+    },
+    "collapse": {
+      "pigY": 494.1266346390416,
+      "pigAngle": -3.445045773917926,
+      "damage": 375.03517808588526
+    },
+    "secondContactImpulse": 416.00879684501973,
+    "pigHpAfterStone": -245.9616459860266,
+    "groundBounces": 3,
+    "restingBodies": 3
+  }
+}

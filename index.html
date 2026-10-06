@@ -2804,254 +2804,420 @@ const PIG_TYPES=[
   {id:'gold',hp:80,mult:2,r:15,color:'#ddbd3c'},
   {id:'royal',hp:145,mult:3,r:21,color:'#8bc455'}
 ];
+// BIRD RIGID BODY ENGINE — standalone, shared by the game and physics tests.
+const BIRD_PHYSICS=(()=>{
+  const SETTINGS=Object.freeze({DT:1/120,GRAVITY:1152,MAX_FRAME_DELTA:.10,
+    SOLVER_ITERATIONS:16,POSITION_ITERATIONS:4,MAX_SUBSTEPS:24,MAX_TRAVEL:4,MAX_LINEAR_SPEED:4000,MAX_ANGULAR_SPEED:40,
+    RESTITUTION_SPEED:45,SLOP:.12,SLEEP_SPEED:5,SLEEP_ANGULAR_SPEED:.08,SLEEP_TIME:.65,
+    BIRD_SLEEP_SPEED:7,BIRD_SLEEP_ANGULAR_SPEED:.12,BIRD_SLEEP_TIME:.8,BIRD_MAX_LIFETIME:18,
+    PIG_DAMAGE_THRESHOLD:95,PIG_FALL_DAMAGE_THRESHOLD:200,PIG_DAMAGE_SCALE:.22,
+    BLOCK_DAMAGE_THRESHOLD:120,BLOCK_DAMAGE_SCALE:.12,IMPACT_COOLDOWN:.12,GROUND_Y:510});
+  const MATERIALS=Object.freeze({
+    lightWood:{density:.001,friction:.55,restitution:.10,rollingFriction:.035,linearDamping:.08,angularDamping:.14,hp:48,color:'#c99056'},
+    wood:{density:.002,friction:.65,restitution:.07,rollingFriction:.035,linearDamping:.08,angularDamping:.14,hp:65,color:'#b67a43'},
+    heavyWood:{density:.004,friction:.72,restitution:.04,rollingFriction:.035,linearDamping:.08,angularDamping:.14,hp:100,color:'#825532'},
+    stone:{density:.0065,friction:.82,restitution:.025,rollingFriction:.035,linearDamping:.06,angularDamping:.12,hp:120,color:'#89929a'},
+    glass:{density:.0014,friction:.4,restitution:.12,rollingFriction:.035,linearDamping:.06,angularDamping:.12,hp:35,color:'#74d5da'},
+    bird:{density:.003,friction:.65,restitution:.42,rollingFriction:.025,linearDamping:.04,angularDamping:.12},
+    pig:{density:.0035,friction:.75,restitution:.09,rollingFriction:.04,linearDamping:.07,angularDamping:.18},
+    ground:{density:0,friction:.85,restitution:.04,rollingFriction:.04,linearDamping:0,angularDamping:0}
+  });
+  let nextId=1;
+  const dot=(a,b)=>a.x*b.x+a.y*b.y,cross=(a,b)=>a.x*b.y-a.y*b.x;
+  const vec=(x,y)=>({x,y}),sub=(a,b)=>vec(a.x-b.x,a.y-b.y);
+  function massProperties(b){
+    b.mass=b.density*(b.shape==='circle'?Math.PI*b.r*b.r:b.w*b.h);
+    b.inertia=b.mass*(b.shape==='circle'?b.r*b.r/2:(b.w*b.w+b.h*b.h)/12);
+    b.invMass=b.static?0:1/b.mass;b.invInertia=b.static?0:1/b.inertia;
+  }
+  function createBody(options){
+    const mat=MATERIALS[options.material||'wood'];
+    const b={id:nextId++,shape:'rect',kind:'block',x:0,y:0,w:16,h:58,r:14,
+      vx:0,vy:0,angle:0,angularVelocity:0,alive:true,static:false,sleeping:false,sleepTime:0,age:0,
+      ...mat,...options};
+    massProperties(b);return b;
+  }
+  function wake(b){if(b.static)return;b.sleeping=false;b.sleepTime=0;}
+  function pointVelocity(b,p){return vec(b.vx-b.angularVelocity*(p.y-b.y),b.vy+b.angularVelocity*(p.x-b.x));}
+  function applyImpulse(b,impulse,point=b,awaken=true){
+    if(b.static)return;if(awaken)wake(b);
+    b.vx+=impulse.x*b.invMass;b.vy+=impulse.y*b.invMass;
+    b.angularVelocity+=cross(sub(point,b),impulse)*b.invInertia;
+  }
+  function axes(b){const c=Math.cos(b.angle),s=Math.sin(b.angle);return [vec(c,s),vec(-s,c)];}
+  function vertices(b){const [u,v]=axes(b);return [[-1,-1],[1,-1],[1,1],[-1,1]].map(([i,j])=>vec(b.x+i*u.x*b.w/2+j*v.x*b.h/2,b.y+i*u.y*b.w/2+j*v.y*b.h/2));}
+  function bounds(b){
+    if(b.shape==='circle')return {minX:b.x-b.r,maxX:b.x+b.r,minY:b.y-b.r,maxY:b.y+b.r};
+    const c=Math.abs(Math.cos(b.angle)),s=Math.abs(Math.sin(b.angle)),x=(c*b.w+s*b.h)/2,y=(s*b.w+c*b.h)/2;
+    return {minX:b.x-x,maxX:b.x+x,minY:b.y-y,maxY:b.y+y};
+  }
+  function circleCircle(a,b){
+    const d=sub(b,a),len=Math.hypot(d.x,d.y),depth=a.r+b.r-len;if(depth<0)return null;
+    const n=len>1e-8?vec(d.x/len,d.y/len):vec(1,0);
+    return {a,b,n,points:[{x:a.x+n.x*(a.r-depth/2),y:a.y+n.y*(a.r-depth/2),depth}]};
+  }
+  function circleOBB(a,b){
+    const [u,v]=axes(b),d=sub(a,b),x=dot(d,u),y=dot(d,v),hw=b.w/2,hh=b.h/2;
+    const qx=Math.max(-hw,Math.min(hw,x)),qy=Math.max(-hh,Math.min(hh,y));
+    let dx=qx-x,dy=qy-y,dist=Math.hypot(dx,dy),depth=a.r-dist,lx=qx,ly=qy;
+    if(dist>1e-8){if(depth<0)return null;dx/=dist;dy/=dist;}
+    else{
+      const ex=hw-Math.abs(x),ey=hh-Math.abs(y);
+      if(ex<ey){lx=x<0?-hw:hw;dx=x<0?1:-1;dy=0;depth=a.r+ex;}
+      else{ly=y<0?-hh:hh;dx=0;dy=y<0?1:-1;depth=a.r+ey;}
+    }
+    return {a,b,n:vec(u.x*dx+v.x*dy,u.y*dx+v.y*dy),points:[{x:b.x+u.x*lx+v.x*ly,y:b.y+u.y*lx+v.y*ly,depth}]};
+  }
+  function clip(points,t,center,limit,sign){
+    if(points.length<2)return points;
+    const da=sign*dot(sub(points[0],center),t)-limit,db=sign*dot(sub(points[1],center),t)-limit,out=[];
+    if(da<=0)out.push(points[0]);if(db<=0)out.push(points[1]);
+    if(da*db<0){const f=da/(da-db);out.push(vec(points[0].x+f*(points[1].x-points[0].x),points[0].y+f*(points[1].y-points[0].y)));}
+    return out;
+  }
+  function obbOBB(a,b){
+    const aa=axes(a),bb=axes(b),d=sub(b,a);let depth=Infinity,index=-1,n;
+    for(let i=0;i<4;i++){
+      const axis=i<2?aa[i]:bb[i-2];
+      const ra=Math.abs(dot(aa[0],axis))*a.w/2+Math.abs(dot(aa[1],axis))*a.h/2;
+      const rb=Math.abs(dot(bb[0],axis))*b.w/2+Math.abs(dot(bb[1],axis))*b.h/2;
+      const overlap=ra+rb-Math.abs(dot(d,axis));if(overlap<0)return null;
+      if(overlap<depth){depth=overlap;index=i;const sign=dot(d,axis)<0?-1:1;n=vec(axis.x*sign,axis.y*sign);}
+    }
+    const ref=index<2?a:b,inc=index<2?b:a,refAxes=index<2?aa:bb,incAxes=index<2?bb:aa,k=index%2;
+    const rn=index<2?n:vec(-n.x,-n.y),rt=refAxes[1-k],rh=(k===0?ref.w:ref.h)/2,side=(k===0?ref.h:ref.w)/2;
+    const face=vec(ref.x+rn.x*rh,ref.y+rn.y*rh);
+    const ik=Math.abs(dot(incAxes[0],rn))>Math.abs(dot(incAxes[1],rn))?0:1;
+    const sign=dot(incAxes[ik],rn)>0?-1:1,inorm=vec(incAxes[ik].x*sign,incAxes[ik].y*sign),it=incAxes[1-ik];
+    const ih=(ik===0?inc.w:inc.h)/2,iside=(ik===0?inc.h:inc.w)/2,ic=vec(inc.x+inorm.x*ih,inc.y+inorm.y*ih);
+    let ps=[vec(ic.x-it.x*iside,ic.y-it.y*iside),vec(ic.x+it.x*iside,ic.y+it.y*iside)];
+    ps=clip(ps,rt,face,side,1);ps=clip(ps,rt,face,side,-1);
+    const points=[];for(const p of ps){const separation=dot(sub(p,face),rn);if(separation<=.001)points.push({x:p.x-rn.x*separation/2,y:p.y-rn.y*separation/2,depth:-separation});}
+    return points.length?{a,b,n,points}:null;
+  }
+  function detectCollision(a,b){
+    if(a.shape==='circle'&&b.shape==='circle')return circleCircle(a,b);
+    if(a.shape==='circle')return circleOBB(a,b);
+    if(b.shape==='circle'){const c=circleOBB(b,a);if(!c)return null;return {...c,a,b,n:vec(-c.n.x,-c.n.y)};}
+    return obbOBB(a,b);
+  }
+  function inverseEffectiveMass(a,b,p,n){return a.invMass+b.invMass+cross(sub(p,a),n)**2*a.invInertia+cross(sub(p,b),n)**2*b.invInertia;}
+  function pairImpulse(c,p,x,y){applyImpulse(c.a,vec(-x,-y),p,false);applyImpulse(c.b,vec(x,y),p,false);}
+  function prepareContact(c,previous){
+    const tangent=vec(-c.n.y,c.n.x);c.t=tangent;c.friction=Math.sqrt(c.a.friction*c.b.friction);c.impact=0;
+    for(let i=0;i<c.points.length;i++){
+      const p=c.points[i],rv=sub(pointVelocity(c.b,p),pointVelocity(c.a,p)),closing=Math.max(0,-dot(rv,c.n));
+      p.normalMass=1/inverseEffectiveMass(c.a,c.b,p,c.n);p.tangentMass=1/inverseEffectiveMass(c.a,c.b,p,tangent);
+      p.bounce=closing>SETTINGS.RESTITUTION_SPEED?closing*Math.max(c.a.restitution,c.b.restitution):0;
+      c.impact=Math.max(c.impact,closing*p.normalMass);
+      const old=previous?.points[i];
+      const compatible=old&&dot(c.n,previous.n)>.95&&Math.hypot(p.x-old.x,p.y-old.y)<6;
+      p.jn=compatible?old.jn*.85:0;p.jt=compatible?old.jt*.85:0;
+    }
+  }
+  function resolveCollision(c){
+    // Solve the two normal contacts together, avoiding the rocking of stacked planks.
+    if(c.points.length===2){
+      const [p,q]=c.points,a=c.a,b=c.b;
+      const k11=1/p.normalMass,k22=1/q.normalMass;
+      const k12=a.invMass+b.invMass+cross(sub(p,a),c.n)*cross(sub(q,a),c.n)*a.invInertia+cross(sub(p,b),c.n)*cross(sub(q,b),c.n)*b.invInertia;
+      const r1=p.jn*k11+q.jn*k12+p.bounce-dot(sub(pointVelocity(b,p),pointVelocity(a,p)),c.n);
+      const r2=p.jn*k12+q.jn*k22+q.bounce-dot(sub(pointVelocity(b,q),pointVelocity(a,q)),c.n);
+      const determinant=k11*k22-k12*k12;
+      let x=determinant>1e-10?(r1*k22-r2*k12)/determinant:0;
+      let y=determinant>1e-10?(r2*k11-r1*k12)/determinant:0;
+      if(x<0){x=0;y=Math.max(0,r2/k22);}else if(y<0){y=0;x=Math.max(0,r1/k11);}
+      const dp=x-p.jn,dq=y-q.jn;p.jn=x;q.jn=y;
+      pairImpulse(c,p,c.n.x*dp,c.n.y*dp);pairImpulse(c,q,c.n.x*dq,c.n.y*dq);
+    }else{
+      const p=c.points[0],rv=sub(pointVelocity(c.b,p),pointVelocity(c.a,p)),old=p.jn;
+      p.jn=Math.max(0,old+(p.bounce-dot(rv,c.n))*p.normalMass);
+      pairImpulse(c,p,c.n.x*(p.jn-old),c.n.y*(p.jn-old));
+    }
+    for(const p of c.points){
+      const rv=sub(pointVelocity(c.b,p),pointVelocity(c.a,p)),old=p.jt,limit=c.friction*p.jn;
+      p.jt=Math.max(-limit,Math.min(limit,old-dot(rv,c.t)*p.tangentMass));
+      pairImpulse(c,p,c.t.x*(p.jt-old),c.t.y*(p.jt-old));
+      if(c.a.shape==='circle'||c.b.shape==='circle'){
+        const radius=c.a.shape==='circle'?c.a.r:c.b.r;
+        const max=Math.min(c.a.rollingFriction||0,c.b.rollingFriction||0)*p.jn*radius;
+        const sum=c.a.invInertia+c.b.invInertia,angular=c.b.angularVelocity-c.a.angularVelocity;
+        const impulse=Math.max(-max,Math.min(max,-angular/sum));
+        if(!c.a.static)c.a.angularVelocity-=impulse*c.a.invInertia;
+        if(!c.b.static)c.b.angularVelocity+=impulse*c.b.invInertia;
+      }
+    }
+  }
+  function correctPosition(c){
+    for(const p of c.points){
+      const amount=Math.max(0,p.depth-SETTINGS.SLOP)*.28/c.points.length;
+      const j=amount/inverseEffectiveMass(c.a,c.b,p,c.n),ix=c.n.x*j,iy=c.n.y*j;
+      for(const [b,sign] of [[c.a,-1],[c.b,1]])if(!b.static&&!b.sleeping){
+        b.x+=sign*ix*b.invMass;b.y+=sign*iy*b.invMass;
+        b.angle+=sign*cross(sub(p,b),vec(ix,iy))*b.invInertia;
+      }
+    }
+  }
+  function createWorld({gravity=SETTINGS.GRAVITY,ground=true,onImpact=null}={}){
+    const w={bodies:[],gravity,time:0,cache:new Map(),previousContacts:new Map(),impactTimes:new Map(),onImpact,damageEnabled:true};
+    if(ground)w.bodies.push(createBody({kind:'ground',material:'ground',static:true,x:480,y:550,w:3000,h:80}));
+    return w;
+  }
+  function contactIslands(w,contacts){
+    const parent=new Map();for(const b of w.bodies)if(b.alive&&!b.static)parent.set(b,b);
+    const root=b=>{while(parent.get(b)!==b){parent.set(b,parent.get(parent.get(b)));b=parent.get(b);}return b;};
+    for(const c of contacts)if(!c.a.static&&!c.b.static){const a=root(c.a),b=root(c.b);if(a!==b)parent.set(a,b);}
+    const groups=new Map();for(const b of parent.keys()){const r=root(b);if(!groups.has(r))groups.set(r,{bodies:[],grounded:false});groups.get(r).bodies.push(b);}
+    for(const c of contacts)if(c.a.static!==c.b.static)groups.get(root(c.a.static?c.b:c.a)).grounded=true;
+    for(const g of groups.values()){
+      const active=g.bodies.some(b=>!b.sleeping);
+      if(active||!g.grounded)for(const b of g.bodies)if(b.sleeping){b.sleeping=false;b.sleepTime=0;}
+    }
+    return groups;
+  }
+  function detectCollisions(w){
+    const bodies=w.bodies.filter(b=>b.alive),aabbs=bodies.map(bounds),contacts=[];
+    for(let i=0;i<bodies.length;i++)for(let j=i+1;j<bodies.length;j++){
+      const a=bodies[i],b=bodies[j],ab=aabbs[i],bb=aabbs[j];if(a.static&&b.static)continue;
+      if(ab.maxX<bb.minX||bb.maxX<ab.minX||ab.maxY<bb.minY||bb.maxY<ab.minY)continue;
+      const c=detectCollision(a,b);if(c){c.key=a.id+':'+b.id;contacts.push(c);}
+    }
+    return contacts;
+  }
+  function integrateBody(b,dt,gravity){
+    if(b.static||b.sleeping)return;
+    b.vy+=gravity*dt;const ld=Math.exp(-b.linearDamping*dt),ad=Math.exp(-b.angularDamping*dt);
+    b.vx*=ld;b.vy*=ld;b.angularVelocity*=ad;
+    const speed=Math.hypot(b.vx,b.vy);if(speed>SETTINGS.MAX_LINEAR_SPEED){b.vx*=SETTINGS.MAX_LINEAR_SPEED/speed;b.vy*=SETTINGS.MAX_LINEAR_SPEED/speed;}
+    b.angularVelocity=Math.max(-SETTINGS.MAX_ANGULAR_SPEED,Math.min(SETTINGS.MAX_ANGULAR_SPEED,b.angularVelocity));
+    b.x+=b.vx*dt;b.y+=b.vy*dt;b.angle+=b.angularVelocity*dt;
+  }
+  function stepOnce(w,dt){
+    w.time+=dt;
+    // Wake an unsupported sleeping island as soon as a support is removed.
+    const before=detectCollisions(w),present=new Set(before.map(c=>c.key));
+    for(const [key,c] of w.previousContacts)if(!present.has(key)&&(!c.a.alive||!c.b.alive)){
+      if(c.a.alive&&!c.a.static)wake(c.a);if(c.b.alive&&!c.b.static)wake(c.b);
+    }
+    contactIslands(w,before);
+    for(const b of w.bodies)if(b.alive)integrateBody(b,dt,w.gravity);
+    const contacts=detectCollisions(w),islands=contactIslands(w,contacts),cache=new Map();
+    for(const c of contacts){
+      if((c.a.sleeping||c.a.static)&&(c.b.sleeping||c.b.static))continue;
+      prepareContact(c,w.cache.get(c.key));cache.set(c.key,c);
+    }
+    // Capture all impact velocities BEFORE applying cached constraint impulses.
+    // Otherwise a neighbouring warm-start impulse looks like a new violent impact.
+    for(const c of cache.values())for(const p of c.points)pairImpulse(c,p,c.n.x*p.jn+c.t.x*p.jt,c.n.y*p.jn+c.t.y*p.jt);
+    for(let it=0;it<SETTINGS.SOLVER_ITERATIONS;it++)for(const c of cache.values())resolveCollision(c);
+    for(let it=0;it<SETTINGS.POSITION_ITERATIONS;it++)for(const original of cache.values()){
+      const c=detectCollision(original.a,original.b);if(c)correctPosition(c);
+    }
+    w.cache=cache;w.previousContacts=new Map(detectCollisions(w).map(c=>[c.key,c]));
+    if(w.damageEnabled&&w.onImpact)for(const c of cache.values())if(c.impact>30&&w.time-(w.impactTimes.get(c.key)??-Infinity)>SETTINGS.IMPACT_COOLDOWN){
+      w.impactTimes.set(c.key,w.time);w.onImpact(c.a,c.b,c.impact,c.points[0],c.n);
+    }
+    // An entire connected island sleeps together; supports never freeze in mid-air.
+    for(const g of islands.values()){
+      const quiet=g.grounded&&g.bodies.every(b=>Math.hypot(b.vx,b.vy)<SETTINGS.SLEEP_SPEED&&Math.abs(b.angularVelocity)<SETTINGS.SLEEP_ANGULAR_SPEED);
+      const time=quiet?Math.min(...g.bodies.map(b=>b.sleepTime))+dt:0;
+      for(const b of g.bodies){b.sleepTime=time;if(time>=SETTINGS.SLEEP_TIME){b.sleeping=true;b.vx=0;b.vy=0;b.angularVelocity=0;}}
+    }
+    for(const [key,t] of w.impactTimes)if(w.time-t>1)w.impactTimes.delete(key);
+  }
+  function step(w,dt=SETTINGS.DT){
+    let speed=0;
+    for(const b of w.bodies)if(b.alive&&!b.static&&!b.sleeping){const extent=b.shape==='circle'?b.r:Math.hypot(b.w,b.h)/2;speed=Math.max(speed,Math.hypot(b.vx,b.vy)+Math.abs(b.angularVelocity)*extent);}
+    const steps=Math.min(SETTINGS.MAX_SUBSTEPS,Math.max(2,Math.ceil(speed*dt/SETTINGS.MAX_TRAVEL)));
+    for(let i=0;i<steps;i++)stepOnce(w,dt/steps);
+  }
+  return {SETTINGS,MATERIALS,createBody,massProperties,createWorld,applyImpulse,wake,pointVelocity,vertices,bounds,
+    circleCircle,circleOBB,obbOBB,detectCollision,step};
+})();
+// END BIRD RIGID BODY ENGINE
+
+const BIRD_DEBUG_PHYSICS=false;
 let birdState={
   betIndex:1,active:false,launched:false,revealed:false,birdsLeft:3,pigsKilled:0,roundWin:0,
-  blocks:[],pigs:[],bonuses:[],birds:[],dragging:false,dragX:110,dragY:390,lastTime:0,settleTimer:0
+  blocks:[],pigs:[],bonuses:[],birds:[],dragging:false,dragX:115,dragY:390,
+  world:null,accumulator:0,settleTimer:0,roundBet:0,debug:BIRD_DEBUG_PHYSICS
 };
 function birdBet(){return BIRD_BETS[birdState.betIndex]}
-function resizeBirdCanvas(){
-  // canvas keeps a fixed internal resolution; CSS handles responsive sizing
-}
+function resizeBirdCanvas(){/* Fixed internal resolution; CSS handles responsive sizing. */}
 function randRange(a,b){return a+Math.random()*(b-a)}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function createBlock(x,y,w,h,mat='wood'){
-  const props=mat==='glass'?{hp:35,color:'#74d5da'}:mat==='stone'?{hp:120,color:'#89929a'}:{hp:65,color:'#b67a43'};
-  return {x,y,w,h,vx:0,vy:0,hp:props.hp,maxHp:props.hp,color:props.color,mat,alive:true,grounded:false};
+  const material=BIRD_PHYSICS.MATERIALS[mat],body=BIRD_PHYSICS.createBody({x:x+w/2,y:y+h/2,w,h,material:mat,
+    mat,kind:'block',maxHp:material.hp});
+  return body;
 }
 function choosePigType(difficulty){
   const r=Math.random();
-  if(difficulty>.8 && r<.22)return PIG_TYPES[4];
-  if(difficulty>.6 && r<.30)return PIG_TYPES[3];
-  if(difficulty>.45 && r<.42)return PIG_TYPES[2];
-  if(difficulty>.25 && r<.48)return PIG_TYPES[1];
+  if(difficulty>.8&&r<.22)return PIG_TYPES[4];
+  if(difficulty>.6&&r<.30)return PIG_TYPES[3];
+  if(difficulty>.45&&r<.42)return PIG_TYPES[2];
+  if(difficulty>.25&&r<.48)return PIG_TYPES[1];
   return PIG_TYPES[0];
 }
-function addPigOnPlatform(platform,difficulty){
-  const type=choosePigType(difficulty);
-  const margin=type.r+8;
-  const x=randRange(platform.x+margin,platform.x+platform.w-margin);
-  const y=platform.y-type.r-2;
-  birdState.pigs.push({
-    x,y,vx:0,vy:0,r:type.r,hp:type.hp,maxHp:type.hp,type:type.id,mult:type.mult,color:type.color,
-    alive:true,onGround:false,value:Math.round(birdBet()*type.mult),flash:0
-  });
+function addPigOnPlatform(platform,difficulty,clearWidth=platform.w){
+  let type=choosePigType(difficulty);
+  if(type.r*2+4>clearWidth)type=PIG_TYPES[0];
+  const margin=type.r+2;
+  const left=platform.x-clearWidth/2+margin,right=platform.x+clearWidth/2-margin;
+  if(right<left)return;
+  const x=randRange(left,right),y=platform.y-platform.h/2-type.r;
+  if(birdState.pigs.some(p=>Math.hypot(p.x-x,p.y-y)<p.r+type.r+4))return;
+  const pig=BIRD_PHYSICS.createBody({shape:'circle',kind:'pig',material:'pig',x,y,r:type.r,
+    hp:type.hp,maxHp:type.hp,type:type.id,mult:type.mult,color:type.color,
+    value:Math.round(birdState.roundBet*type.mult),flash:0});
+  birdState.pigs.push(pig);birdState.world.bodies.push(pig);
+}
+function birdImpactDamage(a,b,impulse,point){
+  for(const [body,other] of [[a,b],[b,a]]){
+    if(body.kind==='pig'){
+      const threshold=other.kind==='ground'?BIRD_PHYSICS.SETTINGS.PIG_FALL_DAMAGE_THRESHOLD:BIRD_PHYSICS.SETTINGS.PIG_DAMAGE_THRESHOLD;
+      if(impulse>threshold)damagePig(body,(impulse-threshold)*BIRD_PHYSICS.SETTINGS.PIG_DAMAGE_SCALE);
+    }else if(body.kind==='block'&&impulse>BIRD_PHYSICS.SETTINGS.BLOCK_DAMAGE_THRESHOLD){
+      damageBlock(body,(impulse-BIRD_PHYSICS.SETTINGS.BLOCK_DAMAGE_THRESHOLD)*BIRD_PHYSICS.SETTINGS.BLOCK_DAMAGE_SCALE);
+    }
+  }
+  for(const bird of [a,b])if(bird.kind==='bird'&&bird.bomb&&bird.alive&&impulse>40)explodeBird(bird);
 }
 function generateBirdLevel(){
   birdState.blocks=[];birdState.pigs=[];birdState.bonuses=[];birdState.birds=[];
-  const baseY=466;
-  const structureCount=2+Math.floor(Math.random()*3);
-  const starts=[520,665,805];
+  birdState.world=BIRD_PHYSICS.createWorld({onImpact:birdImpactDamage});
+  const structureCount=1+Math.floor(Math.random()*5),span=440,slot=span/structureCount;
+  birdState.structureCount=structureCount;
   for(let s=0;s<structureCount;s++){
-    const sx=starts[s]||randRange(520,820);
-    const floors=2+Math.floor(Math.random()*2);
-    let width=randRange(100,145);
+    const sx=495+(s+.5)*slot,floors=2+Math.floor(Math.random()*2),width=Math.min(124,slot-16);
     for(let f=0;f<floors;f++){
-      const levelY=baseY-f*72;
-      const mat=Math.random()<.18?'stone':Math.random()<.38?'glass':'wood';
-      // two vertical supports
-      birdState.blocks.push(createBlock(sx-width/2,levelY-58,16,58,mat));
-      birdState.blocks.push(createBlock(sx+width/2-16,levelY-58,16,58,mat));
-      // horizontal platform - all pigs stand on these
-      const platform=createBlock(sx-width/2-8,levelY-66,width+16,14,Math.random()<.15?'stone':'wood');
-      birdState.blocks.push(platform);
-      const difficulty=clamp((sx-500)/380 + f*.18,0,1);
-      if(Math.random()<.88)addPigOnPlatform(platform,difficulty);
-      if(f===floors-1 && Math.random()<.45)addPigOnPlatform(platform,clamp(difficulty+.2,0,1));
-      width*=.82;
+      const bottom=BIRD_PHYSICS.SETTINGS.GROUND_Y-f*72;
+      const draw=Math.random(),mat=draw<.12?'stone':draw<.25?'heavyWood':draw<.42?'glass':draw<.65?'lightWood':'wood';
+      const supports=[createBlock(sx-width/2,bottom-58,16,58,mat),createBlock(sx+width/2-16,bottom-58,16,58,mat)];
+      const platform=createBlock(sx-width/2-4,bottom-72,width+8,14,Math.random()<.12?'heavyWood':'wood');
+      birdState.blocks.push(...supports,platform);birdState.world.bodies.push(...supports,platform);
+      const difficulty=clamp((sx-500)/380+f*.18,0,1);
+      if(Math.random()<.88||!birdState.pigs.length)addPigOnPlatform(platform,difficulty,f===floors-1?platform.w-6:width-32);
+      if(f===floors-1&&Math.random()<.45)addPigOnPlatform(platform,clamp(difficulty+.2,0,1));
     }
   }
-
-  // Bonus gates. At least one will later be forced onto the real launch path.
+  // Settle the actual bodies before accepting a shot, with rewards/damage disabled.
+  birdState.world.damageEnabled=false;
+  for(let i=0;i<120;i++)BIRD_PHYSICS.step(birdState.world);
+  birdState.world.damageEnabled=true;birdState.world.impactTimes.clear();
   const count=2+Math.floor(Math.random()*2);
   for(let i=0;i<count;i++){
     const type=BONUS_TYPES[Math.floor(Math.random()*BONUS_TYPES.length)];
-    birdState.bonuses.push({
-      x:260+i*95+randRange(-20,20),
-      y:randRange(170,365),
-      r:24,type:type.id,label:type.label,color:type.color,active:true
-    });
+    birdState.bonuses.push({x:260+i*95+randRange(-20,20),y:randRange(170,365),r:24,
+      type:type.id,label:type.label,color:type.color,active:true});
   }
 }
 function startBirdRound(){
   if(state.balance<birdBet()){toast('Недостаточно средств');return;}
-  state.balance-=birdBet();
+  birdState.roundBet=birdBet();state.balance-=birdState.roundBet;
   birdState.active=true;birdState.launched=false;birdState.revealed=false;birdState.birdsLeft=3;
   birdState.pigsKilled=0;birdState.roundWin=0;birdState.dragging=false;
-  birdState.dragX=115;birdState.dragY=390;birdState.settleTimer=0;
-  generateBirdLevel();
-  updateBirdUI();
-  drawBirdGame();
+  birdState.dragX=115;birdState.dragY=390;birdState.settleTimer=0;birdState.accumulator=0;
+  generateBirdLevel();el('birdMessage').textContent='Оттяни птицу и отпусти. Постройки откроются после выстрела.';
+  updateBirdUI();drawBirdGame();
 }
-function newReadyBird(){
-  birdState.launched=false;
-  birdState.dragging=false;
-  birdState.dragX=115;birdState.dragY=390;
-}
-function birdDamageFromSpeed(vx,vy,mass=1){return Math.sqrt(vx*vx+vy*vy)*mass*.55}
+function newReadyBird(){birdState.launched=false;birdState.dragging=false;birdState.dragX=115;birdState.dragY=390;}
 function damagePig(p,amount){
-  if(!p.alive)return;
-  p.hp-=amount;p.flash=4;
-  if(p.hp<=0){
-    p.alive=false;
-    birdState.pigsKilled++;
-    birdState.roundWin+=p.value;
-    state.balance+=p.value;
-  }
+  if(!p.alive||amount<=0)return;
+  p.hp-=amount;p.flash=.12;
+  if(p.hp<=0){p.alive=false;birdState.pigsKilled++;birdState.roundWin+=p.value;state.balance+=p.value;}
 }
 function damageBlock(b,amount){
-  if(!b.alive)return;
-  b.hp-=amount;
-  if(b.hp<=0){b.alive=false;b.vy+=1.5;b.vx+=randRange(-1.2,1.2)}
-}
-function circleRectHit(cx,cy,r,b){
-  const nx=clamp(cx,b.x,b.x+b.w),ny=clamp(cy,b.y,b.y+b.h);
-  const dx=cx-nx,dy=cy-ny;return dx*dx+dy*dy<=r*r;
+  if(!b.alive||b.kind!=='block'||amount<=0)return;b.hp-=amount;
+  if(b.hp>0)return;b.alive=false;
+  // Two physical fragments inherit the parent's mass, point velocity and rotation.
+  const alongWidth=b.w>=b.h,c=Math.cos(b.angle),s=Math.sin(b.angle);
+  for(const sign of [-1,1]){
+    const distance=(alongWidth?b.w:b.h)/4,ox=(alongWidth?c:-s)*distance*sign,oy=(alongWidth?s:c)*distance*sign;
+    const fragment=BIRD_PHYSICS.createBody({kind:'debris',material:b.mat,mat:b.mat,
+      x:b.x+ox,y:b.y+oy,w:alongWidth?b.w/2:b.w,h:alongWidth?b.h:b.h/2,angle:b.angle,
+      vx:b.vx-b.angularVelocity*oy,vy:b.vy+b.angularVelocity*ox,angularVelocity:b.angularVelocity,color:b.color,age:0});
+    birdState.blocks.push(fragment);birdState.world.bodies.push(fragment);
+  }
 }
 function forceMandatoryBonusOnPath(vx,vy){
-  const candidates=birdState.bonuses.filter(x=>x.active);
-  if(!candidates.length)return;
-  // Put one bonus on the early ballistic path so every shot crosses at least one gate.
-  const b=candidates[Math.floor(Math.random()*candidates.length)];
-  const t=20;
-  b.x=115+vx*t;
-  b.y=390+vy*t+.5*.32*t*t;
-  b.x=clamp(b.x,210,430); b.y=clamp(b.y,115,390);
+  const candidates=birdState.bonuses.filter(x=>x.active);if(!candidates.length)return;
+  const gate=candidates[Math.floor(Math.random()*candidates.length)],t=20/60;
+  gate.x=clamp(115+vx*t,210,430);gate.y=clamp(390+vy*t+.5*BIRD_PHYSICS.SETTINGS.GRAVITY*t*t,115,390);
+}
+function makeFlyingBird(options){
+  const bird=BIRD_PHYSICS.createBody({shape:'circle',kind:'bird',material:'bird',x:115,y:390,r:14,
+    bomb:false,mega:false,lastBonus:null,flightActive:true,flightSleep:0,...options});
+  birdState.birds.push(bird);birdState.world.bodies.push(bird);return bird;
 }
 function applyBonus(bird,bonus){
-  bonus.active=false;
-  bird.lastBonus=bonus.id;
-  if(bonus.id==='split'){
-    const clones=[];
-    for(const dv of [-1.6,1.6]){
-      clones.push({...bird,vx:bird.vx,vy:bird.vy+dv,r:Math.max(8,bird.r*.78),mass:bird.mass*.65,splitClone:true});
-    }
-    birdState.birds.push(...clones);
-  }else if(bonus.id==='mega'){
-    bird.r*=1.55;bird.mass*=2.2;bird.mega=true;
-  }else if(bonus.id==='bomb'){
-    bird.bomb=true;
-  }else if(bonus.id==='dead'){
-    bird.alive=false;
-  }else if(bonus.id==='homing'){
-    let target=null,best=1e9;
-    for(const p of birdState.pigs)if(p.alive){
-      const d=(p.x-bird.x)**2+(p.y-bird.y)**2;if(d<best){best=d;target=p}
-    }
-    if(target){
-      const dx=target.x-bird.x,dy=target.y-bird.y,len=Math.hypot(dx,dy)||1,sp=Math.hypot(bird.vx,bird.vy)||8;
-      bird.vx=dx/len*sp*1.1;bird.vy=dy/len*sp*1.1;
-    }
+  bonus.active=false;const type=bonus.type||bonus.id;bird.lastBonus=type;
+  if(type==='split'){
+    const speed=Math.hypot(bird.vx,bird.vy)||1,nx=-bird.vy/speed,ny=bird.vx/speed,r=Math.max(8,bird.r*.78);
+    for(const sign of [-1,1])makeFlyingBird({x:bird.x+nx*(bird.r+r+1)*sign,y:bird.y+ny*(bird.r+r+1)*sign,
+      vx:bird.vx+nx*96*sign,vy:bird.vy+ny*96*sign,r,angle:bird.angle,angularVelocity:bird.angularVelocity,
+      bomb:bird.bomb,mega:bird.mega,splitClone:true,lastBonus:type});
+  }else if(type==='mega'){
+    bird.r*=1.55;bird.mega=true;BIRD_PHYSICS.massProperties(bird);BIRD_PHYSICS.wake(bird);
+  }else if(type==='bomb')bird.bomb=true;
+  else if(type==='dead'){bird.alive=false;bird.flightActive=false;}
+  else if(type==='homing'){
+    let target=null,best=Infinity;for(const p of birdState.pigs)if(p.alive){const d=(p.x-bird.x)**2+(p.y-bird.y)**2;if(d<best){best=d;target=p;}}
+    if(target){const dx=target.x-bird.x,dy=target.y-bird.y,len=Math.hypot(dx,dy)||1,speed=Math.hypot(bird.vx,bird.vy)||480;
+      bird.vx=dx/len*speed*1.1;bird.vy=dy/len*speed*1.1;BIRD_PHYSICS.wake(bird);}
   }
 }
 function explodeBird(bird){
-  const radius=95*bird.mass;
-  for(const p of birdState.pigs)if(p.alive){
-    const d=Math.hypot(p.x-bird.x,p.y-bird.y);
-    if(d<radius)damagePig(p,(radius-d)*.9+30);
+  if(!bird.alive)return;bird.bomb=false;
+  const radius=95*(bird.mega?1.55:1);
+  for(const body of [...birdState.world.bodies])if(body.alive&&!body.static&&body!==bird){
+    const dx=body.x-bird.x,dy=body.y-bird.y,d=Math.hypot(dx,dy);if(d>=radius)continue;
+    const strength=1800*(1-d/radius),nx=d>1?dx/d:0,ny=d>1?dy/d:-1;
+    // An off-centre pressure point gives long bodies a real angular impulse.
+    const point={x:body.x-ny*(body.shape==='circle'?body.r*.25:body.w*.18),y:body.y+nx*(body.shape==='circle'?body.r*.25:body.h*.18)};
+    BIRD_PHYSICS.applyImpulse(body,{x:nx*strength,y:ny*strength},point);
+    if(body.kind==='pig')damagePig(body,Math.max(0,strength-BIRD_PHYSICS.SETTINGS.PIG_DAMAGE_THRESHOLD)*.10);
+    if(body.kind==='block')damageBlock(body,Math.max(0,strength-BIRD_PHYSICS.SETTINGS.BLOCK_DAMAGE_THRESHOLD)*.08);
   }
-  for(const bl of birdState.blocks)if(bl.alive){
-    const cx=bl.x+bl.w/2,cy=bl.y+bl.h/2,d=Math.hypot(cx-bird.x,cy-bird.y);
-    if(d<radius){damageBlock(bl,(radius-d)*.85+25);bl.vx+=(cx-bird.x)/Math.max(d,1)*3;bl.vy-=2.2}
-  }
-  bird.alive=false;
+  // The spent bird remains a dynamic body after the blast.
 }
 function launchBird(){
-  const dx=115-birdState.dragX,dy=390-birdState.dragY;
-  const power=clamp(Math.hypot(dx,dy),20,125);
-  if(power<20)return;
-  const scale=.11;
-  const vx=dx*scale,vy=dy*scale;
-  forceMandatoryBonusOnPath(vx,vy);
-  birdState.birds.push({x:115,y:390,vx,vy,r:14,mass:1,alive:true,bomb:false,mega:false,lastBonus:null});
-  birdState.launched=true;birdState.revealed=true;birdState.birdsLeft--;
-  birdState.dragging=false;
+  const dx=115-birdState.dragX,dy=390-birdState.dragY;if(Math.hypot(dx,dy)<20)return;
+  const vx=dx*6.6,vy=dy*6.6;
+  forceMandatoryBonusOnPath(vx,vy);makeFlyingBird({vx,vy});
+  birdState.launched=true;birdState.revealed=true;birdState.birdsLeft--;birdState.dragging=false;birdState.dragX=115;birdState.dragY=390;birdState.settleTimer=0;
 }
 function updateBirdPhysics(dt){
-  const g=.32;
-  for(const bird of birdState.birds){
-    if(!bird.alive)continue;
-    bird.vy+=g*dt;bird.x+=bird.vx*dt;bird.y+=bird.vy*dt;
-    // bonuses
-    for(const bo of birdState.bonuses)if(bo.active){
-      if(Math.hypot(bird.x-bo.x,bird.y-bo.y)<bird.r+bo.r){applyBonus(bird,bo);break}
+  const world=birdState.world;if(!world||!birdState.active)return;
+  BIRD_PHYSICS.step(world,dt);
+  for(const body of world.bodies)if(body.alive&&!body.static){
+    body.age+=dt;
+    if(body.kind==='pig')body.flash=Math.max(0,body.flash-dt);
+    if(body.kind==='bird'){
+      if(body.flightActive)for(const gate of birdState.bonuses)if(gate.active&&Math.hypot(body.x-gate.x,body.y-gate.y)<body.r+gate.r){applyBonus(body,gate);break;}
+      const quiet=Math.hypot(body.vx,body.vy)<BIRD_PHYSICS.SETTINGS.BIRD_SLEEP_SPEED&&Math.abs(body.angularVelocity)<BIRD_PHYSICS.SETTINGS.BIRD_SLEEP_ANGULAR_SPEED;
+      body.flightSleep=quiet?body.flightSleep+dt:0;
+      if(body.flightSleep>BIRD_PHYSICS.SETTINGS.BIRD_SLEEP_TIME||body.age>BIRD_PHYSICS.SETTINGS.BIRD_MAX_LIFETIME)body.flightActive=false;
     }
-    // blocks
-    for(const bl of birdState.blocks)if(bl.alive && circleRectHit(bird.x,bird.y,bird.r,bl)){
-      const dmg=birdDamageFromSpeed(bird.vx,bird.vy,bird.mass);
-      damageBlock(bl,dmg*1.4);
-      bl.vx+=bird.vx*.12*bird.mass;bl.vy+=bird.vy*.08*bird.mass;
-      bird.vx*=-.42;bird.vy*=-.35;
-      if(bird.bomb){explodeBird(bird);break}
-    }
-    // pigs
-    for(const p of birdState.pigs)if(p.alive){
-      const d=Math.hypot(bird.x-p.x,bird.y-p.y);
-      if(d<bird.r+p.r){
-        damagePig(p,birdDamageFromSpeed(bird.vx,bird.vy,bird.mass)*1.9);
-        bird.vx*=-.45;bird.vy*=-.35;
-        if(bird.bomb){explodeBird(bird);break}
-      }
-    }
-    if(bird.y>510){bird.vy*=-.25;bird.vx*=.72;bird.y=510}
-    if(bird.x>1040||bird.x<-80||bird.y>650||Math.hypot(bird.vx,bird.vy)<.14&&bird.y>480)bird.alive=false;
-  }
-
-  // simplified block physics and damage from falling debris
-  for(const bl of birdState.blocks)if(bl.alive){
-    bl.vy+=g*.45*dt;
-    bl.x+=bl.vx*dt;bl.y+=bl.vy*dt;bl.vx*=.985;
-    if(bl.y+bl.h>510){bl.y=510-bl.h;bl.vy*=-.18;bl.vx*=.78}
-    // support approximation: stop on other horizontal-ish blocks
-    for(const other of birdState.blocks)if(other!==bl&&other.alive){
-      if(bl.x+bl.w>other.x&&bl.x<other.x+other.w&&bl.y+bl.h>=other.y&&bl.y+bl.h<=other.y+12&&bl.vy>=0){
-        bl.y=other.y-bl.h;bl.vy=0;break;
-      }
-    }
-    for(const p of birdState.pigs)if(p.alive){
-      const nx=clamp(p.x,bl.x,bl.x+bl.w),ny=clamp(p.y,bl.y,bl.y+bl.h);
-      const d=Math.hypot(p.x-nx,p.y-ny);
-      if(d<p.r && Math.hypot(bl.vx,bl.vy)>.8)damagePig(p,Math.hypot(bl.vx,bl.vy)*7);
+    if(body.x<-100||body.x>1060||body.y>650){
+      if(body.kind==='pig')damagePig(body,body.hp);else body.alive=false;
     }
   }
-  // pigs gravity / platforms
-  for(const p of birdState.pigs)if(p.alive){
-    p.vy+=g*.55*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.99;
-    let supported=false;
-    for(const bl of birdState.blocks)if(bl.alive){
-      if(p.x>bl.x&&p.x<bl.x+bl.w&&p.y+p.r>=bl.y&&p.y+p.r<=bl.y+14&&p.vy>=0){
-        if(p.vy>3)damagePig(p,p.vy*5);
-        p.y=bl.y-p.r;p.vy=0;supported=true;break;
-      }
-    }
-    if(!supported&&p.y+p.r>510){
-      if(p.vy>5)damagePig(p,p.vy*7);
-      p.y=510-p.r;p.vy*=-.12;
-    }
-    if(p.flash>0)p.flash--;
-  }
-  birdState.birds=birdState.birds.filter(b=>b.alive);
-
-  if(birdState.launched && birdState.birds.length===0){
-    birdState.settleTimer+=dt;
-    if(birdState.settleTimer>35){
-      birdState.settleTimer=0;
-      const alivePigs=birdState.pigs.filter(p=>p.alive).length;
-      if(alivePigs===0){
-        const clearBonus=Math.round(birdBet()*.75);
-        state.balance+=clearBonus;birdState.roundWin+=clearBonus;
-        birdState.active=false;
-        el('birdMessage').textContent=`Полная зачистка! Бонус +${fmt(clearBonus)}.`;
-      }else if(birdState.birdsLeft>0){
-        newReadyBird();
-        el('birdMessage').textContent='Следующая птица готова. Оттяни её и отпусти.';
-      }else{
-        birdState.active=false;
-        el('birdMessage').textContent=`Раунд окончен. Итоговый выигрыш: ${fmt(birdState.roundWin)}.`;
-      }
-      updateBirdUI();
-    }
-  }
+  world.bodies=world.bodies.filter(b=>b.alive);
+  birdState.blocks=birdState.blocks.filter(b=>b.alive);birdState.birds=birdState.birds.filter(b=>b.alive);
+  if(!birdState.launched)return;
+  const flying=birdState.birds.some(b=>b.flightActive),moving=world.bodies.some(b=>!b.static&&!b.sleeping&&
+    (Math.hypot(b.vx,b.vy)>BIRD_PHYSICS.SETTINGS.SLEEP_SPEED||Math.abs(b.angularVelocity)>BIRD_PHYSICS.SETTINGS.SLEEP_ANGULAR_SPEED));
+  birdState.settleTimer=!flying&&!moving?birdState.settleTimer+dt:0;
+  if(birdState.settleTimer<.65)return;birdState.settleTimer=0;
+  if(!birdState.pigs.some(p=>p.alive)){
+    const clearBonus=Math.round(birdState.roundBet*.75);state.balance+=clearBonus;birdState.roundWin+=clearBonus;
+    birdState.active=false;el('birdMessage').textContent=`Полная зачистка! Бонус +${fmt(clearBonus)}.`;
+  }else if(birdState.birdsLeft>0){newReadyBird();el('birdMessage').textContent='Следующая птица готова. Оттяни её и отпусти.';}
+  else{birdState.active=false;el('birdMessage').textContent=`Раунд окончен. Итоговый выигрыш: ${fmt(birdState.roundWin)}.`;}
+  updateBirdUI();
 }
+
 function drawRoundedRect(ctx,x,y,w,h,r,fill,stroke=null){
   ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();
   if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}
@@ -3084,24 +3250,26 @@ function drawBirdGame(){
     c.font='700 15px system-ui';c.fillStyle='#a9b5ad';c.fillText('постройки откроются после выстрела',710,300);
   }else{
     for(const bl of birdState.blocks)if(bl.alive){
-      c.save();c.translate(bl.x,bl.y);
+      c.save();c.translate(bl.x,bl.y);c.rotate(bl.angle);c.translate(-bl.w/2,-bl.h/2);
       drawRoundedRect(c,0,0,bl.w,bl.h,3,bl.color,'rgba(0,0,0,.18)');
       c.fillStyle='rgba(255,255,255,.16)';c.fillRect(3,3,Math.max(0,bl.w-6),3);
-      const ratio=clamp(bl.hp/bl.maxHp,0,1);c.fillStyle='rgba(0,0,0,.18)';c.fillRect(0,bl.h-3,bl.w*(1-ratio),3);
+      if(bl.kind==='block'){const ratio=clamp(bl.hp/bl.maxHp,0,1);c.fillStyle='rgba(0,0,0,.18)';c.fillRect(0,bl.h-3,bl.w*(1-ratio),3);}
       c.restore();
     }
     for(const p of birdState.pigs)if(p.alive){
-      c.beginPath();c.arc(p.x,p.y,p.r,0,Math.PI*2);c.fillStyle=p.flash?'#dff59b':p.color;c.fill();c.strokeStyle='#325a28';c.lineWidth=2;c.stroke();
+      c.save();c.translate(p.x,p.y);c.rotate(p.angle);
+      c.beginPath();c.arc(0,0,p.r,0,Math.PI*2);c.fillStyle=p.flash?'#dff59b':p.color;c.fill();c.strokeStyle='#325a28';c.lineWidth=2;c.stroke();
       // snout
-      c.beginPath();c.ellipse(p.x,p.y+4,p.r*.48,p.r*.32,0,0,Math.PI*2);c.fillStyle='#9edb73';c.fill();
-      c.fillStyle='#284b24';c.beginPath();c.arc(p.x-4,p.y+4,1.8,0,Math.PI*2);c.arc(p.x+4,p.y+4,1.8,0,Math.PI*2);c.fill();
-      c.fillStyle='#fff';c.beginPath();c.arc(p.x-6,p.y-5,3,0,Math.PI*2);c.arc(p.x+6,p.y-5,3,0,Math.PI*2);c.fill();
-      if(p.type==='helmet'){c.fillStyle='#737d88';c.beginPath();c.arc(p.x,p.y-8,p.r*.85,Math.PI,0);c.fill()}
+      c.beginPath();c.ellipse(0,4,p.r*.48,p.r*.32,0,0,Math.PI*2);c.fillStyle='#9edb73';c.fill();
+      c.fillStyle='#284b24';c.beginPath();c.arc(-4,4,1.8,0,Math.PI*2);c.arc(4,4,1.8,0,Math.PI*2);c.fill();
+      c.fillStyle='#fff';c.beginPath();c.arc(-6,-5,3,0,Math.PI*2);c.arc(6,-5,3,0,Math.PI*2);c.fill();
+      if(p.type==='helmet'){c.fillStyle='#737d88';c.beginPath();c.arc(0,-8,p.r*.85,Math.PI,0);c.fill()}
       if(p.type==='gold'){c.strokeStyle='#ffe66a';c.lineWidth=3;c.stroke()}
-      if(p.type==='royal'){c.fillStyle='#ffd95e';c.beginPath();c.moveTo(p.x-10,p.y-p.r);c.lineTo(p.x-5,p.y-p.r-10);c.lineTo(p.x,p.y-p.r-3);c.lineTo(p.x+6,p.y-p.r-11);c.lineTo(p.x+11,p.y-p.r);c.closePath();c.fill()}
+      if(p.type==='royal'){c.fillStyle='#ffd95e';c.beginPath();c.moveTo(-10,-p.r);c.lineTo(-5,-p.r-10);c.lineTo(0,-p.r-3);c.lineTo(6,-p.r-11);c.lineTo(11,-p.r);c.closePath();c.fill()}
       // HP bar
-      c.fillStyle='rgba(0,0,0,.45)';c.fillRect(p.x-p.r,p.y-p.r-11,p.r*2,4);
-      c.fillStyle='#b7ff72';c.fillRect(p.x-p.r,p.y-p.r-11,p.r*2*clamp(p.hp/p.maxHp,0,1),4);
+      c.fillStyle='rgba(0,0,0,.45)';c.fillRect(-p.r,-p.r-11,p.r*2,4);
+      c.fillStyle='#b7ff72';c.fillRect(-p.r,-p.r-11,p.r*2*clamp(p.hp/p.maxHp,0,1),4);
+      c.restore();
     }
   }
 
@@ -3111,9 +3279,24 @@ function drawBirdGame(){
     c.fillStyle='#fff';c.beginPath();c.arc(birdState.dragX+5,birdState.dragY-4,4,0,Math.PI*2);c.fill();c.fillStyle='#111';c.beginPath();c.arc(birdState.dragX+6,birdState.dragY-4,1.5,0,Math.PI*2);c.fill();
   }
   for(const b of birdState.birds){
-    c.beginPath();c.arc(b.x,b.y,b.r,0,Math.PI*2);c.fillStyle=b.bomb?'#25292d':b.mega?'#f2a93b':'#d84b42';c.fill();c.strokeStyle='#70231d';c.lineWidth=2;c.stroke();
-    c.fillStyle='#fff';c.beginPath();c.arc(b.x+b.r*.35,b.y-b.r*.25,Math.max(2,b.r*.23),0,Math.PI*2);c.fill();
+    c.save();c.translate(b.x,b.y);c.rotate(b.angle);
+    c.beginPath();c.arc(0,0,b.r,0,Math.PI*2);c.fillStyle=b.bomb?'#25292d':b.mega?'#f2a93b':'#d84b42';c.fill();c.strokeStyle='#70231d';c.lineWidth=2;c.stroke();
+    c.fillStyle='#fff';c.beginPath();c.arc(b.r*.35,-b.r*.25,Math.max(2,b.r*.23),0,Math.PI*2);c.fill();
+    c.restore();
   }
+  if(birdState.debug)drawBirdPhysicsDebug(c);
+}
+function drawBirdPhysicsDebug(c){
+  const world=birdState.world;if(!world)return;c.save();c.lineWidth=1;c.font='10px monospace';c.textAlign='left';
+  for(const b of world.bodies)if(b.alive&&!b.static){
+    c.strokeStyle=b.sleeping?'#39ffff':'#ff33e0';c.fillStyle=c.strokeStyle;
+    c.beginPath();if(b.shape==='circle')c.arc(b.x,b.y,b.r,0,Math.PI*2);
+    else{const points=BIRD_PHYSICS.vertices(b);c.moveTo(points[0].x,points[0].y);for(const p of points.slice(1))c.lineTo(p.x,p.y);c.closePath();}c.stroke();
+    c.fillRect(b.x-2,b.y-2,4,4);c.beginPath();c.moveTo(b.x,b.y);c.lineTo(b.x+b.vx*.08,b.y+b.vy*.08);c.stroke();
+    c.fillText(`m=${b.mass.toFixed(1)} ω=${b.angularVelocity.toFixed(1)} ${b.sleeping?'SLEEP':''}`,b.x+4,b.y-5);
+  }
+  for(const contact of world.previousContacts.values())for(const p of contact.points){c.fillStyle='#ffec33';c.fillRect(p.x-2,p.y-2,4,4);c.beginPath();c.moveTo(p.x,p.y);c.lineTo(p.x+contact.n.x*16,p.y+contact.n.y*16);c.stroke();}
+  c.restore();
 }
 function updateBirdUI(){
   syncLobbyBalance();
@@ -3149,14 +3332,17 @@ birdCanvas.addEventListener('pointerup',e=>{
   if(!birdState.dragging)return;
   birdState.dragging=false;launchBird();
 });
+birdCanvas.addEventListener('pointercancel',()=>{birdState.dragging=false;birdState.dragX=115;birdState.dragY=390;});
 let birdAnimLast=performance.now();
 function birdLoop(now){
-  const dt=Math.min(2.2,(now-birdAnimLast)/16.666);birdAnimLast=now;
-  if(document.body.classList.contains('bird-active')){
-    if(birdState.active)updateBirdPhysics(dt);
-    drawBirdGame();
-    updateBirdUI();
-  }
+  const dt=Math.min(BIRD_PHYSICS.SETTINGS.MAX_FRAME_DELTA,Math.max(0,(now-birdAnimLast)/1000));birdAnimLast=now;
+  if(document.body.classList.contains('bird-active')&&!document.hidden){
+    if(birdState.active){
+      birdState.accumulator+=dt;
+      while(birdState.accumulator>=BIRD_PHYSICS.SETTINGS.DT){updateBirdPhysics(BIRD_PHYSICS.SETTINGS.DT);birdState.accumulator-=BIRD_PHYSICS.SETTINGS.DT;if(!birdState.active)break;}
+    }
+    drawBirdGame();updateBirdUI();
+  }else birdState.accumulator=0;
   requestAnimationFrame(birdLoop);
 }
 requestAnimationFrame(birdLoop);

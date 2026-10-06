@@ -1,0 +1,41 @@
+{
+  "checks": [
+    "50 generated worlds: no pre-launch collapse, damage or reward",
+    "all five bonuses, fragment mass conservation, one-time pig payments",
+    "actual falling-beam kill, clear bonus paid once, three misses finish without payout",
+    "real slingshot pointer input and fixed-step live physics",
+    "Poker draft, slot lobby/embedded symbols still work offline"
+  ],
+  "pageErrors": [],
+  "externalRequests": [],
+  "generation": {
+    "structureCounts": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "count": 50,
+    "worstAngle": 0.010303951038496727,
+    "worstSpeed": 0,
+    "seconds": 4.5525
+  },
+  "abilities": {
+    "splitBodies": 3,
+    "megaMassRatio": 2.4025,
+    "physicalFragments": 2
+  },
+  "completion": {
+    "clearPayout": 25,
+    "clearSeconds": 1.4833333333333294,
+    "threeMissesCompleted": true
+  },
+  "realShot": {
+    "pigsKilled": 0,
+    "roundWin": 0,
+    "birds": 1,
+    "blocks": 7,
+    "worldTime": 3.025000000000045
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "baselineCommit": "07b826edd6b5a16c947e07b9d2c1993d653a2dbc",
+  "htmlSha256": "a3ed8140edd0c18cc599b5abe97f65cc96649387298e7f1654fe0a485866578c",
+  "unchangedBeforeBirdSha256": "960a9a3e5ce414ee94104de7d8f5c5a31877e3e1e66c2fc89fc49109dc9ae950",
+  "unchangedAfterBirdSha256": "eb0e29348942ef12c589d95593c6839361ffa41f4ece2a4638de45d783cd387c",
+  "checks": [
+    "all HTML/CSS/assets unchanged",
+    "Football Cascade and Poker Duel code unchanged",
+    "shared balance and lobby code unchanged",
+    "only Bird Siege script changed"
+  ]
+}
