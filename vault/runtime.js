@@ -67,7 +67,7 @@
   function refreshBalanceUI(){syncLobbyBalance();for(const id of ['balance','pokerBalance','birdBalance'])byId(id).textContent=VaultWalletService.formatBalance();}
   const VaultWalletService=window.VaultWalletService={
     getBalance:()=>canonicalBalance,
-    formatBalance:()=>owner!=='guest'&&!profileRemote?'—':fmt(canonicalBalance),
+    formatBalance:()=>owner!=='guest'&&!data.walletConfirmed?'—':fmt(canonicalBalance),
     setLocalBalance(value){const n=amount(value);if(n===null)throw Error('Invalid wallet value');canonicalBalance=n;data.balance=n;if(!suppress){VaultStorage.saveLocalState({preferences:false});refreshBalanceUI();}return n;},
     applyDelta(delta,{gameId}={}){
       if(!Number.isFinite(delta)||amount(canonicalBalance+delta)===null)throw Error('Invalid wallet delta');
@@ -160,7 +160,7 @@
     byId('vaultGuestActions').hidden=VaultSession.mode==='authenticated';byId('vaultUserActions').hidden=VaultSession.mode!=='authenticated';
     const username=VaultSession.profile?.username||VaultSession.user?.user_metadata?.username||'Player';byId('vaultUsername').textContent=username;byId('vaultInitials').textContent=username.slice(0,1).toUpperCase();
     const avatar=VaultSession.profile?.avatar_url,node=byId('vaultAvatar');if(typeof avatar==='string'&&/^https:\/\//.test(avatar)){node.src=avatar;node.hidden=false;byId('vaultInitials').hidden=true;}else{node.removeAttribute('src');node.hidden=true;byId('vaultInitials').hidden=false;}
-    byId('vaultConflictButton').hidden=!conflict;
+    byId('vaultConflictButton').hidden=!conflict;byId('vaultReloadAccount').hidden=!signedIn||profileRemote;
   }
   async function acquireLock(){
     releaseLock?.();releaseLock=null;lockHeld=false;locked=false;
@@ -178,7 +178,17 @@
       if(!client||!VaultSession.user)throw Error('No authenticated session');
       const uid=VaultSession.user.id;
       const responses=await Promise.all([client.from('profiles').select('*').eq('id',uid).single(),client.from('wallets').select('*').eq('user_id',uid).single(),client.from('user_settings').select('*').eq('user_id',uid).single(),client.from('game_stats').select('*').eq('user_id',uid),client.from('game_rounds').select('round_id,game_id,bet,status').eq('user_id',uid).eq('status','started')]);
-      for(const response of responses)if(response.error)throw response.error;
+      // A failed optional/profile query must not hide a successfully loaded personal wallet.
+      const walletResponse=responses[1];
+      if(!walletResponse.error&&uid===owner&&amount(walletResponse.data?.balance)!==null&&!data.queue.length&&!Object.keys(data.recovery.openRounds).length){
+        canonicalBalance=amount(walletResponse.data.balance);data.balance=canonicalBalance;data.walletConfirmed=true;data.revision=Number(walletResponse.data.revision)||0;clientRevision=data.revision;refreshBalanceUI();
+      }
+      const names=['профиль','кошелёк','настройки','статистика','история раундов'];
+      for(let i=0;i<responses.length;i++)if(responses[i].error){
+        const error=responses[i].error;console.error('VAULT account load failed: '+names[i],error);
+        status('Не удалось загрузить: '+names[i]+'. Проверьте SQL-настройку Supabase.');
+        throw Object.assign(Error('Could not load account data'),{vaultComponent:/fetch|network/i.test(error.message||'')?null:names[i],cause:error});
+      }
       const [profile,wallet,settings,stats,rounds]=responses.map(r=>r.data);
       if(amount(wallet.balance)===null)throw Error('Invalid remote wallet');
       return {profile,wallet,settings,stats,rounds};
@@ -251,7 +261,7 @@
     const uid=user?.id||'guest';if(uid!=='guest'&&!isId(uid))throw Error('Invalid identity');
     if(connecting&&connectionUser===uid)return connecting;
     if(VaultSession.ready&&uid===owner){
-      if(uid!=='guest'){try{const remote=await VaultProfileService.load();VaultSession.profile=remote.profile;profileRemote=true;if(!VaultRoundService.anyActive()&&!data.queue.length){capturePreferences();const screen=currentGame;applyRemote(remote);data.lastGame=screen;suppress=true;restorePreferences();VaultRecovery.restore();suppress=false;updateUI();updatePokerUI();updateBirdUI();refreshBalanceUI();}renderIdentity();scheduleSync();}catch(e){console.error('VAULT reconnect pending',e);status('Offline — прогресс сохранён локально');}}
+      if(uid!=='guest'){try{const remote=await VaultProfileService.load();VaultSession.profile=remote.profile;profileRemote=true;if(!VaultRoundService.anyActive()&&!data.queue.length){capturePreferences();const screen=currentGame;applyRemote(remote);data.lastGame=screen;suppress=true;restorePreferences();VaultRecovery.restore();suppress=false;updateUI();updatePokerUI();updateBirdUI();refreshBalanceUI();}renderIdentity();scheduleSync();}catch(e){console.error('VAULT reconnect pending',e);status(e.vaultComponent?'Не удалось загрузить: '+e.vaultComponent+'. Проверьте SQL-настройку Supabase.':'Offline — прогресс сохранён локально');}}
       return;
     }
     if(VaultRoundService.anyActive()&&VaultSession.ready&&uid!==owner)throw Error('Finish active rounds before switching account');
@@ -263,13 +273,13 @@
       await acquireLock();
       if(uid!=='guest'&&!cachedOnly){
         try{const remote=await VaultProfileService.load();applyRemote(remote,{wallet:data.queue.length===0&&!Object.keys(data.recovery.openRounds).length});}
-        catch(e){console.error('VAULT remote load failed',e);const cached=read(`user:${uid}`);profileRemote=cached?.version===C.storageVersion&&cached.data?.walletConfirmed===true&&amount(cached.data?.balance)!==null;status('Offline — прогресс сохранён локально');}
+        catch(e){console.error('VAULT remote load failed',e);const cached=read(`user:${uid}`);profileRemote=!e.vaultComponent&&cached?.version===C.storageVersion&&cached.data?.walletConfirmed===true&&amount(cached.data?.balance)!==null;status(e.vaultComponent?'Не удалось загрузить: '+e.vaultComponent+'. Проверьте SQL-настройку Supabase.':'Offline — прогресс сохранён локально');}
       }
       if(cachedOnly)profileRemote=true;
       if(guestPreferences){Object.assign(data,guestPreferences);data.settingsUpdatedAt=Date.now();enqueue('settings',{settings:{...data.settings,bets:data.bets,lastGame:data.lastGame},updatedAt:new Date(data.settingsUpdatedAt).toISOString()});}
       suppress=true;canonicalBalance=data.balance;restorePreferences();VaultRecovery.restore();suppress=false;
       VaultSession.ready=true;rememberSession();renderIdentity();showSavedScreen();VaultStorage.saveLocalState({preferences:false});
-      if(!locked&&!conflict)status(uid==='guest'?'Локальное сохранение':profileRemote?'Sync pending':'Could not load profile');scheduleSync();
+      if(!locked&&!conflict&&(uid==='guest'||profileRemote))status(uid==='guest'?'Локальное сохранение':'Sync pending');scheduleSync();
     })();
     try{return await connecting;}finally{connecting=null;connectionUser=null;}
   }
@@ -337,6 +347,7 @@
       byId('vaultAuthPassword').value='';if(result.error)byId('vaultAuthMessage').textContent=result.error;else if(result.confirmationRequired)byId('vaultAuthMessage').textContent='Проверьте почту и подтвердите аккаунт. Затем войдите.';else closeAuth();
     }finally{submit.disabled=false;}
   };
+  byId('vaultReloadAccount').onclick=async()=>{const button=byId('vaultReloadAccount');button.disabled=true;try{await switchIdentity(VaultSession.user);}finally{button.disabled=false;}};
   byId('vaultSignOut').onclick=async()=>{const result=await VaultAuth.signOut();if(result.error)status(result.error);};
   byId('vaultConflictButton').onclick=()=>{if(confirm('Загрузить облачный баланс, завершить зависшие раунды без дополнительной выплаты и отказаться от неподтверждённых локальных результатов?'))VaultSync.useRemote();};
   document.addEventListener('click',e=>{const id=e.target.closest('button')?.id;if(id&&/(BetMinus|BetPlus|MaxBet|soundToggle|musicToggle|fastGameToggle|fastBonusToggle|scatterBoost)/i.test(id))VaultStorage.schedule();});

@@ -14,7 +14,8 @@
     "TOKEN_REFRESHED preserves the current round, cards and wallet",
     "Changed SDK identity cannot send a previous account outbox with a different JWT",
     "Offline sign-out clears the persisted SDK session and cannot re-authenticate on reload",
-    "An unavailable first remote load never invents or caches a starting account balance"
+    "A failed profile query preserves the confirmed personal wallet; retry restores account readiness",
+    "A failed wallet request never fabricates an account balance"
   ],
   "pageErrors": []
 }

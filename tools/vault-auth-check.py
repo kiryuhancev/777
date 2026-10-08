@@ -21,7 +21,7 @@ A='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';B='bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb
 def now():return datetime.now(timezone.utc).isoformat()
 class Cloud:
  def __init__(self):
-  self.users={};self.rows={};self.rounds={};self.stats={};self.offline=False;self.drop_settle=False;self.calls=[];self.unavailable_profiles=set()
+  self.users={};self.rows={};self.rounds={};self.stats={};self.offline=False;self.drop_settle=False;self.calls=[];self.unavailable_profiles=set();self.unavailable_wallets=set()
   self.create(A,'alice@example.test','Alice');self.create(B,'bob@example.test','Bob')
  def create(self,uid,email,username):
   self.users[uid]={'id':uid,'email':email,'aud':'authenticated','role':'authenticated','user_metadata':{'username':username},'app_metadata':{'provider':'email','providers':['email']},'created_at':now(),'identities':[]}
@@ -70,6 +70,7 @@ class Cloud:
      if self.drop_settle:self.drop_settle=False;self.offline=True;return route.abort('failed')
    return response({'balance':wallet['balance'],'revision':wallet['revision'],'status':r['status']})
   table=path.split('/')[-1]
+  if table=='wallets' and uid in self.unavailable_wallets:return response({'message':'Wallet unavailable'},503)
   if table=='profiles' and uid in self.unavailable_profiles:return response({'message':'Profile unavailable'},503)
   if table=='game_rounds':return response([{'round_id':id,'game_id':r['p_game_id'],'bet':r['p_bet'],'status':r['status']} for id,r in self.rounds.items() if r['user_id']==uid and r['status']=='started'])
   if table=='game_stats':return response([s for (id,_),s in self.stats.items() if id==uid])
@@ -144,11 +145,12 @@ with sync_playwright() as p:
  cloud.offline=False;offline_ctx.close()
  report['passed'].append('Offline sign-out clears the persisted SDK session and cannot re-authenticate on reload')
  missing_ctx=context();missing=missing_ctx.new_page();missing.goto('http://127.0.0.1:8777/');ready(missing)
- cloud.unavailable_profiles.add(B);missing.evaluate("VaultAuth.signIn('bob@example.test','fixture-password')")
- assert missing.locator('#lobbyBalance').inner_text()=='—';assert not missing.evaluate('VaultRoundService.canPlay("poker")')
+ cloud.rows[B]['wallets']['balance']=43210;cloud.unavailable_profiles.add(B);missing.evaluate("VaultAuth.signIn('bob@example.test','fixture-password')")
+ assert missing.evaluate('state.balance')==43210;assert missing.locator('#lobbyBalance').inner_text()!='—';assert missing.locator('#vaultReloadAccount').is_visible();assert not missing.evaluate('VaultRoundService.canPlay("poker")')
  assert missing.evaluate("localStorage.getItem('vault:v1:user:"+B+"')") is None
- cloud.unavailable_profiles.remove(B);missing.evaluate('VaultAuth.restoreSession()');assert missing.locator('#lobbyBalance').inner_text()!='—'
- missing_ctx.close();report['passed'].append('An unavailable first remote load never invents or caches a starting account balance')
+ cloud.unavailable_profiles.remove(B);missing.locator('#vaultReloadAccount').click();missing.wait_for_function('document.getElementById("vaultReloadAccount").hidden');assert missing.locator('#lobbyBalance').inner_text()!='—'
+ missing_ctx.close();report['passed'].append('A failed profile query preserves the confirmed personal wallet; retry restores account readiness')
+ cloud.unavailable_wallets.add(B);wallet_ctx=context();wallet_page=wallet_ctx.new_page();wallet_page.goto('http://127.0.0.1:8777/');ready(wallet_page);wallet_page.evaluate("VaultAuth.signIn('bob@example.test','fixture-password')");assert wallet_page.locator('#lobbyBalance').inner_text()=='—';assert not wallet_page.evaluate('VaultRoundService.canPlay("slot")');cloud.unavailable_wallets.remove(B);wallet_ctx.close();report['passed'].append('A failed wallet request never fabricates an account balance')
  cache=page.evaluate("Object.keys(localStorage).filter(k=>k.startsWith('vault:v1:')).map(k=>localStorage.getItem(k)).join('')");assert 'fixture-password' not in cache
  b.close()
 assert not report['pageErrors'],report
