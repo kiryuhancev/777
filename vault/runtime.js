@@ -154,7 +154,7 @@
   function restorePreferences(){Object.assign(state,data.settings);state.betIndex=data.bets.slot;pokerState.betIndex=data.bets.poker;birdState.betIndex=data.bets.bird;settingsFingerprint=JSON.stringify({settings:data.settings,bets:data.bets,lastGame:data.lastGame});}
   function showSavedScreen(){if(VaultSession.mode!=='authenticated'){openLobby();return;}const open={lobby:openLobby,slot:openSlotGame,poker:openPokerGame,bird:openBirdGame};open[data.lastGame]();updateUI();updatePokerUI();updateBirdUI();drawBirdGame();updateSettingsUI();}
   function renderIdentity(){
-    const signedIn=VaultSession.mode==='authenticated';document.body.classList.toggle('vault-signed-out',!signedIn);
+    const signedIn=VaultSession.mode==='authenticated';byId('vaultProfileMenu').open=false;document.body.classList.toggle('vault-signed-out',!signedIn);
     document.querySelector('.lobby .lobby-balance').hidden=!signedIn;
     if(signedIn){if(byId('vaultAuthDialog').open)byId('vaultAuthDialog').close();}else if(!byId('vaultAuthDialog').open)openAuth('signin');
     byId('vaultGuestActions').hidden=VaultSession.mode==='authenticated';byId('vaultUserActions').hidden=VaultSession.mode!=='authenticated';
@@ -333,7 +333,7 @@
     return write(`user:${uid}`,{version:C.storageVersion,updatedAt:Date.now(),data:target});
   }
   let authMode='signin',returnFocus=null;
-  function openAuth(mode){authMode=mode;returnFocus=document.activeElement;byId('vaultAuthTitle').textContent=mode==='signup'?'CREATE ACCOUNT':'SIGN IN';byId('vaultUsernameField').hidden=mode!=='signup';byId('vaultAuthUsername').required=mode==='signup';byId('vaultAuthPassword').autocomplete=mode==='signup'?'new-password':'current-password';byId('vaultAuthSubmit').textContent=mode==='signup'?'CREATE ACCOUNT':'SIGN IN';byId('vaultAuthMessage').textContent=configured()?'': 'Вход временно недоступен. Проверьте подключение.';byId('vaultAuthSwitch').textContent=mode==='signup'?'Уже есть аккаунт? Войти':'Нет аккаунта? Создать';if(!byId('vaultAuthDialog').open)byId('vaultAuthDialog').showModal();byId('vaultAuthEmail').focus();}
+  function openAuth(mode){authMode=mode;returnFocus=document.activeElement;byId('vaultAuthTitle').textContent=mode==='signup'?'Open your Vault':'Enter the Vault';byId('vaultUsernameField').hidden=mode!=='signup';byId('vaultAuthUsername').required=mode==='signup';byId('vaultAuthPassword').autocomplete=mode==='signup'?'new-password':'current-password';byId('vaultAuthDescription').textContent=mode==='signup'?'Create an account to save your progress.':'Sign in to continue.';byId('vaultAuthSubmit').textContent=mode==='signup'?'CREATE ACCOUNT':'ENTER';byId('vaultAuthMessage').textContent=configured()?'': 'Вход временно недоступен. Проверьте подключение.';byId('vaultAuthSwitch').textContent=mode==='signup'?'Already have an account? SIGN IN':'New to VAULT? CREATE ACCOUNT';if(!byId('vaultAuthDialog').open)byId('vaultAuthDialog').showModal();byId('vaultAuthEmail').focus();}
   function closeAuth(){if(VaultSession.mode!=='authenticated')return;byId('vaultAuthDialog').close();byId('vaultAuthPassword').value='';returnFocus?.focus();}
   byId('vaultAuthSwitch').onclick=()=>{openAuth(authMode==='signin'?'signup':'signin');};
   byId('vaultAuthDialog').addEventListener('cancel',e=>{if(VaultSession.mode!=='authenticated')e.preventDefault();});
@@ -341,13 +341,15 @@
   byId('vaultAuthDialog').addEventListener('close',()=>{byId('vaultAuthPassword').value='';});
   byId('vaultAuthDialog').onclick=e=>{if(e.target===byId('vaultAuthDialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeAuth();}};
   byId('vaultAuthForm').onsubmit=async e=>{
-    e.preventDefault();const submit=byId('vaultAuthSubmit');submit.disabled=true;byId('vaultAuthMessage').textContent='';
+    e.preventDefault();const submit=byId('vaultAuthSubmit');submit.disabled=true;submit.textContent=authMode==='signup'?'CREATING…':'ENTERING…';byId('vaultAuthSwitch').disabled=true;byId('vaultAuthMessage').textContent='';
     try{const email=byId('vaultAuthEmail').value,password=byId('vaultAuthPassword').value,username=byId('vaultAuthUsername').value;
       const result=authMode==='signup'?await VaultAuth.signUp(email,password,username):await VaultAuth.signIn(email,password);
       byId('vaultAuthPassword').value='';if(result.error)byId('vaultAuthMessage').textContent=result.error;else if(result.confirmationRequired)byId('vaultAuthMessage').textContent='Проверьте почту и подтвердите аккаунт. Затем войдите.';else closeAuth();
-    }finally{submit.disabled=false;}
+    }finally{submit.disabled=false;submit.textContent=authMode==='signup'?'CREATE ACCOUNT':'ENTER';byId('vaultAuthSwitch').disabled=false;}
   };
   byId('vaultReloadAccount').onclick=async()=>{const button=byId('vaultReloadAccount');button.disabled=true;try{await switchIdentity(VaultSession.user);}finally{button.disabled=false;}};
+  document.addEventListener('click',e=>{if(!byId('vaultProfileMenu').contains(e.target))byId('vaultProfileMenu').open=false;});
+  byId('vaultProfileMenu').addEventListener('keydown',e=>{if(e.key==='Escape'){byId('vaultProfileMenu').open=false;byId('vaultProfileMenu').querySelector('summary').focus();}});
   byId('vaultSignOut').onclick=async()=>{const result=await VaultAuth.signOut();if(result.error)status(result.error);};
   byId('vaultConflictButton').onclick=()=>{if(confirm('Загрузить облачный баланс, завершить зависшие раунды без дополнительной выплаты и отказаться от неподтверждённых локальных результатов?'))VaultSync.useRemote();};
   document.addEventListener('click',e=>{const id=e.target.closest('button')?.id;if(id&&/(BetMinus|BetPlus|MaxBet|soundToggle|musicToggle|fastGameToggle|fastBonusToggle|scatterBoost)/i.test(id))VaultStorage.schedule();});

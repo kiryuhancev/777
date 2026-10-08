@@ -25,7 +25,7 @@ with sync_playwright() as p:
   page.evaluate('state.size=8;fillGrid();render();resizeCell()');assert page.evaluate('document.documentElement.scrollWidth<=innerWidth');page.evaluate('state.size=5;fillGrid();render();resizeCell()')
   if width==390:page.screenshot(path='/workspace/output/derby-shell-mobile.png',full_page=True)
  page.evaluate('openPokerGame()');page.locator('#pokerStartBtn').click();page.locator('#choice0').click();page.locator('#choice0').click();page.locator('#pokerFoldBtn').click();balance=page.evaluate('state.balance');page.reload();page.wait_for_function('VaultSession.ready');assert page.evaluate('state.balance')==balance
- page.evaluate('openLobby()');page.locator('#vaultSignOut').click();page.wait_for_function("VaultSession.mode==='guest'");assert page.locator('#vaultAuthDialog').is_visible() and not page.locator('#lobbyBalance').is_visible()
+ page.evaluate('openLobby()');page.locator('#vaultProfileMenu summary').click();page.locator('#vaultSignOut').click();page.wait_for_function("VaultSession.mode==='guest'");assert page.locator('#vaultAuthDialog').is_visible() and not page.locator('#lobbyBalance').is_visible()
  page.set_viewport_size({'width':390,'height':844});page.screenshot(path='/workspace/output/vault-entry-mobile.png');assert not errors,errors
  result={'authGate':True,'sharedShellThreeGames':True,'reloadBalance':True,'viewports':[1440,1024,768,390,320],'consoleErrors':errors};(ROOT/'reports/vault-interface.json').write_text(json.dumps(result,indent=2));print(json.dumps(result))
  b.close()

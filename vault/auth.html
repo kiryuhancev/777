@@ -1,14 +1,17 @@
 <div class="vault-boot" id="vaultBoot" role="status" aria-live="polite">VAULT</div>
 <dialog class="vault-auth-dialog" id="vaultAuthDialog" aria-labelledby="vaultAuthTitle">
   <button class="vault-auth-close" id="vaultAuthClose" type="button" aria-label="Закрыть">×</button>
-  <div class="vault-auth-brand">VAULT<span>YOUR NEXT PLAY STARTS HERE</span></div>
-  <h2 id="vaultAuthTitle">SIGN IN</h2>
+  <div class="vault-auth-brand"><img class="vault-mark" data-vault-mark src="__VAULT_MARK__" alt="" width="96" height="96"><span class="vault-wordmark">VAULT</span></div>
+  <div class="vault-auth-panel">
+  <h2 id="vaultAuthTitle">Enter the Vault</h2>
+  <p class="vault-auth-description" id="vaultAuthDescription">Sign in to continue.</p>
   <form id="vaultAuthForm">
     <label id="vaultUsernameField" hidden>Username<input id="vaultAuthUsername" name="username" autocomplete="nickname" minlength="1" maxlength="40"></label>
     <label>Email<input id="vaultAuthEmail" name="email" type="email" autocomplete="email" required maxlength="254"></label>
     <label>Password<input id="vaultAuthPassword" name="password" type="password" autocomplete="current-password" minlength="8" maxlength="128" required></label>
-    <button class="vault-account-primary" id="vaultAuthSubmit" type="submit">SIGN IN</button>
+    <button class="vault-account-primary" id="vaultAuthSubmit" type="submit">ENTER</button>
     <p id="vaultAuthMessage" role="status" aria-live="polite"></p>
     <button id="vaultAuthSwitch" type="button">Нет аккаунта? Создать</button>
   </form>
+  </div>
 </dialog>
