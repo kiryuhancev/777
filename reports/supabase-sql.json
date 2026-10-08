@@ -1,0 +1,16 @@
+{
+  "database": "PostgreSQL 17",
+  "passed": [
+    "migration and repeat application",
+    "trigger creates profile/wallet/settings",
+    "RLS A cannot read/update B",
+    "no direct wallet, XP or round writes",
+    "idempotent debit and payout",
+    "one stats/XP update",
+    "stale wallet revision rejected",
+    "mismatched duplicate rejected",
+    "interrupted payout credited exactly once",
+    "settings last write wins",
+    "anonymous RPC denied"
+  ]
+}

@@ -17,9 +17,9 @@
       5
     ],
     "count": 50,
-    "worstAngle": 0.010303951038496727,
+    "worstAngle": 0.009666894454287126,
     "worstSpeed": 0,
-    "seconds": 4.5525
+    "seconds": 5.4995
   },
   "abilities": {
     "splitBodies": 3,
@@ -32,10 +32,10 @@
     "threeMissesCompleted": true
   },
   "realShot": {
-    "pigsKilled": 0,
-    "roundWin": 0,
+    "pigsKilled": 1,
+    "roundWin": 10,
     "birds": 1,
-    "blocks": 7,
-    "worldTime": 3.025000000000045
+    "blocks": 16,
+    "worldTime": 3.0750000000000477
   }
 }

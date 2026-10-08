@@ -1,0 +1,25 @@
+/* Account controls only; no selectors modify game screens. */
+.vault-booting> :not(#vaultBoot):not(script):not(style){visibility:hidden!important}
+.vault-boot{position:fixed;inset:0;z-index:20000;display:grid;place-items:center;background:#10080c;color:#e5d3a6;font:800 24px system-ui;letter-spacing:.22em}
+.vault-boot[hidden]{display:none}
+.lobby .vault-account-bar{display:flex;align-items:center;gap:20px}
+.lobby .vault-auth-actions{display:flex;align-items:center;gap:10px}
+.lobby .vault-auth-actions[hidden],.vault-auth-dialog [hidden],.lobby .vault-account-status[hidden]{display:none!important}
+.lobby .vault-auth-actions button,.vault-auth-dialog button,.lobby .vault-account-status button{border:1px solid #e5d3a633;border-radius:12px;background:transparent;color:#e5d3a6;font:700 11px system-ui;letter-spacing:.04em;padding:12px;min-height:44px;cursor:pointer}
+.lobby .vault-auth-actions .vault-account-primary,.vault-auth-dialog .vault-account-primary{background:#e5d3a6;color:#180d12}
+.lobby .vault-account-identity{display:flex;align-items:center;gap:8px;max-width:160px;font-size:13px}
+.lobby .vault-account-identity b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lobby .vault-initials,.lobby .vault-avatar{display:grid;place-items:center;width:32px;height:32px;flex-shrink:0;border-radius:10px;background:#211016;border:1px solid #e5d3a633;font:700 14px system-ui;color:#e5d3a6;object-fit:cover}
+.lobby .vault-account-status{max-width:1180px;margin:8px auto 0;display:flex;justify-content:flex-end;align-items:center;gap:10px;min-height:20px;color:#b9a576;font-size:11px}
+.vault-auth-dialog{width:min(420px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;padding:28px;border:1px solid #e5d3a644;border-radius:20px;background:#180d12;color:#f0e3c4;box-shadow:0 24px 70px #0009}
+.vault-auth-dialog::backdrop{background:#10080ccc}
+.vault-auth-dialog h2{font-size:20px;letter-spacing:.08em;margin:0 44px 24px 0}
+.vault-auth-dialog .vault-auth-close{position:absolute;right:12px;top:12px;width:44px;padding:0;font-size:24px}
+.vault-auth-dialog label{display:block;font-size:12px;line-height:1.5;margin:14px 0;color:#d4c18f}
+.vault-auth-dialog input{display:block;width:100%;margin-top:6px;min-height:44px;padding:12px;border:1px solid #e5d3a633;border-radius:10px;background:#211016;color:#f0e3c4;font:16px system-ui}
+.vault-auth-dialog .vault-account-primary{width:100%;font-size:12px}
+.vault-auth-dialog button:disabled{opacity:.5;cursor:wait}
+.vault-auth-dialog p{font-size:13px;line-height:1.6;color:#d4c18f;margin:16px 0 0}
+.vault-auth-dialog input:focus-visible,.vault-auth-dialog button:focus-visible,.lobby .vault-auth-actions button:focus-visible{outline:2px solid #e5d3a6;outline-offset:3px}
+@media(max-width:900px){.lobby .vault-account-bar{gap:12px}.lobby .vault-auth-actions button{font-size:10px;padding:10px}}
+@media(max-width:700px){.lobby .lobby-top{flex-wrap:wrap;padding:16px 0}.lobby .vault-account-bar{display:contents}.lobby .vault-auth-actions{width:100%;justify-content:flex-end}.lobby .vault-account-status{font-size:10px}.lobby .vault-account-identity{margin-right:auto}}

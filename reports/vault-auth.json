@@ -1,0 +1,20 @@
+{
+  "mode": "Real Supabase SDK with HTTP fixtures; not live cloud",
+  "passed": [
+    "Registration via actual SDK; guest preferences migrate, guest wallet never imports",
+    "SDK persistSession/getSession restores signed-in identity after F5",
+    "Round/wallet/statistics synchronize once; repeated reload creates no duplicate",
+    "Offline auth cache and bounded outbox; lost settlement reply retries without a second payout",
+    "Offline round queues locally and reconnect flushes business events",
+    "Second browser profile loads remote identity, profile, wallet and settings",
+    "Cross-device stale-wallet conflict blocks gameplay; explicit remote recovery, never max(balance)",
+    "Paused guest bonus remains in its owner namespace and is never imported into an account",
+    "Sign-out restores separate guest namespace; next account cannot see previous wallet/profile/outbox",
+    "Sign-out remains signed out after F5; no password stored in application cache",
+    "TOKEN_REFRESHED preserves the current round, cards and wallet",
+    "Changed SDK identity cannot send a previous account outbox with a different JWT",
+    "Offline sign-out clears the persisted SDK session and cannot re-authenticate on reload",
+    "An unavailable first remote load never invents or caches a starting account balance"
+  ],
+  "pageErrors": []
+}

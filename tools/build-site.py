@@ -1,6 +1,7 @@
 """Build the standalone game for static hosting; no external dependencies."""
 from pathlib import Path
 import hashlib
+import base64
 import json
 import os
 import re
@@ -10,8 +11,20 @@ import subprocess
 ROOT = Path(__file__).resolve().parent.parent
 html = ROOT / 'index.html'
 source = html.read_text()
+# Refuse accidental deployment of a privileged key; public configuration may stay blank.
+public_key = re.search(r"supabaseAnonKey:\s*'([^']*)'", source)
+if public_key and public_key[1]:
+    value = public_key[1]
+    if not value.startswith('sb_publishable_'):
+        try:
+            payload = value.split('.')[1]
+            role = json.loads(base64.urlsafe_b64decode(payload + '=' * (-len(payload) % 4))).get('role')
+        except (ValueError, IndexError, UnicodeDecodeError):
+            role = None
+        if role != 'anon':
+            raise SystemExit('VAULT frontend accepts only a public publishable/anon key')
 scripts = re.findall(r'<script\b[^>]*>(.*?)</script>', source, re.S | re.I)
-if not scripts or '<title>DIGITAL DERBY' not in source:
+if not scripts or not re.search(r'<title>(?:DIGITAL DERBY|VAULT)', source):
     raise SystemExit('Expected the v45 standalone game with embedded JavaScript')
 Path('/tmp/digital-derby-release.js').write_text('\n'.join(scripts))
 site = ROOT / '_site'

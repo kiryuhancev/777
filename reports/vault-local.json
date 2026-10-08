@@ -1,0 +1,21 @@
+{
+  "passed": [
+    "Critical F5: shared balance, bets, settings, last screen survive a real reload",
+    "Settled round/payout/statistics not replayed on repeated reload",
+    "Read-only second tab does not cancel or overwrite a live round in the first tab",
+    "Interrupted Poker draft: no refund, no second debit, no tactical/draft replay",
+    "Bird interrupted after a pig payout: paid progress retained; physics reset; no replay",
+    "Interrupted paid slot animation: exact debit retained, active cascade discarded",
+    "Interrupted free spin is consumed; remaining bonus and safe checkpoint restored, autoplay paused",
+    "Interrupted bonus purchase retains its paid bonus entitlement without another charge",
+    "Second tab cannot spend the same local wallet concurrently",
+    "Guest gameplay remains available offline",
+    "Malformed JSON, negative wallet and invalid bets are rejected",
+    "Small-screen auth form and unconfigured guest fallback",
+    "Inline standalone guest startup degrades gracefully without origin storage"
+  ],
+  "pageErrors": [],
+  "notRun": [
+    "file:// navigation is blocked by managed Chromium policy; check in a normal browser"
+  ]
+}
