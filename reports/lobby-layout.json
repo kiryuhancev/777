@@ -1,0 +1,53 @@
+{
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 900,
+      "cards16x9": true,
+      "noOverflow": true,
+      "filters": true,
+      "keyboardLaunchAllGames": true
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "cards16x9": true,
+      "noOverflow": true,
+      "filters": true,
+      "keyboardLaunchAllGames": true
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "cards16x9": true,
+      "noOverflow": true,
+      "filters": true,
+      "keyboardLaunchAllGames": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "cards16x9": true,
+      "noOverflow": true,
+      "filters": true,
+      "keyboardLaunchAllGames": true
+    },
+    {
+      "width": 320,
+      "height": 640,
+      "cards16x9": true,
+      "noOverflow": true,
+      "filters": true,
+      "keyboardLaunchAllGames": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "cards16x9": true,
+      "noOverflow": true,
+      "filters": true,
+      "keyboardLaunchAllGames": true
+    }
+  ],
+  "errors": []
+}
