@@ -89,7 +89,7 @@ with sync_playwright() as p:
  page.goto('http://127.0.0.1:8777/');ready(page)
  page.evaluate("state.balance=999123;state.betIndex=4;toggleSetting('sound');openLobby();saveVaultState()")
  page.evaluate("()=>{const m=SLOT_MATH.newBonus('normal',rand);state.bonus=true;state.bonusType='normal';state.slotProfile='normal';writeSlotModel(m);state.bonusAutoRunning=false;VaultRecovery.checkpointSlot();}")
- page.locator('#vaultSignUp').click();page.locator('#vaultAuthUsername').fill('Alice Vault');page.locator('#vaultAuthEmail').fill('alice@example.test');page.locator('#vaultAuthPassword').fill('fixture-password');page.locator('#vaultAuthSubmit').click();page.wait_for_function('VaultSession.mode==="authenticated"&&VaultSession.ready')
+ page.locator('#vaultAuthSwitch').click();page.locator('#vaultAuthUsername').fill('Alice Vault');page.locator('#vaultAuthEmail').fill('alice@example.test');page.locator('#vaultAuthPassword').fill('fixture-password');page.locator('#vaultAuthSubmit').click();page.wait_for_function('VaultSession.mode==="authenticated"&&VaultSession.ready')
  settled_sync(page);assert page.evaluate('state.balance')==1000000;assert page.evaluate('state.betIndex')==4;assert not page.evaluate('state.bonus')
  report['passed'].append('Registration via actual SDK; guest preferences migrate, guest wallet never imports')
  page.reload();ready(page);assert page.evaluate('VaultSession.user.id')==A;assert page.evaluate('state.betIndex')==4

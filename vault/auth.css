@@ -23,3 +23,64 @@
 .vault-auth-dialog input:focus-visible,.vault-auth-dialog button:focus-visible,.lobby .vault-auth-actions button:focus-visible{outline:2px solid #e5d3a6;outline-offset:3px}
 @media(max-width:900px){.lobby .vault-account-bar{gap:12px}.lobby .vault-auth-actions button{font-size:10px;padding:10px}}
 @media(max-width:700px){.lobby .lobby-top{flex-wrap:wrap;padding:16px 0}.lobby .vault-account-bar{display:contents}.lobby .vault-auth-actions{width:100%;justify-content:flex-end}.lobby .vault-account-status{font-size:10px}.lobby .vault-account-identity{margin-right:auto}}
+
+/* Shared VAULT shell and mandatory entry screen. */
+body{background:radial-gradient(ellipse at 32% 15%,#34192399,transparent 55%),#10080c}
+body::before{opacity:.12}
+body.game-mode .lobby{display:block!important;min-height:0;padding-bottom:0}
+body.game-mode .lobby .game-select{display:none}
+.vault-shell-back{min-height:44px;border:1px solid #e5d3a633;border-radius:12px;background:#211016;color:#e5d3a6;padding:10px 16px;font-weight:700;cursor:pointer}
+body:not(.game-mode) .vault-shell-back{display:none}
+body.game-mode .app,body.game-mode .poker-app,body.game-mode .bird-app{max-width:1244px;margin:0 auto;padding-top:16px;background:transparent;min-height:0}
+body.game-mode .app>.topbar,body.game-mode .poker-app>.topbar,body.game-mode .bird-app>.topbar{display:none!important}
+body.game-mode .lobby-top{min-height:88px}
+body.vault-signed-out .lobby,body.vault-signed-out .app,body.vault-signed-out .poker-app,body.vault-signed-out .bird-app{display:none!important}
+body.vault-signed-out{padding:0!important}
+body.vault-signed-out .vault-auth-dialog{position:fixed;inset:0;margin:0;width:100%;height:100dvh;max-width:none;max-height:none;border:0;border-radius:0;padding:clamp(32px,8vh,80px) 24px;background:radial-gradient(ellipse at 20% 15%,#51233666,transparent 55%),radial-gradient(ellipse at 85% 85%,#e5d3a60c,transparent 50%),#10080c;display:flex;flex-direction:column;justify-content:center;align-items:center;overflow:auto}
+body.vault-signed-out .vault-auth-dialog::before{content:'';position:absolute;inset:24px;border:1px solid #e5d3a619;pointer-events:none;border-radius:24px}
+body.vault-signed-out .vault-auth-close{display:none}
+body.vault-signed-out .vault-auth-dialog h2{width:min(380px,100%);margin:30px 0 8px;font-size:16px;letter-spacing:.12em}
+body.vault-signed-out .vault-auth-dialog form{width:min(380px,100%)}
+.vault-auth-brand{text-align:center;color:#e5d3a6;font-size:clamp(40px,8vw,64px);font-weight:800;letter-spacing:.2em}
+.vault-auth-brand span{display:block;font-size:10px;letter-spacing:.22em;line-height:2.4;color:#b9a576}
+#vaultAuthSwitch{width:100%;margin-top:14px;min-height:44px;border:0;background:transparent;color:#d4c18f}
+body.vault-signed-out .vault-auth-dialog input{background:#211016aa;border-color:#e5d3a633}
+body.vault-signed-out .vault-account-primary{margin-top:10px;min-height:48px}
+/* Stadium presentation stays inside the persistent VAULT frame. */
+body.slot-active .layout{display:block;margin-top:0}
+body.slot-active .arena{border-radius:24px;border-color:#e5d3a62b;background:radial-gradient(ellipse at 50% 20%,#0d4433bb,transparent 60%),linear-gradient(#04201a,#020c0b);overflow:hidden}
+body.slot-active .arena-inner{padding:24px 22px 30px;min-height:820px}
+body.slot-active .hud{width:min(1040px,100%);margin-bottom:32px;gap:18px}
+body.slot-active .hud-card{background:#020c0de0;border-color:#81d9cc22;min-height:66px}
+body.slot-active .cascade-badge{background:#32643899;border-color:#a5e67b66}
+body.slot-active .field-shell{padding:76px 20px 20px;border:7px solid #05212a;border-radius:30px;background:linear-gradient(180deg,#082e40ed,#043522e8);box-shadow:0 0 0 2px #65d2e3aa,0 0 0 9px #021217,inset 0 0 0 2px #57c9d288,0 24px 50px #000a}
+body.slot-active .pitch{inset:76px 20px 20px;border-radius:18px;background:linear-gradient(110deg,#075c38,#023f29);opacity:.85}
+body.slot-active .pitch i{opacity:.15}
+body.slot-active .side{margin:20px auto 0;width:min(1040px,100%);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+body.slot-active .derby-logo{z-index:8}
+body.slot-active .derby-player-upper{animation:derby-lively-idle 8.5s ease-in-out infinite}
+body.slot-active .derby-player-leg-left{animation:derby-lively-left 8.5s ease-in-out infinite}
+body.slot-active .derby-player-leg-right{animation:derby-lively-right 8.5s ease-in-out infinite}
+body.slot-active .derby-footballer-blue span{animation-duration:10s;animation-delay:-3s}
+@keyframes derby-lively-idle{0%,100%{transform:translate(0,0) rotate(0)}15%,30%{transform:translate(2.4px,-2px) rotate(.8deg)}22%{transform:translate(2.4px,-3px) rotate(.8deg)}45%,55%{transform:translate(0,-1.5px) rotate(0)}70%,85%{transform:translate(-2.4px,-2px) rotate(-.8deg)}77%{transform:translate(-2.4px,-3px) rotate(-.8deg)}}
+@keyframes derby-lively-left{0%,45%,55%,100%{transform:skewX(0)}15%,30%{transform:skewX(-1deg)}70%,85%{transform:skewX(.85deg)}}
+@keyframes derby-lively-right{0%,45%,55%,100%{transform:skewX(0)}15%,30%{transform:skewX(-.85deg)}70%,85%{transform:skewX(1deg)}}
+body.slot-active .derby-footballer-shadow{animation:derby-shadow 8.5s ease-in-out infinite}
+@keyframes derby-shadow{0%,100%{opacity:.7;transform:scaleX(1)}25%,75%{opacity:.9;transform:scaleX(.95)}}
+@media(max-width:980px){body.slot-active .side{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){body.game-mode .lobby{padding:0 12px}body.game-mode .lobby-top{gap:8px;flex-wrap:wrap;padding:10px 0;min-height:72px}.vault-shell-back{padding:8px;font-size:10px}body.game-mode .vault-account-bar{gap:8px}body.game-mode .vault-account-identity b{display:none}body.game-mode .lobby-balance strong{font-size:18px}body.slot-active .arena-inner{padding:14px 8px 18px;min-height:0}body.slot-active .hud{margin-bottom:24px;gap:5px}body.slot-active .hud-card{min-height:46px}body.slot-active .field-shell{padding:48px 9px 9px;border-width:5px;border-radius:22px}body.slot-active .pitch{inset:48px 9px 9px}body.slot-active .side{display:block;width:100%;margin-top:12px}body.slot-active .arena{overflow:visible}}
+@media(prefers-reduced-motion:reduce){body.slot-active .derby-footballer span{animation:none!important}}
+body.slot-active .arena{background-image:linear-gradient(180deg,#03201a30,#020c0b20),url('__VAULT_STADIUM__');background-size:cover;background-position:center bottom}
+body.slot-active .stadium{display:none}
+body.slot-active .derby-logo{top:-75px;width:min(300px,calc(100% - 16px));height:166px}
+body.slot-active .field-stage{margin-top:62px}
+@media(max-width:760px){body.slot-active .derby-logo{top:-48px;width:min(210px,calc(100% - 16px));height:105px}body.slot-active .field-stage{margin-top:30px}}
+body.slot-active .field-shell::before,body.slot-active .field-shell::after{display:none}
+body.slot-active .field-shell .pitch{top:76px}
+body.slot-active.bonus .field-shell{border-color:#233628;background:linear-gradient(180deg,#082e40ed,#34100fe8);box-shadow:0 0 0 2px #d6d98aaa,0 0 0 9px #021217,inset 0 0 0 2px #bdd28188,0 24px 50px #000a}
+@media(max-width:760px){body.slot-active .field-shell .pitch{top:48px}}
+body.game-mode #backLobbyPoker,body.game-mode #backLobbyBird,body.game-mode .poker-topbar .wallet,body.game-mode .bird-topbar .wallet{display:none}
+body.slot-active .side{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+body.slot-active .slot-help{width:min(760px,100%)}
+body.slot-active .slot-help>summary{display:block;min-height:44px;padding:14px 18px;border:1px solid #e5d3a633;border-radius:12px;color:#e5d3a6;background:#211016;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.06em}
+body.slot-active .slot-help[open]>.panel{margin-top:12px}

@@ -1,6 +1,7 @@
 <div class="vault-boot" id="vaultBoot" role="status" aria-live="polite">VAULT</div>
 <dialog class="vault-auth-dialog" id="vaultAuthDialog" aria-labelledby="vaultAuthTitle">
   <button class="vault-auth-close" id="vaultAuthClose" type="button" aria-label="Закрыть">×</button>
+  <div class="vault-auth-brand">VAULT<span>YOUR NEXT PLAY STARTS HERE</span></div>
   <h2 id="vaultAuthTitle">SIGN IN</h2>
   <form id="vaultAuthForm">
     <label id="vaultUsernameField" hidden>Username<input id="vaultAuthUsername" name="username" autocomplete="nickname" minlength="1" maxlength="40"></label>
@@ -8,5 +9,6 @@
     <label>Password<input id="vaultAuthPassword" name="password" type="password" autocomplete="current-password" minlength="8" maxlength="128" required></label>
     <button class="vault-account-primary" id="vaultAuthSubmit" type="submit">SIGN IN</button>
     <p id="vaultAuthMessage" role="status" aria-live="polite"></p>
+    <button id="vaultAuthSwitch" type="button">Нет аккаунта? Создать</button>
   </form>
 </dialog>

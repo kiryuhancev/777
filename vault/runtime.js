@@ -104,6 +104,7 @@
   };
   const VaultRoundService=window.VaultRoundService={
     canPlay(game){
+      if(VaultSession.mode!=='authenticated'){toast('Войдите в аккаунт, чтобы начать игру');return false;}
       if(authBusy||!VaultSession.ready||conflict||locked||(!profileRemote&&owner!=='guest')||data.queue.length>C.maxPendingEvents-6){toast(locked?'Игра открыта в другой вкладке':conflict?'Обновите облачные данные перед игрой':'Sync pending — игра временно недоступна');return false;}
       return games.includes(game);
     },
@@ -151,8 +152,11 @@
     cancelInterrupted(game){const r=data.recovery.openRounds[game];if(r)VaultRoundService.finish(game,'interrupted','cancelled',{recovery:'safe-reset-no-refund'});},
   };
   function restorePreferences(){Object.assign(state,data.settings);state.betIndex=data.bets.slot;pokerState.betIndex=data.bets.poker;birdState.betIndex=data.bets.bird;settingsFingerprint=JSON.stringify({settings:data.settings,bets:data.bets,lastGame:data.lastGame});}
-  function showSavedScreen(){const open={lobby:openLobby,slot:openSlotGame,poker:openPokerGame,bird:openBirdGame};open[data.lastGame]();updateUI();updatePokerUI();updateBirdUI();drawBirdGame();updateSettingsUI();}
+  function showSavedScreen(){if(VaultSession.mode!=='authenticated'){openLobby();return;}const open={lobby:openLobby,slot:openSlotGame,poker:openPokerGame,bird:openBirdGame};open[data.lastGame]();updateUI();updatePokerUI();updateBirdUI();drawBirdGame();updateSettingsUI();}
   function renderIdentity(){
+    const signedIn=VaultSession.mode==='authenticated';document.body.classList.toggle('vault-signed-out',!signedIn);
+    document.querySelector('.lobby .lobby-balance').hidden=!signedIn;
+    if(signedIn){if(byId('vaultAuthDialog').open)byId('vaultAuthDialog').close();}else if(!byId('vaultAuthDialog').open)openAuth('signin');
     byId('vaultGuestActions').hidden=VaultSession.mode==='authenticated';byId('vaultUserActions').hidden=VaultSession.mode!=='authenticated';
     const username=VaultSession.profile?.username||VaultSession.user?.user_metadata?.username||'Player';byId('vaultUsername').textContent=username;byId('vaultInitials').textContent=username.slice(0,1).toUpperCase();
     const avatar=VaultSession.profile?.avatar_url,node=byId('vaultAvatar');if(typeof avatar==='string'&&/^https:\/\//.test(avatar)){node.src=avatar;node.hidden=false;byId('vaultInitials').hidden=true;}else{node.removeAttribute('src');node.hidden=true;byId('vaultInitials').hidden=false;}
@@ -288,8 +292,6 @@
         return await switchIdentity(sessionData.session?.user||null);
       }catch(e){
         console.error('VAULT session restore unavailable',e);
-        const cached=read('session');
-        if(cached?.project===C.supabaseUrl&&isId(cached.user?.id)){VaultSession.profile=cached.profile;return switchIdentity(cached.user);}
         return switchIdentity(null);
       }
     },
@@ -321,8 +323,10 @@
     return write(`user:${uid}`,{version:C.storageVersion,updatedAt:Date.now(),data:target});
   }
   let authMode='signin',returnFocus=null;
-  function openAuth(mode){authMode=mode;returnFocus=document.activeElement;byId('vaultAuthTitle').textContent=mode==='signup'?'CREATE ACCOUNT':'SIGN IN';byId('vaultUsernameField').hidden=mode!=='signup';byId('vaultAuthUsername').required=mode==='signup';byId('vaultAuthPassword').autocomplete=mode==='signup'?'new-password':'current-password';byId('vaultAuthSubmit').textContent=mode==='signup'?'CREATE ACCOUNT':'SIGN IN';byId('vaultAuthMessage').textContent=configured()?'': 'Прогресс гостя сохраняется локально. Вход станет доступен после подключения Supabase.';byId('vaultAuthDialog').showModal();byId('vaultAuthEmail').focus();}
-  function closeAuth(){byId('vaultAuthDialog').close();byId('vaultAuthPassword').value='';returnFocus?.focus();}
+  function openAuth(mode){authMode=mode;returnFocus=document.activeElement;byId('vaultAuthTitle').textContent=mode==='signup'?'CREATE ACCOUNT':'SIGN IN';byId('vaultUsernameField').hidden=mode!=='signup';byId('vaultAuthUsername').required=mode==='signup';byId('vaultAuthPassword').autocomplete=mode==='signup'?'new-password':'current-password';byId('vaultAuthSubmit').textContent=mode==='signup'?'CREATE ACCOUNT':'SIGN IN';byId('vaultAuthMessage').textContent=configured()?'': 'Вход временно недоступен. Проверьте подключение.';byId('vaultAuthSwitch').textContent=mode==='signup'?'Уже есть аккаунт? Войти':'Нет аккаунта? Создать';if(!byId('vaultAuthDialog').open)byId('vaultAuthDialog').showModal();byId('vaultAuthEmail').focus();}
+  function closeAuth(){if(VaultSession.mode!=='authenticated')return;byId('vaultAuthDialog').close();byId('vaultAuthPassword').value='';returnFocus?.focus();}
+  byId('vaultAuthSwitch').onclick=()=>{openAuth(authMode==='signin'?'signup':'signin');};
+  byId('vaultAuthDialog').addEventListener('cancel',e=>{if(VaultSession.mode!=='authenticated')e.preventDefault();});
   byId('vaultSignIn').onclick=()=>openAuth('signin');byId('vaultSignUp').onclick=()=>openAuth('signup');byId('vaultAuthClose').onclick=closeAuth;
   byId('vaultAuthDialog').addEventListener('close',()=>{byId('vaultAuthPassword').value='';});
   byId('vaultAuthDialog').onclick=e=>{if(e.target===byId('vaultAuthDialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeAuth();}};
@@ -344,15 +348,9 @@
   setInterval(()=>{if(data.queue.length&&!document.hidden)VaultSync.flush();},15000);
   window.saveVaultState=()=>VaultStorage.flush();
   async function boot(){
-    let backgroundRestore=false;
-    try{
-      const cached=read('session'),bucket=isId(cached?.user?.id)?read(`user:${cached.user.id}`):null;
-      if(configured()&&location.protocol!=='file:'&&cached?.project===C.supabaseUrl&&bucket?.version===C.storageVersion&&bucket.data?.walletConfirmed===true&&amount(bucket.data?.balance)!==null){
-        VaultSession.profile=cached.profile;await switchIdentity(cached.user,{cachedOnly:true});backgroundRestore=true;
-      }else await VaultAuth.restoreSession();
-    }catch(e){console.error('VAULT boot recovery',e);await switchIdentity(null);}
-    finally{VaultSession.ready=true;document.body.classList.remove('vault-booting');byId('vaultBoot').hidden=true;}
-    if(backgroundRestore)VaultAuth.restoreSession().catch(e=>console.error('VAULT background session restore',e));
+    try{await VaultAuth.restoreSession();}
+    catch(e){console.error('VAULT boot recovery',e);await switchIdentity(null);}
+    finally{VaultSession.ready=true;renderIdentity();document.body.classList.remove('vault-booting');byId('vaultBoot').hidden=true;}
   }
   window.vaultReady=boot();
 })();

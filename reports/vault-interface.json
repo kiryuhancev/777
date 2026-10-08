@@ -1,0 +1,13 @@
+{
+  "authGate": true,
+  "sharedShellThreeGames": true,
+  "reloadBalance": true,
+  "viewports": [
+    1440,
+    1024,
+    768,
+    390,
+    320
+  ],
+  "consoleErrors": []
+}
