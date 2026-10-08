@@ -13,7 +13,7 @@ with sync_playwright() as p:
   for size in [5,8]:
    page.evaluate("size=>{state.size=size;state.bonus=size===8;state.slotProfile=size===8?'super':'base';state.grid=blankGrid(size);state.sticky.clear();document.body.classList.toggle('bonus',size===8);fillGrid();render();updateUI();}",size)
    page.wait_for_timeout(100)
-   data=page.evaluate('''()=>{const rect=s=>document.querySelector(s).getBoundingClientRect().toJSON();return {l:rect('.derby-footballer-red'),r:rect('.derby-footballer-blue'),g:rect('#grid'),f:rect('#fieldShell'),overflow:document.documentElement.scrollWidth>innerWidth}}''')
+   data=page.evaluate('''()=>{const rect=s=>document.querySelector(s).getBoundingClientRect().toJSON();return {l:rect('.player-zone-left .derby-footballer'),r:rect('.player-zone-right .derby-footballer'),g:rect('#grid'),f:rect('#fieldShell'),overflow:document.documentElement.scrollWidth>innerWidth}}''')
    assert not data['overflow'],(width,size,data)
    if width>980:
     l,r,g,f=(data[k] for k in ['l','r','g','f']);assert abs(l['height']-r['height'])<1
