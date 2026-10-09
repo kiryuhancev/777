@@ -1,0 +1,60 @@
+/* POKER BLITZ — presentation only; functional nodes/handlers remain intact. */
+#pokerApp{--poker-ivory:#e5d3a6;--poker-muted:#c8b18c;--poker-line:#e5d3a650;--poker-card-width:clamp(62px,6.3vw,88px);--poker-card-height:calc(var(--poker-card-width)*1.386);padding-bottom:24px}
+#pokerApp .poker-layout{display:block}
+#pokerApp .poker-scene{isolation:isolate;position:relative;min-height:720px;padding:156px 24px 24px;border:1px solid #e5d3a62a;border-radius:24px;background-color:#2a0e15;background-image:linear-gradient(180deg,#09040608,#13070c12 40%,#13070c88),url('__POKER_SCENE__');background-size:cover;background-position:center top;box-shadow:0 20px 60px #0008}
+#pokerApp .poker-scene::before{display:none}
+#pokerApp .poker-topbar{position:absolute;top:18px;left:24px;right:24px;z-index:4;align-items:flex-start;margin:0;gap:12px}
+#pokerApp .poker-topbar .brand{font-size:22px;line-height:1.4;letter-spacing:.1em;padding:12px 18px;border:1px solid var(--poker-line);border-radius:16px;background:#10080cd9;color:var(--poker-ivory);font-weight:650}
+#pokerApp .poker-topbar .brand span{color:inherit}
+#pokerApp .poker-topbar .mode-pill{align-self:center;background:#10080ccc;color:var(--poker-muted);border-color:#e5d3a62a;font-size:10px;letter-spacing:.1em;margin-left:auto}
+#pokerApp .poker-hands-button{margin:0;padding:12px 18px;border:1px solid var(--poker-line);border-radius:14px;background:#10080cdd;color:var(--poker-ivory);min-height:44px;align-self:center;font-size:12px}
+#pokerApp .poker-status{position:relative;z-index:3;order:5;max-width:760px;width:100%;background:#10080c9c;border:0;box-shadow:none;padding:9px 14px;margin:10px auto 0;color:var(--poker-ivory);font-size:13px;font-weight:500;line-height:1.5;border-radius:12px}
+#pokerApp .poker-scene{display:flex;flex-direction:column}
+#pokerApp .poker-zones{position:relative;display:grid;grid-template-areas:'dealer' 'community' 'selection' 'player';grid-template-columns:minmax(0,1fr);gap:12px;width:min(760px,100%);margin:0 auto;z-index:2}
+#pokerApp .poker-zones section{border:0;background:none;min-width:0;padding:0;position:relative}
+#pokerApp .poker-dealer-hand{grid-area:dealer}
+#pokerApp .poker-community{grid-area:community;min-height:126px;padding-top:10px!important}
+#pokerApp .poker-selection{grid-area:selection}
+#pokerApp .poker-player-hand{grid-area:player;margin-top:8px}
+#pokerApp .zone-label{justify-content:center;margin:0;min-height:0;color:var(--poker-muted);font-size:12px;font-weight:500}
+#pokerApp .zone-label>span,#pokerApp #communityCount,#pokerApp #dealerHandName{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+#pokerApp .poker-player-hand .zone-label{position:absolute;bottom:-22px;left:0;right:0}
+#pokerApp #playerHandName{color:var(--poker-ivory);font-weight:600;max-width:100%;font-size:12px}
+#pokerApp #choiceHint{font-size:12px;line-height:1.4;margin:0 0 8px;color:var(--poker-ivory);text-shadow:0 2px 8px #000}
+#pokerApp .poker-selection:has(#choice0[style*="display: none"]){display:none}
+#pokerApp .card-row{min-height:var(--poker-card-height);flex-wrap:nowrap;gap:clamp(5px,1vw,12px);align-items:center}
+#pokerApp .playing-card,#pokerApp .dealer-hidden,#pokerApp .choice-slot{width:var(--poker-card-width);height:var(--poker-card-height);flex:0 0 auto;border-radius:9px;box-shadow:0 8px 14px #0008}
+#pokerApp #playerCards{min-height:calc(var(--poker-card-height)*1.1)}
+#pokerApp #playerCards .playing-card{width:calc(var(--poker-card-width)*1.1);height:calc(var(--poker-card-height)*1.1);transform:rotate(-5deg);transform-origin:center bottom}
+#pokerApp #playerCards .playing-card:nth-child(2){transform:rotate(5deg)}
+#pokerApp .choice-row{gap:18px;padding-bottom:6px}
+#pokerApp .choice-slot{transition:transform 180ms ease,filter 180ms ease,box-shadow 180ms ease}
+#pokerApp .choice-slot:hover:not(:disabled){transform:translateY(-6px);box-shadow:0 16px 20px #0009;filter:brightness(1.1)}
+#pokerApp .choice-slot:focus-visible,#pokerApp button:focus-visible,#pokerApp .poker-side summary:focus-visible{outline:2px solid var(--poker-ivory);outline-offset:4px}
+#pokerApp .poker-controls{justify-content:center;position:relative;z-index:3;margin-top:30px;gap:10px}
+#pokerApp .betbox{min-width:190px;border:1px solid var(--poker-line);border-radius:999px;background:#10080cda;padding:4px}
+#pokerApp .betbox button{border-radius:50%;background:none;color:var(--poker-ivory);width:44px;height:44px;font-size:24px}
+#pokerApp .betbox strong{color:var(--poker-ivory);font-size:22px}
+#pokerApp .betbox small{color:var(--poker-muted)}
+#pokerApp .poker-actions{position:relative;z-index:3;grid-template-columns:repeat(3,minmax(0,1fr));width:min(940px,100%);margin:16px auto 0;gap:12px}
+#pokerApp .poker-actions .btn{min-height:52px;border-radius:14px;letter-spacing:.06em;font-size:13px}
+#pokerApp .btn.secondary,#pokerApp #tacticalBtn{background:#180d12db;color:var(--poker-ivory);border:1px solid var(--poker-line);box-shadow:none}
+#pokerApp #pokerFoldBtn{background:#10080ce8}
+#pokerApp #pokerStartBtn{background:var(--poker-ivory);color:#180d12;border:1px solid #f0e3c4;box-shadow:0 6px 16px #0004}
+#pokerApp .poker-actions:has(#pokerFoldBtn[hidden]) #pokerStartBtn{grid-column:1/-1;justify-self:center;width:min(420px,100%)}
+#pokerApp .poker-actions [hidden]{display:none!important}
+#pokerApp .poker-side{margin:16px auto 0;max-width:900px;color:var(--poker-muted)}
+#pokerApp .poker-side summary{padding:12px 16px;min-height:44px;cursor:pointer;border:1px solid #e5d3a62a;border-radius:12px;background:#180d12;font-size:12px}
+#pokerApp .poker-side .panel{position:static;margin-top:8px;background:#180d12;border-color:#e5d3a62a}
+#pokerApp .poker-side .kv span,#pokerApp .poker-legend{color:var(--poker-muted)}
+@media(max-width:980px){#pokerApp .poker-scene{padding-top:140px;background-position:50% 0}#pokerApp .poker-topbar .mode-pill{display:none}#pokerApp .poker-hands-button{margin-left:auto}}
+@media(max-width:600px){#pokerApp{--poker-card-width:clamp(44px,13vw,64px);padding:8px 6px 20px!important}#pokerApp .poker-scene{min-height:580px;padding:132px 10px 16px;border-radius:18px;background-size:auto 100%;background-position:center top}#pokerApp .poker-topbar{top:12px;left:12px;right:12px;gap:8px}#pokerApp .poker-topbar .brand{font-size:14px;padding:9px 12px;border-radius:12px}#pokerApp .poker-hands-button{padding:9px 12px;font-size:11px}#pokerApp .poker-zones{gap:14px}#pokerApp .poker-community{min-height:102px}#pokerApp .playing-card .corner{font-size:14px;left:5px;top:4px}#pokerApp .playing-card .corner.bottom{left:auto;top:auto;right:5px;bottom:4px}#pokerApp .playing-card .pip{font-size:28px}#pokerApp .poker-actions{gap:7px;grid-template-columns:repeat(2,minmax(0,1fr))}#pokerApp .poker-actions .btn{font-size:10px;padding:12px 8px;min-height:48px}#pokerApp #pokerStartBtn{grid-column:1/-1}#pokerApp .poker-controls{margin-top:28px}#pokerApp .poker-status{font-size:12px;padding:8px 6px}#pokerApp #pokerMaxBet{font-size:11px;min-height:44px}#pokerApp .betbox{min-width:174px}}
+@media(prefers-reduced-motion:reduce){#pokerApp .playing-card,#pokerApp .choice-slot{animation:none!important;transition:none!important}}
+/* Crop the backdrop above the rail so the actual dealer cards rest on felt. */
+#pokerApp .poker-scene{background-size:auto calc(100% + 140px);background-position:center -140px}
+@media(max-width:600px){#pokerApp .poker-scene{background-size:auto calc(100% + 100px);background-position:center -100px}}
+body.poker-active #tacticalModal .topup-card{background:#180d12;border-color:#e5d3a650;color:#f0e3c4}
+body.poker-active #tacticalModal .topup-card h2{font-size:22px;color:#e5d3a6}
+body.poker-active #tacticalModal .topup-card p{color:#c8b18c}
+body.poker-active #tacticalModal .btn{background:#211016;color:#e5d3a6;border:1px solid #e5d3a650;box-shadow:none}
+body.poker-active #tacticalModal button:focus-visible{outline:2px solid #e5d3a6;outline-offset:3px}

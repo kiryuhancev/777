@@ -1,0 +1,35 @@
+{
+  "viewports": [
+    [
+      1920,
+      1080
+    ],
+    [
+      1440,
+      900
+    ],
+    [
+      1366,
+      768
+    ],
+    [
+      390,
+      844
+    ],
+    [
+      360,
+      800
+    ],
+    [
+      320,
+      640
+    ],
+    [
+      844,
+      390
+    ]
+  ],
+  "errors": [],
+  "allBusinessScriptsIdentical": true,
+  "otherGameMarkupIdentical": true
+}

@@ -14,6 +14,12 @@ for name,path,tag in [('VAULT STYLES','auth.css','style'),('VAULT CONFIG','confi
  if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
  elif name in ['VAULT STYLES','VAULT CONFIG']:s=s.replace('</head>',block+'\n</head>',1)
  else:s=s.replace('</body>',block+'\n</body>',1)
+# Poker presentation is isolated from business/auth code.
+css=(ROOT/'poker/presentation.css').read_text().replace('__POKER_SCENE__','data:image/webp;base64,'+base64.b64encode((ROOT/'assets/poker-scene.webp').read_bytes()).decode())
+block='<!-- BEGIN POKER PRESENTATION -->\n<style>\n'+css+'\n</style>\n<!-- END POKER PRESENTATION -->'
+pattern=r'<!-- BEGIN POKER PRESENTATION -->[\s\S]*?<!-- END POKER PRESENTATION -->'
+if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
+else:s=s.replace('</head>',block+'\n</head>',1)
 # Header lives outside the embedded auth block; replace the same shared mark there too.
 s=re.sub(r'(<img class="vault-mark" data-vault-mark src=")[^"]*(")',lambda m:m[1]+mark+m[2],s)
 p.write_text(s)
