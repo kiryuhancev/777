@@ -62,3 +62,11 @@
 - `supabase_schema.sql`: профиль, кошелёк, настройки, rounds/stats/achievements, trigger, RLS, ограниченные grants и идемпотентные RPC.
 - `.gitlab-ci.yml` публикует готовый HTML без npm/backend/build; `SUPABASE_SETUP.md` описывает подключение и ограничения.
 - Внутренние CSS игр, RNG и rigid-body solver не изменены. Добавлены только wallet/round/save hooks.
+
+## BLACKJACK + BACCARAT
+
+- Added two TABLE cards and full games inside the existing VAULT header/navigation; current featured game and existing games remain unchanged.
+- Reused Poker Blitz scene, dealer, card renderer, typography, bet selector and ivory/burgundy buttons.
+- Blackjack: natural 3:2, S17, HIT/STAND/DOUBLE; Baccarat: six-deck Punto Banco, official third-card matrix, Banker commission and tie pushes.
+- Extended existing shared wallet/round/persistence registry; one UUID per hand, one settle, safe interrupted-hand recovery, fractional balances and automatic schema-readiness guard.
+- Added repeat-safe `supabase_table_games.sql` for the existing database and focused math/browser/PostgreSQL/RLS tests.

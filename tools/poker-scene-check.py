@@ -7,6 +7,8 @@ import subprocess,re
 before=subprocess.check_output(['git','show','e531074:index.html'],cwd=ROOT,text=True)
 current=(ROOT/'index.html').read_text()
 def game_scripts(html):
+ html=re.sub(r'<!-- BEGIN TABLE (?:RULES|GAMES) -->[\s\S]*?<!-- END TABLE (?:RULES|GAMES) -->','',html)
+ html=re.sub(r",\{id:'(?:blackjack|baccarat)',element:'open(?:Blackjack|Baccarat)Game',category:'table',isNew:true\}",'',html)
  html=re.sub(r'const BONUS_TYPES=\[[\s\S]*?(?=// BIRD RIGID BODY ENGINE)','',html)
  html=re.sub(r'<!-- BEGIN VAULT RUNTIME -->[\s\S]*?<!-- END VAULT RUNTIME -->','',html)
  if '// BEGIN BIRD GAME V2' in html:html=re.sub(r'// BEGIN BIRD GAME V2[\s\S]*?// END BIRD GAME V2','',html)
@@ -16,7 +18,9 @@ def game_scripts(html):
 assert game_scripts(before)==game_scripts(current),'Poker/slot scripts changed'
 assert re.search(r'<style>([\s\S]*?)</style>',before)[1]==re.search(r'<style>([\s\S]*?)</style>',current)[1]
 for marker,end in [('<section class="lobby"','<div class="app">'),('<div class="app">','<div class="poker-app"')]:
- def exclude_branding(section):return re.sub(r'<button class="game-card playable" id="openBirdGame"[\s\S]*?</button>','BIRD_CARD',section)
+ def exclude_branding(section):
+  section=re.sub(r'<button class="game-card playable" id="open(?:Blackjack|Baccarat)Game"[\s\S]*?</button>','',section)
+  return re.sub(r'<button class="game-card playable" id="openBirdGame"[\s\S]*?</button>','BIRD_CARD',section)
  assert exclude_branding(before.split(marker,1)[1].split(end,1)[0])==exclude_branding(current.split(marker,1)[1].split(end,1)[0]),marker
 report={'viewports':[],'errors':[],'pokerAndSlotScriptsIdentical':True,'otherGameMarkupIdentical':True}
 with sync_playwright() as p:

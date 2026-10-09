@@ -86,3 +86,7 @@ Auth contract test при первом запуске скачивает зак�
 SQL test ожидает disposable контейнер `vault-postgres-test` с PostgreSQL 17, БД `vault_test` и пользователем postgres. Создать: `docker run -d --name vault-postgres-test -e POSTGRES_PASSWORD=vault-local-test-only -e POSTGRES_DB=vault_test postgres:17-alpine`. Скрипт создаёт тестовые auth roles/users и очищает их; **не запускать против production**. Он проверяет повторное применение migration, RLS A/B, запрет прямых записей, транзакции, duplicates и stale revision.
 
 После настройки реального Supabase обязательно проверить регистрацию/письмо, вход/выход, F5, offline/online, повтор round ID, второй browser profile и попытку получить строки B токеном A. Проверять RLS нужно через клиент с JWT пользователей, а не через SQL Editor с привилегиями владельца.
+
+### BLACKJACK / BACCARAT update
+
+For an existing configured database, run the complete `supabase_table_games.sql` once in https://supabase.com/dashboard/project/umccpdbopcgluwsnhlwj/sql/new . It extends game IDs and RPCs without resetting accounts or balances. Then open either new table again; readiness is checked automatically. See `TABLE_GAMES.md`. A newly created database should use the updated full `supabase_schema.sql`.

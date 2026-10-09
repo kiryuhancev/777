@@ -22,7 +22,7 @@ create table if not exists public.wallets (
 );
 create table if not exists public.game_stats (
   id uuid primary key default gen_random_uuid(),user_id uuid not null references auth.users(id) on delete cascade,
-  game_id text not null check(game_id in ('slot','poker','bird')),
+  game_id text not null check(game_id in ('slot','poker','bird','blackjack','baccarat')),
   rounds_played bigint not null default 0,total_wagered numeric(20,6) not null default 0,
   total_won numeric(20,6) not null default 0,biggest_win numeric(20,6) not null default 0,
   biggest_multiplier numeric(20,6) not null default 0,updated_at timestamptz not null default now(),unique(user_id,game_id)
@@ -30,7 +30,7 @@ create table if not exists public.game_stats (
 create table if not exists public.game_rounds (
   id uuid primary key default gen_random_uuid(),round_id uuid not null unique,
   user_id uuid not null references auth.users(id) on delete cascade,
-  game_id text not null check(game_id in ('slot','poker','bird')),
+  game_id text not null check(game_id in ('slot','poker','bird','blackjack','baccarat')),
   status text not null default 'started' check(status in ('started','settled','cancelled')),
   bet numeric(20,6) not null check(bet>=0),payout numeric(20,6) not null default 0 check(payout>=0),
   multiplier numeric(20,6) not null default 0 check(multiplier>=0),result text not null default '',
@@ -50,10 +50,17 @@ create table if not exists public.user_settings (
   user_id uuid primary key references auth.users(id) on delete cascade,
   sound_enabled boolean not null default true,music_enabled boolean not null default false,
   fast_mode boolean not null default false,fast_bonus boolean not null default false,scatter_boost boolean not null default false,
-  last_game_id text check(last_game_id in ('lobby','slot','poker','bird')),
+  last_game_id text check(last_game_id in ('lobby','slot','poker','bird','blackjack','baccarat')),
   selected_bets jsonb not null default '{"slot":2,"poker":2,"bird":1}'::jsonb,
   updated_at timestamptz not null default now()
 );
+-- Existing installations: extend only game/screen registries, preserving all rows and RLS.
+alter table public.game_stats drop constraint if exists game_stats_game_id_check;
+alter table public.game_stats add constraint game_stats_game_id_check check(game_id in ('slot','poker','bird','blackjack','baccarat'));
+alter table public.game_rounds drop constraint if exists game_rounds_game_id_check;
+alter table public.game_rounds add constraint game_rounds_game_id_check check(game_id in ('slot','poker','bird','blackjack','baccarat'));
+alter table public.user_settings drop constraint if exists user_settings_last_game_id_check;
+alter table public.user_settings add constraint user_settings_last_game_id_check check(last_game_id in ('lobby','slot','poker','bird','blackjack','baccarat'));
 create or replace function public.vault_touch_updated_at() returns trigger language plpgsql set search_path='' as $$
 begin new.updated_at=now();return new;end $$;
 drop trigger if exists profiles_updated_at on public.profiles;
@@ -111,7 +118,7 @@ returns jsonb language plpgsql security definer set search_path='' as $$
 declare u uuid:=auth.uid();w public.wallets;r public.game_rounds;
 begin
  if u is null then raise exception 'Authentication required';end if;
- if p_round_id is null or p_game_id is null or p_game_id not in ('slot','poker','bird') or p_bet is null or p_bet<0 or p_bet>1000000000000 then raise exception 'Invalid round';end if;
+ if p_round_id is null or p_game_id is null or p_game_id not in ('slot','poker','bird','blackjack','baccarat') or p_bet is null or p_bet<0 or p_bet>1000000000000 then raise exception 'Invalid round';end if;
  perform public.vault_validate_payload(p_metadata,p_recovery);
  select * into w from public.wallets where user_id=u for update;
  if not found then raise exception 'Wallet missing';end if;
@@ -133,17 +140,26 @@ returns jsonb language plpgsql security definer set search_path='' as $$
 declare u uuid:=auth.uid();w public.wallets;r public.game_rounds;
 begin
  if u is null then raise exception 'Authentication required';end if;
- if p_round_id is null or p_game_id is null or p_game_id not in ('slot','poker','bird') or p_bet is null or p_bet<0 or p_status is null or p_payout is null or p_payout<0 or p_payout>1000000000000 or p_multiplier is null or p_multiplier<0
+ if p_round_id is null or p_game_id is null or p_game_id not in ('slot','poker','bird','blackjack','baccarat') or p_bet is null or p_bet<0 or p_status is null or p_payout is null or p_payout<0 or p_payout>1000000000000 or p_multiplier is null or p_multiplier<0
    or p_multiplier>1000000000000 or p_result is null or length(p_result)>200 or p_status not in ('settled','cancelled') then raise exception 'Invalid settlement';end if;
  perform public.vault_validate_payload(p_metadata,p_recovery);
  select * into w from public.wallets where user_id=u for update;
  select * into r from public.game_rounds where round_id=p_round_id and user_id=u for update;
- if not found or r.game_id<>p_game_id or r.bet<>round(p_bet,6) then raise exception 'Round missing or mismatch';end if;
+ if not found or r.game_id<>p_game_id then raise exception 'Round missing or mismatch';end if;
  if r.status<>'started' then
+  if r.bet<>round(p_bet,6) then raise exception 'Round missing or mismatch';end if;
   if r.payout<>round(p_payout,6) or r.status<>p_status then raise exception using message='VAULT_WALLET_CONFLICT',errcode='P0001';end if;
   return jsonb_build_object('balance',w.balance,'revision',w.revision,'duplicate',true,'status',r.status);
  end if;
- update public.game_rounds set payout=round(p_payout,6),multiplier=round(p_multiplier,6),result=p_result,metadata=metadata||p_metadata,status=p_status,settled_at=now() where round_id=p_round_id;
+ -- DOUBLE adds exactly one original stake. Its debit joins the final wallet/round transaction.
+ -- Client demo outcomes remain client-authoritative; no direct wallet write grant is added.
+ if r.bet<>round(p_bet,6) then
+  if p_game_id<>'blackjack' or p_bet<>r.bet*2 or p_metadata->>'doubled' is distinct from 'true' then raise exception 'Round missing or mismatch';end if;
+  if w.balance<p_bet-r.bet then raise exception using message='VAULT_WALLET_CONFLICT',errcode='P0001';end if;
+  update public.wallets set balance=balance-(p_bet-r.bet) where user_id=u;
+  r.bet:=round(p_bet,6);
+ end if;
+ update public.game_rounds set bet=r.bet,payout=round(p_payout,6),multiplier=round(p_multiplier,6),result=p_result,metadata=metadata||p_metadata,status=p_status,settled_at=now() where round_id=p_round_id;
  update public.wallets set balance=balance+round(p_payout,6),revision=revision+1,recovery=case when p_game_id='slot' then p_recovery else recovery end,updated_at=now() where user_id=u returning * into w;
  insert into public.game_stats(user_id,game_id,rounds_played,total_wagered,total_won,biggest_win,biggest_multiplier)
  values(u,p_game_id,1,r.bet,round(p_payout,6),round(p_payout,6),round(p_multiplier,6))
@@ -164,7 +180,7 @@ begin
  update public.user_settings set sound_enabled=coalesce((p_settings->>'sound')::boolean,s.sound_enabled),
  music_enabled=coalesce((p_settings->>'music')::boolean,s.music_enabled),fast_mode=coalesce((p_settings->>'fastGame')::boolean,s.fast_mode),
  fast_bonus=coalesce((p_settings->>'fastBonus')::boolean,s.fast_bonus),scatter_boost=coalesce((p_settings->>'scatterBoost')::boolean,s.scatter_boost),
- last_game_id=case when p_settings->>'lastGame' in ('lobby','slot','poker','bird') then p_settings->>'lastGame' else s.last_game_id end,
+ last_game_id=case when p_settings->>'lastGame' in ('lobby','slot','poker','bird','blackjack','baccarat') then p_settings->>'lastGame' else s.last_game_id end,
  selected_bets=coalesce(p_settings->'bets',s.selected_bets),updated_at=least(p_updated_at,clock_timestamp()) where user_id=u returning * into s;
  return to_jsonb(s);
 end $$;
@@ -173,4 +189,8 @@ revoke all on function public.begin_game_round(uuid,text,numeric,bigint,jsonb,js
 grant execute on function public.begin_game_round(uuid,text,numeric,bigint,jsonb,jsonb),public.record_game_round(uuid,text,numeric,numeric,numeric,text,jsonb,text,jsonb),public.save_vault_settings(jsonb,timestamptz) to authenticated;
 -- Future server-authoritative apply_wallet_transaction must validate outcomes on the server.
 -- Do not expose an unrestricted set_balance RPC or wallet UPDATE grant.
+create or replace function public.table_games_capabilities() returns jsonb language sql stable security invoker set search_path='' as $$ select jsonb_build_object('version',1); $$;
+revoke all on function public.table_games_capabilities() from public,anon;
+grant execute on function public.table_games_capabilities() to authenticated;
+
 commit;

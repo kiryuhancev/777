@@ -20,6 +20,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Check game mathematics
         run: |
+          node tools/table-rules-tests.cjs
           node tools/math-tests.cjs
           node tools/bird-physics-tests.cjs
           node tools/bird-round-tests.cjs

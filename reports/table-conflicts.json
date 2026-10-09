@@ -1,0 +1,8 @@
+{
+  "mode": "Supabase SDK contract fixture",
+  "passed": [
+    "Funded offline DOUBLE rebases exact total stake/return once",
+    "Insufficient remote DOUBLE cancels without fabricated payout or stuck sync"
+  ],
+  "pageErrors": []
+}

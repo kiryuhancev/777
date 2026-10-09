@@ -1,0 +1,17 @@
+{
+  "mode": "Browser and Supabase SDK contract fixture, not live cloud",
+  "passed": [
+    "Natural 3:2, duplicate DEAL ignored, shared wallet and one remote result",
+    "Hidden dealer card; S17 stands without extra draw",
+    "DOUBLE debits once, draws one, returns 2× total stake; server matches",
+    "BUST consumes stake; no payout",
+    "Both naturals, dealer natural, push, doubled bust and doubled loss",
+    "F5 during DOUBLE resets hand without refund/replay; repeated reload does not log twice",
+    "TABLE filter, three bet choices, automated baccarat, selected size/type and last screen survive F5",
+    "Five desktop/tablet/mobile widths, no horizontal scrolling, shared header and readable controls",
+    "Unique DOM IDs; switching to original games hides new tables",
+    "Insufficient wallet disables DOUBLE and consumes only the original stake",
+    "Missing SQL blocks new-table debits/outbox only; old games work; migration unlocks automatically"
+  ],
+  "pageErrors": []
+}

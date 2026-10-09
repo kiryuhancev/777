@@ -1,0 +1,14 @@
+{
+  "database": "PostgreSQL 17",
+  "passed": [
+    "repeat-safe registry migration",
+    "one hand UUID with DOUBLE",
+    "atomic additional debit and return",
+    "duplicate settle is idempotent",
+    "interrupted DOUBLE consumes both stakes without refund",
+    "extra wager rejected outside Blackjack",
+    "Baccarat commission credited once",
+    "last-game/settings persistence",
+    "RLS isolates both new games"
+  ]
+}

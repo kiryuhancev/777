@@ -37,3 +37,14 @@ else:s=s.replace('</head>',block+'\n</head>',1)
 s=re.sub(r'(<img class="vault-mark" data-vault-mark src=")[^"]*(")',lambda m:m[1]+mark+m[2],s)
 p.write_text(s)
 print('Embedded VAULT configuration, UI and data layer')
+# Adjacent tables inherit the approved Poker materials and card components.
+s=p.read_text()
+shared=(ROOT/'poker/presentation.css').read_text().replace('#pokerApp','.vault-table').replace('body.poker-active #tacticalModal','body.table-active #unusedTacticalModal')
+shared=shared.replace('__POKER_SCENE__','data:image/webp;base64,'+base64.b64encode((ROOT/'assets/poker-scene.webp').read_bytes()).decode())
+for name,text,tag in [('TABLE PRESENTATION',shared+'\n'+(ROOT/'tables/presentation.css').read_text(),'style'),('TABLE SCREENS',(ROOT/'tables/screens.html').read_text(),None),('TABLE RULES',(ROOT/'tables/rules.js').read_text(),'script'),('TABLE GAMES',(ROOT/'tables/game.js').read_text(),'script')]:
+ block=f'<!-- BEGIN {name} -->\n'+(f'<{tag}>\n{text}\n</{tag}>' if tag else text)+f'\n<!-- END {name} -->'
+ pattern=rf'<!-- BEGIN {name} -->[\s\S]*?<!-- END {name} -->'
+ if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
+ elif tag=='style':s=s.replace('</head>',block+'\n</head>',1)
+ else:s=s.replace('<!-- BEGIN VAULT RUNTIME -->',block+'\n<!-- BEGIN VAULT RUNTIME -->',1)
+p.write_text(s)
