@@ -1,0 +1,19 @@
+/* Only Bird Siege. VAULT shell and both other games are unchanged. */
+#birdApp .bird-shell{max-width:1240px;margin:auto}
+#birdApp .bird-layout{display:block}
+#birdApp .bird-stage-wrap{border:1px solid #a5bdba70;border-radius:20px;background:#263c56;overflow:hidden;box-shadow:0 18px 60px #0005}
+#birdApp #birdCanvas{display:block;width:100%;height:auto;aspect-ratio:16/9;touch-action:none}
+#birdApp .bird-hud{top:12px;left:12px;right:12px;gap:8px;pointer-events:none;align-items:flex-start}
+#birdApp .bird-chip{background:#183039d9;color:#ead7ae;border:1px solid #e3c89244;min-width:72px;box-shadow:none}
+#birdApp .bird-chip small{color:#c9d6d0}
+#birdApp #birdBonusHud{align-self:center;background:#183039d9;border-radius:10px;padding:7px 10px;color:#eed2a0;font-size:13px;max-width:40%;overflow-wrap:anywhere}
+#birdApp #birdBonusHud:empty{display:none}
+#birdApp .bird-controls{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:16px}
+#birdApp .bird-steer{display:flex;gap:6px}
+#birdApp .bird-steer button{width:44px;min-height:44px;touch-action:none}
+#birdApp .bird-message{text-align:center;min-height:24px;margin:12px auto;color:#d6d0bf}
+#birdApp .bird-side{display:block;margin-top:12px;color:#c5cfc8;font-size:13px}
+#birdApp .bird-side summary{cursor:pointer;text-align:center;padding:10px}
+#birdApp .bird-side .bird-guide{max-width:900px;margin:auto;line-height:1.7;padding:12px 18px;background:#18303999;border-radius:12px}
+#birdApp .bird-topbar .mode-pill{background:#183039;color:#d1d8c3;border-color:#a5bdba50}
+@media(max-width:600px){#birdApp{padding:8px!important}#birdApp .bird-stage-wrap{border-radius:12px}#birdApp .bird-hud{top:7px;left:7px;right:7px;gap:5px}#birdApp .bird-chip{min-width:48px;padding:5px 7px}#birdApp .bird-chip small{font-size:8px}#birdApp .bird-chip strong{font-size:15px}#birdApp #birdBonusHud{font-size:9px;padding:5px;max-width:28%}#birdApp .bird-controls{gap:7px}#birdApp .bird-controls .btn{font-size:11px;padding:10px 13px;min-height:44px}#birdApp .betbox{min-width:155px}#birdApp #birdStartBtn{flex:1;min-width:140px}#birdApp .bird-message{font-size:12px;line-height:1.5}#birdApp .bird-topbar{margin-bottom:10px}#birdApp .mode-pill{font-size:9px}}

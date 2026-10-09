@@ -1,0 +1,11 @@
+{
+  "baseline": "a042ab9",
+  "unchanged": [
+    "Digital Derby HTML/styles/RNG/logic",
+    "Poker Blitz HTML/styles/logic",
+    "lobby VAULT and auth UI",
+    "rigid-body engine",
+    "wallet/auth/Supabase services"
+  ],
+  "allowedRecoveryChange": "Existing safe reset delegates to resetBirdRecovery; no physics-frame restoration"
+}

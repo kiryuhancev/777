@@ -19,7 +19,10 @@ jobs:
       - name: Check out game
         uses: actions/checkout@v4
       - name: Check game mathematics
-        run: node tools/math-tests.cjs
+        run: |
+          node tools/math-tests.cjs
+          node tools/bird-physics-tests.cjs
+          node tools/bird-round-tests.cjs
       - name: Build standalone site
         id: site
         run: |

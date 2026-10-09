@@ -21,6 +21,18 @@ pattern=r'<!-- BEGIN POKER PRESENTATION -->[\s\S]*?<!-- END POKER PRESENTATION -
 if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
 else:s=s.replace('</head>',block+'\n</head>',1)
 # Header lives outside the embedded auth block; replace the same shared mark there too.
+bird='// BEGIN BIRD GAME V2\n'+'\n'.join((ROOT/'bird'/f).read_text().rstrip() for f in ['config.js','model.js','game.js'])+'\n// END BIRD GAME V2'
+pattern=r'// BEGIN BIRD GAME V2[\s\S]*?// END BIRD GAME V2'
+if re.search(pattern,s):s=re.sub(pattern,lambda _:bird,s)
+else:
+ start=s.index('const BIRD_DEBUG_PHYSICS=false;',s.index('// END BIRD RIGID BODY ENGINE'))
+ end=s.index("window.addEventListener('resize',resizeCell);",start)
+ s=s[:start]+bird+'\n\n'+s[end:]
+css=(ROOT/'bird/presentation.css').read_text()
+block='<!-- BEGIN BIRD PRESENTATION -->\n<style>\n'+css+'\n</style>\n<!-- END BIRD PRESENTATION -->'
+pattern=r'<!-- BEGIN BIRD PRESENTATION -->[\s\S]*?<!-- END BIRD PRESENTATION -->'
+if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
+else:s=s.replace('</head>',block+'\n</head>',1)
 s=re.sub(r'(<img class="vault-mark" data-vault-mark src=")[^"]*(")',lambda m:m[1]+mark+m[2],s)
 p.write_text(s)
 print('Embedded VAULT configuration, UI and data layer')

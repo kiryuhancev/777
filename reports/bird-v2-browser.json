@@ -1,0 +1,48 @@
+{
+  "passed": [
+    "One paid launch, fixed bonuses, moving camera, one settlement/stat entry, bounded cleanup",
+    "Mobile drag and no overflow; F5 retains debit/session and cancels flight without duplicate payout",
+    "Five viewport widths, shared VAULT header, all navigation, no duplicate IDs or page errors",
+    "Large physical scene played in real time; full target framing and bounded settlement"
+  ],
+  "consoleErrors": [],
+  "result": {
+    "seed": 1863279913,
+    "bet": 20,
+    "routeType": "DRY",
+    "bonusesOffered": [
+      "heavy",
+      "x2",
+      "x2",
+      "x2",
+      "mega",
+      "heavy",
+      "pierce",
+      "x2",
+      "x2",
+      "mega"
+    ],
+    "bonusesCollected": [
+      "x2"
+    ],
+    "buildingArchetype": "PYRAMID",
+    "buildingSize": "LARGE",
+    "pigsTotal": 8,
+    "pigsDestroyed": 1,
+    "blocksTotal": 24,
+    "blocksDestroyed": 2,
+    "damageScore": 29.60838126151847,
+    "chainReactions": 2,
+    "destructionScore": 129.60838126151847,
+    "multiplier": 2,
+    "payout": 51.843353,
+    "birdsUsed": 1,
+    "roundId": "2d48f733-200f-4fd5-9aa6-5ac7b94cbd4f"
+  },
+  "largeSceneFrameTiming": {
+    "frames": 48,
+    "meanMs": 16.666666666666668,
+    "p95Ms": 16.700000000000728
+  },
+  "mode": "Actual browser/SDK, API fixture; no live Supabase claim"
+}

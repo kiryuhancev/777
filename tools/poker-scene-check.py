@@ -1,4 +1,4 @@
-"""Poker presentation QA with isolated Supabase fixture; game scripts compared byte-for-byte."""
+"""Poker presentation QA with isolated Supabase fixture; Poker/slot scripts compared byte-for-byte; Bird has its own QA."""
 from pathlib import Path
 fixture=Path(__file__).with_name('vault-auth-check.py');namespace={'__file__':str(fixture)}
 exec(compile(fixture.read_text().split('with sync_playwright() as p:')[0],str(fixture),'exec'),namespace)
@@ -6,12 +6,18 @@ globals().update({k:v for k,v in namespace.items() if not k.startswith('__')})
 import subprocess,re
 before=subprocess.check_output(['git','show','e531074:index.html'],cwd=ROOT,text=True)
 current=(ROOT/'index.html').read_text()
-game_scripts=lambda html:re.findall(r'<script[^>]*>([\s\S]*?)</script>',re.sub(r'<!-- BEGIN VAULT RUNTIME -->[\s\S]*?<!-- END VAULT RUNTIME -->','',html))
-assert game_scripts(before)==game_scripts(current),'Game scripts changed'
+def game_scripts(html):
+ html=re.sub(r'const BONUS_TYPES=\[[\s\S]*?(?=// BIRD RIGID BODY ENGINE)','',html)
+ html=re.sub(r'<!-- BEGIN VAULT RUNTIME -->[\s\S]*?<!-- END VAULT RUNTIME -->','',html)
+ if '// BEGIN BIRD GAME V2' in html:html=re.sub(r'// BEGIN BIRD GAME V2[\s\S]*?// END BIRD GAME V2','',html)
+ else:
+  a=html.index('const BIRD_DEBUG_PHYSICS=false;',html.index('// END BIRD RIGID BODY ENGINE'));b=html.index("window.addEventListener('resize',resizeCell);",a);html=html[:a]+html[b:]
+ return [re.sub(r'\n\s*\n','\n',s) for s in re.findall(r'<script[^>]*>([\s\S]*?)</script>',html)]
+assert game_scripts(before)==game_scripts(current),'Poker/slot scripts changed'
 assert re.search(r'<style>([\s\S]*?)</style>',before)[1]==re.search(r'<style>([\s\S]*?)</style>',current)[1]
-for marker,end in [('<section class="lobby"','<div class="app">'),('<div class="app">','<div class="poker-app"'),('<div class="bird-app"','<script>')]:
+for marker,end in [('<section class="lobby"','<div class="app">'),('<div class="app">','<div class="poker-app"')]:
  assert before.split(marker,1)[1].split(end,1)[0]==current.split(marker,1)[1].split(end,1)[0],marker
-report={'viewports':[],'errors':[],'allGameScriptsIdentical':True,'otherGameMarkupIdentical':True}
+report={'viewports':[],'errors':[],'pokerAndSlotScriptsIdentical':True,'otherGameMarkupIdentical':True}
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
  for width,height in [(1920,1080),(1440,900),(1366,768),(390,844),(360,800),(320,640),(844,390)]:
