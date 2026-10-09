@@ -72,7 +72,10 @@ class Cloud:
   table=path.split('/')[-1]
   if table=='wallets' and uid in self.unavailable_wallets:return response({'message':'Wallet unavailable'},503)
   if table=='profiles' and uid in self.unavailable_profiles:return response({'message':'Profile unavailable'},503)
-  if table=='game_rounds':return response([{'round_id':id,'game_id':r['p_game_id'],'bet':r['p_bet'],'status':r['status']} for id,r in self.rounds.items() if r['user_id']==uid and r['status']=='started'])
+  if table=='game_rounds':
+   q=parse_qs(url.query);wanted=q.get('round_id',[''])[0];status_filter=q.get('status',[''])[0]
+   selected=set(wanted.removeprefix('in.(').removesuffix(')').split(',')) if wanted else None
+   return response([{'round_id':id,'game_id':r['p_game_id'],'bet':r['p_bet'],'payout':r.get('payout',0),'status':r['status']} for id,r in self.rounds.items() if r['user_id']==uid and (not selected or id in selected) and (not status_filter or r['status']==status_filter.removeprefix('eq.'))])
   if table=='game_stats':return response([s for (id,_),s in self.stats.items() if id==uid])
   if req.method=='PATCH':self.rows[uid][table].update(payload)
   return response(self.rows[uid][table])
@@ -111,10 +114,10 @@ with sync_playwright() as p:
  result=other.evaluate("VaultAuth.signIn('alice@example.test','fixture-password')");assert 'error' not in result;settled_sync(other)
  assert other.evaluate('VaultSession.profile.username')=='Alice Vault';assert other.evaluate('state.balance')==cloud.rows[A]['wallets']['balance']
  report['passed'].append('Second browser profile loads remote identity, profile, wallet and settings')
- cloud.offline=True;fold(page);cloud.offline=False;fold(other);settled_sync(other);page.evaluate('VaultSync.flush()');assert page.evaluate('VaultStorage.inspect().conflict')
- assert page.locator('#vaultConflictButton').get_attribute('hidden') is None
- page.evaluate('VaultSync.useRemote()');assert not page.evaluate('VaultStorage.inspect().conflict');assert page.evaluate('state.balance')==cloud.rows[A]['wallets']['balance']
- report['passed'].append('Cross-device stale-wallet conflict blocks gameplay; explicit remote recovery, never max(balance)')
+ cloud.offline=True;fold(page);cloud.offline=False;fold(other);settled_sync(other);page.evaluate('VaultSync.flush()');page.wait_for_function('!VaultStorage.inspect().conflict&&VaultStorage.inspect().data.queue.length===0',timeout=20000)
+ assert page.locator('#vaultConflictButton').get_attribute('hidden') is not None
+ assert not page.evaluate('VaultStorage.inspect().conflict');assert page.evaluate('state.balance')==cloud.rows[A]['wallets']['balance']
+ report['passed'].append('Cross-device wallet revision rebases pending business events automatically, never max(balance)')
  result=page.evaluate('VaultAuth.signOut()');assert 'error' not in result;assert page.evaluate('VaultSession.mode')=='guest';assert page.evaluate('state.balance')==999123;assert page.evaluate('state.bonus&&state.freeSpins===8&&!state.bonusAutoRunning')
  report['passed'].append('Paused guest bonus remains in its owner namespace and is never imported into an account')
  result=page.evaluate("VaultAuth.signIn('bob@example.test','fixture-password')");assert 'error' not in result;assert page.evaluate('VaultSession.user.id')==B;assert page.evaluate('state.balance')==1000000

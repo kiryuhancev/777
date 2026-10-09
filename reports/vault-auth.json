@@ -7,7 +7,7 @@
     "Offline auth cache and bounded outbox; lost settlement reply retries without a second payout",
     "Offline round queues locally and reconnect flushes business events",
     "Second browser profile loads remote identity, profile, wallet and settings",
-    "Cross-device stale-wallet conflict blocks gameplay; explicit remote recovery, never max(balance)",
+    "Cross-device wallet revision rebases pending business events automatically, never max(balance)",
     "Paused guest bonus remains in its owner namespace and is never imported into an account",
     "Sign-out restores separate guest namespace; next account cannot see previous wallet/profile/outbox",
     "Sign-out remains signed out after F5; no password stored in application cache",

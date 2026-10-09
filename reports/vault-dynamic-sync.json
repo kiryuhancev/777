@@ -1,0 +1,12 @@
+{
+  "mode": "Real SDK/API fixture, not live Supabase",
+  "passed": [
+    "Offline rounds rebase automatically onto a changed remote revision, with exact debits/payouts and no manual button",
+    "Ten rapid consecutive Poker rounds synchronize without persistent conflict or duplicate stats",
+    "A delayed profile read cannot overwrite a newer local wallet mutation",
+    "An abandoned remote round recovers automatically after F5 without refund or payout",
+    "Revision conflict during draft never resets the live hand; recovery waits for its settlement",
+    "Insufficient remote funds reject unaccepted events without fabricating credits or keeping a permanent conflict"
+  ],
+  "errors": []
+}

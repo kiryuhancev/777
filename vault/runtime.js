@@ -11,7 +11,7 @@
   const VaultSession=window.VaultSession={mode:'guest',user:null,profile:null,ready:false};
   let authBusy=false;
   let owner='guest',data=defaults(),client=null,clientRevision=0,suppress=false,localTimer=null,syncTimer=null,syncing=null,identityEpoch=0,connecting=null,connectionUser=null,settingsFingerprint='',conflict=false,locked=false,releaseLock=null,lockHeld=false,storageAvailable=true,profileRemote=true;
-  let canonicalBalance=state.balance;
+  let canonicalBalance=state.balance,walletMutation=0,recovering=null;
   const byId=id=>document.getElementById(id);
   const status=text=>{if(!storageAvailable&&/сохран|Saved|Offline|pending/i.test(text))text='Сохранение недоступно — не перезагружайте страницу';const node=byId('vaultSyncStatus');if(node)node.textContent=text;};
   function configured(){
@@ -68,7 +68,7 @@
   const VaultWalletService=window.VaultWalletService={
     getBalance:()=>canonicalBalance,
     formatBalance:()=>owner!=='guest'&&!data.walletConfirmed?'—':fmt(canonicalBalance),
-    setLocalBalance(value){const n=amount(value);if(n===null)throw Error('Invalid wallet value');canonicalBalance=n;data.balance=n;if(!suppress){VaultStorage.saveLocalState({preferences:false});refreshBalanceUI();}return n;},
+    setLocalBalance(value){const n=amount(value);if(n===null)throw Error('Invalid wallet value');canonicalBalance=n;data.balance=n;walletMutation++;if(!suppress){VaultStorage.saveLocalState({preferences:false});refreshBalanceUI();}return n;},
     applyDelta(delta,{gameId}={}){
       if(!Number.isFinite(delta)||amount(canonicalBalance+delta)===null)throw Error('Invalid wallet delta');
       const round=data.recovery.openRounds[gameId];
@@ -105,7 +105,8 @@
   const VaultRoundService=window.VaultRoundService={
     canPlay(game){
       if(VaultSession.mode!=='authenticated'){toast('Войдите в аккаунт, чтобы начать игру');return false;}
-      if(authBusy||!VaultSession.ready||conflict||locked||(!profileRemote&&owner!=='guest')||data.queue.length>C.maxPendingEvents-6){toast(locked?'Игра открыта в другой вкладке':conflict?'Обновите облачные данные перед игрой':'Sync pending — игра временно недоступна');return false;}
+      if(conflict){recoverWallet();status('Восстанавливаем кошелёк…');return false;}
+      if(authBusy||!VaultSession.ready||locked||(!profileRemote&&owner!=='guest')||data.queue.length>C.maxPendingEvents-6){toast(locked?'Игра открыта в другой вкладке':'Sync pending — игра временно недоступна');return false;}
       return games.includes(game);
     },
     begin(gameId,betValue,{stake=betValue,...metadata}={}){
@@ -160,7 +161,7 @@
     byId('vaultGuestActions').hidden=VaultSession.mode==='authenticated';byId('vaultUserActions').hidden=VaultSession.mode!=='authenticated';
     const username=VaultSession.profile?.username||VaultSession.user?.user_metadata?.username||'Player';byId('vaultUsername').textContent=username;byId('vaultInitials').textContent=username.slice(0,1).toUpperCase();
     const avatar=VaultSession.profile?.avatar_url,node=byId('vaultAvatar');if(typeof avatar==='string'&&/^https:\/\//.test(avatar)){node.src=avatar;node.hidden=false;byId('vaultInitials').hidden=true;}else{node.removeAttribute('src');node.hidden=true;byId('vaultInitials').hidden=false;}
-    byId('vaultConflictButton').hidden=!conflict;byId('vaultReloadAccount').hidden=!signedIn||profileRemote;
+    byId('vaultConflictButton').hidden=true;byId('vaultReloadAccount').hidden=!signedIn||profileRemote;
   }
   async function acquireLock(){
     releaseLock?.();releaseLock=null;lockHeld=false;locked=false;
@@ -174,13 +175,14 @@
   }
   function rememberSession(){if(owner==='guest'){try{localStorage.removeItem(NS+'session');}catch{}return;}write('session',{user:VaultSession.user,profile:VaultSession.profile,project:C.supabaseUrl});}
   const VaultProfileService=window.VaultProfileService={
-    async load(){
+    async load({previewWallet=false}={}){
+      const mutation=walletMutation,epoch=identityEpoch;
       if(!client||!VaultSession.user)throw Error('No authenticated session');
       const uid=VaultSession.user.id;
       const responses=await Promise.all([client.from('profiles').select('*').eq('id',uid).single(),client.from('wallets').select('*').eq('user_id',uid).single(),client.from('user_settings').select('*').eq('user_id',uid).single(),client.from('game_stats').select('*').eq('user_id',uid),client.from('game_rounds').select('round_id,game_id,bet,status').eq('user_id',uid).eq('status','started')]);
       // A failed optional/profile query must not hide a successfully loaded personal wallet.
       const walletResponse=responses[1];
-      if(!walletResponse.error&&uid===owner&&amount(walletResponse.data?.balance)!==null&&!data.queue.length&&!Object.keys(data.recovery.openRounds).length){
+      if(previewWallet&&mutation===walletMutation&&epoch===identityEpoch&&!walletResponse.error&&uid===owner&&amount(walletResponse.data?.balance)!==null&&!data.queue.length&&!Object.keys(data.recovery.openRounds).length){
         canonicalBalance=amount(walletResponse.data.balance);data.balance=canonicalBalance;data.walletConfirmed=true;data.revision=Number(walletResponse.data.revision)||0;clientRevision=data.revision;refreshBalanceUI();
       }
       const names=['профиль','кошелёк','настройки','статистика','история раундов'];
@@ -201,17 +203,68 @@
   };
   function applyRemote(remote,{wallet=true}={}){
     VaultSession.profile=remote.profile;profileRemote=true;
-    if(wallet&&remote.rounds.length){conflict=true;status('Раунд открыт на другом устройстве');}
+    if(wallet&&remote.rounds.length){conflict=true;status('Восстанавливаем раздачу…');}
     if(wallet){canonicalBalance=amount(remote.wallet.balance);data.balance=canonicalBalance;data.walletConfirmed=true;data.revision=Number(remote.wallet.revision)||0;clientRevision=data.revision;data.recovery.slotBonus=validBonus(remote.wallet.recovery?.slotBonus);}
     const s=remote.settings,ts=Date.parse(s.updated_at)||0;
     if(ts>=data.settingsUpdatedAt){data.settings={sound:s.sound_enabled,music:s.music_enabled,fastGame:s.fast_mode,fastBonus:s.fast_bonus,scatterBoost:s.scatter_boost};data.bets=validBets(s.selected_bets);data.lastGame=screens.includes(s.last_game_id)?s.last_game_id:'lobby';data.settingsUpdatedAt=ts;}
     if(wallet)data.stats=Object.fromEntries(remote.stats.map(s=>[s.game_id,s]));rememberSession();
   }
+  // Rebase business events automatically at a stable boundary, never midway through gameplay.
+  function recoverWallet(){
+    if(recovering)return recovering;
+    if(conflict&&!state.busy&&!data.recovery.openRounds.slot){if(autoState.active)stopAutoplay();if(state.bonusAutoRunning){state.bonusAutoRunning=false;clearTimeout(bonusAutoTimer);bonusAutoTimer=null;}}
+    if(!conflict||!client||owner==='guest'||locked||!navigator.onLine||VaultRoundService.anyActive())return;
+    const uid=owner,epoch=identityEpoch;
+    recovering=(async()=>{
+      try{
+        if(syncing)await syncing;
+        if(owner!==uid||identityEpoch!==epoch||VaultRoundService.anyActive())return;
+        const events=copy(data.queue),ids=[...new Set(events.filter(e=>e.type!=='settings').map(e=>e.payload.p_round_id))];
+        const queries=[client.from('wallets').select('*').eq('user_id',uid).single(),client.from('game_rounds').select('round_id,game_id,bet,payout,status').eq('user_id',uid).eq('status','started')];
+        if(ids.length)queries.push(client.from('game_rounds').select('round_id,game_id,bet,payout,status').eq('user_id',uid).in('round_id',ids));
+        const results=await Promise.all(queries);for(const r of results)if(r.error)throw r.error;
+        if(owner!==uid||identityEpoch!==epoch||VaultRoundService.anyActive())return;
+        let wallet=results[0].data;const known=new Map([...(results[1].data||[]),...(results[2]?.data||[])].map(r=>[r.round_id,r]));
+        // A previous-device/reload round without local business events is abandoned: no refund or new payout.
+        for(const round of results[1].data||[]){
+          if(ids.includes(round.round_id))continue;
+          const result=await client.rpc('record_game_round',{p_round_id:round.round_id,p_game_id:round.game_id,p_bet:round.bet,p_payout:0,p_multiplier:0,p_result:'automatic-recovery',p_metadata:{recovery:'safe-reset-no-refund'},p_status:'cancelled',p_recovery:wallet.recovery||{}});
+          if(result.error)throw result.error;if(owner!==uid||identityEpoch!==epoch)return;
+          wallet={...wallet,...result.data};
+        }
+        let balance=amount(wallet.balance),revision=Number(wallet.revision);if(balance===null||!Number.isSafeInteger(revision))throw Error('Invalid remote wallet');
+        const rejected=new Set(),accepted=new Set([...known].filter(([,r])=>r.status==='started').map(([id])=>id));
+        const next=[];
+        for(const event of data.queue){
+          if(event.userId!==uid)throw Error('Queue identity mismatch');
+          if(event.type==='settings'){next.push(event);continue;}
+          const payload=event.payload,id=payload.p_round_id,round=known.get(id);
+          if(round&&round.status!=='started')continue; // Server already settled this UUID; never repeat its payout.
+          if(event.type==='begin'){
+            if(!accepted.has(id)){
+              if(amount(payload.p_bet)===null||payload.p_bet>balance){rejected.add(id);continue;}
+              payload.p_expected_revision=revision;balance=amount(balance-payload.p_bet);revision++;accepted.add(id);
+            }
+            next.push(event);
+          }else{
+            if(rejected.has(id))continue;
+            if(!accepted.has(id))throw Error('Round missing during automatic recovery');
+            balance=amount(balance+payload.p_payout);if(balance===null)throw Error('Invalid settlement');revision++;next.push(event);
+          }
+        }
+        if(events.some(e=>e.payload?.p_game_id==='slot'&&rejected.has(e.payload.p_round_id))){data.recovery.slotBonus=validBonus(wallet.recovery?.slotBonus);suppress=true;VaultRecovery.restore();suppress=false;}
+        data.queue=next;data.rounds=data.rounds.filter(r=>!rejected.has(r.roundId));canonicalBalance=balance;data.balance=balance;data.walletConfirmed=true;data.revision=Number(wallet.revision);clientRevision=revision;walletMutation++;conflict=false;
+        VaultStorage.saveLocalState({preferences:false});refreshBalanceUI();renderIdentity();status('Сохраняем прогресс…');scheduleSync();
+      }catch(e){console.error('VAULT automatic recovery failed',e);status('Соединение нестабильно — повторим автоматически');}
+      finally{recovering=null;}
+    })();return recovering;
+  }
   const VaultSync=window.VaultSync={
     async flush(){
       clearTimeout(syncTimer);
       if(syncing)return syncing;
-      if(!client||owner==='guest'||!navigator.onLine||conflict||locked||!profileRemote)return;
+      if(conflict)return recoverWallet();
+      if(!client||owner==='guest'||!navigator.onLine||locked||!profileRemote)return;
       const epoch=identityEpoch,uid=owner;
       syncing=(async()=>{
         try{
@@ -223,35 +276,24 @@
             else{method='save_vault_settings';args={p_settings:event.payload.settings,p_updated_at:event.payload.updatedAt};}
             const {data:result,error}=await client.rpc(method,args);if(owner!==uid||identityEpoch!==epoch)return;
             if(error)throw error;
-            if(event.type!=='settings'){data.revision=Number(result.revision);}
+            if(event.type!=='settings'){data.revision=Number(result.revision);walletMutation++;}
             // Remove only the acknowledged event, even when preferences coalesce during a request.
             data.queue=data.queue.filter(e=>e.id!==event.id);VaultStorage.saveLocalState({preferences:false});
           }
           if(owner===uid&&identityEpoch===epoch&&!data.queue.length&&!Object.keys(data.recovery.openRounds).length){
-            const remote=await VaultProfileService.load();if(owner!==uid||identityEpoch!==epoch||data.queue.length||Object.keys(data.recovery.openRounds).length)return;
+            const mutation=walletMutation,remote=await VaultProfileService.load();if(mutation!==walletMutation||owner!==uid||identityEpoch!==epoch||data.queue.length||Object.keys(data.recovery.openRounds).length)return;
             // Server balance wins only after every local transaction was acknowledged.
-            canonicalBalance=amount(remote.wallet.balance);data.balance=canonicalBalance;data.revision=Number(remote.wallet.revision);clientRevision=data.revision;VaultSession.profile=remote.profile;rememberSession();VaultStorage.saveLocalState({preferences:false});refreshBalanceUI();
+            canonicalBalance=amount(remote.wallet.balance);data.balance=canonicalBalance;data.revision=Number(remote.wallet.revision);clientRevision=data.revision;data.stats=Object.fromEntries(remote.stats.map(s=>[s.game_id,s]));VaultSession.profile=remote.profile;rememberSession();VaultStorage.saveLocalState({preferences:false});refreshBalanceUI();
           }
           status(storageAvailable?'Сохранено':'Сохранение недоступно');
         }catch(e){
           console.error('VAULT sync failed',e);
-          if(String(e.message||'').includes('VAULT_WALLET_CONFLICT')||/Round mismatch|Round missing|Queue identity/.test(String(e.message||''))){conflict=true;status('Конфликт синхронизации');renderIdentity();}
+          if(String(e.message||'').includes('VAULT_WALLET_CONFLICT')||/Round mismatch|Round missing|Queue identity/.test(String(e.message||''))){conflict=true;status('Восстанавливаем кошелёк…');renderIdentity();setTimeout(recoverWallet,0);}
           else status('Offline — прогресс сохранён локально');
         }finally{syncing=null;}
       })();return syncing;
     },
-    async useRemote(){
-      if(VaultRoundService.anyActive()){toast('Сначала завершите текущий раунд');return;}
-      authBusy=true;
-      try{
-        let remote=await VaultProfileService.load();
-        for(const round of remote.rounds){
-          const {error}=await client.rpc('record_game_round',{p_round_id:round.round_id,p_game_id:round.game_id,p_bet:round.bet,p_payout:0,p_multiplier:0,p_result:'remote-recovery',p_metadata:{recovery:'explicit-cloud-reset'},p_status:'cancelled',p_recovery:remote.wallet.recovery||{}});
-          if(error)throw error;
-        }
-        remote=await VaultProfileService.load();data.queue=[];data.recovery.openRounds={};conflict=false;applyRemote(remote);suppress=true;restorePreferences();VaultRecovery.restore();suppress=false;renderIdentity();showSavedScreen();VaultStorage.flush();status('Облачные данные загружены');
-      }catch(e){console.error('VAULT cloud recovery failed',e);status('Could not sync progress');}finally{authBusy=false;}
-    },
+    async useRemote(){conflict=true;return recoverWallet();},
   };
   async function loadSDK(){
     if(window.supabase?.createClient)return window.supabase;
@@ -261,7 +303,7 @@
     const uid=user?.id||'guest';if(uid!=='guest'&&!isId(uid))throw Error('Invalid identity');
     if(connecting&&connectionUser===uid)return connecting;
     if(VaultSession.ready&&uid===owner){
-      if(uid!=='guest'){try{const remote=await VaultProfileService.load();VaultSession.profile=remote.profile;profileRemote=true;if(!VaultRoundService.anyActive()&&!data.queue.length){capturePreferences();const screen=currentGame;applyRemote(remote);data.lastGame=screen;suppress=true;restorePreferences();VaultRecovery.restore();suppress=false;updateUI();updatePokerUI();updateBirdUI();refreshBalanceUI();}renderIdentity();scheduleSync();}catch(e){console.error('VAULT reconnect pending',e);status(e.vaultComponent?'Не удалось загрузить: '+e.vaultComponent+'. Проверьте SQL-настройку Supabase.':'Offline — прогресс сохранён локально');}}
+      if(uid!=='guest'){try{const mutation=walletMutation,remote=await VaultProfileService.load({previewWallet:!profileRemote});VaultSession.profile=remote.profile;profileRemote=true;if(mutation===walletMutation&&!VaultRoundService.anyActive()&&!data.queue.length){capturePreferences();const screen=currentGame;applyRemote(remote);data.lastGame=screen;suppress=true;restorePreferences();VaultRecovery.restore();suppress=false;updateUI();updatePokerUI();updateBirdUI();refreshBalanceUI();}renderIdentity();scheduleSync();}catch(e){console.error('VAULT reconnect pending',e);status(e.vaultComponent?'Не удалось загрузить: '+e.vaultComponent+'. Проверьте SQL-настройку Supabase.':'Offline — прогресс сохранён локально');}}
       return;
     }
     if(VaultRoundService.anyActive()&&VaultSession.ready&&uid!==owner)throw Error('Finish active rounds before switching account');
@@ -272,13 +314,14 @@
       const marker=read('session');VaultSession.profile=uid!=='guest'&&marker?.project===C.supabaseUrl&&marker.user?.id===uid?marker.profile:null;
       await acquireLock();
       if(uid!=='guest'&&!cachedOnly){
-        try{const remote=await VaultProfileService.load();applyRemote(remote,{wallet:data.queue.length===0&&!Object.keys(data.recovery.openRounds).length});}
+        try{const remote=await VaultProfileService.load({previewWallet:true});applyRemote(remote,{wallet:data.queue.length===0&&!Object.keys(data.recovery.openRounds).length});}
         catch(e){console.error('VAULT remote load failed',e);const cached=read(`user:${uid}`);profileRemote=!e.vaultComponent&&cached?.version===C.storageVersion&&cached.data?.walletConfirmed===true&&amount(cached.data?.balance)!==null;status(e.vaultComponent?'Не удалось загрузить: '+e.vaultComponent+'. Проверьте SQL-настройку Supabase.':'Offline — прогресс сохранён локально');}
       }
       if(cachedOnly)profileRemote=true;
       if(guestPreferences){Object.assign(data,guestPreferences);data.settingsUpdatedAt=Date.now();enqueue('settings',{settings:{...data.settings,bets:data.bets,lastGame:data.lastGame},updatedAt:new Date(data.settingsUpdatedAt).toISOString()});}
       suppress=true;canonicalBalance=data.balance;restorePreferences();VaultRecovery.restore();suppress=false;
       VaultSession.ready=true;rememberSession();renderIdentity();showSavedScreen();VaultStorage.saveLocalState({preferences:false});
+      if(conflict)setTimeout(recoverWallet,0);
       if(!locked&&!conflict&&(uid==='guest'||profileRemote))status(uid==='guest'?'Локальное сохранение':'Sync pending');scheduleSync();
     })();
     try{return await connecting;}finally{connecting=null;connectionUser=null;}
@@ -351,14 +394,14 @@
   document.addEventListener('click',e=>{if(!byId('vaultProfileMenu').contains(e.target))byId('vaultProfileMenu').open=false;});
   byId('vaultProfileMenu').addEventListener('keydown',e=>{if(e.key==='Escape'){byId('vaultProfileMenu').open=false;byId('vaultProfileMenu').querySelector('summary').focus();}});
   byId('vaultSignOut').onclick=async()=>{const result=await VaultAuth.signOut();if(result.error)status(result.error);};
-  byId('vaultConflictButton').onclick=()=>{if(confirm('Загрузить облачный баланс, завершить зависшие раунды без дополнительной выплаты и отказаться от неподтверждённых локальных результатов?'))VaultSync.useRemote();};
+  byId('vaultConflictButton').onclick=recoverWallet;
   document.addEventListener('click',e=>{const id=e.target.closest('button')?.id;if(id&&/(BetMinus|BetPlus|MaxBet|soundToggle|musicToggle|fastGameToggle|fastBonusToggle|scatterBoost)/i.test(id))VaultStorage.schedule();});
   window.addEventListener('pagehide',()=>{VaultStorage.flush();releaseLock?.();});
   document.addEventListener('visibilitychange',()=>{if(document.hidden)VaultStorage.flush();});
   window.addEventListener('offline',()=>status('Offline — прогресс сохранён локально'));
   window.addEventListener('online',()=>{if(!client&&configured())VaultAuth.restoreSession().catch(e=>console.error('VAULT reconnect',e));else VaultSync.flush();});
   // A bounded retry timer only sends business events, never frame state.
-  setInterval(()=>{if(data.queue.length&&!document.hidden)VaultSync.flush();},15000);
+  setInterval(()=>{if((data.queue.length||conflict)&&!document.hidden)VaultSync.flush();},15000);
   window.saveVaultState=()=>VaultStorage.flush();
   async function boot(){
     try{await VaultAuth.restoreSession();}
