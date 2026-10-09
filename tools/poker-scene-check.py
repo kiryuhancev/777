@@ -16,7 +16,8 @@ def game_scripts(html):
 assert game_scripts(before)==game_scripts(current),'Poker/slot scripts changed'
 assert re.search(r'<style>([\s\S]*?)</style>',before)[1]==re.search(r'<style>([\s\S]*?)</style>',current)[1]
 for marker,end in [('<section class="lobby"','<div class="app">'),('<div class="app">','<div class="poker-app"')]:
- assert before.split(marker,1)[1].split(end,1)[0]==current.split(marker,1)[1].split(end,1)[0],marker
+ def exclude_branding(section):return re.sub(r'<button class="game-card playable" id="openBirdGame"[\s\S]*?</button>','BIRD_CARD',section)
+ assert exclude_branding(before.split(marker,1)[1].split(end,1)[0])==exclude_branding(current.split(marker,1)[1].split(end,1)[0]),marker
 report={'viewports':[],'errors':[],'pokerAndSlotScriptsIdentical':True,'otherGameMarkupIdentical':True}
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])

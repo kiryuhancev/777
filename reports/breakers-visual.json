@@ -1,0 +1,8 @@
+{
+  "passed": [
+    "Approved side-view player and front-facing Sentinel sprites render; Sentinel collider remains circular; DPR2 and debug work",
+    "All eleven asset failures resolve without crash; geometric industrial fallback completes and settles a real round"
+  ],
+  "pageErrors": [],
+  "assetFailureWarnings": 11
+}

@@ -46,6 +46,13 @@ const BIRD_MODEL = (() => {
   function plan(seed,bet){
     if(!Number.isFinite(bet)||bet<=0)throw Error('Invalid Bird bet');
     seed=Number(seed)>>>0;const r=rng(seed),routeType=pick(C.routes,r),distance=C.flight.distanceMin+r()*(C.flight.distanceMax-C.flight.distanceMin),target=building(seed^0x9e3779b9,distance);
+    return freeze({seed,bet,flightPlan:{seed,distance,duration:(distance-C.sling.x)/C.flight.nominalVx,
+      routeType,bonusSpawns:[],hazardSpawns:[],approachSpeed:C.flight.nominalVx,targetId:`${seed}:${target.archetype}`},buildingPlan:target});
+  }
+  function flightBonuses(flightPlan){
+    // Called only on release. Replay the independent seeded route draws to preserve
+    // the existing distribution; the player's actual velocity is never an input.
+    const {seed,distance,routeType}=flightPlan,r=rng(seed);pick(C.routes,r);r();
     const spawns=[];
     for(let i=0;i<C.bonus.candidates;i++){
       if(r()>C.bonus.visualSpawnChance&&spawns.length>=6)continue;
@@ -57,8 +64,7 @@ const BIRD_MODEL = (() => {
       const type=rare?'x3':pick(Object.fromEntries(Object.entries(BIRD_BONUS_TYPES).filter(([k])=>k!=='x3')),r);
       spawns.push({id:i,type,x,y:center+offset,r:C.bonus.radius,placement:reachable?'corridor':nearMiss?'near-miss':'alternate'});
     }
-    return freeze({seed,bet,flightPlan:{seed,distance,duration:(distance-C.sling.x)/C.flight.nominalVx,
-      routeType,bonusSpawns:spawns,hazardSpawns:[],approachSpeed:C.flight.nominalVx,targetId:`${seed}:${target.archetype}`},buildingPlan:target});
+    return freeze(spawns);
   }
   function impactDamage(body,other,impulse){
     if(body.kind==='pig')return Math.max(0,impulse-(other.kind==='ground'?C.damage.pigFallThreshold:C.damage.pigThreshold))*C.damage.pigScale*(other.hunter?1.6:1);
@@ -67,7 +73,7 @@ const BIRD_MODEL = (() => {
   }
   function createRun(scene,notify=()=>{}){
     const run={plan:scene,phase:'SLINGSHOT',time:0,phaseTime:0,impactTime:null,settled:false,result:null,
-      blocks:[],pigs:[],birds:[],bonuses:scene.flightPlan.bonusSpawns.map(b=>({...b,collected:false})),
+      blocks:[],pigs:[],birds:[],bonuses:[],
       collected:[],multiplier:1,score:0,pigsDestroyed:0,blocksDestroyed:0,damageScore:0,chainCount:0,lastBreak:-100,
       steering:0,steeringVelocity:0,correctionDistance:0,split:false,events:[],world:null,targetAdded:false};
     const transitions={SLINGSHOT:['FLIGHT'],FLIGHT:['APPROACH','SETTLING'],APPROACH:['IMPACT','SETTLING'],IMPACT:['SETTLING'],SETTLING:['RESULT']};
@@ -130,6 +136,8 @@ const BIRD_MODEL = (() => {
     run.collect=(bird,gate)=>{if(gate.collected||!effects[gate.type])return;gate.collected=true;run.collected.push(gate.type);effects[gate.type](bird);P.wake(bird);notify('bonus',gate.type);};
     run.launch=(vx=C.flight.nominalVx,vy=C.flight.nominalVy)=>{
       if(run.phase!=='SLINGSHOT')return false;
+      run.plan=freeze({...scene,flightPlan:{...scene.flightPlan,bonusSpawns:flightBonuses(scene.flightPlan)}});
+      run.bonuses=run.plan.flightPlan.bonusSpawns.map(b=>({...b,collected:false}));
       run.addBird({vx:clip(vx,0,800),vy:clip(vy,-650,500)});run.transition('FLIGHT');return true;
     };
     run.reveal=()=>{
@@ -147,7 +155,7 @@ const BIRD_MODEL = (() => {
       // This is the ONLY payout calculation: the completed physical scene supplies score.
       const payout=Math.round(scene.bet*destructionScore/C.scoring.pointsPerBet*run.multiplier*1e6)/1e6;
       run.result={seed:scene.seed,bet:scene.bet,routeType:scene.flightPlan.routeType,
-        bonusesOffered:scene.flightPlan.bonusSpawns.map(b=>b.type),bonusesCollected:[...run.collected],
+        bonusesOffered:run.plan.flightPlan.bonusSpawns.map(b=>b.type),bonusesCollected:[...run.collected],
         buildingArchetype:scene.buildingPlan.archetype,buildingSize:scene.buildingPlan.size,
         pigsTotal:run.pigs.length,pigsDestroyed:run.pigsDestroyed,blocksTotal:run.blocks.length,
         blocksDestroyed:run.blocksDestroyed,damageScore:run.damageScore,chainReactions:run.chainCount,
@@ -186,6 +194,6 @@ const BIRD_MODEL = (() => {
   function simulate(seed,bet=20,input={}){const scene=plan(seed,bet),run=createRun(scene);run.launch(input.vx,input.vy);
     for(let i=0;i<2400&&!run.settled;i++)run.step(P.SETTINGS.DT,input.steer||0);
     if(!run.settled)throw Error('Bird simulation exceeded its bounded lifetime');return {...run.result,seconds:run.time};}
-  return {rng,pick,plan,building,createRun,impactDamage,simulate};
+  return {rng,pick,plan,flightBonuses,building,createRun,impactDamage,simulate};
 })();
 function simulateBirdRound(seed,bet,input){return BIRD_MODEL.simulate(seed,bet,input);}

@@ -1,5 +1,7 @@
 # Bird Siege: one launch, one physical result
 
+Historical notes for `d64b0a7`. The current VAULT BREAKERS presentation and release-time core generation are described in [VAULT_BREAKERS.md](VAULT_BREAKERS.md).
+
 One paid round follows `SLINGSHOT → FLIGHT → APPROACH → IMPACT → SETTLING → RESULT`, with `IDLE` before payment and `RESETTING` after the result. A miss can go directly to settling. Split adds physical projectiles to the same round, never another paid/free attempt.
 
 `bird/config.js` contains provisional tuning. `bird/model.js` generates an immutable seeded plan and runs the existing rigid-body engine without DOM. `bird/game.js` handles pointer/keyboard input, camera, effects and the existing VAULT service calls. `bird/presentation.css` affects only Bird Siege. Run `python3 tools/embed-vault.py` after changing these sources; the deployed `index.html` remains standalone.

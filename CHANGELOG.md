@@ -1,3 +1,13 @@
+# VAULT BREAKERS — industrial identity and release-time cores
+
+- Bird Siege визуально превращён в VAULT BREAKERS с 11 утверждёнными WebP-ассетами архива.
+- Breaker сбоку, круглые Sentinel, промышленные блоки, энергетические ядра, Launch Gate, индустриальный parallax и amber HUD.
+- Ядра генерируются один раз только после выпуска модуля; до выпуска список пуст и ничего не отображается.
+- Вероятности, collider/physics, damage и payout сохранены; сравнение 3 000 seed и 30 физических выплат с предыдущей версией проходит.
+- Wallet/Auth/persistence, Digital Derby и Poker Blitz не изменены; в лобби только новое название/символы существующей карточки.
+- Добавлены preload/fallback ассетов, High DPI, ограниченные trails/sparks и безопасный cleanup.
+- RTP измеряется на реальных физических раундах для четырёх стратегий; полный JSON/CSV и описание методики доступны в reports/breakers-rtp.*.
+
 # Bird Siege — seeded flight and physical destruction
 
 - Один оплаченный запуск и одна итоговая выплата; три попытки и выплаты за каждую свинью удалены.

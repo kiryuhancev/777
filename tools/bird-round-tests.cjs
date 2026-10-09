@@ -5,14 +5,16 @@ const root=path.join(__dirname,'..'),physics=loadPhysics();
 const source=['config.js','model.js'].map(f=>fs.readFileSync(path.join(root,'bird',f),'utf8')).join('\n');
 const {C,M}=new Function('BIRD_PHYSICS',source+'\nreturn {C:BIRD_CONFIG,M:BIRD_MODEL};')(physics);
 const results=[],check=(name,f)=>{f();results.push(name);console.log('PASS',name);};
-check('Seeded route, bonuses and building are reproducible, frozen, with no target payout',()=>{
- const a=M.plan(425,20),b=M.plan(425,20);assert.deepEqual(a,b);assert(Object.isFrozen(a.flightPlan.bonusSpawns[0]));assert(!JSON.stringify(a).includes('targetPayout'));
+check('Seeded scene is reproducible; bonuses are absent until release, then generated once',()=>{
+ const a=M.plan(425,20),b=M.plan(425,20);assert.deepEqual(a,b);assert.deepEqual(a.flightPlan.bonusSpawns,[]);assert(!JSON.stringify(a).includes('targetPayout'));
+ const run=M.createRun(a);assert.deepEqual(run.bonuses,[]);run.launch();assert(run.bonuses.length>=6);assert(Object.isFrozen(run.plan.flightPlan.bonusSpawns[0]));
+ const offered=run.plan.flightPlan.bonusSpawns;assert.equal(run.launch(),false);assert.strictEqual(run.plan.flightPlan.bonusSpawns,offered);
 });
 check('All ten archetypes and four sizes generated; dry scenes contain visible bonus objects',()=>{
  const archetypes=new Set(),sizes=new Set();for(let seed=0;seed<3000;seed++){
   const p=M.plan(seed,20);archetypes.add(p.buildingPlan.archetype);sizes.add(p.buildingPlan.size);
   assert(p.buildingPlan.blocks.length<=C.round.maxBlocks);assert(p.buildingPlan.blocks.length>=6);
-  assert(p.flightPlan.bonusSpawns.length>=6);assert(p.buildingPlan.pigs.length>0);
+  assert(M.flightBonuses(p.flightPlan).length>=6);assert(p.buildingPlan.pigs.length>0);
  }assert.equal(archetypes.size,10);assert.equal(sizes.size,4);
 });
 check('Heavy and Mega alter real mass; split is bounded; x2 alone never guarantees profit',()=>{
@@ -37,7 +39,7 @@ check('Bomb pressure imparts physical velocities and damage to nearby bodies',()
  const hp=block.hp;run.explode(bird);assert(block.hp<hp);assert(Math.hypot(block.vx,block.vy)>0);
 });
 check('Bonus positions remain fixed after launching and steering; no second launch',()=>{
- const run=M.createRun(M.plan(425,20)),positions=run.bonuses.map(b=>[b.x,b.y]);run.launch();assert.equal(run.launch(),false);
+ const run=M.createRun(M.plan(425,20));run.launch();const positions=run.bonuses.map(b=>[b.x,b.y]);assert.equal(run.launch(),false);
  for(let i=0;i<250;i++)run.step(undefined,1);assert.deepEqual(run.bonuses.map(b=>[b.x,b.y]),positions);
  assert(Math.abs(run.correctionDistance)<(run.plan.flightPlan.distance-C.sling.x)*C.flight.maxFlightCorrection);
 });

@@ -2,7 +2,7 @@
 const BIRD_DEBUG=BIRD_CONFIG.debug;
 let birdState={betIndex:1,phase:'IDLE',run:null,roundId:null,roundBet:0,roundWin:0,pigsKilled:0,
   dragging:false,pointerId:null,dragX:BIRD_CONFIG.sling.x,dragY:BIRD_CONFIG.sling.y,
-  accumulator:0,resultTime:0,camera:{x:0,zoom:1},particles:[],shake:0,steer:0,debug:BIRD_DEBUG,lastResult:null};
+  accumulator:0,resultTime:0,camera:{x:0,zoom:1},particles:[],trails:new Map(),sentinelAngles:new Map(),shake:0,steer:0,debug:BIRD_DEBUG,lastResult:null};
 // Compatibility views only; the phase is the single source for gameplay lifecycle.
 Object.defineProperties(birdState,{
   active:{get(){return ['SLINGSHOT','FLIGHT','APPROACH','IMPACT','SETTLING'].includes(this.phase);}},
@@ -14,13 +14,13 @@ Object.defineProperties(birdState,{
 });
 function birdBet(){return BIRD_BETS[birdState.betIndex];}
 function birdMoney(n){return Number(n||0).toLocaleString('ru-RU',{maximumFractionDigits:2});}
-function resizeBirdCanvas(){/* A fixed logical viewport avoids mobile-dependent mathematics. */}
+function resizeBirdCanvas(){const dpr=Math.min(2,window.devicePixelRatio||1);birdCanvas.width=Math.round(960*dpr);birdCanvas.height=Math.round(540*dpr);}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 function resetBirdRecovery(){
   birdState.phase='IDLE';birdState.run=null;birdState.roundId=null;birdState.roundBet=0;
   birdState.roundWin=0;birdState.pigsKilled=0;birdState.dragging=false;birdState.pointerId=null;
   birdState.dragX=BIRD_CONFIG.sling.x;birdState.dragY=BIRD_CONFIG.sling.y;birdState.accumulator=0;
-  birdState.resultTime=0;birdState.camera={x:0,zoom:1};birdState.particles=[];birdState.shake=0;birdState.steer=0;
+  birdState.resultTime=0;birdState.camera={x:0,zoom:1};birdState.particles=[];birdState.trails.clear();birdState.sentinelAngles.clear();birdState.shake=0;birdState.steer=0;
 }
 function birdEffect(event,data){
   if(event==='phase'){
@@ -28,14 +28,17 @@ function birdEffect(event,data){
     const messages={APPROACH:'Цель впереди. Камера открывает постройку.',IMPACT:'Удар! Результат определяют столкновения.',SETTLING:'Разрушения продолжаются…'};
     if(messages[data])el('birdMessage').textContent=messages[data];return;
   }
-  if(event==='bonus'){sound(700,.07,'sine');updateBirdUI();return;}
+  if(event==='bonus'){
+    sound(700,.07,'sine');const b=birdState.run?.birds[0];if(b)for(let i=0;i<8&&birdState.particles.length<BIRD_CONFIG.round.maxParticles;i++)birdState.particles.push({x:b.x,y:b.y,vx:Math.cos(i*Math.PI/4)*80,vy:Math.sin(i*Math.PI/4)*80,life:.35,size:2,color:'#f0b84b'});
+    updateBirdUI();return;
+  }
   if(event==='impact'){birdState.shake=Math.min(3,data.impulse/600);sound(80,.06,'triangle',.015);return;}
   if(event==='break'||event==='blast'){
     const random=BIRD_MODEL.rng((birdState.run?.plan.seed||0)+Math.round(birdState.run?.time*120||0)+birdState.particles.length);
     const count=event==='blast'?24:8;
     for(let i=0;i<count&&birdState.particles.length<BIRD_CONFIG.round.maxParticles;i++)birdState.particles.push({
       x:data.x,y:data.y,vx:(random()-.5)*230,vy:-random()*180,life:.45+random()*.55,
-      size:data.material==='stone'?5:2+random()*3,color:data.color||'#e5b56f'});
+      size:data.material==='stone'?5:2+random()*3,color:data.material==='glass'?'#e9b765':data.kind==='pig'?'#efb859':'#b8a487'});
     sound(data.material==='glass'?1100:data.kind==='pig'?270:150,.06,'triangle',.012);
   }
 }
@@ -50,7 +53,7 @@ function startBirdRound(){
   birdState.run=BIRD_MODEL.createRun(scene,birdEffect);birdState.particles=[];birdState.camera={x:0,zoom:1};
   birdState.roundWin=0;birdState.pigsKilled=0;birdState.resultTime=0;birdState.accumulator=0;
   birdState.dragX=BIRD_CONFIG.sling.x;birdState.dragY=BIRD_CONFIG.sling.y;
-  el('birdMessage').textContent='Оттяни птицу и отпусти. Или нажми «ЗАПУСТИТЬ» для стандартного броска.';
+  el('birdMessage').textContent='Оттяни модуль и отпусти. Или нажми «ЗАПУСТИТЬ» для стандартного броска.';
   updateBirdUI();drawBirdGame();
 }
 function launchBird(nominal=false){
@@ -69,7 +72,7 @@ function settleBirdRound(){
   const result={...run.result,roundId:birdState.roundId};birdState.lastResult=result;
   if(result.payout>0)VaultWalletService.applyDelta(result.payout,{gameId:'bird'});
   VaultRoundService.finish('bird',result.payout>0?'win':'no-win','settled',result);
-  el('birdMessage').textContent=`${result.payout>0?'ROUND WIN +'+birdMoney(result.payout):'NO WIN'} · ${result.pigsDestroyed} свиней · ${result.blocksDestroyed} блоков · ×${result.multiplier}`;
+  el('birdMessage').textContent=`${result.payout>0?'BREACH COMPLETE +'+birdMoney(result.payout):'NO BREACH'} · ${result.pigsDestroyed} охранников · ${result.blocksDestroyed} блоков · ×${result.multiplier}`;
   sound(result.payout>0?600:180,.15,'sine');updateBirdUI();
 }
 function updateBirdPhysics(dt){
@@ -81,68 +84,111 @@ function updateBirdPhysics(dt){
 function drawRoundedRect(ctx,x,y,w,h,r,fill,stroke=null){
   ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke();}
 }
-function drawBirdShape(c,x,y,r,b={}){
-  c.save();c.translate(x,y);c.rotate(b.angle||0);
-  c.shadowColor='#0005';c.shadowBlur=8;c.shadowOffsetY=4;
-  c.fillStyle=b.bomb?'#414653':b.mega?'#e8b66e':'#b85956';c.beginPath();c.ellipse(0,0,r,r*.87,0,0,Math.PI*2);c.fill();c.shadowBlur=0;c.shadowOffsetY=0;
-  c.fillStyle='#e7cd9f';c.beginPath();c.moveTo(r*.7,-3);c.lineTo(r+10,2);c.lineTo(r*.65,7);c.fill();
-  c.fillStyle='#f3e9d7';c.beginPath();c.arc(r*.35,-r*.22,r*.24,0,Math.PI*2);c.fill();
-  c.fillStyle='#262631';c.beginPath();c.arc(r*.42,-r*.22,r*.09,0,Math.PI*2);c.fill();
-  c.strokeStyle='#edd09b';c.lineWidth=2;c.beginPath();c.arc(-r*.22,3,r*.45,.1,2);c.stroke();
-  if(b.hunter){c.strokeStyle='#c5d985';c.strokeRect(-r,-r,r*2,r*2);}c.restore();
+function drawBreaker(c,x,y,r,b={}){
+  c.save();c.translate(x,y);c.rotate(clamp(Math.sin(b.angle||0)*.28,-.28,.28));
+  if(!drawVBSprite(c,'player',-r*1.4,-r*1.2,r*2.8,r*2.4)){
+    drawRoundedRect(c,-r,-r*.65,r*2,r*1.3,5,'#353d48','#b39b72');
+    c.fillStyle='#f0b84b';c.fillRect(r*.45,-r*.4,r*.45,r*.8);
+  }
+  if(b.bomb||b.hunter){c.strokeStyle=b.bomb?'#e07e47':'#e5d3a6';c.lineWidth=1.5;c.beginPath();c.arc(0,0,r+4,0,Math.PI*2);c.stroke();}c.restore();
+}
+function drawSentinel(c,p){
+  c.save();c.translate(p.x,p.y);
+  const sprite=p.type==='helmet'?'sentinelScout':'sentinelBasic';
+  c.fillStyle='#0006';c.beginPath();c.ellipse(0,p.r*.86,p.r*.8,3,0,0,Math.PI*2);c.fill();
+  c.rotate(birdState.sentinelAngles.get(p.id)??p.angle);
+  if(!drawVBSprite(c,sprite,-p.r*1.08,-p.r*1.08,p.r*2.16,p.r*2.16)){
+    c.fillStyle='#495361';c.strokeStyle='#c5ab76';c.lineWidth=2;c.beginPath();c.arc(0,0,p.r,0,Math.PI*2);c.fill();c.stroke();
+    c.fillStyle='#f0b84b';c.beginPath();c.arc(0,0,p.r*.38,0,Math.PI*2);c.fill();
+  }
+  if(p.type==='gold'||p.type==='royal'){c.strokeStyle='#f0b84b';c.lineWidth=2;c.beginPath();c.arc(0,0,p.r+2,0,Math.PI*2);c.stroke();}
+  const ratio=clamp(p.hp/p.maxHp,0,1);
+  if(p.flash){c.fillStyle='#ffbd5b55';c.beginPath();c.arc(0,0,p.r,0,Math.PI*2);c.fill();}
+  if(ratio<.7){c.strokeStyle='#ffd6a199';c.lineWidth=1;c.beginPath();c.moveTo(-p.r*.5,-p.r*.4);c.lineTo(0,0);c.lineTo(-p.r*.2,p.r*.6);c.stroke();}
+  c.restore();c.fillStyle='#0f111599';c.fillRect(p.x-p.r,p.y-p.r-10,p.r*2,3);c.fillStyle='#e0ad64';c.fillRect(p.x-p.r,p.y-p.r-10,p.r*2*ratio,3);
+}
+function breakerBlockSprite(b){return b.material==='stone'?'armor':b.material==='glass'?'container':b.h>b.w?'column':'beam';}
+function updateSentinelRenderAngles(run,dt){
+  for(const p of run?.pigs||[])if(p.alive){
+    const previous=birdState.sentinelAngles.get(p.id)??p.angle;
+    const difference=Math.atan2(Math.sin(p.angle-previous),Math.cos(p.angle-previous));
+    birdState.sentinelAngles.set(p.id,previous+clamp(difference,-6*dt,6*dt));
+  }
+  for(const id of birdState.sentinelAngles.keys())if(!run?.pigs.some(p=>p.id===id&&p.alive))birdState.sentinelAngles.delete(id);
+}
+function drawIndustrialBackground(c,cam){
+  const sky=c.createLinearGradient(0,0,0,540);sky.addColorStop(0,'#0f1115');sky.addColorStop(.65,'#2a313b');sky.addColorStop(1,'#191d24');
+  c.fillStyle=sky;c.fillRect(0,0,960,540);
+  const light=c.createRadialGradient(710,100,5,710,100,460);light.addColorStop(0,'#f0b84b16');light.addColorStop(1,'#f0b84b00');c.fillStyle=light;c.fillRect(0,0,960,540);
+  // Far skyline, mid mechanical frames, foreground pipes: independent parallax.
+  for(const [factor,space,base,color] of [[.10,160,380,'#20262e'],[.30,240,440,'#171d25'],[.65,130,500,'#10161d']]){
+    const offset=cam.x*factor;
+    for(let i=Math.floor(offset/space)-1;i<(offset+960)/space+1;i++){
+      const x=i*space-offset,height=70+(Math.sin(i*2.7)+1)*45;
+      c.fillStyle=color;c.fillRect(x,base-height,space*.63,height+100);
+      c.strokeStyle=factor===.65?'#4d566044':'#515a6555';c.lineWidth=3;
+      c.strokeRect(x+12,base-height+12,space*.48,height-18);
+      if(factor===.30){c.beginPath();c.moveTo(x,base-height+30);c.lineTo(x+space,base-height-10);c.stroke();
+        c.fillStyle='#f0b84b35';c.fillRect(x+25,base-height+25,7,3);c.fillRect(x+space*.5,base-height+25,7,3);}
+      if(factor===.65){c.fillStyle='#29303b';c.fillRect(x,base+7,space,7);c.fillRect(x+30,base-16,7,40);}
+    }
+  }
+  c.strokeStyle='#b1874933';c.lineWidth=1;c.beginPath();c.moveTo(0,75);c.lineTo(960,115);c.moveTo(0,80);c.lineTo(960,120);c.stroke();
+}
+function drawLaunchGate(c,s){
+  drawRoundedRect(c,s.x-65,499,130,11,2,'#3c4551','#a48652');
+  for(const sign of [-1,1]){
+    drawRoundedRect(c,s.x+sign*34-9,s.y-36,18,146,3,'#303945','#82909d66');
+    c.fillStyle='#b78c4a';c.fillRect(s.x+sign*34-6,s.y-25,12,5);c.fillRect(s.x+sign*34-6,479,12,5);
+  }
+  c.strokeStyle='#e4b76699';c.lineWidth=2;c.beginPath();c.moveTo(s.x-34,s.y);c.lineTo(birdState.dragX,birdState.dragY);c.lineTo(s.x+34,s.y);c.stroke();
+  const pull=Math.hypot(s.x-birdState.dragX,s.y-birdState.dragY)/s.maxPull;
+  c.strokeStyle=`rgba(240,184,75,${.3+pull*.6})`;c.lineWidth=1+pull*2;c.beginPath();c.arc(birdState.dragX,birdState.dragY,s.radius+7,0,Math.PI*2);c.stroke();
+  if(['IDLE','SLINGSHOT'].includes(birdState.phase)){
+    drawBreaker(c,birdState.dragX,birdState.dragY,s.radius);
+    if(birdState.dragging){const vx=(s.x-birdState.dragX)*s.launchScale,vy=(s.y-birdState.dragY)*s.launchScale;
+      c.fillStyle='#e5bd8588';for(let i=1;i<10;i++){const t=i*.045;c.beginPath();c.arc(s.x+vx*t,s.y+vy*t+.5*BIRD_CONFIG.flight.gravity*t*t,2,0,Math.PI*2);c.fill();}}
+  }
+}
+function drawFlightCore(c,gate,time){
+  const type=BIRD_BONUS_TYPES[gate.type],pulse=1+Math.sin(time*3+gate.id)*.045;
+  c.save();c.translate(gate.x,gate.y);c.scale(pulse,pulse);c.rotate(Math.sin(time*.8+gate.id)*.1);
+  c.fillStyle='#f0b84b0d';c.beginPath();c.arc(0,0,gate.r+7,0,Math.PI*2);c.fill();
+  if(!['split','bomb','ricochet'].includes(gate.type)||!drawVBSprite(c,gate.type,-gate.r,-gate.r,gate.r*2,gate.r*2)){
+    c.fillStyle='#303844';c.strokeStyle='#bb9760';c.lineWidth=2;c.beginPath();c.arc(0,0,gate.r*.85,0,Math.PI*2);c.fill();c.stroke();
+    c.fillStyle='#e5d3a6';c.font='bold 16px system-ui';c.textAlign='center';c.textBaseline='middle';c.fillText(type.label,0,0);
+  }c.restore();
 }
 function drawBirdGame(){
   const c=bctx,W=960,H=540,cam=birdState.camera,run=birdState.run;
-  const sky=c.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#263c56');sky.addColorStop(.6,'#809da8');sky.addColorStop(1,'#d4b58d');
-  c.fillStyle=sky;c.fillRect(0,0,W,H);
-  c.fillStyle='#e8d5ae';c.beginPath();c.arc(740-cam.x*.035,115,39,0,Math.PI*2);c.fill();
-  const drift=performance.now()*.003;
-  c.fillStyle='#d5e0de25';for(let i=0;i<5;i++){
-    const x=((i*271-cam.x*.06+drift)%1300+1300)%1300-140,y=82+(i%3)*43;
-    c.beginPath();c.ellipse(x,y,65,13,0,0,Math.PI*2);c.ellipse(x+23,y-8,36,14,0,0,Math.PI*2);c.fill();
-  }
-  // Three independently moving layers, bounded drawing regardless of world length.
-  for(const [factor,base,amp,color] of [[.10,325,65,'#49647a'],[.28,405,55,'#496b69'],[.65,485,26,'#38534f']]){
-    c.fillStyle=color;c.beginPath();c.moveTo(0,H);for(let x=-40;x<=1000;x+=30){const world=x+cam.x*factor;
-      c.lineTo(x,base+Math.sin(world*.007)*amp+Math.sin(world*.013)*amp*.25);}c.lineTo(W,H);c.fill();
-  }
+  // Higher backing-store resolution never changes world coordinates or physics.
+  c.setTransform(birdCanvas.width/W,0,0,birdCanvas.height/H,0,0);
+  drawIndustrialBackground(c,cam);
   c.save();const shake=birdState.shake*Math.sin((run?.time||0)*91);
   c.translate(-cam.x*cam.zoom+shake,H-H*cam.zoom);c.scale(cam.zoom,cam.zoom);
   const left=cam.x,right=cam.x+W/cam.zoom;
-  c.fillStyle='#34473c';c.fillRect(left,510,right-left,90);c.fillStyle='#9ba878';c.fillRect(left,508,right-left,5);
-  c.fillStyle='#62755c';for(let x=Math.floor(left/90)*90;x<right;x+=90){c.beginPath();c.moveTo(x,510);c.lineTo(x+4,499);c.lineTo(x+10,510);c.fill();}
-  const s=BIRD_CONFIG.sling;
-  if(cam.x<s.x+140){
-    c.strokeStyle='#8e7255';c.lineWidth=13;c.lineCap='round';c.beginPath();c.moveTo(s.x,510);c.lineTo(s.x,425);c.lineTo(s.x-19,s.y);c.moveTo(s.x,425);c.lineTo(s.x+19,s.y);c.stroke();
-    if(['IDLE','SLINGSHOT'].includes(birdState.phase)){
-      c.strokeStyle='#d4af79';c.lineWidth=4;c.beginPath();c.moveTo(s.x-19,s.y);c.lineTo(birdState.dragX,birdState.dragY);c.lineTo(s.x+19,s.y);c.stroke();
-      drawBirdShape(c,birdState.dragX,birdState.dragY,s.radius);
-      if(birdState.dragging){const vx=(s.x-birdState.dragX)*s.launchScale,vy=(s.y-birdState.dragY)*s.launchScale;
-        c.fillStyle='#f3dfb6aa';for(let i=1;i<10;i++){const t=i*.045;c.beginPath();c.arc(s.x+vx*t,s.y+vy*t+.5*BIRD_CONFIG.flight.gravity*t*t,3,0,Math.PI*2);c.fill();}}
-    }
-  }
+  c.fillStyle='#11161d';c.fillRect(left,510,right-left,90);c.fillStyle='#56606b';c.fillRect(left,508,right-left,5);
+  c.fillStyle='#af8a4b';for(let x=Math.floor(left/90)*90;x<right;x+=90){c.save();c.translate(x,512);c.rotate(-.6);c.fillRect(0,0,15,3);c.restore();}
+  const s=BIRD_CONFIG.sling;if(cam.x<s.x+140)drawLaunchGate(c,s);
   if(run){
-    for(const gate of run.bonuses)if(!gate.collected&&gate.x>left-30&&gate.x<right+30){
-      const type=BIRD_BONUS_TYPES[gate.type];c.fillStyle='#23383b';c.strokeStyle=type.color;c.lineWidth=3;c.beginPath();c.arc(gate.x,gate.y,gate.r,0,Math.PI*2);c.fill();c.stroke();
-      c.fillStyle=type.color;c.font='bold 18px system-ui';c.textAlign='center';c.textBaseline='middle';c.fillText(type.label,gate.x,gate.y);
-    }
+    // Nothing is generated or drawn in the held/aiming state.
+    if(run.phase!=='SLINGSHOT')for(const gate of run.bonuses)if(!gate.collected&&gate.x>left-30&&gate.x<right+30)drawFlightCore(c,gate,run.time);
     if(run.targetAdded){
       for(const b of run.blocks)if(b.alive){
-        c.save();c.translate(b.x,b.y);c.rotate(b.angle);drawRoundedRect(c,-b.w/2,-b.h/2,b.w,b.h,2,b.color,'#20333f66');
-        c.fillStyle='#ffffff30';c.fillRect(-b.w/2+2,-b.h/2+2,b.w-4,3);
-        const ratio=b.hp/b.maxHp;if(ratio<.7){c.strokeStyle=b.material==='glass'?'#eefaff':'#302b2d88';c.lineWidth=ratio<.4?2:1;c.beginPath();c.moveTo(-b.w*.3,-b.h*.3);c.lineTo(0,0);c.lineTo(-b.w*.15,b.h*.3);if(ratio<.4){c.moveTo(0,0);c.lineTo(b.w*.3,-b.h*.15);}c.stroke();}
-        if(ratio<.15){c.fillStyle='#b94a4930';c.fillRect(-b.w/2,-b.h/2,b.w,b.h);}c.restore();
+        c.save();c.translate(b.x,b.y);c.rotate(b.angle);
+        drawRoundedRect(c,-b.w/2,-b.h/2,b.w,b.h,2,'#39414c','#b18c5044');
+        drawVBSprite(c,breakerBlockSprite(b),-b.w/2,-b.h/2,b.w,b.h,'cover');
+        const ratio=b.hp/b.maxHp;
+        if(ratio<.7){c.strokeStyle='#d9b48899';c.lineWidth=ratio<.4?1.5:1;c.beginPath();c.moveTo(-b.w*.3,-b.h*.3);c.lineTo(0,0);c.lineTo(-b.w*.15,b.h*.3);if(ratio<.4){c.moveTo(0,0);c.lineTo(b.w*.3,-b.h*.15);}c.stroke();}
+        if(ratio<.15){c.fillStyle='#f0b84b66';c.fillRect(-b.w*.1,-b.h*.1,Math.max(2,b.w*.2),Math.max(2,b.h*.2));}c.restore();
       }
-      for(const p of run.pigs)if(p.alive){
-        c.save();c.translate(p.x,p.y);c.rotate(p.angle);c.fillStyle=p.flash?'#d7e5a5':p.color;c.strokeStyle='#355447';c.lineWidth=2;c.beginPath();c.arc(0,0,p.r,0,Math.PI*2);c.fill();c.stroke();
-        c.fillStyle='#b3c995';c.beginPath();c.ellipse(0,5,p.r*.5,p.r*.3,0,0,Math.PI*2);c.fill();
-        c.fillStyle='#283e37';for(const x of [-5,5]){c.beginPath();c.arc(x,-5,2.5,0,Math.PI*2);c.fill();c.beginPath();c.arc(x*.65,5,1.7,0,Math.PI*2);c.fill();}
-        if(p.type==='helmet'){c.fillStyle='#728391';c.beginPath();c.arc(0,-5,p.r*.88,Math.PI,0);c.fill();}
-        if(p.type==='royal'){c.fillStyle='#d9bb72';c.fillRect(-9,-p.r-6,18,7);}
-        c.fillStyle='#263f3955';c.fillRect(-p.r,-p.r-12,p.r*2,3);c.fillStyle='#d6cf96';c.fillRect(-p.r,-p.r-12,p.r*2*Math.max(0,p.hp/p.maxHp),3);c.restore();
-      }
+      for(const p of run.pigs)if(p.alive)drawSentinel(c,p);
     }
-    for(const b of run.birds)if(b.alive)drawBirdShape(c,b.x,b.y,b.r,b);
+    for(const b of run.birds)if(b.alive){
+      const trail=birdState.trails.get(b.id)||[];c.strokeStyle=b.bomb?'#d2794980':b.ricochet?'#6ed6ff60':'#e5b46d60';c.lineWidth=Math.max(2,b.r*.18);c.beginPath();
+      trail.forEach((p,i)=>{if(i===0)c.moveTo(p.x,p.y);else c.lineTo(p.x,p.y);});c.lineTo(b.x,b.y);c.stroke();
+      drawBreaker(c,b.x,b.y,b.r,b);
+    }
     if(birdState.debug){
       c.font='10px monospace';c.textAlign='left';c.strokeStyle='#fbed6f';
       for(const b of run.world.bodies)if(b.alive&&!b.static){const box=BIRD_PHYSICS.bounds(b);c.strokeRect(box.minX,box.minY,box.maxX-box.minX,box.maxY-box.minY);c.beginPath();c.moveTo(b.x,b.y);c.lineTo(b.x+b.vx*.1,b.y+b.vy*.1);c.stroke();c.fillStyle='#fff';c.fillText(`${b.material} ${Math.round(b.hp||0)} ${b.sleeping?'SLEEP':''}`,b.x,b.y-20);}
@@ -151,9 +197,9 @@ function drawBirdGame(){
     }
   }
   for(const p of birdState.particles){c.globalAlpha=Math.max(0,p.life);c.fillStyle=p.color;c.fillRect(p.x,p.y,p.size,p.size);}c.globalAlpha=1;c.restore();
-  if(birdState.debug&&run){c.fillStyle='#fff';c.font='12px monospace';c.textAlign='left';c.fillText(`seed ${run.plan.seed} · ${run.phase} · correction ${run.correctionDistance.toFixed(1)}`,20,515);}
+  if(birdState.debug&&run){c.fillStyle='#e5d3a6';c.font='12px monospace';c.textAlign='left';c.fillText(`seed ${run.plan.seed} · ${run.phase}`,20,515);}
   if(birdState.phase==='RESULT'&&run?.result){
-    drawRoundedRect(c,300,180,360,125,20,'#152c35ef','#e3c89299');c.textAlign='center';c.fillStyle='#e9d7ae';c.font='700 16px system-ui';c.fillText(birdState.roundWin>0?'ROUND WIN':'NO WIN',480,212);c.font='800 35px system-ui';c.fillText(birdState.roundWin>0?'+'+birdMoney(birdState.roundWin):'0',480,253);c.font='13px system-ui';c.fillText(`${run.pigsDestroyed} PIGS · ${run.blocksDestroyed} BLOCKS · ×${run.multiplier}`,480,283);
+    drawRoundedRect(c,300,180,360,125,12,'#171c24ef','#bc986b99');c.textAlign='center';c.fillStyle='#e5d3a6';c.font='700 16px system-ui';c.fillText(birdState.roundWin>0?'BREACH COMPLETE':'NO BREACH',480,212);c.font='800 35px system-ui';c.fillText(birdState.roundWin>0?'+'+birdMoney(birdState.roundWin):'0',480,253);c.font='13px system-ui';c.fillText(`${run.pigsDestroyed} SENTINELS · ${run.blocksDestroyed} BLOCKS · ×${run.multiplier}`,480,283);
   }
 }
 function updateBirdUI(){
@@ -213,6 +259,9 @@ function birdLoop(now){
     if(birdState.active){birdState.accumulator+=dt;while(birdState.accumulator>=BIRD_PHYSICS.SETTINGS.DT){birdState.accumulator-=BIRD_PHYSICS.SETTINGS.DT;updateBirdPhysics(BIRD_PHYSICS.SETTINGS.DT);if(!birdState.active)break;}}
     if(birdState.phase==='RESULT'){birdState.resultTime+=dt;if(birdState.resultTime>=BIRD_CONFIG.round.resultSeconds){birdState.phase='RESETTING';const last=birdState.lastResult,win=birdState.roundWin;resetBirdRecovery();birdState.lastResult=last;birdState.roundWin=win;updateBirdUI();}}
     const run=birdState.run,primary=run?.birds[0],cam=birdState.camera;
+    updateSentinelRenderAngles(run,dt);
+    for(const b of run?.birds||[])if(b.alive){const trail=birdState.trails.get(b.id)||[];trail.push({x:b.x,y:b.y});if(trail.length>12)trail.shift();birdState.trails.set(b.id,trail);}
+    for(const id of birdState.trails.keys())if(!run?.birds.some(b=>b.id===id&&b.alive))birdState.trails.delete(id);
     let desiredX=0,desiredZoom=1;
     if(primary){desiredX=Math.max(0,primary.x-310);if(run.targetAdded){const box=run.plan.buildingPlan.bounds;
       desiredZoom=Math.min(.95,800/(box.right-box.left+240),440/(510-box.top+50));desiredZoom=Math.max(.55,desiredZoom);

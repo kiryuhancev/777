@@ -21,7 +21,8 @@ pattern=r'<!-- BEGIN POKER PRESENTATION -->[\s\S]*?<!-- END POKER PRESENTATION -
 if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
 else:s=s.replace('</head>',block+'\n</head>',1)
 # Header lives outside the embedded auth block; replace the same shared mark there too.
-bird='// BEGIN BIRD GAME V2\n'+'\n'.join((ROOT/'bird'/f).read_text().rstrip() for f in ['config.js','model.js','game.js'])+'\n// END BIRD GAME V2'
+bird='// BEGIN BIRD GAME V2\n'+'\n'.join((ROOT/'bird'/f).read_text().rstrip() for f in ['config.js','model.js','assets.js','game.js'])+'\n// END BIRD GAME V2'
+bird=re.sub(r'__VB_ASSET_([^\s\'"<>]+)__',lambda m:'data:image/webp;base64,'+base64.b64encode((ROOT/'assets/breakers'/m[1]).read_bytes()).decode(),bird)
 pattern=r'// BEGIN BIRD GAME V2[\s\S]*?// END BIRD GAME V2'
 if re.search(pattern,s):s=re.sub(pattern,lambda _:bird,s)
 else:

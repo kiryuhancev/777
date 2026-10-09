@@ -1,0 +1,347 @@
+{
+  "generatedAt": "2026-10-09T09:06:31.341Z",
+  "masterSeed": 539365385,
+  "simulation": "Exact production rigid-body engine and unchanged payout formula, DT=1/120",
+  "modelSha256": "ff5374058f317b362e01ff4391805ded3e0ba8fdf92eef940f37a08f2d738a66",
+  "elapsedSeconds": 1456.357,
+  "workers": 4,
+  "formula": "RTP = sum(payout) / sum(bet) * 100; bet = 20 in all samples",
+  "policies": {
+    "standard": "Nominal button launch vx=660, vy=-290, no correction",
+    "mixedDrag": "Uniform pull 65\u2013120, angle 10\u201345 degrees, no correction",
+    "steerLeft": "Nominal launch, constant correction -1",
+    "steerRight": "Nominal launch, constant correction +1"
+  },
+  "limitations": [
+    "Monte Carlo estimate for each stated policy, not a single policy-independent theoretical RTP.",
+    "Approximate normal 95% intervals may be optimistic for rare multiplier chains; larger samples are needed for calibration.",
+    "No target RTP or payout parameters were adjusted.",
+    "Empirical bootstrap intervals resample observed rounds only; they cannot quantify unobserved rare chains."
+  ],
+  "profiles": {
+    "standard": {
+      "rounds": 10000,
+      "totalWager": 200000,
+      "totalPayout": 754262.2735030008,
+      "rtpPercent": 377.13113675150043,
+      "approximate95PercentInterval": [
+        359.6729781910037,
+        394.5892953119972
+      ],
+      "positivePayoutPercent": 99.42999999999999,
+      "profitableRoundPercent": 67.65,
+      "medianReturn": 1.7105447999999999,
+      "p95Return": 12.771217199999999,
+      "p99Return": 33.95,
+      "maximum": {
+        "profile": "standard",
+        "index": 7240,
+        "seed": 3727047914,
+        "vx": 660,
+        "vy": -290,
+        "steer": 0,
+        "payout": 7991.789407,
+        "return": 399.58947035,
+        "route": "HOT",
+        "archetype": "DOUBLE_TOWER",
+        "size": "FORTRESS",
+        "bonuses": 5,
+        "multiplier": 36,
+        "pigs": 8,
+        "blocks": 28,
+        "seconds": 7.491666666666829
+      },
+      "topOnePercentPayoutShare": 0.17026117160490467,
+      "byRoute": {
+        "DRY": {
+          "rounds": 4231,
+          "rtpPercent": 155.5011146620185
+        },
+        "HOT": {
+          "rounds": 1172,
+          "rtpPercent": 1044.1087038566538
+        },
+        "NORMAL": {
+          "rounds": 4462,
+          "rtpPercent": 372.8613944811752
+        },
+        "RARE": {
+          "rounds": 135,
+          "rtpPercent": 1673.9496909999996
+        }
+      },
+      "byBuildingSize": {
+        "FORTRESS": {
+          "rounds": 481,
+          "rtpPercent": 958.8999717359675
+        },
+        "LARGE": {
+          "rounds": 2283,
+          "rtpPercent": 463.6538512877795
+        },
+        "MEDIUM": {
+          "rounds": 3683,
+          "rtpPercent": 372.01284024708144
+        },
+        "SMALL": {
+          "rounds": 3553,
+          "rtpPercent": 248.08202870532025
+        }
+      },
+      "empiricalBootstrap95PercentInterval": [
+        360.013199211,
+        394.104459865
+      ]
+    },
+    "mixedDrag": {
+      "rounds": 2000,
+      "totalWager": 40000,
+      "totalPayout": 69766.03725400001,
+      "rtpPercent": 174.41509313500003,
+      "approximate95PercentInterval": [
+        152.88240146966706,
+        195.94778480033298
+      ],
+      "positivePayoutPercent": 57.65,
+      "profitableRoundPercent": 35.449999999999996,
+      "medianReturn": 0.06517315,
+      "p95Return": 7.96101465,
+      "p99Return": 16.14708135,
+      "maximum": {
+        "profile": "mixedDrag",
+        "index": 1771,
+        "seed": 3197564026,
+        "vx": 651.2652603954773,
+        "vy": -306.014573558636,
+        "steer": 0,
+        "payout": 2809.229788,
+        "return": 140.4614894,
+        "route": "HOT",
+        "archetype": "TALL_THIN",
+        "size": "FORTRESS",
+        "bonuses": 7,
+        "multiplier": 24,
+        "pigs": 3,
+        "blocks": 10,
+        "seconds": 8.441666666666828
+      },
+      "topOnePercentPayoutShare": 0.18620003820347697,
+      "byRoute": {
+        "DRY": {
+          "rounds": 847,
+          "rtpPercent": 138.90604183589141
+        },
+        "HOT": {
+          "rounds": 231,
+          "rtpPercent": 304.4707092207792
+        },
+        "NORMAL": {
+          "rounds": 896,
+          "rtpPercent": 175.86582927455345
+        },
+        "RARE": {
+          "rounds": 26,
+          "rtpPercent": 125.70199903846155
+        }
+      },
+      "byBuildingSize": {
+        "FORTRESS": {
+          "rounds": 106,
+          "rtpPercent": 709.2558503773588
+        },
+        "LARGE": {
+          "rounds": 432,
+          "rtpPercent": 191.84375663194433
+        },
+        "MEDIUM": {
+          "rounds": 714,
+          "rtpPercent": 144.30502478291314
+        },
+        "SMALL": {
+          "rounds": 748,
+          "rtpPercent": 117.29782830213908
+        }
+      },
+      "empiricalBootstrap95PercentInterval": [
+        154.126926105,
+        197.02722966000002
+      ]
+    },
+    "steerLeft": {
+      "rounds": 2000,
+      "totalWager": 40000,
+      "totalPayout": 159919.548233,
+      "rtpPercent": 399.7988705825,
+      "approximate95PercentInterval": [
+        364.3266594592815,
+        435.27108170571853
+      ],
+      "positivePayoutPercent": 99.55000000000001,
+      "profitableRoundPercent": 71.2,
+      "medianReturn": 1.9738418500000001,
+      "p95Return": 13.3943415,
+      "p99Return": 31.610854949999997,
+      "maximum": {
+        "profile": "steerLeft",
+        "index": 1771,
+        "seed": 3197564026,
+        "vx": 660,
+        "vy": -290,
+        "steer": -1,
+        "payout": 3637.87678,
+        "return": 181.893839,
+        "route": "HOT",
+        "archetype": "TALL_THIN",
+        "size": "FORTRESS",
+        "bonuses": 7,
+        "multiplier": 24,
+        "pigs": 4,
+        "blocks": 16,
+        "seconds": 10.525000000000043
+      },
+      "topOnePercentPayoutShare": 0.1545865408085154,
+      "byRoute": {
+        "DRY": {
+          "rounds": 847,
+          "rtpPercent": 171.92577645808737
+        },
+        "HOT": {
+          "rounds": 231,
+          "rtpPercent": 1077.537633939394
+        },
+        "NORMAL": {
+          "rounds": 896,
+          "rtpPercent": 408.19066194754396
+        },
+        "RARE": {
+          "rounds": 26,
+          "rtpPercent": 1512.5608446153847
+        }
+      },
+      "byBuildingSize": {
+        "FORTRESS": {
+          "rounds": 106,
+          "rtpPercent": 914.2172753301887
+        },
+        "LARGE": {
+          "rounds": 432,
+          "rtpPercent": 356.7342769560183
+        },
+        "MEDIUM": {
+          "rounds": 714,
+          "rtpPercent": 419.12288018907543
+        },
+        "SMALL": {
+          "rounds": 748,
+          "rtpPercent": 333.32589021390373
+        }
+      },
+      "empiricalBootstrap95PercentInterval": [
+        365.82984965,
+        438.855736975
+      ]
+    },
+    "steerRight": {
+      "rounds": 2000,
+      "totalWager": 40000,
+      "totalPayout": 148583.37995500007,
+      "rtpPercent": 371.45844988750014,
+      "approximate95PercentInterval": [
+        335.83488180410416,
+        407.0820179708961
+      ],
+      "positivePayoutPercent": 100,
+      "profitableRoundPercent": 66.9,
+      "medianReturn": 1.7169301999999997,
+      "p95Return": 12.450327249999999,
+      "p99Return": 32.97583555,
+      "maximum": {
+        "profile": "steerRight",
+        "index": 1771,
+        "seed": 3197564026,
+        "vx": 660,
+        "vy": -290,
+        "steer": 1,
+        "payout": 3805.712539,
+        "return": 190.28562695,
+        "route": "HOT",
+        "archetype": "TALL_THIN",
+        "size": "FORTRESS",
+        "bonuses": 7,
+        "multiplier": 24,
+        "pigs": 4,
+        "blocks": 21,
+        "seconds": 6.200000000000098
+      },
+      "topOnePercentPayoutShare": 0.1671242758007025,
+      "byRoute": {
+        "DRY": {
+          "rounds": 847,
+          "rtpPercent": 163.13377151711924
+        },
+        "HOT": {
+          "rounds": 231,
+          "rtpPercent": 1015.4927749350652
+        },
+        "NORMAL": {
+          "rounds": 896,
+          "rtpPercent": 374.55861807477646
+        },
+        "RARE": {
+          "rounds": 26,
+          "rtpPercent": 1329.201634423077
+        }
+      },
+      "byBuildingSize": {
+        "FORTRESS": {
+          "rounds": 106,
+          "rtpPercent": 875.475414433962
+        },
+        "LARGE": {
+          "rounds": 432,
+          "rtpPercent": 342.0232803240739
+        },
+        "MEDIUM": {
+          "rounds": 714,
+          "rtpPercent": 424.3465547969191
+        },
+        "SMALL": {
+          "rounds": 748,
+          "rtpPercent": 266.54947676470584
+        }
+      },
+      "empiricalBootstrap95PercentInterval": [
+        339.36509259999997,
+        408.0784197025
+      ]
+    }
+  },
+  "pairedPolicySensitivity": {
+    "mixedDrag": {
+      "rounds": 2000,
+      "rtpDifferencePercentagePoints": -200.31192383,
+      "empiricalBootstrap95PercentInterval": [
+        -232.17160530750002,
+        -170.10524354249998
+      ]
+    },
+    "steerLeft": {
+      "rounds": 2000,
+      "rtpDifferencePercentagePoints": 25.0718536175,
+      "empiricalBootstrap95PercentInterval": [
+        10.879236600000002,
+        38.824687759999996
+      ]
+    },
+    "steerRight": {
+      "rounds": 2000,
+      "rtpDifferencePercentagePoints": -3.2685670775,
+      "empiricalBootstrap95PercentInterval": [
+        -16.112051930000003,
+        10.972136517500001
+      ]
+    }
+  },
+  "standardReferenceOnSensitivitySeedsPercent": 374.72701696499996,
+  "modelSha256Method": "config + model + engine loader + entire embedded rigid-body engine, UTF-8"
+}

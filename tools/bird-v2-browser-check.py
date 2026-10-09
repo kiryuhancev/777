@@ -16,9 +16,11 @@ with sync_playwright() as p:
  before=page.evaluate('state.balance');page.locator('#birdStartBtn').click()
  assert page.evaluate('birdState.phase')=='SLINGSHOT';assert page.evaluate('state.balance')==before-20
  rid=page.evaluate('birdState.roundId');assert rid and len(rid)==36
- assert page.evaluate('birdState.run.plan.flightPlan.bonusSpawns.length')>=6
+ assert page.evaluate('birdState.run.plan.flightPlan.bonusSpawns.length')==0
+ assert page.evaluate('birdState.bonuses.length')==0
+ page.evaluate('VB_ASSETS_READY');assert page.evaluate('Object.values(VB_ASSETS).every(a=>a.status==="ready")')
  page.screenshot(path='/workspace/output/bird-v2-sling-desktop.png',full_page=True)
- positions=page.evaluate('birdState.bonuses.map(b=>[b.x,b.y])');page.locator('#birdStartBtn').click()
+ page.locator('#birdStartBtn').click();positions=page.evaluate('birdState.bonuses.map(b=>[b.x,b.y])');assert len(positions)>=6
  assert page.evaluate('birdState.run.birds.length')==1;assert page.evaluate('state.balance')==before-20
  page.wait_for_function('birdState.camera.x>100');assert page.evaluate('birdState.phase')=='FLIGHT'
  page.screenshot(path='/workspace/output/bird-v2-flight-desktop.png',full_page=True)
@@ -32,7 +34,7 @@ with sync_playwright() as p:
  assert cloud.stats[(A,'bird')]['rounds_played']==1
  page.screenshot(path='/workspace/output/bird-v2-result-desktop.png',full_page=True)
  page.wait_for_function("birdState.phase==='IDLE'");assert page.evaluate('birdState.run') is None
- checks.append('One paid launch, fixed bonuses, moving camera, one settlement/stat entry, bounded cleanup')
+ checks.append('No cores before release; immutable cores after release; one paid launch and settlement; all eleven archive assets loaded')
  # A new plan and actual touch/pen/mouse-compatible drag path.
  page.set_viewport_size({'width':390,'height':844});page.wait_for_timeout(200)
  assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')

@@ -1,11 +1,12 @@
 {
-  "baseline": "a042ab9",
+  "baseline": "d64b0a7",
   "unchanged": [
     "Digital Derby HTML/styles/RNG/logic",
     "Poker Blitz HTML/styles/logic",
-    "lobby VAULT and auth UI",
+    "lobby VAULT layout and auth UI",
     "rigid-body engine",
     "wallet/auth/Supabase services"
   ],
-  "allowedRecoveryChange": "Existing safe reset delegates to resetBirdRecovery; no physics-frame restoration"
+  "allowedBrandingChange": "Title and existing Bird game-card name/icons; lobby layout unchanged",
+  "allowedGameplayChange": "Bonus object generation moves from round preparation to one release-time call; distribution and score formula preserved"
 }
