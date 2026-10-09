@@ -2,16 +2,16 @@
  * Only explicit business checkpoints cross this boundary. No frame/DOM serialization. */
 (() => {
   'use strict';
-  const C=VAULT_CONFIG,NS=`vault:v${C.storageVersion}:`,games=['slot','poker','bird'],screens=['lobby',...games];
+  const C=VAULT_CONFIG,NS=`vault:v${C.storageVersion}:`,games=['slot','poker','bird','blackjack','baccarat'],screens=['lobby',...games];
   const uuid=()=>globalThis.crypto?.randomUUID?.()||'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const n=Math.floor(Math.random()*16);return(c==='x'?n:(n&3)|8).toString(16);});
   const isId=x=>typeof x==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x);
   const amount=x=>Number.isFinite(Number(x))&&Number(x)>=0&&Number(x)<=1e12?Math.round(Number(x)*1e6)/1e6:null;
   const copy=x=>JSON.parse(JSON.stringify(x));
-  const defaults=()=>({balance:C.guestStartingBalance,revision:0,walletConfirmed:false,settings:{sound:true,music:false,fastGame:false,fastBonus:false,scatterBoost:false},bets:{slot:2,poker:2,bird:1},lastGame:'lobby',settingsUpdatedAt:0,recovery:{slotBonus:null,openRounds:{}},rounds:[],stats:{},queue:[]});
+  const defaults=()=>({balance:C.guestStartingBalance,revision:0,walletConfirmed:false,settings:{sound:true,music:false,fastGame:false,fastBonus:false,scatterBoost:false},bets:{slot:2,poker:2,bird:1,blackjack:2,baccarat:2,baccaratType:'PLAYER'},lastGame:'lobby',settingsUpdatedAt:0,recovery:{slotBonus:null,openRounds:{}},rounds:[],stats:{},queue:[]});
   const VaultSession=window.VaultSession={mode:'guest',user:null,profile:null,ready:false};
   let authBusy=false;
   let owner='guest',data=defaults(),client=null,clientRevision=0,suppress=false,localTimer=null,syncTimer=null,syncing=null,identityEpoch=0,connecting=null,connectionUser=null,settingsFingerprint='',conflict=false,locked=false,releaseLock=null,lockHeld=false,storageAvailable=true,profileRemote=true;
-  let canonicalBalance=state.balance,walletMutation=0,recovering=null;
+  let canonicalBalance=state.balance,walletMutation=0,recovering=null,tableSupport=false,tableSupportPromise=null;
   const byId=id=>document.getElementById(id);
   const status=text=>{if(!storageAvailable&&/сохран|Saved|Offline|pending/i.test(text))text='Сохранение недоступно — не перезагружайте страницу';const node=byId('vaultSyncStatus');if(node)node.textContent=text;};
   function configured(){
@@ -24,7 +24,7 @@
   function read(key){try{return JSON.parse(localStorage.getItem(NS+key)||'null');}catch{return null;}}
   function write(key,value){try{localStorage.setItem(NS+key,JSON.stringify(value));return true;}catch{storageAvailable=false;status('Сохранение недоступно');return false;}}
   function validSettings(input){const out=defaults().settings;for(const key of Object.keys(out))if(typeof input?.[key]==='boolean')out[key]=input[key];return out;}
-  function validBets(input){const out={slot:2,poker:2,bird:1};for(const game of games){const n=input?.[game],max=game==='bird'?BIRD_BETS.length:BETS.length;if(Number.isInteger(n)&&n>=0&&n<max)out[game]=n;}return out;}
+  function validBets(input){const out={slot:2,poker:2,bird:1,blackjack:2,baccarat:2,baccaratType:['PLAYER','BANKER','TIE'].includes(input?.baccaratType)?input.baccaratType:'PLAYER'};for(const game of games){const n=input?.[game],max=game==='bird'?BIRD_BETS.length:BETS.length;if(Number.isInteger(n)&&n>=0&&n<max)out[game]=n;}return out;}
   function validBonus(b){
     if(!b||!['normal','super'].includes(b.type)||!Number.isInteger(b.size)||b.size<5||b.size>8||!Number.isInteger(b.freeSpins)||b.freeSpins<0||b.freeSpins>5000)return null;
     const entries=Array.isArray(b.sticky)?b.sticky.filter(entry=>Array.isArray(entry)&&entry.length===2).filter(([k,v])=>typeof k==='string'&&/^\d,\d$/.test(k)&&SYMBOLS[v]&&v.startsWith('wild')&&k.split(',').every(n=>Number(n)<b.size)):[];
@@ -46,7 +46,7 @@
   }
   function capturePreferences(){
     const settings={sound:state.sound,music:state.music,fastGame:state.fastGame,fastBonus:state.fastBonus,scatterBoost:state.scatterBoost};
-    const bets={slot:state.betIndex,poker:pokerState.betIndex,bird:birdState.betIndex};
+    const bets={slot:state.betIndex,poker:pokerState.betIndex,bird:birdState.betIndex,...VaultTables.preferences()};
     const fingerprint=JSON.stringify({settings,bets,lastGame:currentGame});
     if(fingerprint!==settingsFingerprint){settingsFingerprint=fingerprint;data.settings=settings;data.bets=bets;data.lastGame=screens.includes(currentGame)?currentGame:'lobby';data.settingsUpdatedAt=Date.now();
       if(VaultSession.mode==='authenticated')enqueue('settings',{settings:{...settings,bets,lastGame:data.lastGame},updatedAt:new Date(data.settingsUpdatedAt).toISOString()});
@@ -67,7 +67,7 @@
   function refreshBalanceUI(){syncLobbyBalance();for(const id of ['balance','pokerBalance','birdBalance'])byId(id).textContent=VaultWalletService.formatBalance();}
   const VaultWalletService=window.VaultWalletService={
     getBalance:()=>canonicalBalance,
-    formatBalance:()=>owner!=='guest'&&!data.walletConfirmed?'—':fmt(canonicalBalance),
+    formatBalance:()=>owner!=='guest'&&!data.walletConfirmed?'—':canonicalBalance.toLocaleString('ru-RU',{maximumFractionDigits:6}),
     setLocalBalance(value){const n=amount(value);if(n===null)throw Error('Invalid wallet value');canonicalBalance=n;data.balance=n;walletMutation++;if(!suppress){VaultStorage.saveLocalState({preferences:false});refreshBalanceUI();}return n;},
     applyDelta(delta,{gameId}={}){
       if(!Number.isFinite(delta)||amount(canonicalBalance+delta)===null)throw Error('Invalid wallet delta');
@@ -103,7 +103,15 @@
     load:()=>copy(data.stats),
   };
   const VaultRoundService=window.VaultRoundService={
+    async checkTableSupport(){
+      if(tableSupport)return true;if(tableSupportPromise)return tableSupportPromise;
+      if(!client||VaultSession.mode!=='authenticated')return false;
+      const cached=read('table-schema');if(!navigator.onLine&&cached?.version===1&&cached.project===C.supabaseUrl){tableSupport=true;return true;}
+      tableSupportPromise=(async()=>{try{const {data:result,error}=await client.rpc('table_games_capabilities');if(error)throw error;tableSupport=result?.version===1;if(tableSupport)write('table-schema',{version:1,project:C.supabaseUrl});return tableSupport;}catch(e){if(cached?.version===1&&cached.project===C.supabaseUrl&&/fetch|network|offline/i.test(e.message||'')){tableSupport=true;return true;}console.error('VAULT table schema unavailable',e);return false;}finally{tableSupportPromise=null;}})();return tableSupportPromise;
+    },
+    get tableSupport(){return tableSupport;},
     canPlay(game){
+      if(['blackjack','baccarat'].includes(game)&&!tableSupport)return false;
       if(VaultSession.mode!=='authenticated'){toast('Войдите в аккаунт, чтобы начать игру');return false;}
       if(conflict){recoverWallet();status('Восстанавливаем кошелёк…');return false;}
       if(authBusy||!VaultSession.ready||locked||(!profileRemote&&owner!=='guest')||data.queue.length>C.maxPendingEvents-6){toast(locked?'Игра открыта в другой вкладке':'Sync pending — игра временно недоступна');return false;}
@@ -120,6 +128,12 @@
       if(gameId==='slot')VaultRecovery.checkpointSlot({save:false});
       if(owner!=='guest')enqueue('begin',{p_round_id:round.roundId,p_game_id:gameId,p_bet:wager,p_expected_revision:clientRevision,p_metadata:metadata,p_recovery:stableRecovery()});
       clientRevision++;VaultStorage.saveLocalState();refreshBalanceUI();return round.roundId;
+    },
+    addStake(gameId,value){
+      const round=data.recovery.openRounds[gameId],n=amount(value);
+      if(gameId!=='blackjack'||!round||round.metadata.doubled||n===null||n!==round.stake||n>canonicalBalance)return false;
+      round.bet=amount(round.bet+n);round.stake=round.bet;round.metadata.doubled=true;
+      suppress=true;VaultWalletService.applyDelta(-n,{gameId});suppress=false;VaultStorage.saveLocalState();refreshBalanceUI();return true;
     },
     finish(gameId,result='completed',statusValue='settled',metadata={}){
       const round=data.recovery.openRounds[gameId];if(!round)return false;
@@ -145,15 +159,15 @@
       state.busy=false;state.activeSpinFast=null;state.bonusAutoRunning=false;state.bonusAutoNotBefore=0;autoState.active=false;autoState.remaining=0;
       clearTimeout(autoState.timer);clearTimeout(bonusAutoTimer);bonusAutoTimer=null;
       pokerState.deck=[];pokerState.discard=[];pokerState.player=[];pokerState.dealer=[];pokerState.community=[];pokerState.choice=[];pokerState.phase='idle';pokerState.resolved=false;pokerState.winner='';pokerState.result='';pokerState.playerEval=null;pokerState.dealerEval=null;pokerState.peekUntil=0;pokerState.dealerHiddenRevealed=false;pokerState.tacticalUsed=false;pokerState.spent=0;
-      resetBirdRecovery();
+      resetBirdRecovery();VaultTables.reset();
       const b=validBonus(data.recovery.slotBonus);
       state.bonus=!!b&&b.freeSpins>0;state.bonusType=b?.type||'normal';state.slotProfile=state.bonus?b.type:'base';state.size=state.bonus?b.size:5;state.freeSpins=state.bonus?b.freeSpins:0;state.bonusLevel=state.bonus?b.level:0;state.scatterProgress=state.bonus?b.progress:0;state.bonusSpinsPlayed=state.bonus?b.spins:0;state.bonusTotalWin=state.bonus?b.totalWin:0;state.bonusCascades=state.bonus?b.cascades:0;state.bonusPurchaseCost=state.bonus?b.purchaseCost:0;state.sticky=new Map(state.bonus?b.sticky.map(([k,v])=>[k.replace(',',':'),v]):[]);state.grid=blankGrid(state.size);state.cascade=0;state.lastWin=0;state.pendingBonusPurchaseCost=0;
       document.body.classList.toggle('bonus',state.bonus);fillGrid();render();
     },
     cancelInterrupted(game){const r=data.recovery.openRounds[game];if(r)VaultRoundService.finish(game,'interrupted','cancelled',{recovery:'safe-reset-no-refund'});},
   };
-  function restorePreferences(){Object.assign(state,data.settings);state.betIndex=data.bets.slot;pokerState.betIndex=data.bets.poker;birdState.betIndex=data.bets.bird;settingsFingerprint=JSON.stringify({settings:data.settings,bets:data.bets,lastGame:data.lastGame});}
-  function showSavedScreen(){if(VaultSession.mode!=='authenticated'){openLobby();return;}const open={lobby:openLobby,slot:openSlotGame,poker:openPokerGame,bird:openBirdGame};open[data.lastGame]();updateUI();updatePokerUI();updateBirdUI();drawBirdGame();updateSettingsUI();}
+  function restorePreferences(){Object.assign(state,data.settings);state.betIndex=data.bets.slot;pokerState.betIndex=data.bets.poker;birdState.betIndex=data.bets.bird;VaultTables.restore(data.bets);settingsFingerprint=JSON.stringify({settings:data.settings,bets:data.bets,lastGame:data.lastGame});}
+  function showSavedScreen(){if(VaultSession.mode!=='authenticated'){openLobby();return;}const open={lobby:openLobby,slot:openSlotGame,poker:openPokerGame,bird:openBirdGame,blackjack:()=>VaultTables.open('blackjack'),baccarat:()=>VaultTables.open('baccarat')};open[data.lastGame]();updateUI();updatePokerUI();updateBirdUI();drawBirdGame();updateSettingsUI();}
   function renderIdentity(){
     const signedIn=VaultSession.mode==='authenticated';byId('vaultProfileMenu').open=false;document.body.classList.toggle('vault-signed-out',!signedIn);
     document.querySelector('.lobby .lobby-balance').hidden=!signedIn;
@@ -249,7 +263,9 @@
           }else{
             if(rejected.has(id))continue;
             if(!accepted.has(id))throw Error('Round missing during automatic recovery');
-            balance=amount(balance+payload.p_payout);if(balance===null)throw Error('Invalid settlement');revision++;next.push(event);
+            const originalBet=Number(round?.bet??events.find(e=>e.type==='begin'&&e.payload.p_round_id===id)?.payload.p_bet??payload.p_bet),extra=Math.max(0,payload.p_bet-originalBet);
+            if(extra>balance){payload.p_bet=originalBet;payload.p_payout=0;payload.p_multiplier=0;payload.p_status='cancelled';payload.p_result='double-rejected';payload.p_metadata={...payload.p_metadata,doubled:false,recovery:'insufficient-remote-double-stake'};const saved=data.rounds.find(r=>r.roundId===id);if(saved)Object.assign(saved,{bet:originalBet,stake:originalBet,payout:0,multiplier:0,status:'cancelled',result:payload.p_result,metadata:payload.p_metadata});balance=amount(balance);}
+            else balance=amount(balance-extra+payload.p_payout);if(balance===null)throw Error('Invalid settlement');revision++;next.push(event);
           }
         }
         if(events.some(e=>e.payload?.p_game_id==='slot'&&rejected.has(e.payload.p_round_id))){data.recovery.slotBonus=validBonus(wallet.recovery?.slotBonus);suppress=true;VaultRecovery.restore();suppress=false;}
