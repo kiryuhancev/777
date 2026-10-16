@@ -70,3 +70,11 @@
 - Blackjack: natural 3:2, S17, HIT/STAND/DOUBLE; Baccarat: six-deck Punto Banco, official third-card matrix, Banker commission and tie pushes.
 - Extended existing shared wallet/round/persistence registry; one UUID per hand, one settle, safe interrupted-hand recovery, fractional balances and automatic schema-readiness guard.
 - Added repeat-safe `supabase_table_games.sql` for the existing database and focused math/browser/PostgreSQL/RLS tests.
+
+## Authorization feedback and retry
+
+- Failed sign-in no longer clears the entered password; it clears only after success or closing the dialog.
+- Authentication errors are visible above ENTER and distinguish invalid credentials, unconfirmed email, rate limits and connection/service failures.
+- A failed initial Supabase SDK load can retry on the next submit without a page reload.
+- An initialization fallback prevents native form navigation; auth failure and retry paths are covered in desktop/mobile browser tests.
+- No database migration, wallet change or gameplay change is required.

@@ -342,6 +342,16 @@
     })();
     try{return await connecting;}finally{connecting=null;connectionUser=null;}
   }
+  function authFailure(error,fallback){
+    const code=error?.code||'',message=String(error?.message||'');
+    if(code==='invalid_credentials'||/invalid login credentials/i.test(message))return {error:'Неверный email или пароль. Проверьте данные и попробуйте снова.',errorKind:'credentials'};
+    if(code==='email_not_confirmed'||/email not confirmed/i.test(message))return {error:'Подтвердите email по ссылке в письме, затем повторите вход.',errorKind:'confirmation'};
+    if(/rate_limit|too_many_requests/.test(code)||error?.status===429)return {error:'Слишком много попыток. Подождите немного и повторите вход.',errorKind:'rate-limit'};
+    if(code==='user_banned')return {error:'Доступ к этому аккаунту ограничен.',errorKind:'account'};
+    if(code==='user_already_exists')return {error:'Аккаунт с этим email уже существует. Перейдите ко входу.',errorKind:'account'};
+    if(error?.status>=500||!navigator.onLine||/fetch|network|timeout|timed out|unreachable/i.test(message))return {error:'Не удалось связаться с сервером авторизации. Проверьте соединение и повторите попытку.',errorKind:'connection'};
+    return {error:fallback,errorKind:'service'};
+  }
   const VaultAuth=window.VaultAuth={
     get client(){return client;},isConfigured:configured,
     async restoreSession(){
@@ -367,15 +377,20 @@
     async signIn(email,password){
       if(authBusy)return {error:'Дождитесь завершения операции'};
       if(VaultRoundService.anyActive())return {error:'Сначала завершите текущий раунд и бонус'};
-      if(!client)return {error:'Вход доступен после подключения Supabase'};
-      authBusy=true;try{const {data:result,error}=await client.auth.signInWithPassword({email:email.trim(),password});if(error)throw error;await switchIdentity(result.user);return {data:result};}catch(e){console.error('VAULT sign in failed',e);return {error:'Could not sign in'};}finally{authBusy=false;}
+      authBusy=true;
+      try{
+        if(!client)await this.restoreSession();
+        if(!client)return {error:'Сервис входа не загрузился. Проверьте соединение и повторите попытку.',errorKind:'connection'};
+        const {data:result,error}=await client.auth.signInWithPassword({email:email.trim(),password});if(error)throw error;
+        if(!result?.user)throw Error('Authenticated user missing');
+        await switchIdentity(result.user);return {data:result};
+      }catch(e){console.error('VAULT sign in failed',e);return authFailure(e,'Не удалось войти. Повторите попытку позже.');}finally{authBusy=false;}
     },
     async signUp(email,password,username){
       if(authBusy)return {error:'Дождитесь завершения операции'};
       if(VaultRoundService.anyActive())return {error:'Сначала завершите текущий раунд и бонус'};
-      if(!client)return {error:'Регистрация доступна после подключения Supabase'};
       if(!username.trim()||username.length>40)return {error:'Укажите имя до 40 символов'};
-      authBusy=true;try{const {data:result,error}=await client.auth.signUp({email:email.trim(),password,options:{data:{username:username.trim()},emailRedirectTo:location.origin+location.pathname}});if(error)throw error;if(result.session)await switchIdentity(result.user,{migrate:true});else migrateGuestStateToUser(result.user?.id);return {data:result,confirmationRequired:!result.session};}catch(e){console.error('VAULT sign up failed',e);return {error:'Could not create account'};}finally{authBusy=false;}
+      authBusy=true;try{if(!client)await this.restoreSession();if(!client)return {error:'Сервис регистрации не загрузился. Проверьте соединение и повторите попытку.',errorKind:'connection'};const {data:result,error}=await client.auth.signUp({email:email.trim(),password,options:{data:{username:username.trim()},emailRedirectTo:location.origin+location.pathname}});if(error)throw error;if(result.session)await switchIdentity(result.user,{migrate:true});else migrateGuestStateToUser(result.user?.id);return {data:result,confirmationRequired:!result.session};}catch(e){console.error('VAULT sign up failed',e);return authFailure(e,'Не удалось создать аккаунт. Повторите попытку позже.');}finally{authBusy=false;}
     },
     async signOut(){
       if(authBusy)return {error:'Дождитесь завершения операции'};
@@ -401,9 +416,15 @@
   byId('vaultAuthDialog').onclick=e=>{if(e.target===byId('vaultAuthDialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeAuth();}};
   byId('vaultAuthForm').onsubmit=async e=>{
     e.preventDefault();const submit=byId('vaultAuthSubmit');submit.disabled=true;submit.textContent=authMode==='signup'?'CREATING…':'ENTERING…';byId('vaultAuthSwitch').disabled=true;byId('vaultAuthMessage').textContent='';
-    try{const email=byId('vaultAuthEmail').value,password=byId('vaultAuthPassword').value,username=byId('vaultAuthUsername').value;
-      const result=authMode==='signup'?await VaultAuth.signUp(email,password,username):await VaultAuth.signIn(email,password);
-      byId('vaultAuthPassword').value='';if(result.error)byId('vaultAuthMessage').textContent=result.error;else if(result.confirmationRequired)byId('vaultAuthMessage').textContent='Проверьте почту и подтвердите аккаунт. Затем войдите.';else closeAuth();
+    try{const mode=authMode,email=byId('vaultAuthEmail').value,password=byId('vaultAuthPassword').value,username=byId('vaultAuthUsername').value;
+      const result=mode==='signup'?await VaultAuth.signUp(email,password,username):await VaultAuth.signIn(email,password);
+      if(result.error){
+        if(VaultSession.mode!=='authenticated'&&authMode!==mode)openAuth(mode);
+        byId('vaultAuthMessage').textContent=result.error;
+        byId('vaultAuthPassword').setAttribute('aria-invalid',String(result.errorKind==='credentials'));
+        byId('vaultAuthMessage').scrollIntoView({block:'nearest'});
+      }else{byId('vaultAuthPassword').value='';byId('vaultAuthPassword').removeAttribute('aria-invalid');if(result.confirmationRequired)byId('vaultAuthMessage').textContent='Проверьте почту и подтвердите аккаунт. Затем войдите.';else closeAuth();}
+    }catch(e){console.error('VAULT auth form failed',e);byId('vaultAuthMessage').textContent='Не удалось завершить вход. Повторите попытку.';
     }finally{submit.disabled=false;submit.textContent=authMode==='signup'?'CREATE ACCOUNT':'ENTER';byId('vaultAuthSwitch').disabled=false;}
   };
   byId('vaultReloadAccount').onclick=async()=>{const button=byId('vaultReloadAccount');button.disabled=true;try{await switchIdentity(VaultSession.user);}finally{button.disabled=false;}};

@@ -127,3 +127,7 @@ body.vault-signed-out .vault-auth-dialog form{width:100%}
 .lobby .vault-brand-lockup .vault-wordmark{opacity:.9;transition:opacity var(--vault-transition)}
 .lobby .vault-brand-lockup:hover .vault-wordmark{opacity:1}
 @media(min-width:701px){.lobby .vault-brand-lockup .vault-mark{width:48px;height:48px}}
+
+/* Authentication failures stay next to the action and remain readable on phones. */
+.vault-auth-dialog #vaultAuthMessage:empty{display:none}
+.vault-auth-dialog #vaultAuthMessage:not(:empty){display:block;margin:14px 0;padding:12px 14px;border:1px solid #e5d3a66b;border-radius:10px;background:#4a202bcc;color:#f0e3c4;font-size:13px;line-height:1.5}

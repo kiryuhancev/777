@@ -1,0 +1,10 @@
+{
+  "mode": "Chromium and actual Supabase SDK with HTTP fixtures; not live backend",
+  "passed": [
+    "1440px: invalid credentials / confirmation / rate limit / service failure preserve fields, show alert, retry and F5 succeed",
+    "390px: invalid credentials / confirmation / rate limit / service failure preserve fields, show alert, retry and F5 succeed",
+    "Initial SDK download failure recovers on next submit without page reload",
+    "Fallback blocks native form submission before runtime initialization"
+  ],
+  "pageErrors": []
+}
