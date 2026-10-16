@@ -78,3 +78,4 @@
 - A failed initial Supabase SDK load can retry on the next submit without a page reload.
 - An initialization fallback prevents native form navigation; auth failure and retry paths are covered in desktop/mobile browser tests.
 - No database migration, wallet change or gameplay change is required.
+- Embedded the same pinned Supabase JS SDK in the standalone HTML so a blocked CDN cannot prevent auth initialization; verified sign-in with CDN requests blocked.

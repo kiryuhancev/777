@@ -48,3 +48,14 @@ for name,text,tag in [('TABLE PRESENTATION',shared+'\n'+(ROOT/'tables/presentati
  elif tag=='style':s=s.replace('</head>',block+'\n</head>',1)
  else:s=s.replace('<!-- BEGIN VAULT RUNTIME -->',block+'\n<!-- BEGIN VAULT RUNTIME -->',1)
 p.write_text(s)
+
+# Auth initializes with the page, including when the SDK CDN is unavailable.
+s=p.read_text()
+sdk=base64.b64encode((ROOT/'vendor/supabase-2.49.8.js').read_bytes()).decode()
+# The unmodified Webpack UMD runtime requires currentScript.src. A data URL
+# supplies it without a network request or a separate file beside the HTML.
+block='<!-- BEGIN SUPABASE SDK -->\n<script src="data:application/javascript;base64,'+sdk+'"></script>\n<!-- END SUPABASE SDK -->'
+pattern=r'<!-- BEGIN SUPABASE SDK -->[\s\S]*?<!-- END SUPABASE SDK -->'
+if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
+else:s=s.replace('<!-- BEGIN VAULT RUNTIME -->',block+'\n<!-- BEGIN VAULT RUNTIME -->',1)
+p.write_text(s)

@@ -7,6 +7,7 @@ import subprocess,re
 before=subprocess.check_output(['git','show','e531074:index.html'],cwd=ROOT,text=True)
 current=(ROOT/'index.html').read_text()
 def game_scripts(html):
+ html=re.sub(r'<!-- BEGIN SUPABASE SDK -->[\s\S]*?<!-- END SUPABASE SDK -->','',html)
  html=re.sub(r'<!-- BEGIN TABLE (?:RULES|GAMES) -->[\s\S]*?<!-- END TABLE (?:RULES|GAMES) -->','',html)
  html=re.sub(r",\{id:'(?:blackjack|baccarat)',element:'open(?:Blackjack|Baccarat)Game',category:'table',isNew:true\}",'',html)
  html=re.sub(r'const BONUS_TYPES=\[[\s\S]*?(?=// BIRD RIGID BODY ENGINE)','',html)

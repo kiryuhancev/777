@@ -27,6 +27,10 @@ with sync_playwright() as p:
   assert page.locator('#vaultAuthPassword').input_value()=='' and not page.locator('#vaultAuthDialog').is_visible()
   page.reload();page.wait_for_function('VaultSession.ready');assert page.evaluate('VaultSession.user.id')==A
   ctx.close();passed.append(f'{width}px: invalid credentials / confirmation / rate limit / service failure preserve fields, show alert, retry and F5 succeed')
+ # Vendored SDK boots with the CDN fully blocked.
+ cloud=Cloud();ctx=b.new_context();ctx.route('https://**',lambda r:r.abort());ctx.route('https://vault-test.supabase.co/**',cloud.route);ctx.route('http://127.0.0.1:8777/**',lambda r:r.fulfill(content_type='text/html',body=HTML))
+ page=ctx.new_page();page.on('pageerror',lambda e:errors.append(str(e)));page.goto('http://127.0.0.1:8777/');page.wait_for_function('VaultSession.ready');assert page.evaluate('!!VaultAuth.client')
+ page.locator('#vaultAuthEmail').fill('alice@example.test');page.locator('#vaultAuthPassword').fill('typed-password');page.locator('#vaultAuthSubmit').click();page.wait_for_function("VaultSession.mode==='authenticated'&&VaultSession.ready");ctx.close();passed.append('Embedded SDK signs in with the external CDN completely blocked')
  # An initial CDN failure can recover on ENTER without reloading the entire app.
  cloud=Cloud();ctx=b.new_context();attempts={'count':0}
  ctx.route('https://**',lambda r:r.abort())
@@ -34,7 +38,7 @@ with sync_playwright() as p:
   attempts['count']+=1
   if attempts['count']==1:return r.abort()
   return r.fulfill(content_type='application/javascript',body=SDK)
- ctx.route('https://cdn.jsdelivr.net/**',sdk);ctx.route('https://vault-test.supabase.co/**',cloud.route);ctx.route('http://127.0.0.1:8777/**',lambda r:r.fulfill(content_type='text/html',body=HTML))
+ ctx.route('https://cdn.jsdelivr.net/**',sdk);ctx.route('https://vault-test.supabase.co/**',cloud.route);ctx.route('http://127.0.0.1:8777/**',lambda r:r.fulfill(content_type='text/html',body=re.sub(r'<!-- BEGIN SUPABASE SDK -->[\s\S]*?<!-- END SUPABASE SDK -->','',HTML)))
  page=ctx.new_page();page.on('pageerror',lambda e:errors.append(str(e)));page.goto('http://127.0.0.1:8777/');page.wait_for_function('VaultSession.ready');assert page.evaluate('VaultAuth.client===null')
  page.locator('#vaultAuthEmail').fill('alice@example.test');page.locator('#vaultAuthPassword').fill('typed-password');page.locator('#vaultAuthSubmit').click();page.wait_for_function("VaultSession.mode==='authenticated'&&VaultSession.ready")
  assert attempts['count']==2;ctx.close();passed.append('Initial SDK download failure recovers on next submit without page reload')
