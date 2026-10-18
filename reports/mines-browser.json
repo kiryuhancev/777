@@ -1,0 +1,21 @@
+{
+  "mode": "Chromium + actual SDK with HTTP fixture, not live Supabase",
+  "passed": [
+    "Auth gate, ARCADE lobby card, same shell and accessible 25-cell board",
+    "Mine count and common bet preferences survive F5",
+    "Fixed board at START, exact mine count, debit once, cashout disabled before safe pick; no position hints",
+    "Safe pick grows multiplier without extra debit; repeated pick ignored; F5 restores exact board/picks and stake",
+    "Second browser resumes the same active round, seed, mine positions and picks",
+    "Cashout pays exactly once; all cells revealed/locked; reload cannot repeat payout or stats",
+    "Mine hit ends round, pays zero, reveals mines, remains bust after reload without refund",
+    "Offline safe pick, reload and cashout replay once after reconnect",
+    "Two-device conflicting picks restore remote prefix; competing cashout cannot pay twice",
+    "F5 adopts another-device settlement without requiring a stale click or manual refresh of cloud data",
+    "24 mines: the only safe core automatically cashes out at 24.25x",
+    "Five responsive widths, touch targets >=44px, no horizontal overflow or duplicate IDs",
+    "Shared wallet across games; account switching never exposes another user board",
+    "Missing migration disables only MINES; no unsupported debit or outbox event"
+  ],
+  "pageErrors": [],
+  "unexpectedConsoleErrors": []
+}

@@ -1,0 +1,16 @@
+{
+  "database": "isolated PostgreSQL 17, not live Supabase",
+  "passed": [
+    "repeat-safe migration",
+    "one debit per UUID",
+    "safe-pick checkpoint idempotent without wallet revision",
+    "old prefix cannot rewind picks",
+    "changed board or divergent prefix rejected",
+    "correct cashout once and stats once",
+    "zero-pick cashout/fake payout/corrupt checkpoint rejected",
+    "bust payout zero",
+    "RLS isolates accounts",
+    "settings accept MINES",
+    "other-game recovery namespaces preserved"
+  ]
+}

@@ -1,0 +1,16 @@
+<section id="minesApp" class="mines-app" hidden aria-labelledby="minesTitle">
+ <header class="mines-heading"><div><p>VAULT · INSTANT ARCADE</p><h1 id="minesTitle">MINES</h1><span>EXTRACTION GRID</span></div><button id="minesSound" class="mines-sound" aria-pressed="true" aria-label="Toggle sound">SOUND ON</button></header>
+ <div class="mines-layout">
+  <div class="mines-chamber"><div class="mines-chamber-head"><span>CONTAINMENT ARRAY / 25</span><span id="minesRisk">03 UNSTABLE</span></div><div id="minesGrid" class="mines-grid" aria-label="Extraction grid, five by five"></div><div class="mines-chamber-foot"><span id="minesPicks">00 EXTRACTED</span><span id="minesRemaining">22 CORES REMAIN</span></div></div>
+  <aside class="mines-console">
+   <div class="mines-readout"><small>CURRENT MULTIPLIER</small><strong id="minesMultiplier">1.00×</strong><span id="minesNext">NEXT · 1.10×</span></div>
+   <div class="mines-potential"><small>POTENTIAL WIN</small><strong id="minesPotential">20</strong></div>
+   <div class="mines-control"><label>BET</label><div><button id="minesBetMinus" aria-label="Decrease bet">−</button><output id="minesBet">20</output><button id="minesBetPlus" aria-label="Increase bet">+</button><button id="minesMax">MAX</button></div></div>
+   <div class="mines-control"><label>MINES <small>1 — 24</small></label><div><button id="minesCountMinus" aria-label="Fewer mines">−</button><output id="minesCount">3</output><button id="minesCountPlus" aria-label="More mines">+</button></div></div>
+   <button id="minesAction" class="mines-primary">START ROUND</button>
+   <p id="minesMessage" class="mines-message" role="status" aria-live="polite">Choose your risk. Extract. Leave before the breach.</p>
+   <details class="mines-rules"><summary>HOW TO PLAY</summary><p>Open safe cores, then CASH OUT. One unstable core loses the stake. Cash out unlocks after your first safe pick. Your bet is charged once, at START.</p><p>Payout = bet × min(50,000, 0.97 ÷ survival probability). The 3% house edge applies once. A zero-pick round starts at 1.00× but cannot cash out. At all safe cells or the 50,000× cap, cashout is automatic. A cap can reduce return below 97%.</p><p>Your board stays fixed after reload. This is the existing VAULT client-side demo, not a cryptographically verifiable or server-secret Mines implementation.</p></details>
+  </aside>
+ </div>
+ <pre id="minesDebug" hidden></pre>
+</section>

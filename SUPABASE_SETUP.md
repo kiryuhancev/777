@@ -94,3 +94,10 @@ For an existing configured database, run the complete `supabase_table_games.sql`
 ### Swamp collect-slot update
 
 For an existing VAULT database, copy the complete `supabase_swamp_slot.txt` into https://supabase.com/dashboard/project/umccpdbopcgluwsnhlwj/sql/new and click Run. This repeat-safe migration preserves existing user data and extends the game registry, owned FS recovery and capability check. Reopen the new slot afterward. Do not rerun the older table-only migration after this newer migration. Details: `SWAMP_SLOT.md`.
+
+## Enable MINES on an existing project
+
+Run the complete **[supabase_mines.txt](supabase_mines.txt)** file (identical SQL version: `supabase_mines.sql`) in a new SQL Editor query:
+https://supabase.com/dashboard/project/umccpdbopcgluwsnhlwj/sql/new
+
+Copy from the first comment/`begin;` through the final `commit;`, select all query text, then Run. Do not execute a selected middle fragment. The update preserves accounts/balances, extends the game registry and existing begin/settle/settings RPCs, and adds owned resumable Mines checkpoints. It keeps all previous games including Swamp registered. Reload VAULT afterward; MINES enables automatically after its capability check. No URL/key change is needed. Do not run earlier table-only/Swamp-only registry migrations afterward.

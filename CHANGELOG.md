@@ -88,3 +88,12 @@
 - Extended the existing wallet/UUID/persistence adapter with stable bonus checkpoints and stale-device free-spin rejection; no independent wallet or authentication redesign.
 - Added repeat-safe database activation as both `supabase_swamp_slot.sql` and `.txt`, pure math/simulation, browser and PostgreSQL/RLS checks. Five-million-paid-spin validation measured 97.0776% (approximate 95% interval 95.7487%–98.4066%).
 - Existing five games, their art/styles/logic and the lobby/auth design are unchanged; original frontend retained separately. See `SWAMP_SLOT.md`.
+
+## MINES · VAULT Extraction Grid
+
+- Added independent `mines` ARCADE card and 5×5 extraction screen; existing featured game, six games, art and lobby/auth design stay unchanged.
+- Fixed pre-generated seeded boards, 1–24 mines, shared bet controls, 3% probability-based house edge, once-only cashout/bust and configurable 50,000× automatic cashout cap.
+- Resumable owned business checkpoint preserves exact board/opened cells/stake after F5 and across devices; no mid-animation restoration or duplicate payout. Offline outbox uses existing namespaces and queue limit.
+- Extended current SQL RPC registry with owned prefix checkpoints, mathematical payout validation and repeat-safe `supabase_mines.txt`; existing wallet/auth/RLS model retained.
+- Fixed empty-active-round sync promise cleanup so subsequent safe-pick events cannot stall behind an already-completed flush.
+- Added simulation (six strategies × 1,000,000 paid rounds), nine mathematical suites, PostgreSQL/RLS tests, Chromium reload/offline/conflict/mobile tests and strict six-game source isolation.

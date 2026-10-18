@@ -1,0 +1,100 @@
+{
+  "model": "actual seeded board placement + fixed ordered picks; complete independent paid rounds",
+  "config": {
+    "version": 1,
+    "rows": 5,
+    "cols": 5,
+    "defaultMines": 3,
+    "minMines": 1,
+    "maxMines": 24,
+    "houseEdge": 0.03,
+    "maxWinX": 50000,
+    "debug": false
+  },
+  "results": [
+    {
+      "mineCount": 1,
+      "safePicks": 1,
+      "effectiveCashoutPicks": 1,
+      "rounds": 1000000,
+      "seed": 42017,
+      "rtp": 0.9701970312500001,
+      "theoreticalRtp": 0.9700000000000001,
+      "bustRate": 0.03980499999999998,
+      "theoreticalBustRate": 0.040000000000000036,
+      "averageMultiplier": 0.9701970312500001,
+      "cashoutMultiplier": 1.0104166666666667,
+      "capApplied": false
+    },
+    {
+      "mineCount": 3,
+      "safePicks": 3,
+      "effectiveCashoutPicks": 3,
+      "rounds": 1000000,
+      "seed": 42018,
+      "rtp": 0.9684843435064935,
+      "theoreticalRtp": 0.97,
+      "bustRate": 0.331481,
+      "theoreticalBustRate": 0.33043478260869563,
+      "averageMultiplier": 0.9684843435064935,
+      "cashoutMultiplier": 1.4487012987012986,
+      "capApplied": false
+    },
+    {
+      "mineCount": 5,
+      "safePicks": 5,
+      "effectiveCashoutPicks": 5,
+      "rounds": 1000000,
+      "seed": 42019,
+      "rtp": 0.9692735773606811,
+      "theoreticalRtp": 0.97,
+      "bustRate": 0.708406,
+      "theoreticalBustRate": 0.7081874647092039,
+      "averageMultiplier": 0.9692735773606811,
+      "cashoutMultiplier": 3.324051857585139,
+      "capApplied": false
+    },
+    {
+      "mineCount": 10,
+      "safePicks": 3,
+      "effectiveCashoutPicks": 3,
+      "rounds": 1000000,
+      "seed": 42020,
+      "rtp": 0.9690777538461539,
+      "theoreticalRtp": 0.9700000000000001,
+      "bustRate": 0.802362,
+      "theoreticalBustRate": 0.8021739130434783,
+      "averageMultiplier": 0.9690777538461539,
+      "cashoutMultiplier": 4.903296703296704,
+      "capApplied": false
+    },
+    {
+      "mineCount": 20,
+      "safePicks": 2,
+      "effectiveCashoutPicks": 2,
+      "rounds": 1000000,
+      "seed": 42021,
+      "rtp": 0.9664109999999999,
+      "theoreticalRtp": 0.9699999999999999,
+      "bustRate": 0.96679,
+      "theoreticalBustRate": 0.9666666666666667,
+      "averageMultiplier": 0.9664109999999999,
+      "cashoutMultiplier": 29.099999999999998,
+      "capApplied": false
+    },
+    {
+      "mineCount": 12,
+      "safePicks": 13,
+      "effectiveCashoutPicks": 11,
+      "rounds": 1000000,
+      "seed": 42022,
+      "rtp": 0.9,
+      "theoreticalRtp": 0.8749495221429535,
+      "bustRate": 0.999982,
+      "theoreticalBustRate": 0.9999825010095571,
+      "averageMultiplier": 0.9,
+      "cashoutMultiplier": 50000,
+      "capApplied": true
+    }
+  ]
+}
