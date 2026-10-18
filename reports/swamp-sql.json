@@ -1,0 +1,14 @@
+{
+  "database": "PostgreSQL 17",
+  "passed": [
+    "repeat-safe migration",
+    "one paid debit/payout",
+    "free spin consumed once before payout",
+    "duplicate UUID cannot rewind bonus or payout",
+    "pending bonus blocks a new paid spin",
+    "stale free-spin index rejected",
+    "interrupted last FS remains consumed",
+    "other-game recovery namespace preserved",
+    "RLS prevents cross-account feature use"
+  ]
+}

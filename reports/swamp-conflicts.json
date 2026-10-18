@@ -1,0 +1,9 @@
+{
+  "mode": "Actual browser and SDK with HTTP fixtures",
+  "passed": [
+    "Two stale offline free spins rejected after another device consumes their index; no payout duplication, no stuck sync",
+    "Fourth Collector on last FS awards +10 and next x2; reload restores both once",
+    "Free Spins start automatically; leaving for the lobby pauses future spins"
+  ],
+  "pageErrors": []
+}

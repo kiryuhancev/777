@@ -22,7 +22,7 @@ create table if not exists public.wallets (
 );
 create table if not exists public.game_stats (
   id uuid primary key default gen_random_uuid(),user_id uuid not null references auth.users(id) on delete cascade,
-  game_id text not null check(game_id in ('slot','poker','bird','blackjack','baccarat')),
+  game_id text not null check(game_id in ('slot','poker','bird','blackjack','baccarat','swamp')),
   rounds_played bigint not null default 0,total_wagered numeric(20,6) not null default 0,
   total_won numeric(20,6) not null default 0,biggest_win numeric(20,6) not null default 0,
   biggest_multiplier numeric(20,6) not null default 0,updated_at timestamptz not null default now(),unique(user_id,game_id)
@@ -30,7 +30,7 @@ create table if not exists public.game_stats (
 create table if not exists public.game_rounds (
   id uuid primary key default gen_random_uuid(),round_id uuid not null unique,
   user_id uuid not null references auth.users(id) on delete cascade,
-  game_id text not null check(game_id in ('slot','poker','bird','blackjack','baccarat')),
+  game_id text not null check(game_id in ('slot','poker','bird','blackjack','baccarat','swamp')),
   status text not null default 'started' check(status in ('started','settled','cancelled')),
   bet numeric(20,6) not null check(bet>=0),payout numeric(20,6) not null default 0 check(payout>=0),
   multiplier numeric(20,6) not null default 0 check(multiplier>=0),result text not null default '',
@@ -50,17 +50,17 @@ create table if not exists public.user_settings (
   user_id uuid primary key references auth.users(id) on delete cascade,
   sound_enabled boolean not null default true,music_enabled boolean not null default false,
   fast_mode boolean not null default false,fast_bonus boolean not null default false,scatter_boost boolean not null default false,
-  last_game_id text check(last_game_id in ('lobby','slot','poker','bird','blackjack','baccarat')),
+  last_game_id text check(last_game_id in ('lobby','slot','poker','bird','blackjack','baccarat','swamp')),
   selected_bets jsonb not null default '{"slot":2,"poker":2,"bird":1}'::jsonb,
   updated_at timestamptz not null default now()
 );
 -- Existing installations: extend only game/screen registries, preserving all rows and RLS.
 alter table public.game_stats drop constraint if exists game_stats_game_id_check;
-alter table public.game_stats add constraint game_stats_game_id_check check(game_id in ('slot','poker','bird','blackjack','baccarat'));
+alter table public.game_stats add constraint game_stats_game_id_check check(game_id in ('slot','poker','bird','blackjack','baccarat','swamp'));
 alter table public.game_rounds drop constraint if exists game_rounds_game_id_check;
-alter table public.game_rounds add constraint game_rounds_game_id_check check(game_id in ('slot','poker','bird','blackjack','baccarat'));
+alter table public.game_rounds add constraint game_rounds_game_id_check check(game_id in ('slot','poker','bird','blackjack','baccarat','swamp'));
 alter table public.user_settings drop constraint if exists user_settings_last_game_id_check;
-alter table public.user_settings add constraint user_settings_last_game_id_check check(last_game_id in ('lobby','slot','poker','bird','blackjack','baccarat'));
+alter table public.user_settings add constraint user_settings_last_game_id_check check(last_game_id in ('lobby','slot','poker','bird','blackjack','baccarat','swamp'));
 create or replace function public.vault_touch_updated_at() returns trigger language plpgsql set search_path='' as $$
 begin new.updated_at=now();return new;end $$;
 drop trigger if exists profiles_updated_at on public.profiles;
@@ -118,7 +118,7 @@ returns jsonb language plpgsql security definer set search_path='' as $$
 declare u uuid:=auth.uid();w public.wallets;r public.game_rounds;
 begin
  if u is null then raise exception 'Authentication required';end if;
- if p_round_id is null or p_game_id is null or p_game_id not in ('slot','poker','bird','blackjack','baccarat') or p_bet is null or p_bet<0 or p_bet>1000000000000 then raise exception 'Invalid round';end if;
+ if p_round_id is null or p_game_id is null or p_game_id not in ('slot','poker','bird','blackjack','baccarat','swamp') or p_bet is null or p_bet<0 or p_bet>1000000000000 then raise exception 'Invalid round';end if;
  perform public.vault_validate_payload(p_metadata,p_recovery);
  select * into w from public.wallets where user_id=u for update;
  if not found then raise exception 'Wallet missing';end if;
@@ -128,10 +128,28 @@ begin
   return jsonb_build_object('balance',w.balance,'revision',w.revision,'duplicate',true,'status',r.status);
  end if;
  if exists(select 1 from public.game_rounds where user_id=u and game_id=p_game_id and status='started') then raise exception using message='VAULT_WALLET_CONFLICT',errcode='P0001';end if;
+ -- Free-spin entitlements cannot be reused across tabs/devices by rebasing a stale queue.
+ if p_game_id='swamp' then
+  if p_metadata->>'freeSpin'='true' then
+   if p_bet<>0 or coalesce((w.recovery->'swampBonus'->>'remaining')::integer,0)<1
+    or p_metadata->>'featureId' is distinct from w.recovery->'swampBonus'->>'featureId'
+    or (p_metadata->>'freeSpinIndex')::integer is distinct from (w.recovery->'swampBonus'->>'spinsPlayed')::integer+1
+    or (p_recovery->'swampBonus'->>'remaining')::integer is distinct from (w.recovery->'swampBonus'->>'remaining')::integer-1
+    or (p_recovery->'swampBonus'->>'spinsPlayed')::integer is distinct from (w.recovery->'swampBonus'->>'spinsPlayed')::integer+1
+    or p_recovery->'swampBonus'->>'featureId' is distinct from w.recovery->'swampBonus'->>'featureId'
+    or (p_recovery->'swampBonus'->>'bet')::numeric is distinct from (w.recovery->'swampBonus'->>'bet')::numeric
+    or p_recovery->'swampBonus'->>'collectors' is distinct from w.recovery->'swampBonus'->>'collectors'
+    or p_recovery->'swampBonus'->>'tier' is distinct from w.recovery->'swampBonus'->>'tier'
+    or (p_recovery->'swampBonus'->>'totalWinX')::numeric is distinct from (w.recovery->'swampBonus'->>'totalWinX')::numeric
+   then raise exception using message='VAULT_WALLET_CONFLICT',errcode='P0001';end if;
+  elsif p_bet<=0 or coalesce((w.recovery->'swampBonus'->>'remaining')::integer,0)>0 then
+   raise exception using message='VAULT_WALLET_CONFLICT',errcode='P0001';
+  end if;
+ end if;
  if p_expected_revision is null or w.revision<>p_expected_revision then raise exception using message='VAULT_WALLET_CONFLICT',errcode='P0001';end if;
  if w.balance<p_bet then raise exception using message='VAULT_WALLET_CONFLICT',errcode='P0001';end if;
  insert into public.game_rounds(round_id,user_id,game_id,bet,metadata) values(p_round_id,u,p_game_id,round(p_bet,6),p_metadata);
- update public.wallets set balance=balance-round(p_bet,6),revision=revision+1,recovery=case when p_game_id='slot' then p_recovery else recovery end,updated_at=now() where user_id=u returning * into w;
+ update public.wallets set balance=balance-round(p_bet,6),revision=revision+1,recovery=case when p_game_id='slot' then recovery||jsonb_build_object('slotBonus',p_recovery->'slotBonus') when p_game_id='swamp' then recovery||jsonb_build_object('swampBonus',p_recovery->'swampBonus') else recovery end,updated_at=now() where user_id=u returning * into w;
  return jsonb_build_object('balance',w.balance,'revision',w.revision,'duplicate',false,'status','started');
 end $$;
 -- Idempotent finalization: wallet, round, stats and XP settle together.
@@ -140,7 +158,7 @@ returns jsonb language plpgsql security definer set search_path='' as $$
 declare u uuid:=auth.uid();w public.wallets;r public.game_rounds;
 begin
  if u is null then raise exception 'Authentication required';end if;
- if p_round_id is null or p_game_id is null or p_game_id not in ('slot','poker','bird','blackjack','baccarat') or p_bet is null or p_bet<0 or p_status is null or p_payout is null or p_payout<0 or p_payout>1000000000000 or p_multiplier is null or p_multiplier<0
+ if p_round_id is null or p_game_id is null or p_game_id not in ('slot','poker','bird','blackjack','baccarat','swamp') or p_bet is null or p_bet<0 or p_status is null or p_payout is null or p_payout<0 or p_payout>1000000000000 or p_multiplier is null or p_multiplier<0
    or p_multiplier>1000000000000 or p_result is null or length(p_result)>200 or p_status not in ('settled','cancelled') then raise exception 'Invalid settlement';end if;
  perform public.vault_validate_payload(p_metadata,p_recovery);
  select * into w from public.wallets where user_id=u for update;
@@ -160,7 +178,7 @@ begin
   r.bet:=round(p_bet,6);
  end if;
  update public.game_rounds set bet=r.bet,payout=round(p_payout,6),multiplier=round(p_multiplier,6),result=p_result,metadata=metadata||p_metadata,status=p_status,settled_at=now() where round_id=p_round_id;
- update public.wallets set balance=balance+round(p_payout,6),revision=revision+1,recovery=case when p_game_id='slot' then p_recovery else recovery end,updated_at=now() where user_id=u returning * into w;
+ update public.wallets set balance=balance+round(p_payout,6),revision=revision+1,recovery=case when p_game_id='slot' then recovery||jsonb_build_object('slotBonus',p_recovery->'slotBonus') when p_game_id='swamp' then recovery||jsonb_build_object('swampBonus',p_recovery->'swampBonus') else recovery end,updated_at=now() where user_id=u returning * into w;
  insert into public.game_stats(user_id,game_id,rounds_played,total_wagered,total_won,biggest_win,biggest_multiplier)
  values(u,p_game_id,1,r.bet,round(p_payout,6),round(p_payout,6),round(p_multiplier,6))
  on conflict(user_id,game_id) do update set rounds_played=public.game_stats.rounds_played+1,
@@ -180,7 +198,7 @@ begin
  update public.user_settings set sound_enabled=coalesce((p_settings->>'sound')::boolean,s.sound_enabled),
  music_enabled=coalesce((p_settings->>'music')::boolean,s.music_enabled),fast_mode=coalesce((p_settings->>'fastGame')::boolean,s.fast_mode),
  fast_bonus=coalesce((p_settings->>'fastBonus')::boolean,s.fast_bonus),scatter_boost=coalesce((p_settings->>'scatterBoost')::boolean,s.scatter_boost),
- last_game_id=case when p_settings->>'lastGame' in ('lobby','slot','poker','bird','blackjack','baccarat') then p_settings->>'lastGame' else s.last_game_id end,
+ last_game_id=case when p_settings->>'lastGame' in ('lobby','slot','poker','bird','blackjack','baccarat','swamp') then p_settings->>'lastGame' else s.last_game_id end,
  selected_bets=coalesce(p_settings->'bets',s.selected_bets),updated_at=least(p_updated_at,clock_timestamp()) where user_id=u returning * into s;
  return to_jsonb(s);
 end $$;
@@ -192,5 +210,9 @@ grant execute on function public.begin_game_round(uuid,text,numeric,bigint,jsonb
 create or replace function public.table_games_capabilities() returns jsonb language sql stable security invoker set search_path='' as $$ select jsonb_build_object('version',1); $$;
 revoke all on function public.table_games_capabilities() from public,anon;
 grant execute on function public.table_games_capabilities() to authenticated;
+
+create or replace function public.swamp_slot_capabilities() returns jsonb language sql stable security invoker set search_path='' as $$ select jsonb_build_object('version',1); $$;
+revoke all on function public.swamp_slot_capabilities() from public,anon;
+grant execute on function public.swamp_slot_capabilities() to authenticated;
 
 commit;

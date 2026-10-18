@@ -6,3 +6,7 @@
 открыть `index.html`: изображения и логотип DIGITAL DERBY встроены в файл.
 
 VAULT BREAKERS: [ассеты и архитектура](VAULT_BREAKERS.md), [измерение RTP](reports/breakers-rtp.md).
+
+### Swamp collect-slot — working title
+
+Added a separate haunted-swamp 5×3 collect-slot, using the supplied art pack. Source/assets, exact rules, measured simulation, safe bonus restore, screenshots and setup: [SWAMP_SLOT.md](SWAMP_SLOT.md). For an existing database, run the complete [TXT migration](supabase_swamp_slot.txt) once in Supabase SQL Editor before playing the new slot. Existing games remain unchanged.

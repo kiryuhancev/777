@@ -90,3 +90,7 @@ SQL test ожидает disposable контейнер `vault-postgres-test` с P
 ### BLACKJACK / BACCARAT update
 
 For an existing configured database, run the complete `supabase_table_games.sql` once in https://supabase.com/dashboard/project/umccpdbopcgluwsnhlwj/sql/new . It extends game IDs and RPCs without resetting accounts or balances. Then open either new table again; readiness is checked automatically. See `TABLE_GAMES.md`. A newly created database should use the updated full `supabase_schema.sql`.
+
+### Swamp collect-slot update
+
+For an existing VAULT database, copy the complete `supabase_swamp_slot.txt` into https://supabase.com/dashboard/project/umccpdbopcgluwsnhlwj/sql/new and click Run. This repeat-safe migration preserves existing user data and extends the game registry, owned FS recovery and capability check. Reopen the new slot afterward. Do not rerun the older table-only migration after this newer migration. Details: `SWAMP_SLOT.md`.

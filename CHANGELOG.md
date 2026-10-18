@@ -79,3 +79,12 @@
 - An initialization fallback prevents native form navigation; auth failure and retry paths are covered in desktop/mobile browser tests.
 - No database migration, wallet change or gameplay change is required.
 - Embedded the same pinned Supabase JS SDK in the standalone HTML so a blocked CDN cannot prevent auth initialization; verified sign-in with CDN requests blocked.
+
+## Swamp collect-slot (working title)
+
+- Added an isolated 5×3, ten-line swamp slot using the supplied WebP pack; prepared 18 alpha sprites, separate 16:9 lobby art and a weathered wood material strip.
+- Added Money Fish, Scatter FS, multiple Collector Wild collections, cumulative four-Collector retriggers and x1/x2/x3/x10 progression with next-spin upgrades; overall max win is configurable.
+- Added night bonus lighting, anticipation, reel strips, short collect trails, bounded fireflies/fog, procedural low ambience and responsive shared-style controls.
+- Extended the existing wallet/UUID/persistence adapter with stable bonus checkpoints and stale-device free-spin rejection; no independent wallet or authentication redesign.
+- Added repeat-safe database activation as both `supabase_swamp_slot.sql` and `.txt`, pure math/simulation, browser and PostgreSQL/RLS checks. Five-million-paid-spin validation measured 97.0776% (approximate 95% interval 95.7487%–98.4066%).
+- Existing five games, their art/styles/logic and the lobby/auth design are unchanged; original frontend retained separately. See `SWAMP_SLOT.md`.

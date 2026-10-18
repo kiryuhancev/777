@@ -59,3 +59,17 @@ pattern=r'<!-- BEGIN SUPABASE SDK -->[\s\S]*?<!-- END SUPABASE SDK -->'
 if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
 else:s=s.replace('<!-- BEGIN VAULT RUNTIME -->',block+'\n<!-- BEGIN VAULT RUNTIME -->',1)
 p.write_text(s)
+# Swamp is an isolated sixth game; archive originals stay on disk as art sources.
+s=p.read_text()
+def swamp_assets(text):
+ return re.sub(r'__SWAMP_([^\s\'"<>]+)__',lambda m:'data:image/webp;base64,'+base64.b64encode((ROOT/'assets/swamp'/m[1]).read_bytes()).decode(),text)
+for name,text,tag in [('SWAMP STYLES',swamp_assets((ROOT/'swamp/presentation.css').read_text()),'style'),('SWAMP SCREEN',(ROOT/'swamp/screen.html').read_text(),None),('SWAMP MODULE',swamp_assets('\n'.join((ROOT/'swamp'/f).read_text() for f in ['config.js','model.js','assets.js','game.js'])),'script')]:
+ block=f'<!-- BEGIN {name} -->\n'+(f'<{tag}>\n{text}\n</{tag}>' if tag else text)+f'\n<!-- END {name} -->'
+ pattern=rf'<!-- BEGIN {name} -->[\s\S]*?<!-- END {name} -->'
+ if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
+ elif tag=='style':s=s.replace('</head>',block+'\n</head>',1)
+ else:s=s.replace('<!-- BEGIN VAULT RUNTIME -->',block+'\n<!-- BEGIN VAULT RUNTIME -->',1)
+# The card reuses the regular lobby component and separate 16:9 art.
+art='data:image/webp;base64,'+base64.b64encode((ROOT/'assets/swamp/lobby_card.webp').read_bytes()).decode()
+s=re.sub(r'(<img id="swampLobbyArt")([^>]*)(>)',lambda m:m[1]+re.sub(r' src="[^"]*"','',m[2])+' src="'+art+'"'+m[3],s)
+p.write_text(s)

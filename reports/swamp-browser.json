@@ -1,0 +1,16 @@
+{
+  "mode": "Chromium and actual SDK against HTTP fixture, not live Supabase",
+  "passed": [
+    "Auth gate, sixth lobby card, 5x3 grid, ten lines and all provided sprites decode",
+    "Paid debit and settle once before animation; duplicate clicks ignored; shared remote wallet matches",
+    "Selected bet and unfinished bonus survive F5; committed paid spin never pays/logs twice",
+    "Multiple collectors collect all fish; meter/next-spin multiplier and free debit=0 agree with pure model",
+    "Five viewport widths; no overflow; 2000x readable; unique DOM IDs",
+    "Second browser restores remote Free Spins, meter, locked bet and common balance",
+    "Leaving pauses FS; account switching cannot leak another user bonus or wallet",
+    "Bounded 14 fireflies; 121 animation frames over two seconds in Chromium",
+    "Missing SQL disables only new slot; no unauthorized debit or unsupported event"
+  ],
+  "pageErrors": [],
+  "consoleErrors": []
+}

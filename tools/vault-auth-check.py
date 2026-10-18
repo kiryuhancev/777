@@ -21,7 +21,7 @@ A='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';B='bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb
 def now():return datetime.now(timezone.utc).isoformat()
 class Cloud:
  def __init__(self):
-  self.users={};self.rows={};self.rounds={};self.stats={};self.offline=False;self.table_schema_ready=True;self.drop_settle=False;self.calls=[];self.unavailable_profiles=set();self.unavailable_wallets=set()
+  self.users={};self.rows={};self.rounds={};self.stats={};self.offline=False;self.table_schema_ready=True;self.swamp_schema_ready=True;self.drop_settle=False;self.calls=[];self.unavailable_profiles=set();self.unavailable_wallets=set()
   self.create(A,'alice@example.test','Alice');self.create(B,'bob@example.test','Bob')
  def create(self,uid,email,username):
   self.users[uid]={'id':uid,'email':email,'aud':'authenticated','role':'authenticated','user_metadata':{'username':username},'app_metadata':{'provider':'email','providers':['email']},'created_at':now(),'identities':[]}
@@ -50,6 +50,7 @@ class Cloud:
   if uid not in self.rows:return response({'message':'Authentication required'},401)
   if path.startswith('/rest/v1/rpc/'):
    name=path.split('/')[-1];self.calls.append((uid,name,payload));wallet=self.rows[uid]['wallets']
+   if name=='swamp_slot_capabilities':return response({'version':1}) if self.swamp_schema_ready else response({'message':'Function not found','code':'PGRST202'},404)
    if name=='table_games_capabilities':return response({'version':1}) if self.table_schema_ready else response({'message':'Function not found','code':'PGRST202'},404)
    if name=='save_vault_settings':
     s=self.rows[uid]['user_settings'];x=payload['p_settings'];ts=payload['p_updated_at']
@@ -61,7 +62,12 @@ class Cloud:
    if name=='begin_game_round':
     if not r:
      if any(x['user_id']==uid and x['p_game_id']==payload['p_game_id'] and x['status']=='started' for x in self.rounds.values()) or payload['p_expected_revision']!=wallet['revision'] or payload['p_bet']>wallet['balance']:return response({'message':'VAULT_WALLET_CONFLICT'},400)
-     r={**payload,'user_id':uid,'status':'started','payout':0};self.rounds[rid]=r;wallet['balance']=round(wallet['balance']-payload['p_bet'],6);wallet['revision']+=1;wallet['recovery']=payload['p_recovery'] if payload['p_game_id']=='slot' else wallet['recovery']
+     if payload['p_game_id']=='swamp':
+      m=payload.get('p_metadata',{});prev=wallet['recovery'].get('swampBonus');nxt=payload.get('p_recovery',{}).get('swampBonus')
+      if m.get('freeSpin'):
+       if not prev or prev['remaining']<1 or m.get('featureId')!=prev.get('featureId') or m.get('freeSpinIndex')!=prev['spinsPlayed']+1 or not nxt or nxt['remaining']!=prev['remaining']-1 or nxt['spinsPlayed']!=prev['spinsPlayed']+1:return response({'message':'VAULT_WALLET_CONFLICT'},400)
+      elif prev and prev['remaining']>0:return response({'message':'VAULT_WALLET_CONFLICT'},400)
+     r={**payload,'user_id':uid,'status':'started','payout':0};self.rounds[rid]=r;wallet['balance']=round(wallet['balance']-payload['p_bet'],6);wallet['revision']+=1;wallet['recovery']={**wallet['recovery'],**{k:v for k,v in payload['p_recovery'].items() if k==('swampBonus' if payload['p_game_id']=='swamp' else 'slotBonus')}} if payload['p_game_id'] in ['slot','swamp'] else wallet['recovery']
     elif r['user_id']!=uid:return response({'message':'Round mismatch'},400)
    elif name=='record_game_round':
     if not r or r['user_id']!=uid:return response({'message':'Round missing or mismatch'},400)
@@ -70,7 +76,7 @@ class Cloud:
      if extra and (payload['p_game_id']!='blackjack' or extra!=r['p_bet'] or not payload['p_metadata'].get('doubled')):return response({'message':'Round missing or mismatch'},400)
      if extra>wallet['balance']:return response({'message':'VAULT_WALLET_CONFLICT'},400)
      wallet['balance']-=extra;r['p_bet']=payload['p_bet']
-     r['status']=payload['p_status'];r['payout']=payload['p_payout'];wallet['balance']=round(wallet['balance']+r['payout'],6);wallet['revision']+=1;wallet['recovery']=payload['p_recovery'] if payload['p_game_id']=='slot' else wallet['recovery']
+     r['status']=payload['p_status'];r['payout']=payload['p_payout'];wallet['balance']=round(wallet['balance']+r['payout'],6);wallet['revision']+=1;wallet['recovery']={**wallet['recovery'],**{k:v for k,v in payload['p_recovery'].items() if k==('swampBonus' if payload['p_game_id']=='swamp' else 'slotBonus')}} if payload['p_game_id'] in ['slot','swamp'] else wallet['recovery']
      game=payload['p_game_id'];s=self.stats.setdefault((uid,game),{'user_id':uid,'game_id':game,'rounds_played':0,'total_wagered':0,'total_won':0,'biggest_win':0,'biggest_multiplier':0});s['rounds_played']+=1;s['total_wagered']+=payload['p_bet'];s['total_won']+=r['payout'];s['biggest_win']=max(s['biggest_win'],r['payout']);s['biggest_multiplier']=max(s['biggest_multiplier'],payload['p_multiplier']);self.rows[uid]['profiles']['xp']+=10
      if self.drop_settle:self.drop_settle=False;self.offline=True;return route.abort('failed')
    return response({'balance':wallet['balance'],'revision':wallet['revision'],'status':r['status']})
