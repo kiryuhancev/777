@@ -6,7 +6,7 @@ base=(root/'supabase_mines.sql').read_text()
 admin=(root/'admin/schema.sql').read_text()
 s=base.replace('-- VAULT MINES incremental update. Run the ENTIRE file, from BEGIN through COMMIT.','-- VAULT admin + Swamp controls update (includes MINES). Execute this ENTIRE file, BEGIN through COMMIT.')
 s=s.replace('begin;\n','begin;\n'+admin+'\n',1)
-s=s.replace(" if exists(select 1 from public.game_rounds where user_id=u and game_id=p_game_id and status='started')", " if p_bet>0 and not public.vault_game_access() then raise exception 'VAULT_ACCOUNT_DISABLED';end if;\n if exists(select 1 from public.game_rounds where user_id=u and game_id=p_game_id and status='started')",1)
+s=s.replace(" if exists(select 1 from public.game_rounds where user_id=u and game_id=p_game_id and status='started')", " if not public.vault_game_access() and not (p_bet=0 and ((p_game_id='slot' and coalesce((w.recovery->'slotBonus'->>'freeSpins')::integer,0)>0) or (p_game_id='swamp' and coalesce(p_metadata->>'freeSpin'='true',false) and coalesce((w.recovery->'swampBonus'->>'remaining')::integer,0)>0))) then raise exception 'VAULT_ACCOUNT_DISABLED';end if;\n if exists(select 1 from public.game_rounds where user_id=u and game_id=p_game_id and status='started')",1)
 s=s.replace(" end if;\n if p_game_id='mines' then\n  perform", """ end if;
  if p_game_id='swamp' and p_metadata ? 'purchaseType' then
   if p_metadata->>'purchaseType' not in ('bonus','super') or coalesce((p_metadata->>'purchaseStake')::numeric,0)<=0

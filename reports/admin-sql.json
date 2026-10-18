@@ -14,6 +14,7 @@
     "activity and audit readable only by admin",
     "unconfirmed/revoked identity loses admin authority",
     "reapplying migration preserves funds and audit",
-    "anonymous admin RPC denied"
+    "anonymous admin RPC denied",
+    "zero-stake fresh rounds cannot bypass a user block"
   ]
 }

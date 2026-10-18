@@ -7,6 +7,7 @@
     "duplicate UUID cannot charge or grant twice",
     "bought free spin consumes normal owned entitlement",
     "underpriced or wrong-size purchase rejected",
-    "20 FS purchase cost 350x accepted with zero direct payout"
+    "20 FS purchase cost 350x accepted with zero direct payout",
+    "blocked user can still consume a previously paid free-spin entitlement"
   ]
 }

@@ -165,7 +165,7 @@ begin
   if r.user_id<>u or r.game_id<>p_game_id or r.bet<>round(p_bet,6) then raise exception 'Round mismatch';end if;
   return jsonb_build_object('balance',w.balance,'revision',w.revision,'duplicate',true,'status',r.status);
  end if;
- if p_bet>0 and not public.vault_game_access() then raise exception 'VAULT_ACCOUNT_DISABLED';end if;
+ if not public.vault_game_access() and not (p_bet=0 and ((p_game_id='slot' and coalesce((w.recovery->'slotBonus'->>'freeSpins')::integer,0)>0) or (p_game_id='swamp' and coalesce(p_metadata->>'freeSpin'='true',false) and coalesce((w.recovery->'swampBonus'->>'remaining')::integer,0)>0))) then raise exception 'VAULT_ACCOUNT_DISABLED';end if;
  if exists(select 1 from public.game_rounds where user_id=u and game_id=p_game_id and status='started') then raise exception using message='VAULT_WALLET_CONFLICT',errcode='P0001';end if;
  -- Free-spin entitlements cannot be reused across tabs/devices by rebasing a stale queue.
  if p_game_id='swamp' then
@@ -306,6 +306,7 @@ end $$;
 create or replace function public.mines_capabilities() returns jsonb language sql stable security invoker set search_path='' as $$select jsonb_build_object('version',1);$$;
 revoke all on function public.save_mines_checkpoint(uuid,jsonb),public.mines_capabilities() from public,anon;
 grant execute on function public.save_mines_checkpoint(uuid,jsonb),public.mines_capabilities() to authenticated;
+
 
 
 
