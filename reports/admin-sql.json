@@ -1,0 +1,19 @@
+{
+  "database": "isolated PostgreSQL 17, not live Supabase",
+  "passed": [
+    "designated confirmed identity auto-provisioned",
+    "normal user cannot list/activity/change money/block users",
+    "no direct role or wallet writes",
+    "request UUID applies balance once",
+    "revision prevents stale overwrite",
+    "negative/oversized debit rejected",
+    "no admin self-block",
+    "cannot edit money during an active round",
+    "block forbids fresh bets but allows acknowledged round retry and settlement",
+    "unblock, credit, debit and set balance",
+    "activity and audit readable only by admin",
+    "unconfirmed/revoked identity loses admin authority",
+    "reapplying migration preserves funds and audit",
+    "anonymous admin RPC denied"
+  ]
+}

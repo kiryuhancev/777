@@ -7,7 +7,7 @@ def sql(s):
  if p.returncode:raise RuntimeError(p.stderr)
  return p.stdout
 migration=(root/'supabase_table_games.sql').read_text();sql(migration);sql(migration)
-sql('''delete from auth.users;insert into auth.users values('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','{"username":"Alice"}'),('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb','{"username":"Bob"}');
+sql('''do $$begin if to_regclass('public.vault_admin_audit') is not null then execute 'truncate public.vault_admin_audit';end if;end$$;delete from auth.users;insert into auth.users(id,raw_user_meta_data) values('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','{"username":"Alice"}'),('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb','{"username":"Bob"}');
 set role authenticated;select set_config('request.jwt.claim.sub','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',false);
 select public.begin_game_round('11111111-1111-4111-8111-111111111111','blackjack',100,0);
 select public.record_game_round('11111111-1111-4111-8111-111111111111','blackjack',200,400,2,'WIN','{"doubled":true}');

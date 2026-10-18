@@ -1,0 +1,12 @@
+<div id="vaultAccessNotice" class="vault-access-notice" role="status" hidden>Новые ставки приостановлены администратором. Уже начатый раунд можно завершить.</div>
+<dialog id="vaultAdminDialog" class="vault-admin" aria-labelledby="vaultAdminTitle">
+ <header><div><small>VAULT · ADMINISTRATION</small><h2 id="vaultAdminTitle">Управление пользователями</h2></div><button id="vaultAdminClose" aria-label="Закрыть админку">×</button></header>
+ <p id="vaultAdminStatus" role="status" aria-live="polite"></p>
+ <form id="vaultAdminSearch"><label>Поиск по email / имени<input id="vaultAdminQuery" type="search" maxlength="100" placeholder="Email или имя"></label><button type="submit">НАЙТИ</button><button id="vaultAdminRefresh" type="button">ОБНОВИТЬ</button></form>
+ <div class="vault-admin-columns"><section><div id="vaultAdminUsers" class="vault-admin-users"></div><div class="vault-admin-pages"><button id="vaultAdminPrev">← НАЗАД</button><span id="vaultAdminPage">1</span><button id="vaultAdminNext">ДАЛЕЕ →</button></div></section>
+ <section id="vaultAdminDetail" hidden><h3 id="vaultAdminUserTitle"></h3><p id="vaultAdminUserMeta"></p>
+  <form id="vaultAdminBalanceForm"><h4>Изменить баланс</h4><label>Операция<select id="vaultAdminOperation"><option value="credit">Начислить</option><option value="debit">Списать</option><option value="set">Установить баланс</option></select></label><label>Сумма<input id="vaultAdminAmount" type="number" min="0" max="1000000000000" step="0.000001" required></label><label>Причина<input id="vaultAdminReason" maxlength="200" minlength="3" required placeholder="Причина изменения"></label><button type="submit">ПРИМЕНИТЬ</button></form>
+  <form id="vaultAdminAccessForm"><h4>Новые ставки</h4><label>Причина<input id="vaultAdminAccessReason" maxlength="200" minlength="3" required placeholder="Причина блокировки / разблокировки"></label><button id="vaultAdminAccessToggle" type="submit">ПРИОСТАНОВИТЬ</button></form>
+  <h4>Последние раунды</h4><div id="vaultAdminRounds"></div><h4>Действия администратора</h4><div id="vaultAdminAudit"></div>
+ </section></div>
+</dialog>

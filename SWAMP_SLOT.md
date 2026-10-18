@@ -13,7 +13,7 @@ Source modules:
 - `swamp/config.js`: weights, eight symbol pays, ten lines, money values, tiers, configurable maximum win.
 - `swamp/model.js`: pure seeded generation, line evaluation, collection, retriggers, cap and business-checkpoint validation.
 - `swamp/assets.js`: centralized runtime image map. `__SWAMP_<relative path>__` tokens are embedded as data URLs by `tools/embed-vault.py`.
-- `swamp/game.js`: reel strips, anticipation, collect trails, automatic FS, AUTO (25 paid rounds), shared bet/settings controls and scoped procedural audio.
+- `swamp/game.js`: reel strips, anticipation, collect trails, automatic FS, AUTO (10/25/50/100/unlimited paid rounds), shared bet/settings controls and scoped procedural audio.
 - `swamp/screen.html` / `swamp/presentation.css`: independent haunted-swamp scene inside the existing VAULT header.
 
 ## Actual asset paths
@@ -54,7 +54,7 @@ Runtime preloads unique images once. There is no `new Image()` in an animation l
 
 - Five reels × three rows, ten distinct fixed paylines. Line pays run left-to-right starting at reel 1; only the longest 3/4/5 match pays per line. Concurrent lines add together.
 - Paytable values are multiples of the **total bet**, not a per-line stake. All eight paying symbols are supplied physical fishing objects; no A/K/Q/J.
-- Base Scatter: 7.5% probability of one Scatter on each reel, at a random row; at most one per reel. Exactly 3/4/5 grant 10/15/20 FS. Scatters have no cash pay and do not appear during FS.
+- Base Scatter: 9% probability of one Scatter on each reel, at a random row; at most one per reel. Exactly 3/4/5 grant 10/15/20 FS. Scatters have no cash pay and do not appear during FS.
 - Money Fish: 7.5% per non-Scatter base position, 15% after a non-Collector FS position. They have no independent cash payout.
 - Money values / integer weights: `2:60000, 5:27000, 10:9000, 15:2500, 20:1000, 25:400, 50:99, 2000:1`. Thus 2000× is 1 in 100,000 Money Fish value selections, not 1 in 100,000 paid wins.
 - Collector Wild: FS only, reels 2–4, 2.8% per eligible position. It substitutes paying regular symbols. Every Collector collects **all** current Money Fish; N Collectors collect their sum N times. Nothing is guaranteed: collectors may land without fish, or fish without collectors.
@@ -68,7 +68,7 @@ Runtime preloads unique images once. There is no `new Image()` in an animation l
 
 ```
 node tools/swamp-math-tests.cjs
-node tools/swamp-rtp.cjs 5000000 953172
+node tools/swamp-rtp.cjs 5000000 953174
 ```
 
 The simulation executes independent paid rounds and **all** their free spins/retriggers with the exact production model, including the cap. It never selects a target payout and regenerates scenes to meet it. Config, seed, full output and 10,000-round batch returns are in `reports/swamp-rtp.json`.
@@ -78,16 +78,16 @@ Measured independent validation run:
 | Metric | Observed |
 |---|---:|
 | Paid spins | 5,000,000 |
-| Total return / paid stake | 97.0776% |
-| Approximate 95% interval | 95.7487%–98.4066% |
-| Base hit rate | 17.8174% |
-| Bonus triggers | 19,047 (~1 per 262.5 paid spins) |
-| FS played, including retriggers | 286,890 |
-| Mean FS per bonus | 15.0622 |
-| Zero-win FS | 66.8594% |
-| FS at x1 / x2 / x3 / x10 | 182,178 / 54,438 / 23,535 / 26,739 |
-| 2000× Money Fish seen during FS | 3 |
-| Largest paid-round total | 4,562.888× |
+| Total return / paid stake | 96.3046% |
+| Approximate 95% interval | 94.5826%–98.0266% |
+| Base hit rate | 17.6250% |
+| Bonus triggers | 31,774 (~1 per 157.4 paid spins) |
+| FS played, including retriggers | 478,995 |
+| Mean FS per bonus | 15.0751 |
+| Zero-win FS | 67.0235% |
+| FS at x1 / x2 / x3 / x10 | 304646 / 90036 / 42120 / 42193 |
+| 2000× Money Fish seen during FS | 9 |
+| Largest paid-round total | 5534.031× |
 | Maximum-win truncations | 0 |
 
 `targetRtp: .96` is a design/calibration reference, not a proven exact RTP. The measured return is a sample estimate. The approximate interval is based on independent full paid-round returns; the very rare upper tail remains sparsely sampled. Component line/collect return fields are uncapped attributions; `rtp` is always the actual capped return (this run encountered zero caps).
@@ -113,15 +113,15 @@ Server begin checks free-spin feature identity, sequential index and consumed ch
 ## Existing Supabase project — activate the new slot
 
 1. Open https://supabase.com/dashboard/project/umccpdbopcgluwsnhlwj/sql/new .
-2. Copy **all** of `supabase_swamp_slot.txt` into the SQL Editor and click **Run**. The identical `.sql` file is also supplied.
+2. Copy **all** of `supabase_admin_swamp.txt` into the SQL Editor and click **Run**. The identical `.sql` file is also supplied.
 3. Wait for `Success. No rows returned`. The migration is repeat-safe and preserves accounts, funds, stats and history.
-4. Open the new slot again in VAULT. A capability probe detects readiness automatically. Until migration is applied, only the new slot's SPIN/AUTO are disabled; no unsupported rounds can poison the shared outbox.
+4. Open the new slot again in VAULT. A capability probe detects readiness automatically. Older Swamp schemas still allow normal spins. Purchased entries require the new purchase capability; unsupported purchases cannot charge a stake or enter the outbox.
 
 For a new database, the full updated `supabase_schema.sql` includes these changes. Frontend publication does not install SQL in a private Supabase project.
 
 ## QA / previews / build
 
-- `tools/swamp-math-tests.cjs`: 12 rule/economic/recovery suites, including multi-Collector collection, multiple thresholds, top-tier retriggers, dry FS, 2000× selection and configurable max win.
+- `tools/swamp-math-tests.cjs`: Rule/economic/recovery suites, including multi-Collector collection, multiple thresholds, top-tier retriggers, dry FS, 2000× selection and configurable max win.
 - `tools/swamp-browser-check.py`: Chromium + actual Supabase SDK HTTP fixture; five widths (1440/1024/768/390/320), all asset decodes, 2000× text fit, no overflow/duplicate IDs, no console/page errors, shared funds, bet/F5 recovery and cross-account isolation.
 - `tools/swamp-conflict-check.py`: stale offline FS fork rejection, last-FS retrigger persistence, automatic playback and leaving/pausing.
 - `tools/swamp-sql-tests.py`: PostgreSQL 17, duplicate IDs, owned/sequential entitlements, last-FS consumption, namespace preservation, RLS and repeat-safe migration.
@@ -138,3 +138,17 @@ node --check /tmp/digital-derby-release.js
 ```
 
 The resulting `index.html` is standalone with embedded artwork and SDK. Local development can use `python3 -m http.server 8000`; authenticated play requires the configured Supabase origin/setup as before.
+
+## Control and math update (version 2)
+
+The toolbar follows Digital Derby's hierarchy: settings, bet, AUTO, MAX, SPIN, BONUS. AUTO offers 10/25/50/100/∞, STOP cancels future paid spins and lets the current result finish. Bet and purchases lock during auto/FS. Normal reels now take 240 + 5×180 = 1,140ms before extra anticipation/collect; FAST remains 70 + 5×75 = 445ms. Paid auto pause is 600ms. Mobile uses a fixed two-row toolbar with safe-area insets.
+
+BONUS opens a priced shop: 10 FS at **77× bet**, 20 FS at **350× bet**. Both start at x1 with zero marks and use the same bonus reels/retriggers, with no guaranteed payout. The trigger-sized stake is locked. The purchase is a paid UUID round with zero direct payout; its FS entitlement is saved at begin before any animation. Repeated clicks/F5/retries cannot buy or grant twice. Purchased features use the same 50,000× stake cap. `purchaseStake`, type, price and feature size are checked in SQL; an old purchase schema disables these buys before any debit.
+
+Scatter-per-reel increased from 7.5% to **9%**. Exact trigger probability is `sum(C(5,k)×p^k×(1−p)^(5−k), k=3..5)` = **0.63412794%**, or one per **157.70** spins on average. Previously it was one per 266.07 theoretically (the earlier sample observed ~263). There is no dry-streak guarantee or history-dependent RNG. Even at the new rate, about 28.0% of 200-spin sequences can contain no bonus.
+
+To keep overall return near the same 96% target, line scale changed from 1.34 to **0.97**; Money Fish/Collector probabilities, money values, meter thresholds and tiers are unchanged. The current exact-config five-million-cycle report is `reports/swamp-rtp.json`; the historical version-1 result is retained as `reports/swamp-rtp-v1-baseline.json` rather than represented as current math.
+
+Independent purchase pricing sample: `node tools/swamp-bonus-sim.cjs 100000` simulates complete actual features. It measured 73.6949× mean payout for 10 FS (95.7077% of its 77× price) and 338.0464× for 20 FS (96.5847% of 350×). Estimated standard errors of mean payout are 0.6925× and 1.8751× respectively. These are noisy estimates of high-volatility features, not certified exact RTPs. Full config/output: `reports/swamp-bonus-pricing.json`.
+
+For all current features including the admin panel and MINES, use the **single latest** `supabase_admin_swamp.txt`; see `ADMIN_SETUP.md`. Do not apply old registry scripts afterward.

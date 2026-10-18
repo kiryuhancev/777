@@ -84,3 +84,12 @@ for name,text,tag in [('MINES STYLES',(ROOT/'mines/presentation.css').read_text(
 art='data:image/svg+xml;base64,'+base64.b64encode((ROOT/'assets/mines/lobby-card.svg').read_bytes()).decode()
 s=re.sub(r'(<img id="minesLobbyArt")([^>]*)(>)',lambda m:m[1]+re.sub(r' src="[^"]*"','',m[2])+' src="'+art+'"'+m[3],s)
 p.write_text(s)
+# Admin tools are an optional, separately authorized panel; ordinary users retain the same header.
+s=p.read_text()
+for name,text,tag in [('ADMIN STYLES',(ROOT/'admin/presentation.css').read_text(),'style'),('ADMIN SCREEN',(ROOT/'admin/screen.html').read_text(),None),('ADMIN MODULE','\n'.join((ROOT/'admin'/f).read_text() for f in ['service.js','game.js']),'script')]:
+ block=f'<!-- BEGIN {name} -->\n'+(f'<{tag}>\n{text}\n</{tag}>' if tag else text)+f'\n<!-- END {name} -->'
+ pattern=rf'<!-- BEGIN {name} -->[\s\S]*?<!-- END {name} -->'
+ if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
+ elif tag=='style':s=s.replace('</head>',block+'\n</head>',1)
+ else:s=s.replace('<!-- BEGIN VAULT RUNTIME -->',block+'\n<!-- BEGIN VAULT RUNTIME -->',1)
+p.write_text(s)

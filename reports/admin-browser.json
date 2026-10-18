@@ -1,0 +1,16 @@
+{
+  "mode": "Chromium + real SDK with HTTP fixture, not live Supabase",
+  "passed": [
+    "Ordinary user sees no admin entry and private RPC rejects direct invocation",
+    "Authorized admin searches users, credits exact amount and sees a logged reason",
+    "Lost admin reply + retry uses one UUID and cannot credit twice",
+    "Stale wallet revision rejects an absolute overwrite and refreshes the displayed user",
+    "Admin pauses fresh bets; user finishes accepted Mines without losing payout; activity shows the round",
+    "Unblock is reflected automatically and fresh play resumes",
+    "Admin own balance refreshes the canonical header; admin account cannot be blocked",
+    "Admin panel fits desktop and 390/320 mobile widths",
+    "Sign-out clears admin role, selected user, dialog and private list",
+    "Backend-only block rejects queued new stake and automatically restores the confirmed wallet"
+  ],
+  "pageErrors": []
+}

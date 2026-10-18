@@ -8,7 +8,7 @@ def normalize(s):
   s=re.sub(r'<!-- BEGIN '+name+r' -->[\s\S]*?<!-- END '+name+r' -->','',s)
  s=re.sub(r'<button class="game-card playable" id="openMinesGame"[\s\S]*?</button>','',s)
  s=s.replace(",{id:'mines',element:'openMinesGame',category:'arcade',isNew:true}",'')
- for name in ['VAULT RUNTIME','SWAMP STYLES','SWAMP SCREEN','SWAMP MODULE']:
+ for name in ['VAULT RUNTIME','SWAMP STYLES','SWAMP SCREEN','SWAMP MODULE','ADMIN STYLES','ADMIN SCREEN','ADMIN MODULE']:
   s=re.sub(r'<!-- BEGIN '+name+r' -->[\s\S]*?<!-- END '+name+r' -->','',s)
  s=re.sub(r'<button class="game-card playable" id="openSwampGame"[\s\S]*?</button>','',s)
  s=s.replace(",{id:'swamp',element:'openSwampGame',category:'slots',isNew:true}",'')

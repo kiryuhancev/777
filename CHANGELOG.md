@@ -97,3 +97,13 @@
 - Extended current SQL RPC registry with owned prefix checkpoints, mathematical payout validation and repeat-safe `supabase_mines.txt`; existing wallet/auth/RLS model retained.
 - Fixed empty-active-round sync promise cleanup so subsequent safe-pick events cannot stall behind an already-completed flush.
 - Added simulation (six strategies × 1,000,000 paid rounds), nine mathematical suites, PostgreSQL/RLS tests, Chromium reload/offline/conflict/mobile tests and strict six-game source isolation.
+
+## Swamp controls, bonus frequency and VAULT administration
+
+- Swamp bottom toolbar now follows Digital Derby: AUTO selection 10/25/50/100/∞ with STOP, MAX, settings and a priced BONUS shop. Mobile uses a fixed safe-area toolbar.
+- Normal no-anticipation spin is ~1.14s, FAST ~0.445s. Timing never changes RNG.
+- Scatter chance per reel 7.5% → 9% gives exact mean bonus spacing 266.07 → 157.70 paid spins. Line scale 1.34 → 0.97 keeps sampled total return near target: 96.3046% over 5m paid cycles, approximate 95% interval 94.5826–98.0266%. No forced trigger after a drought.
+- Purchases: 10 FS at 77×, 20 FS at 350×; paid/owner-bound entitlement persists before animation and cannot duplicate on reload/retry. Pricing simulation is separate from paid base-cycle RTP.
+- Server-protected admin panel for confirmed `al.kiryuhancev@yandex.ru`: search, credit/debit/set balance, pause/resume fresh bets, last sign-ins/heartbeat, rounds and audit reasons. RLS, role checks, request UUIDs, wallet locks and revision protect critical operations.
+- Accepted rounds/earned FS remain finishable when new bets are blocked. Pending unaccepted stakes recover automatically. Private admin UI clears on identity change.
+- One complete `supabase_admin_swamp.txt` enables this update and includes pending MINES registration without resetting user data. Other six games, their art and lobby/auth design are unchanged.

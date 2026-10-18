@@ -1,0 +1,12 @@
+{
+  "database": "isolated PostgreSQL 17",
+  "passed": [
+    "10 FS purchase cost 77x charged once",
+    "entitlement exists before entry animation/receipt settlement",
+    "reload/interrupted receipt does not refund or remove bought FS",
+    "duplicate UUID cannot charge or grant twice",
+    "bought free spin consumes normal owned entitlement",
+    "underpriced or wrong-size purchase rejected",
+    "20 FS purchase cost 350x accepted with zero direct payout"
+  ]
+}

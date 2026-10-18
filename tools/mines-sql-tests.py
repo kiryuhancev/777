@@ -14,7 +14,7 @@ def j(x):return "'"+json.dumps(x)+"'::jsonb"
 start=f"select public.begin_game_round('{rid}','mines',20,0,{j({'mines':c})},{j({'minesRound':c})});"
 pick=lambda x:f"select public.save_mines_checkpoint('{rid}',{j(x)});"
 settle=f"select public.record_game_round('{rid}','mines',20,{final['payout']},{round(final['payout']/20,6)},'cash-out',{j({'mines':final})},'settled',{j({'minesRound':final})});"
-sql(f'''delete from auth.users;insert into auth.users values('{A}','{{"username":"Alice"}}'),('{B}','{{"username":"Bob"}}');
+sql(f'''do $$begin if to_regclass('public.vault_admin_audit') is not null then execute 'truncate public.vault_admin_audit';end if;end$$;delete from auth.users;insert into auth.users(id,raw_user_meta_data) values('{A}','{{"username":"Alice"}}'),('{B}','{{"username":"Bob"}}');
 set role authenticated;select set_config('request.jwt.claim.sub','{A}',false);select public.mines_capabilities();
 {start}{start}
 do $$begin if (select balance from public.wallets)<>999980 then raise exception 'Duplicate debit';end if;end$$;

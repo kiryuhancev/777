@@ -11,8 +11,9 @@ sql('''do $$begin if not exists(select from pg_roles where rolname='anon') then 
 create schema if not exists auth;create table if not exists auth.users(id uuid primary key,raw_user_meta_data jsonb default '{}');
 create or replace function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
 grant usage on schema public,auth to anon,authenticated;''')
+sql('alter table auth.users add column if not exists email text;alter table auth.users add column if not exists email_confirmed_at timestamptz;alter table auth.users add column if not exists last_sign_in_at timestamptz;alter table auth.users add column if not exists created_at timestamptz default now();');
 migration=(ROOT/'supabase_schema.sql').read_text();sql(migration);sql(migration)
-sql('''delete from auth.users;insert into auth.users values('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','{"username":"Alice"}'),('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb','{"username":"Bob"}');
+sql('''do $$begin if to_regclass('public.vault_admin_audit') is not null then execute 'truncate public.vault_admin_audit';end if;end$$;delete from auth.users;insert into auth.users(id,raw_user_meta_data) values('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','{"username":"Alice"}'),('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb','{"username":"Bob"}');
 set role authenticated;select set_config('request.jwt.claim.sub','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',false);
 do $$begin
  if (select count(*) from public.profiles)<>1 or (select count(*) from public.wallets)<>1 or (select count(*) from public.user_settings)<>1 then raise exception 'RLS identity leak';end if;

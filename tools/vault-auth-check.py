@@ -21,10 +21,10 @@ A='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';B='bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb
 def now():return datetime.now(timezone.utc).isoformat()
 class Cloud:
  def __init__(self):
-  self.users={};self.rows={};self.rounds={};self.stats={};self.offline=False;self.table_schema_ready=True;self.swamp_schema_ready=True;self.mines_schema_ready=True;self.drop_settle=False;self.calls=[];self.unavailable_profiles=set();self.unavailable_wallets=set()
+  self.users={};self.rows={};self.rounds={};self.stats={};self.offline=False;self.table_schema_ready=True;self.swamp_schema_ready=True;self.mines_schema_ready=True;self.drop_admin=False;self.admin_audit={};self.access={};self.drop_settle=False;self.calls=[];self.unavailable_profiles=set();self.unavailable_wallets=set()
   self.create(A,'alice@example.test','Alice');self.create(B,'bob@example.test','Bob')
  def create(self,uid,email,username):
-  self.users[uid]={'id':uid,'email':email,'aud':'authenticated','role':'authenticated','user_metadata':{'username':username},'app_metadata':{'provider':'email','providers':['email']},'created_at':now(),'identities':[]}
+  self.users[uid]={'id':uid,'email':email,'aud':'authenticated','role':'authenticated','user_metadata':{'username':username},'app_metadata':{'provider':'email','providers':['email']},'created_at':now(),'email_confirmed_at':now(),'last_sign_in_at':now(),'identities':[]}
   self.rows[uid]={'profiles':{'id':uid,'username':username,'avatar_url':None,'xp':0,'level':1},'wallets':{'user_id':uid,'balance':1000000,'revision':0,'recovery':{}},'user_settings':{'user_id':uid,'sound_enabled':True,'music_enabled':False,'fast_mode':False,'fast_bonus':False,'scatter_boost':False,'last_game_id':'lobby','selected_bets':{'slot':2,'poker':2,'bird':1},'updated_at':now()}}
  def session(self,uid):return {'access_token':jwt(uid),'refresh_token':'fixture-refresh-'+uid,'expires_in':3600,'token_type':'bearer','user':self.users[uid]}
  def route(self,route):
@@ -51,8 +51,34 @@ class Cloud:
   if path.startswith('/rest/v1/rpc/'):
    name=path.split('/')[-1];self.calls.append((uid,name,payload));wallet=self.rows[uid]['wallets']
    if name=='mines_capabilities':return response({'version':1}) if self.mines_schema_ready else response({'message':'Function not found','code':'PGRST202'},404)
-   if name=='swamp_slot_capabilities':return response({'version':1}) if self.swamp_schema_ready else response({'message':'Function not found','code':'PGRST202'},404)
+   if name=='swamp_slot_capabilities':return response({'version':2,'purchaseVersion':1,'siteAdminVersion':1}) if self.swamp_schema_ready else response({'message':'Function not found','code':'PGRST202'},404)
    if name=='table_games_capabilities':return response({'version':1}) if self.table_schema_ready else response({'message':'Function not found','code':'PGRST202'},404)
+   is_admin=lambda id:self.users[id]['email']=='al.kiryuhancev@yandex.ru' and self.users[id].get('email_confirmed_at') is not None
+   if name=='vault_admin_context':return response({'isAdmin':is_admin(uid)})
+   if name=='vault_presence_heartbeat':return response({'enabled':self.access.get(uid,True)})
+   if name.startswith('vault_admin_'):
+    if not is_admin(uid):return response({'message':'VAULT_ADMIN_FORBIDDEN'},403)
+    if name=='vault_admin_users':
+     results=[]
+     for id,u in self.users.items():
+      if payload.get('p_search','').lower() not in (u['email']+' '+self.rows[id]['profiles']['username']).lower():continue
+      w=self.rows[id]['wallets'];results.append({'user_id':id,'email':u['email'],'username':self.rows[id]['profiles']['username'],'balance':w['balance'],'revision':w['revision'],'enabled':self.access.get(id,True),'is_admin':is_admin(id),'last_sign_in_at':u['last_sign_in_at'],'last_seen_at':now(),'online':True,'last_round_at':now() if any(r['user_id']==id for r in self.rounds.values()) else None,'rounds_played':sum(s['rounds_played'] for (i,g),s in self.stats.items() if i==id)})
+     return response(results[payload['p_offset']:payload['p_offset']+payload['p_limit']])
+    if name=='vault_admin_activity':return response({'rounds':[{'game_id':r['p_game_id'],'status':r['status'],'bet':r['p_bet'],'payout':r.get('payout',0),'created_at':now()} for r in self.rounds.values() if r['user_id']==payload['p_user_id']], 'audit':[a for a in self.admin_audit.values() if a['user_id']==payload['p_user_id']]})
+    target=payload['p_user_id'];w=self.rows[target]['wallets'];request=payload['p_request_id']
+    if request in self.admin_audit:return response({'duplicate':True})
+    if name=='vault_admin_balance':
+     if payload['p_expected_revision']!=w['revision']:return response({'message':'VAULT_ADMIN_REVISION'},400)
+     if any(r['user_id']==target and r['status']=='started' for r in self.rounds.values()):return response({'message':'VAULT_ADMIN_ACTIVE_ROUND'},400)
+     op=payload['p_operation'];amount=payload['p_amount'];next_balance=amount if op=='set' else w['balance']+(amount if op=='credit' else -amount)
+     if next_balance<0:return response({'message':'VAULT_ADMIN_FUNDS'},400)
+     w['balance']=round(next_balance,6);w['revision']+=1;action={'action':'balance','operation':op,'new_balance':w['balance']}
+    elif name=='vault_admin_access':
+     if is_admin(target) and not payload['p_enabled']:return response({'message':'VAULT_ADMIN_SELF_BLOCK'},400)
+     self.access[target]=payload['p_enabled'];action={'action':'access','enabled':payload['p_enabled']}
+    self.admin_audit[request]={'user_id':target,'created_at':now(),'reason':payload['p_reason'],**action}
+    if self.drop_admin:self.drop_admin=False;return route.abort('failed')
+    return response({'duplicate':False})
    if name=='save_vault_settings':
     s=self.rows[uid]['user_settings'];x=payload['p_settings'];ts=payload['p_updated_at']
     if ts>s['updated_at']:
@@ -70,6 +96,7 @@ class Cloud:
     r['p_metadata']['mines']=c;wallet['recovery']['minesRound']=c;return response({'duplicate':False})
    if name=='begin_game_round':
     if not r:
+     if payload['p_bet']>0 and not self.access.get(uid,True):return response({'message':'VAULT_ACCOUNT_DISABLED'},400)
      if any(x['user_id']==uid and x['p_game_id']==payload['p_game_id'] and x['status']=='started' for x in self.rounds.values()) or payload['p_expected_revision']!=wallet['revision'] or payload['p_bet']>wallet['balance']:return response({'message':'VAULT_WALLET_CONFLICT'},400)
      if payload['p_game_id']=='swamp':
       m=payload.get('p_metadata',{});prev=wallet['recovery'].get('swampBonus');nxt=payload.get('p_recovery',{}).get('swampBonus')

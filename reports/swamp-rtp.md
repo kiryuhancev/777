@@ -1,11 +1,13 @@
-# Swamp slot — measured simulation
+# Swamp slot — version 2 measured simulation
 
-Paid cycles: 5,000,000; seed 953172. Each includes every free spin and retrigger.
+Paid cycles: 5,000,000; seed 953174. Each includes all free spins/retriggers.
 
-Observed RTP: **97.0776%**. Approximate 95% interval: **95.7487%–98.4066%**.
+Observed RTP: **96.3046%**. Approximate 95% interval: **94.5826%–98.0266%**.
 
-Base hit rate: 17.8174%; bonus triggers: 19,047; free spins: 286,890; zero-win FS: 66.8594%. Largest paid-cycle win: 4562.888x.
+Scatter per reel: 9%. Exact bonus probability 0.63412794% (~1/157.70); observed 31,774 bonuses (~1/157.36).
 
-The 2000x fish appeared 3 times during sampled FS. Rare-tail uncertainty remains; this is an empirical estimate, not a certified exact return. Default target 96% is a design reference. No outcomes were regenerated to match a payout.
+Base hit rate: 17.6250%; FS 478,995; zero-win FS 67.0235%; largest paid-cycle win 5534.031×. The 2000× fish appeared 9 times in FS. No cap truncations occurred.
 
-Configuration hash: `1a965e881f6aa8f6073a492d0b3c99d5c5ba626b94dff0cc3fcf051db067024a`. Full configuration and 10,000-cycle batches: `swamp-rtp.json`.
+Rare-tail uncertainty remains. This is an empirical estimate, not a certified exact return. Target 96% is a calibration reference. No outcomes were regenerated to meet a payout. Config hash: `819d612f040939877fe1c9754211ec7d79c0fbec4bcee443d0e532c3cb947045`. Full config and 10,000-cycle batches: `swamp-rtp.json`.
+
+The historical v1 sample is separately preserved in `swamp-rtp-v1-baseline.json`.
