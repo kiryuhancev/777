@@ -1,0 +1,72 @@
+{
+  "baseline": "1292196",
+  "otherEightGamesAndLobby": "HTML/math/art unchanged; new card only",
+  "auth": "byte-identical",
+  "canonicalWalletService": "Monetary methods byte-identical; presentation hold extended to MAGNET; isolated owned bridge extends outbox/recovery",
+  "archiveFiles": [
+    {
+      "path": "assets/magnet/00_reference/magnet_main_screen.webp",
+      "sha256": "5d679172a4d761a834a95995f884a3840d4de7550c6cd720bcded5adc9deb255"
+    },
+    {
+      "path": "assets/magnet/00_reference/magnet_symbols_reference.webp",
+      "sha256": "51cf45c8d0a1d0bdae81e1564086477da9a37a8d0d7b44a28d5e482470371777"
+    },
+    {
+      "path": "assets/magnet/01_regular_symbols/copper_coil_module.webp",
+      "sha256": "e61cc6b342e6eb1c78d9f1e5cb9bd7907407991997a4069a09f1f77347995d16"
+    },
+    {
+      "path": "assets/magnet/01_regular_symbols/neon_energy_cell.webp",
+      "sha256": "32cf2a30293a667cf597f0ab945aefe8b3542d03dc0a24d0b7e64ac1776d1c1b"
+    },
+    {
+      "path": "assets/magnet/01_regular_symbols/plasma_orb.webp",
+      "sha256": "6ab39a68bbb1415d660247968a29a39560623aa0ef69f9514c1baa286e14b797"
+    },
+    {
+      "path": "assets/magnet/01_regular_symbols/quantum_crystal_prism.webp",
+      "sha256": "84c763b32bd4e890be60e858f8826e79537f9a545cf9bf1b8a95c0d576859de3"
+    },
+    {
+      "path": "assets/magnet/01_regular_symbols/reactor_shard.webp",
+      "sha256": "61c190732bbdeef3dc34086776ee7df36a0c7bc35d07d85f281d04206b575858"
+    },
+    {
+      "path": "assets/magnet/01_regular_symbols/steel_battery_cell.webp",
+      "sha256": "6cfd8245bf6f8295a797c8e0fd306a76420e729556d8f3cbe7657646d24318e0"
+    },
+    {
+      "path": "assets/magnet/02_special_symbols/chain_magnet.webp",
+      "sha256": "a34f8d9f1c94c05f353ccfbfa2bb3867641903c984956039dd4309272ebfe20d"
+    },
+    {
+      "path": "assets/magnet/02_special_symbols/gravity_core.webp",
+      "sha256": "43ceaf082ac56df3313b1ad78741a95e9eb76d8376d7d6d45d00449e7fb6876f"
+    },
+    {
+      "path": "assets/magnet/02_special_symbols/magnet_wild.webp",
+      "sha256": "70109f2f5487a8b3b3f9a3ec7d5d435824f703973f8bb3c2118f992b930a8b36"
+    },
+    {
+      "path": "assets/magnet/02_special_symbols/overload_core_scatter.webp",
+      "sha256": "76aae07260d0f24dd5eaee345175bd8a045f4c2b0713e774e58791bcbf290ad2"
+    },
+    {
+      "path": "assets/magnet/02_special_symbols/polarity_flip.webp",
+      "sha256": "1fee111eb4c6a388415040e87367c2654a51f45e41423d2aaf6d3af35fd6dd8d"
+    },
+    {
+      "path": "assets/magnet/02_special_symbols/repulsor.webp",
+      "sha256": "3ac7a19d252f5ff4574c64f6621664c9b61b7c50f83eca7398af0c17eac86c66"
+    },
+    {
+      "path": "assets/magnet/03_docs/MAGNET_CODEX_PROMPT.txt",
+      "sha256": "dfb44a647b9d4ae8b89f1606c3ab4651bb977791fa4d9821a32f6a52588026cb"
+    },
+    {
+      "path": "assets/magnet/03_docs/README_FOR_CODEX.txt",
+      "sha256": "a076ecbcac02a12ca756096f157a629e76734300465f89c250603143aeab4911"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "mode": "Chromium + real SDK HTTP fixture; PostgreSQL/RLS checked separately; no live database writes",
+  "passed": [
+    "25 cells and +/\u2212/neutral labels; all original assets decode; SLOTS registration and Featured preserved; five sizes without horizontal overflow/duplicate IDs; settings/help/AUTO menus work",
+    "Real paid spin commits deterministic plan before animation; visible force arcs; final-grid payout only; F5 preserves exact seed/initial/effects/final and never pays twice",
+    "Overdrive F5 during initial reveal; five earned spins with fixed parent UUID/bet; shared exact cross-device spin is idempotent; total payout and statistics bank once",
+    "Offline round persists in bounded owned outbox and reconnect sync preserves shared balance",
+    "Existing Swamp real spin preserves its original held-balance presentation and correct final payout after the MAGNET display extension",
+    "Existing Poker uses the same wallet; sign out/account switch clears private MAGNET checkpoint",
+    "Missing migration disables only MAGNET and cannot debit; existing Poker remains available"
+  ],
+  "pageErrors": [],
+  "expectedOfflineOrMissingSchemaConsoleErrors": [
+    "Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "VAULT sync failed {message: TypeError: Failed to fetch, details: TypeError: Failed to fetch\n    at fetch (http://12\u20262guYmluZChyKSl9KSgpLG8oNDQwKX0pKCkpKTs=:1:110650), hint: , code: }"
+  ]
+}

@@ -1,0 +1,187 @@
+{
+  "config": {
+    "id": "magnet",
+    "version": 1,
+    "columns": 5,
+    "rows": 5,
+    "payRows": [
+      1,
+      2,
+      3
+    ],
+    "ways": 243,
+    "maxMagneticPhases": 3,
+    "maxMovesPerPhase": 10,
+    "maxWinX": 10000,
+    "polarity": {
+      "positive": 0.4,
+      "negative": 0.4,
+      "neutral": 0.2
+    },
+    "specials": {
+      "wild": 0.008,
+      "flip": 0.006,
+      "gravity": 0.006,
+      "repulsor": 0.006,
+      "chain": 0.004,
+      "scatter": 0.018
+    },
+    "normalRadius": 2,
+    "gravityRadius": 2,
+    "wildRadius": 2,
+    "repulsorRadius": 2,
+    "flipRadius": 1,
+    "normalInteractionChance": 0.32,
+    "specialActivationChance": 0.85,
+    "chainActivationChance": 0.65,
+    "overdrive": {
+      "scatterCount": 3,
+      "spins": 5,
+      "fieldPower": [
+        1,
+        1,
+        2,
+        3,
+        5
+      ],
+      "specialBoostPerPower": 0.1,
+      "extraPhaseAt": 3,
+      "radiusUpgradeAt": 2,
+      "scatterChance": 0
+    },
+    "waysPayScale": 0.39,
+    "symbols": [
+      {
+        "id": "copper",
+        "name": "Copper Coil Module",
+        "weight": 28,
+        "pays": [
+          0.3,
+          0.8,
+          2
+        ]
+      },
+      {
+        "id": "steel",
+        "name": "Steel Battery Cell",
+        "weight": 24,
+        "pays": [
+          0.4,
+          1,
+          3
+        ]
+      },
+      {
+        "id": "energy",
+        "name": "Neon Energy Cell",
+        "weight": 18,
+        "pays": [
+          0.6,
+          1.5,
+          5
+        ]
+      },
+      {
+        "id": "plasma",
+        "name": "Plasma Orb",
+        "weight": 14,
+        "pays": [
+          0.8,
+          2.5,
+          8
+        ]
+      },
+      {
+        "id": "crystal",
+        "name": "Quantum Crystal Prism",
+        "weight": 10,
+        "pays": [
+          1.2,
+          4,
+          15
+        ]
+      },
+      {
+        "id": "reactor",
+        "name": "Reactor Shard",
+        "weight": 6,
+        "pays": [
+          2,
+          8,
+          30
+        ]
+      }
+    ],
+    "autoChoices": [
+      10,
+      25,
+      50,
+      100,
+      -1
+    ],
+    "timing": {
+      "reel": 150,
+      "pause": 160,
+      "phase": 420,
+      "fastPhase": 270,
+      "win": 900,
+      "fastWin": 550,
+      "next": 850
+    }
+  },
+  "method": "Seeded paid rounds; all earned Overdrive spins included; no DOM, wallet/history input or payout-conditioned movement. Approximate normal interval for a finite high-volatility sample.",
+  "results": [
+    {
+      "paidRounds": 10000,
+      "seed": 87431,
+      "rtpPercent": 97.020690000001,
+      "approx95IntervalPercent": [
+        92.33528425569422,
+        101.70609574430777
+      ],
+      "hitRate": 0.5075,
+      "averageWinX": 0.97020690000001,
+      "magneticMovementFrequency": 1,
+      "averageSwapsPerResolvedSpin": 6.493574488338886,
+      "specialActivationFrequency": 0.4373155640171347,
+      "specialCounts": {
+        "flip": 1460,
+        "repulsor": 5827,
+        "wild": 2241,
+        "gravity": 3984,
+        "chain": 1070
+      },
+      "overdriveCount": 101,
+      "overdriveFrequency": 0.0101,
+      "averageSpinsBetweenOverdrives": 99.00990099009901,
+      "averageOverdrivePayoutX": 5.414049504950495,
+      "maxObservedWinX": 56.16
+    },
+    {
+      "paidRounds": 100000,
+      "seed": 87431,
+      "rtpPercent": 96.53276099997777,
+      "approx95IntervalPercent": [
+        95.0950270639021,
+        97.97049493605343
+      ],
+      "hitRate": 0.51231,
+      "averageWinX": 0.9653276099997776,
+      "magneticMovementFrequency": 0.99996,
+      "averageSwapsPerResolvedSpin": 6.499852612561213,
+      "specialActivationFrequency": 0.4398516616745115,
+      "specialCounts": {
+        "flip": 15150,
+        "repulsor": 57404,
+        "wild": 23206,
+        "gravity": 40366,
+        "chain": 10705
+      },
+      "overdriveCount": 1033,
+      "overdriveFrequency": 0.01033,
+      "averageSpinsBetweenOverdrives": 96.8054211035818,
+      "averageOverdrivePayoutX": 5.1091887705711585,
+      "maxObservedWinX": 56.16
+    }
+  ]
+}

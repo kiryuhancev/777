@@ -1,3 +1,11 @@
+# MAGNET — deterministic magnetic slot
+
+- Новая самостоятельная игра 5×5 с 243 ways в трёх центральных рядах, магнитными буферами и целыми символами из предоставленного пакета.
+- Seeded initial/effects/final plan, одношаговые swaps, все шесть specials и пять Overdrive spins с Field Power 1/1/2/3/5; выигрыши остаются на поле.
+- Общий wallet и owned checkpoints до анимации, once-only settlement/statistics, F5/offline/cross-device recovery; дополнительный `supabase_magnet.txt` без сброса данных.
+- Проверены математическая модель, PostgreSQL/RLS и Chromium. 100k cycles: sampled RTP 96.532761%, Overdrive 1.033%. Подробные config/правила/отчёты: [MAGNET.md](MAGNET.md).
+- Остальные восемь игр, Featured, auth и canonical WalletService сохранены.
+
 # VAULT HEIST — vault scene and instruments
 
 - Новый фон сейфа и отдельная прозрачная металлическая рама по общему визуальному референсу; крупные оригинальные символы сохранены без обрезки.

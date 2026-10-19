@@ -1,0 +1,197 @@
+TASK: Add a new slot called MAGNET to the existing VAULT game hub.
+
+The attached MAGNET asset pack is the VISUAL SOURCE OF TRUTH. Use the supplied main-screen reference for composition, materials, lighting and layout, and the symbol reference/crops for symbol design. Do not replace the art direction with generic neon sci-fi.
+
+CORE GAMEPLAY
+- Grid: 5x5.
+- Prefer 243 ways; if the existing slot engine cannot safely support ways, use 20 fixed paylines but keep all other mechanics.
+- A paid spin first creates an initial grid, then resolves a MAGNETIC PHASE, then evaluates the FINAL GRID for payout.
+- This is NOT a cascade/tumble slot. Winning symbols do not disappear.
+- Symbols can be POSITIVE (+), NEGATIVE (-), or NEUTRAL.
+- Cyan/blue = positive. Red/orange = negative. Neutral uses material/crystal colors.
+- Opposite polarities attract. Same polarities repel.
+- Movement is grid-based: symbols move between cells, never free-float as game state. Animations may be smooth, but final positions must be valid cells.
+- One ordinary magnetic interaction should move a normal symbol at most one cell.
+- If a target cell is occupied, resolve deterministically using swap/push/cancel rules. Never allow two symbols in one cell.
+
+DETERMINISTIC ROUND PLAN
+Create a round.magneticPlan containing seed, initialGrid, ordered effects, and finalGrid. Resolve game logic first; animation only plays the plan. Do not generate random movements during animation. Reload must restore the same result and never reroll or double-settle.
+
+SPECIAL SYMBOLS
+1) MAGNET WILD
+- U-shaped red/cyan industrial magnet.
+- Wild substitute for regular paying symbols.
+- Stays in place during magnetic phase.
+- Pulls compatible nearby symbols toward itself.
+
+2) POLARITY FLIP
+- Red/cyan circular arrows.
+- Flips + to - and - to + in a configurable local area.
+
+3) GRAVITY CORE
+- Orange glowing reactor core.
+- Pulls nearby symbols toward its cell regardless of polarity.
+
+4) REPULSOR
+- Opposing red/cyan force plates.
+- Pushes nearby symbols outward.
+
+5) CHAIN MAGNET
+- Triggers an additional magnetic phase after the current one.
+- Limit chained phases using config, e.g. maxMagneticPhases = 3.
+
+6) OVERLOAD CORE SCATTER
+- Scatter symbol from supplied art.
+- 3+ trigger OVERDRIVE MODE.
+
+OVERDRIVE MODE
+- Do not implement a generic free-spins bonus presentation.
+- Use a dedicated OVERDRIVE bonus with 5 bonus spins by default.
+- Each bonus spin has FIELD POWER progression, e.g. x1, x1, x2, x3, x5.
+- FIELD POWER may increase attraction radius, repulsion reach, special activation chance, and/or number of magnetic phases. It must not directly multiply payouts unless explicitly configured.
+- Environment becomes more energized: stronger coils, arcs, floating debris, field-power display. Keep symbols readable.
+
+REGULAR SYMBOLS
+Use the supplied designs:
+- Copper Coil Module
+- Steel Battery Cell
+- Neon Energy Cell
+- Plasma Orb
+- Quantum Crystal Prism
+- Reactor Shard
+
+STARTING PAYTABLE (x total bet, configurable)
+Copper: 3=0.3, 4=0.8, 5=2
+Steel: 3=0.4, 4=1, 5=3
+Energy: 3=0.6, 4=1.5, 5=5
+Plasma: 3=0.8, 4=2.5, 5=8
+Crystal: 3=1.2, 4=4, 5=15
+Reactor: 3=2, 4=8, 5=30
+Treat these as tuning defaults, not final RTP targets.
+
+MAGNETIC RESOLUTION
+Use a stable documented order such as:
+1. Gravity Core
+2. Magnet Wild
+3. normal attraction
+4. normal repulsion
+5. Polarity Flip
+6. chain effects
+If another deterministic order better fits the existing engine, document it.
+
+VISUAL DIRECTION
+- Futuristic magnetic reactor laboratory.
+- Dark gunmetal, brushed steel, large coils, industrial containment chamber.
+- Main screen reference is the visual source of truth.
+- Left-side reactor language = cyan positive field.
+- Right-side reactor language = red negative field.
+- Cyan/red should communicate polarity, not be used randomly as decoration.
+- Orange/gold is reserved for reactor/gravity energy and important core events.
+- Avoid generic cyberpunk, nightclub neon, cartoon science, or rainbow UI.
+
+MAGNETIC PHASE PRESENTATION
+After reel stop:
+- short pause
+- display FIELD ACTIVE / MAGNETIC PHASE unobtrusively
+- side reactors power up
+- briefly highlight interacting symbols
+- draw a short force/energy line
+- animate symbol movement 250–500 ms
+- settle with a small pulse
+This should make it obvious WHY a symbol moved.
+
+SPECIFIC FX
+- Polarity Flip: short pulse/rotation and visible +/- change.
+- Gravity Core: orange expansion ring, nearby pieces pull inward.
+- Repulsor: compact outward shockwave.
+- Chain Magnet: reactor remains powered and shows FIELD RECHARGED / CHAIN PHASE.
+- Do not use expensive full-screen shaders if the existing app is DOM/Canvas based.
+
+UI
+Reuse the VAULT slot control system where practical:
+- BALANCE
+- BET +/-
+- MAX
+- central SPIN button
+- AUTO if already supported
+- SETTINGS
+SPIN button should use a steel outer ring and split cyan/red energy accent matching the reference.
+
+LOBBY
+Add a 16:9 MAGNET card under SLOTS. Do not change the current featured game automatically. Art direction: reactor chamber, cyan field on one side, red field on the other, floating magnetic objects. If the lobby renders the game name separately, do not bake title text into card art.
+
+MATH / RNG
+Put all probabilities in config:
+- symbol weights
+- positive chance
+- negative chance
+- neutral chance
+- special frequencies
+- scatter frequency
+- overdrive trigger rate
+- chain magnet rate
+Use the existing seeded RNG abstraction if available. Do not manipulate movement to force a target payout. The result must emerge from symbol generation plus deterministic magnetic rules.
+
+SIMULATION
+Add simulateMagnetSpins(count, seed) runnable without DOM. Report at least:
+- RTP
+- hit rate
+- average win
+- magnetic movement frequency
+- special activation frequency
+- Overdrive frequency
+- average Overdrive payout
+- max observed win
+Run 10k and 100k simulations after implementation.
+
+PERSISTENCE / SAFETY
+- Shared VAULT wallet only.
+- One paid spin = one roundId.
+- Bet deducted once.
+- Settlement once.
+- Preserve initialGrid, magneticPlan, finalGrid, bonus substate and settled state across reload.
+- F5 must not reroll the round or duplicate payout.
+- Do not change auth, Supabase, or other games.
+
+ACCESSIBILITY
+Do not communicate polarity with color alone. Every charged symbol must also show visible + or - marking.
+
+PERFORMANCE
+Target 60 FPS desktop. Preload images once. Avoid per-frame Image creation and expensive filters. Keep field arcs lightweight with Canvas/SVG/CSS. Mobile must fit the 5x5 field without horizontal scrolling; side reactors may be cropped or simplified.
+
+DEBUG
+MAGNET_DEBUG = false. When true show seed, initial grid, final grid, polarity, movement arrows, magnetic plan and phase count.
+
+VALIDATION TESTS
+- 5x5 grid renders.
+- + / - / neutral state is visible and stored in game state.
+- Opposites attract.
+- Same poles repel.
+- Neutral ignores normal polarity.
+- No duplicate cell occupancy.
+- Magnet Wild substitutes and attracts correctly.
+- Polarity Flip changes signs.
+- Gravity Core pulls.
+- Repulsor pushes.
+- Chain Magnet starts another phase and respects maxMagneticPhases.
+- Overdrive triggers on configured Scatter count.
+- Final payout uses FINAL GRID, not initial grid.
+- No tumble/cascade after normal win.
+- Reload preserves exact round result.
+- No duplicate settlement.
+- Simulator runs without DOM.
+- Existing games remain unchanged.
+
+OUTPUT
+1. Create a new version; do not overwrite the original.
+2. Add MAGNET to lobby.
+3. Return config values.
+4. Show one example magneticPlan.
+5. Return 10k and 100k simulation results.
+6. Report estimated RTP and Overdrive frequency.
+7. Provide screenshots/previews of base game, Magnetic Phase and Overdrive.
+8. Run syntax and console checks.
+9. Confirm other VAULT games, wallet, auth and persistence were not changed.
+
+FINAL FEEL
+A spin stopping is not the end of the round — it is the start of the spectacle. The field powers up, polarity becomes readable, forces connect specific symbols, the grid rearranges, and only then is the final result evaluated. The player must understand the magnetic cause-and-effect visually, not see random pieces sliding around.

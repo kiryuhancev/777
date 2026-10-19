@@ -1,0 +1,8 @@
+{
+  "mode": "Isolated PostgreSQL, not production",
+  "passed": [
+    "base: full stable path, every request duplicated, exact checkpoint restore, one wager/payout/statistics, RLS isolation",
+    "overdrive: full stable path, every request duplicated, exact checkpoint restore, one wager/payout/statistics, RLS isolation",
+    "Bad payout rejected; blocked account can finish earned Overdrive; migration repeat-safe; existing Heist/begin RPC definitions unchanged"
+  ]
+}

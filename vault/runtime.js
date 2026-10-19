@@ -2,12 +2,12 @@
  * Only explicit business checkpoints cross this boundary. No frame/DOM serialization. */
 (() => {
   'use strict';
-  const C=VAULT_CONFIG,NS=`vault:v${C.storageVersion}:`,games=['slot','poker','bird','blackjack','baccarat','swamp','mines','vault_heist'],screens=['lobby',...games];
+  const C=VAULT_CONFIG,NS=`vault:v${C.storageVersion}:`,games=['slot','poker','bird','blackjack','baccarat','swamp','mines','vault_heist','magnet'],screens=['lobby',...games];
   const uuid=()=>globalThis.crypto?.randomUUID?.()||'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const n=Math.floor(Math.random()*16);return(c==='x'?n:(n&3)|8).toString(16);});
   const isId=x=>typeof x==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x);
   const amount=x=>Number.isFinite(Number(x))&&Number(x)>=0&&Number(x)<=1e12?Math.round(Number(x)*1e6)/1e6:null;
   const copy=x=>JSON.parse(JSON.stringify(x));
-  const defaults=()=>({balance:C.guestStartingBalance,revision:0,walletConfirmed:false,settings:{sound:true,music:false,fastGame:false,fastBonus:false,scatterBoost:false},bets:{slot:2,poker:2,bird:1,blackjack:2,baccarat:2,swamp:2,mines:2,vault_heist:2,minesCount:3,baccaratType:'PLAYER'},lastGame:'lobby',settingsUpdatedAt:0,recovery:{slotBonus:null,swampBonus:null,minesRound:null,heistRound:null,openRounds:{}},rounds:[],stats:{},queue:[]});
+  const defaults=()=>({balance:C.guestStartingBalance,revision:0,walletConfirmed:false,settings:{sound:true,music:false,fastGame:false,fastBonus:false,scatterBoost:false},bets:{slot:2,poker:2,bird:1,blackjack:2,baccarat:2,swamp:2,mines:2,vault_heist:2,magnet:2,minesCount:3,baccaratType:'PLAYER'},lastGame:'lobby',settingsUpdatedAt:0,recovery:{slotBonus:null,swampBonus:null,minesRound:null,heistRound:null,magnetRound:null,openRounds:{}},rounds:[],stats:{},queue:[]});
   const VaultSession=window.VaultSession={mode:'guest',user:null,profile:null,ready:false};
   let authBusy=false;
   let owner='guest',data=defaults(),client=null,clientRevision=0,suppress=false,localTimer=null,syncTimer=null,syncing=null,identityEpoch=0,connecting=null,connectionUser=null,settingsFingerprint='',conflict=false,locked=false,releaseLock=null,lockHeld=false,storageAvailable=true,profileRemote=true;
@@ -25,7 +25,7 @@
   function read(key){try{return JSON.parse(localStorage.getItem(NS+key)||'null');}catch{return null;}}
   function write(key,value){try{localStorage.setItem(NS+key,JSON.stringify(value));return true;}catch{storageAvailable=false;status('Сохранение недоступно');return false;}}
   function validSettings(input){const out=defaults().settings;for(const key of Object.keys(out))if(typeof input?.[key]==='boolean')out[key]=input[key];return out;}
-  function validBets(input){const out={slot:2,poker:2,bird:1,blackjack:2,baccarat:2,swamp:2,mines:2,vault_heist:2,minesCount:3,baccaratType:['PLAYER','BANKER','TIE'].includes(input?.baccaratType)?input.baccaratType:'PLAYER'};for(const game of games){const n=input?.[game],max=game==='bird'?BIRD_BETS.length:BETS.length;if(Number.isInteger(n)&&n>=0&&n<max)out[game]=n;}if(Number.isInteger(input?.minesCount)&&input.minesCount>=1&&input.minesCount<=24)out.minesCount=input.minesCount;return out;}
+  function validBets(input){const out={slot:2,poker:2,bird:1,blackjack:2,baccarat:2,swamp:2,mines:2,vault_heist:2,magnet:2,minesCount:3,baccaratType:['PLAYER','BANKER','TIE'].includes(input?.baccaratType)?input.baccaratType:'PLAYER'};for(const game of games){const n=input?.[game],max=game==='bird'?BIRD_BETS.length:BETS.length;if(Number.isInteger(n)&&n>=0&&n<max)out[game]=n;}if(Number.isInteger(input?.minesCount)&&input.minesCount>=1&&input.minesCount<=24)out.minesCount=input.minesCount;return out;}
   function validBonus(b){
     if(!b||!['normal','super'].includes(b.type)||!Number.isInteger(b.size)||b.size<5||b.size>8||!Number.isInteger(b.freeSpins)||b.freeSpins<0||b.freeSpins>5000)return null;
     const entries=Array.isArray(b.sticky)?b.sticky.filter(entry=>Array.isArray(entry)&&entry.length===2).filter(([k,v])=>typeof k==='string'&&/^\d,\d$/.test(k)&&SYMBOLS[v]&&v.startsWith('wild')&&k.split(',').every(n=>Number(n)<b.size)):[];
@@ -38,16 +38,17 @@
     const x=raw.data;out.walletConfirmed=x.walletConfirmed===true;out.balance=amount(x.balance);out.revision=Number.isSafeInteger(x.revision)&&x.revision>=0?x.revision:0;
     out.settings=validSettings(x.settings);out.bets=validBets(x.bets);out.lastGame=screens.includes(x.lastGame)?x.lastGame:'lobby';out.settingsUpdatedAt=Number.isFinite(x.settingsUpdatedAt)?x.settingsUpdatedAt:0;
     out.recovery.slotBonus=validBonus(x.recovery?.slotBonus);out.recovery.swampBonus=SWAMP_MODEL.validateBonus(x.recovery?.swampBonus);out.recovery.minesRound=MINES_MODEL.validate(x.recovery?.minesRound);out.recovery.heistRound=VAULT_HEIST_MODEL.validate(x.recovery?.heistRound);
+    out.recovery.magnetRound=MAGNET_MODEL.validate(x.recovery?.magnetRound);
     for(const game of games){const r=x.recovery?.openRounds?.[game];if(validRound(r)&&r.gameId===game&&r.status==='started'&&(game!=='mines'||out.recovery.minesRound?.status==='PLAYING'&&out.recovery.minesRound.roundId===r.roundId))out.recovery.openRounds[game]=copy(r);}
     out.rounds=Array.isArray(x.rounds)?x.rounds.filter(validRound).slice(-C.maxLocalRounds):[];
     out.stats=x.stats&&typeof x.stats==='object'?x.stats:{};
     // Versioned, owner-bound queue; reject unknown RPCs and corrupt envelope data.
-    out.queue=Array.isArray(x.queue)?x.queue.filter(e=>e&&e.userId===id&&isId(e.id)&&['begin','settle','settings','mines','heist'].includes(e.type)&&e.payload&&typeof e.payload==='object'&&(e.type!=='heist'||VAULT_HEIST_MODEL.validate(e.payload.p_checkpoint)&&e.payload.p_round_id===e.payload.p_checkpoint.roundId&&Number.isSafeInteger(e.payload.p_expected_revision)&&e.payload.p_expected_revision>=0&&Number.isInteger(e.payload.p_previous_step)&&e.payload.p_previous_step>=-1&&e.payload.p_previous_step<24&&e.payload.p_checkpoint.step===e.payload.p_previous_step+1)).slice(0,C.maxPendingEvents):[];
+    out.queue=Array.isArray(x.queue)?x.queue.filter(e=>e&&e.userId===id&&isId(e.id)&&['begin','settle','settings','mines','heist','magnet'].includes(e.type)&&e.payload&&typeof e.payload==='object'&&(e.type!=='heist'||VAULT_HEIST_MODEL.validate(e.payload.p_checkpoint)&&e.payload.p_round_id===e.payload.p_checkpoint.roundId&&Number.isSafeInteger(e.payload.p_expected_revision)&&e.payload.p_expected_revision>=0&&Number.isInteger(e.payload.p_previous_step)&&e.payload.p_previous_step>=-1&&e.payload.p_previous_step<24&&e.payload.p_checkpoint.step===e.payload.p_previous_step+1)&&(e.type!=='magnet'||MAGNET_MODEL.validate(e.payload.p_checkpoint)&&e.payload.p_round_id===e.payload.p_checkpoint.roundId&&Number.isSafeInteger(e.payload.p_expected_revision)&&e.payload.p_expected_revision>=0&&Number.isInteger(e.payload.p_previous_step)&&e.payload.p_previous_step>=-1&&e.payload.p_previous_step<5&&e.payload.p_checkpoint.step===e.payload.p_previous_step+1)).slice(0,C.maxPendingEvents):[];
     return out;
   }
   function capturePreferences(){
     const settings={sound:state.sound,music:state.music,fastGame:state.fastGame,fastBonus:state.fastBonus,scatterBoost:state.scatterBoost};
-    const bets={slot:state.betIndex,poker:pokerState.betIndex,bird:birdState.betIndex,...VaultTables.preferences(),swamp:VaultSwamp.betIndex,...VaultMines.preferences(),vault_heist:VaultHeist.betIndex};
+    const bets={slot:state.betIndex,poker:pokerState.betIndex,bird:birdState.betIndex,...VaultTables.preferences(),swamp:VaultSwamp.betIndex,...VaultMines.preferences(),vault_heist:VaultHeist.betIndex,magnet:VaultMagnet.betIndex};
     const fingerprint=JSON.stringify({settings,bets,lastGame:currentGame});
     if(fingerprint!==settingsFingerprint){settingsFingerprint=fingerprint;data.settings=settings;data.bets=bets;data.lastGame=screens.includes(currentGame)?currentGame:'lobby';data.settingsUpdatedAt=Date.now();
       if(VaultSession.mode==='authenticated')enqueue('settings',{settings:{...settings,bets,lastGame:data.lastGame},updatedAt:new Date(data.settingsUpdatedAt).toISOString()});
@@ -68,9 +69,9 @@
   function refreshBalanceUI(){syncLobbyBalance();for(const id of ['balance','pokerBalance','birdBalance'])byId(id).textContent=VaultWalletService.formatBalance();}
   const VaultWalletService=window.VaultWalletService={
     getBalance:()=>canonicalBalance,
-    formatBalance:()=>owner!=='guest'&&!data.walletConfirmed?'—':(walletPresentation?.owner===owner&&currentGame==='swamp'?walletPresentation.balance:canonicalBalance).toLocaleString('ru-RU',{maximumFractionDigits:6}),
-    holdPresentation(game){if(game==='swamp')walletPresentation={owner,balance:canonicalBalance};},
-    releasePresentation(game){if(game==='swamp'&&walletPresentation){walletPresentation=null;refreshBalanceUI();}},
+    formatBalance:()=>owner!=='guest'&&!data.walletConfirmed?'—':(walletPresentation?.owner===owner&&currentGame===walletPresentation.game?walletPresentation.balance:canonicalBalance).toLocaleString('ru-RU',{maximumFractionDigits:6}),
+    holdPresentation(game,{stake=0}={}){if(['swamp','magnet'].includes(game))walletPresentation={owner,game,balance:canonicalBalance-(game==='magnet'?stake:0)};},
+    releasePresentation(game){if(walletPresentation?.game===game){walletPresentation=null;refreshBalanceUI();}},
     setLocalBalance(value){const n=amount(value);if(n===null)throw Error('Invalid wallet value');canonicalBalance=n;data.balance=n;walletMutation++;if(!suppress){VaultStorage.saveLocalState({preferences:false});refreshBalanceUI();}return n;},
     applyDelta(delta,{gameId}={}){
       if(!Number.isFinite(delta)||amount(canonicalBalance+delta)===null)throw Error('Invalid wallet delta');
@@ -111,6 +112,36 @@
       VaultStorage.saveLocalState();refreshBalanceUI();return true;
     }
   };
+  // MAGNET owns only its checkpoint; the existing canonical wallet and outbox own money.
+  let magnetSupport=false;
+  window.VaultMagnetBridge={
+    get ready(){return magnetSupport;},
+    async connect(){
+      if(magnetSupport)return true;if(!client||owner==='guest')return false;
+      const known=read('magnet-schema'),cached=known?.version===1&&known.project===C.supabaseUrl;
+      if(!navigator.onLine&&cached){magnetSupport=true;return true;}
+      try{const {data:cap,error}=await client.rpc('magnet_capabilities');if(error){if(cached&&/fetch|network|offline/i.test(error.message||'')){magnetSupport=true;return true;}return false;}magnetSupport=cap?.version===1;if(magnetSupport)write('magnet-schema',{version:1,project:C.supabaseUrl});return magnetSupport;}catch{return false;}
+    },
+    commit(candidate){
+      if(!magnetSupport||!VaultRoundService.canPlay('magnet')||!storageAvailable||data.queue.length>=C.maxPendingEvents-2)return false;
+      const r=MAGNET_MODEL.validate(candidate),previous=data.recovery.magnetRound;if(!r)return false;
+      const start=r.step===0&&r.roundId!==previous?.roundId;
+      if(start&&(MAGNET_MODEL.active(previous)||r.bet>canonicalBalance)||!start&&(previous?.roundId!==r.roundId||!MAGNET_MODEL.active(previous)||r.step!==previous.step+1))return false;
+      const nextBalance=amount(canonicalBalance-(start?r.bet:0)+(r.status==='SETTLED'?r.payout:0));if(nextBalance===null)return false;
+      const rollback={balance:canonicalBalance,revision:clientRevision,mutation:walletMutation,queue:[...data.queue],rounds:[...data.rounds],stats:data.stats.magnet?copy(data.stats.magnet):null};
+      if(enqueue('magnet',{p_round_id:r.roundId,p_previous_step:start?-1:previous.step,p_expected_revision:clientRevision,p_checkpoint:r})===false)return false;
+      clientRevision++;data.recovery.magnetRound=copy(r);canonicalBalance=nextBalance;data.balance=nextBalance;walletMutation++;
+      if(r.status==='SETTLED'&&!data.rounds.some(x=>x.roundId===r.roundId)){
+        const record={roundId:r.roundId,gameId:'magnet',status:'settled',bet:r.bet,stake:r.bet,payout:r.payout,multiplier:r.payout/r.bet,result:r.result,metadata:{seed:r.seed,overdrive:r.bonus.triggered,bonusSpins:r.step,magneticPhases:r.spins.reduce((n,p)=>n+p.phaseCount,0),movements:r.spins.reduce((n,p)=>n+p.orderedEffects.filter(e=>e.from!==undefined).length,0)},startedAt:Date.now(),settledAt:Date.now()};
+        data.rounds.push(record);data.rounds=data.rounds.slice(-C.maxLocalRounds);localStats(record);
+      }
+      if(!VaultStorage.saveLocalState()){
+        canonicalBalance=rollback.balance;data.balance=rollback.balance;clientRevision=rollback.revision;walletMutation=rollback.mutation;data.queue=rollback.queue;data.rounds=rollback.rounds;data.recovery.magnetRound=previous;
+        if(rollback.stats)data.stats.magnet=rollback.stats;else delete data.stats.magnet;return false;
+      }
+      refreshBalanceUI();return true;
+    }
+  };
   function stableRecovery(){return {slotBonus:data.recovery.slotBonus,swampBonus:data.recovery.swampBonus,minesRound:data.recovery.minesRound};}
   function localStats(round){
     const s=data.stats[round.gameId]||{rounds_played:0,total_wagered:0,total_won:0,biggest_win:0,biggest_multiplier:0};
@@ -147,7 +178,8 @@
     },
     get tableSupport(){return tableSupport;},
     canPlay(game){
-      if(window.VaultAccess?.isBlocked&&!data.recovery.openRounds[game]&&!(game==='slot'&&state.bonus&&state.freeSpins>0)&&!(game==='swamp'&&data.recovery.swampBonus?.remaining>0)&&!(game==='vault_heist'&&VAULT_HEIST_MODEL.active(data.recovery.heistRound))){toast('Новые ставки приостановлены администратором');return false;}
+      if(window.VaultAccess?.isBlocked&&!data.recovery.openRounds[game]&&!(game==='slot'&&state.bonus&&state.freeSpins>0)&&!(game==='swamp'&&data.recovery.swampBonus?.remaining>0)&&!(game==='vault_heist'&&VAULT_HEIST_MODEL.active(data.recovery.heistRound))&&!(game==='magnet'&&MAGNET_MODEL.active(data.recovery.magnetRound))){toast('Новые ставки приостановлены администратором');return false;}
+      if(game==='magnet'&&!magnetSupport)return false;
       if(game==='vault_heist'&&!heistSupport)return false;
       if(game==='mines'&&!minesSupport)return false;
       if(game==='swamp'&&!swampSupport)return false;
@@ -192,7 +224,7 @@
       delete data.recovery.openRounds[gameId];VaultStatsService.recordRound(round);VaultStorage.saveLocalState();return true;
     },
     get:game=>copy(data.recovery.openRounds[game]||null),
-    anyActive:({ignoreMines=false}={})=>!locked&&(VaultHeist.isBusy||VaultSwamp.isBusy||state.busy||birdState.active||(pokerState.phase!=='idle'&&!pokerState.resolved)||state.bonusAutoRunning||Object.keys(data.recovery.openRounds).some(game=>!ignoreMines||game!=='mines')),
+    anyActive:({ignoreMines=false}={})=>!locked&&(VaultMagnet.isBusy||VaultHeist.isBusy||VaultSwamp.isBusy||state.busy||birdState.active||(pokerState.phase!=='idle'&&!pokerState.resolved)||state.bonusAutoRunning||Object.keys(data.recovery.openRounds).some(game=>!ignoreMines||game!=='mines')),
   };
   const VaultRecovery=window.VaultRecovery={
     checkpointMines({save=true,remote=true}={}){const checkpoint=MINES_MODEL.validate(VaultMines.getCheckpoint());data.recovery.minesRound=checkpoint;const r=data.recovery.openRounds.mines;if(r&&checkpoint?.roundId===r.roundId)r.metadata.mines=copy(checkpoint);if(remote&&r&&checkpoint?.status==='PLAYING'&&owner!=='guest')enqueue('mines',{p_round_id:r.roundId,p_checkpoint:checkpoint});if(save)VaultStorage.saveLocalState();},
@@ -220,14 +252,15 @@
       clearTimeout(autoState.timer);clearTimeout(bonusAutoTimer);bonusAutoTimer=null;
       pokerState.deck=[];pokerState.discard=[];pokerState.player=[];pokerState.dealer=[];pokerState.community=[];pokerState.choice=[];pokerState.phase='idle';pokerState.resolved=false;pokerState.winner='';pokerState.result='';pokerState.playerEval=null;pokerState.dealerEval=null;pokerState.peekUntil=0;pokerState.dealerHiddenRevealed=false;pokerState.tacticalUsed=false;pokerState.spent=0;
       resetBirdRecovery();VaultTables.reset();VaultSwamp.restore(data.recovery.swampBonus);VaultHeist.restore(data.recovery.heistRound);
+      VaultMagnet.restore(data.recovery.magnetRound);
       const b=validBonus(data.recovery.slotBonus);
       state.bonus=!!b&&b.freeSpins>0;state.bonusType=b?.type||'normal';state.slotProfile=state.bonus?b.type:'base';state.size=state.bonus?b.size:5;state.freeSpins=state.bonus?b.freeSpins:0;state.bonusLevel=state.bonus?b.level:0;state.scatterProgress=state.bonus?b.progress:0;state.bonusSpinsPlayed=state.bonus?b.spins:0;state.bonusTotalWin=state.bonus?b.totalWin:0;state.bonusCascades=state.bonus?b.cascades:0;state.bonusPurchaseCost=state.bonus?b.purchaseCost:0;state.sticky=new Map(state.bonus?b.sticky.map(([k,v])=>[k.replace(',',':'),v]):[]);state.grid=blankGrid(state.size);state.cascade=0;state.lastWin=0;state.pendingBonusPurchaseCost=0;
       document.body.classList.toggle('bonus',state.bonus);fillGrid();render();
     },
     cancelInterrupted(game){const r=data.recovery.openRounds[game];if(r)VaultRoundService.finish(game,'interrupted','cancelled',{recovery:'safe-reset-no-refund'});},
   };
-  function restorePreferences(){Object.assign(state,data.settings);state.betIndex=data.bets.slot;pokerState.betIndex=data.bets.poker;birdState.betIndex=data.bets.bird;VaultTables.restore(data.bets);VaultSwamp.betIndex=data.bets.swamp;VaultMines.restorePreferences(data.bets);VaultHeist.betIndex=data.bets.vault_heist;settingsFingerprint=JSON.stringify({settings:data.settings,bets:data.bets,lastGame:data.lastGame});}
-  function showSavedScreen(){if(VaultSession.mode!=='authenticated'){openLobby();return;}const open={lobby:openLobby,slot:openSlotGame,poker:openPokerGame,bird:openBirdGame,blackjack:()=>VaultTables.open('blackjack'),baccarat:()=>VaultTables.open('baccarat'),swamp:()=>VaultSwamp.open(),mines:()=>VaultMines.open(),vault_heist:()=>VaultHeist.open()};open[data.lastGame]();updateUI();updatePokerUI();updateBirdUI();drawBirdGame();updateSettingsUI();}
+  function restorePreferences(){Object.assign(state,data.settings);state.betIndex=data.bets.slot;pokerState.betIndex=data.bets.poker;birdState.betIndex=data.bets.bird;VaultTables.restore(data.bets);VaultSwamp.betIndex=data.bets.swamp;VaultMines.restorePreferences(data.bets);VaultHeist.betIndex=data.bets.vault_heist;VaultMagnet.betIndex=data.bets.magnet;settingsFingerprint=JSON.stringify({settings:data.settings,bets:data.bets,lastGame:data.lastGame});}
+  function showSavedScreen(){if(VaultSession.mode!=='authenticated'){openLobby();return;}const open={lobby:openLobby,slot:openSlotGame,poker:openPokerGame,bird:openBirdGame,blackjack:()=>VaultTables.open('blackjack'),baccarat:()=>VaultTables.open('baccarat'),swamp:()=>VaultSwamp.open(),mines:()=>VaultMines.open(),vault_heist:()=>VaultHeist.open(),magnet:()=>VaultMagnet.open()};open[data.lastGame]();updateUI();updatePokerUI();updateBirdUI();drawBirdGame();updateSettingsUI();}
   function renderIdentity(){
     const signedIn=VaultSession.mode==='authenticated';byId('vaultProfileMenu').open=false;document.body.classList.toggle('vault-signed-out',!signedIn);
     document.querySelector('.lobby .lobby-balance').hidden=!signedIn;
@@ -277,8 +310,9 @@
   };
   function applyRemote(remote,{wallet=true}={}){
     VaultSession.profile=remote.profile;profileRemote=true;
-    if(wallet&&remote.rounds.some(r=>!['mines','vault_heist'].includes(r.game_id))){conflict=true;status('Восстанавливаем раздачу…');}
+    if(wallet&&remote.rounds.some(r=>!['mines','vault_heist','magnet'].includes(r.game_id))){conflict=true;status('Восстанавливаем раздачу…');}
     if(wallet){canonicalBalance=amount(remote.wallet.balance);data.balance=canonicalBalance;data.walletConfirmed=true;data.revision=Number(remote.wallet.revision)||0;clientRevision=data.revision;data.recovery.slotBonus=validBonus(remote.wallet.recovery?.slotBonus);data.recovery.swampBonus=SWAMP_MODEL.validateBonus(remote.wallet.recovery?.swampBonus);data.recovery.minesRound=MINES_MODEL.validate(remote.wallet.recovery?.minesRound);data.recovery.heistRound=VAULT_HEIST_MODEL.validate(remote.wallet.recovery?.heistRound);}
+    if(wallet)data.recovery.magnetRound=MAGNET_MODEL.validate(remote.wallet.recovery?.magnetRound);
     const s=remote.settings,ts=Date.parse(s.updated_at)||0;
     if(ts>=data.settingsUpdatedAt){data.settings={sound:s.sound_enabled,music:s.music_enabled,fastGame:s.fast_mode,fastBonus:s.fast_bonus,scatterBoost:s.scatter_boost};data.bets=validBets(s.selected_bets);data.lastGame=screens.includes(s.last_game_id)?s.last_game_id:'lobby';data.settingsUpdatedAt=ts;}
     if(wallet)data.stats=Object.fromEntries(remote.stats.map(s=>[s.game_id,s]));rememberSession();
@@ -301,18 +335,26 @@
         let wallet=results[0].data;const known=new Map([...(results[1].data||[]),...(results[2]?.data||[])].map(r=>[r.round_id,r]));
         // A previous-device/reload round without local business events is abandoned: no refund or new payout.
         for(const round of results[1].data||[]){
-          if(ids.includes(round.round_id)||['mines','vault_heist'].includes(round.game_id))continue;
+          if(ids.includes(round.round_id)||['mines','vault_heist','magnet'].includes(round.game_id))continue;
           const result=await client.rpc('record_game_round',{p_round_id:round.round_id,p_game_id:round.game_id,p_bet:round.bet,p_payout:0,p_multiplier:0,p_result:'automatic-recovery',p_metadata:{recovery:'safe-reset-no-refund'},p_status:'cancelled',p_recovery:wallet.recovery||{}});
           if(result.error)throw result.error;if(owner!==uid||identityEpoch!==epoch)return;
           wallet={...wallet,...result.data};
         }
         let balance=amount(wallet.balance),revision=Number(wallet.revision);if(balance===null||!Number.isSafeInteger(revision))throw Error('Invalid remote wallet');
         const rejected=new Set(),accepted=new Set([...known].filter(([,r])=>r.status==='started').map(([id])=>id));
-        const next=[];let heistCursor=VAULT_HEIST_MODEL.validate(wallet.recovery?.heistRound);let minesCursor=MINES_MODEL.validate(wallet.recovery?.minesRound);const mineRewinds=new Set();let swampCursor=SWAMP_MODEL.validateBonus(wallet.recovery?.swampBonus);const swampForks=new Set();
+        const next=[];let magnetCursor=MAGNET_MODEL.validate(wallet.recovery?.magnetRound);let heistCursor=VAULT_HEIST_MODEL.validate(wallet.recovery?.heistRound);let minesCursor=MINES_MODEL.validate(wallet.recovery?.minesRound);const mineRewinds=new Set();let swampCursor=SWAMP_MODEL.validateBonus(wallet.recovery?.swampBonus);const swampForks=new Set();
         for(const event of data.queue){
           if(event.userId!==uid)throw Error('Queue identity mismatch');
           if(event.type==='settings'){next.push(event);continue;}
           const payload=event.payload,id=payload.p_round_id,round=known.get(id);
+          if(event.type==='magnet'){
+            const candidate=MAGNET_MODEL.validate(payload.p_checkpoint);if(!candidate)continue;
+            if(round&&round.status!=='started')continue;
+            if(magnetCursor?.roundId===id&&magnetCursor.step>=candidate.step)continue;
+            if(payload.p_previous_step===-1){if(MAGNET_MODEL.active(magnetCursor)||candidate.bet>balance||window.VaultAccess?.isBlocked)continue;}
+            else if(magnetCursor?.roundId!==id||magnetCursor.step!==payload.p_previous_step)continue;
+            payload.p_expected_revision=revision;balance=amount(balance-(payload.p_previous_step===-1?candidate.bet:0)+(candidate.status==='SETTLED'?candidate.payout:0));revision++;magnetCursor=candidate;next.push(event);continue;
+          }
           if(event.type==='heist'){
             const candidate=VAULT_HEIST_MODEL.validate(payload.p_checkpoint);if(!candidate)continue;
             if(round&&round.status!=='started')continue;
@@ -352,8 +394,10 @@
         if(events.some(e=>e.payload?.p_game_id==='slot'&&rejected.has(e.payload.p_round_id))){data.recovery.slotBonus=validBonus(wallet.recovery?.slotBonus);suppress=true;VaultRecovery.restore();suppress=false;}
         data.recovery.swampBonus=swampCursor;VaultSwamp.restore(swampCursor);
         data.recovery.heistRound=heistCursor;VaultHeist.restore(heistCursor);data.recovery.minesRound=minesCursor;VaultRecovery.restoreMines();
-        data.queue=next;data.rounds=data.rounds.filter(r=>!rejected.has(r.roundId)&&!mineRewinds.has(r.roundId)&&!(r.gameId==='vault_heist'&&events.some(e=>e.type==='heist'&&e.payload.p_round_id===r.roundId)));canonicalBalance=balance;data.balance=balance;data.walletConfirmed=true;data.revision=Number(wallet.revision);clientRevision=revision;walletMutation++;conflict=false;
+        data.recovery.magnetRound=magnetCursor;VaultMagnet.restore(magnetCursor);
+        data.queue=next;data.rounds=data.rounds.filter(r=>!rejected.has(r.roundId)&&!mineRewinds.has(r.roundId)&&!(r.gameId==='vault_heist'&&events.some(e=>e.type==='heist'&&e.payload.p_round_id===r.roundId))&&!(r.gameId==='magnet'&&events.some(e=>e.type==='magnet'&&e.payload.p_round_id===r.roundId)));canonicalBalance=balance;data.balance=balance;data.walletConfirmed=true;data.revision=Number(wallet.revision);clientRevision=revision;walletMutation++;conflict=false;
         VaultStorage.saveLocalState({preferences:false});refreshBalanceUI();renderIdentity();status('Сохраняем прогресс…');scheduleSync();if(currentGame==='swamp')VaultSwamp.resume();if(currentGame==='vault_heist')VaultHeist.resume();
+        if(currentGame==='magnet')VaultMagnet.resume();
       }catch(e){console.error('VAULT automatic recovery failed',e);status('Соединение нестабильно — повторим автоматически');}
       finally{recovering=null;}
     })();return recovering;
@@ -376,6 +420,7 @@
             else if(event.type==='settle'){method='record_game_round';args=event.payload;}
             else if(event.type==='mines'){method='save_mines_checkpoint';args=event.payload;}
             else if(event.type==='heist'){method='apply_heist_checkpoint';args=event.payload;}
+            else if(event.type==='magnet'){method='apply_magnet_checkpoint';args=event.payload;}
             else{method='save_vault_settings';args={p_settings:event.payload.settings,p_updated_at:event.payload.updatedAt};}
             const {data:result,error}=await client.rpc(method,args);if(owner!==uid||identityEpoch!==epoch)return;
             if(error)throw error;
@@ -389,6 +434,7 @@
             canonicalBalance=amount(remote.wallet.balance);data.balance=canonicalBalance;data.revision=Number(remote.wallet.revision);clientRevision=data.revision;data.stats=Object.fromEntries(remote.stats.map(s=>[s.game_id,s]));VaultSession.profile=remote.profile;rememberSession();VaultStorage.saveLocalState({preferences:false});refreshBalanceUI();
           }
           status(storageAvailable?'Сохранено':'Сохранение недоступно');if(currentGame==='swamp'&&!VaultSwamp.isBusy)VaultSwamp.resume();
+          if(currentGame==='magnet'&&!VaultMagnet.isBusy)VaultMagnet.resume();
         }catch(e){
           console.error('VAULT sync failed',e);
           if(String(e.message||'').includes('VAULT_ACCOUNT_DISABLED')){window.VaultAccess?.markBlocked();conflict=true;setTimeout(recoverWallet,0);}

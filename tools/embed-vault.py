@@ -106,3 +106,23 @@ for name,text,tag in [('HEIST STYLES',(ROOT/'heist/presentation.css').read_text(
 art='data:image/webp;base64,'+base64.b64encode((ROOT/'assets/heist/lobby-card.webp').read_bytes()).decode()
 s=re.sub(r'(<img id="heistLobbyArt")([^>]*)(>)',lambda m:m[1]+re.sub(r' src="[^"]*"','',m[2])+' src="'+art+'"'+m[3],s)
 p.write_text(s)
+
+# MAGNET: independent 5x5 model, plan-driven presentation and owned wallet checkpoint.
+s=p.read_text()
+def magnet_assets(text):
+ return re.sub(r'__MAGNET_([^\s\x27"<>]+)__',lambda m:'data:image/webp;base64,'+base64.b64encode((ROOT/'assets/magnet'/m[1]).read_bytes()).decode(),text)
+for name,text,tag in [('MAGNET STYLES',(ROOT/'magnet/presentation.css').read_text(),'style'),('MAGNET SCREEN',(ROOT/'magnet/screen.html').read_text(),None),('MAGNET MODULE',magnet_assets('\n'.join((ROOT/'magnet'/f).read_text() for f in ['config.js','model.js','assets.js','game.js'])),'script')]:
+ block=f'<!-- BEGIN {name} -->\n'+(f'<{tag}>\n{text}\n</{tag}>' if tag else text)+f'\n<!-- END {name} -->'
+ pattern=rf'<!-- BEGIN {name} -->[\s\S]*?<!-- END {name} -->'
+ if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
+ elif tag=='style':s=s.replace('</head>',block+'\n</head>',1)
+ else:s=s.replace('<!-- BEGIN VAULT RUNTIME -->',block+'\n<!-- BEGIN VAULT RUNTIME -->',1)
+if 'id="openMagnetGame"' not in s:
+ card='<button class="game-card playable" id="openMagnetGame" data-category="slots" aria-label="Играть в MAGNET"><div class="art"><img id="magnetLobbyArt" alt="" loading="lazy"></div><span class="info"><strong>MAGNET</strong><small>Магнитное поле · Overdrive</small></span><span class="lobby-play" aria-hidden="true">PLAY</span></button>'
+ s=s.replace('<button class="game-card playable" id="openHeistGame"',card+'<button class="game-card playable" id="openHeistGame"',1)
+ if 'id="openMagnetGame"' not in s:raise RuntimeError('MAGNET lobby insertion point missing')
+if "id:'magnet',element:'openMagnetGame'" not in s:
+ s=s.replace("{id:'mines',element:'openMinesGame'","{id:'magnet',element:'openMagnetGame',category:'slots',isNew:true},{id:'mines',element:'openMinesGame'",1)
+art='data:image/webp;base64,'+base64.b64encode((ROOT/'assets/magnet/environment.webp').read_bytes()).decode()
+s=re.sub(r'(<img id="magnetLobbyArt")([^>]*)(>)',lambda m:m[1]+re.sub(r' src="[^"]*"','',m[2])+' src="'+art+'"'+m[3],s)
+p.write_text(s)
