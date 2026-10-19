@@ -42,7 +42,7 @@
     out.rounds=Array.isArray(x.rounds)?x.rounds.filter(validRound).slice(-C.maxLocalRounds):[];
     out.stats=x.stats&&typeof x.stats==='object'?x.stats:{};
     // Versioned, owner-bound queue; reject unknown RPCs and corrupt envelope data.
-    out.queue=Array.isArray(x.queue)?x.queue.filter(e=>e&&e.userId===id&&isId(e.id)&&['begin','settle','settings','mines','heist'].includes(e.type)&&e.payload&&typeof e.payload==='object').slice(0,C.maxPendingEvents):[];
+    out.queue=Array.isArray(x.queue)?x.queue.filter(e=>e&&e.userId===id&&isId(e.id)&&['begin','settle','settings','mines','heist'].includes(e.type)&&e.payload&&typeof e.payload==='object'&&(e.type!=='heist'||VAULT_HEIST_MODEL.validate(e.payload.p_checkpoint)&&e.payload.p_round_id===e.payload.p_checkpoint.roundId&&Number.isSafeInteger(e.payload.p_expected_revision)&&e.payload.p_expected_revision>=0&&Number.isInteger(e.payload.p_previous_step)&&e.payload.p_previous_step>=-1&&e.payload.p_previous_step<24&&e.payload.p_checkpoint.step===e.payload.p_previous_step+1)).slice(0,C.maxPendingEvents):[];
     return out;
   }
   function capturePreferences(){

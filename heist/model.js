@@ -66,7 +66,7 @@ const VAULT_HEIST_MODEL=(()=>{
  }
  // Validate by reproducing the entire business action prefix (at most 24 transitions).
  function validate(x){try{
-  if(!x||x.version!==1||typeof x.roundId!=='string'||!(/^[a-f0-9-]{36}$/i.test(x.roundId))||!Number.isInteger(x.seed)||x.seed<0||x.seed>4294967295||!Number.isFinite(x.bet)||x.bet<=0||x.bet>1e9||!Number.isInteger(x.step)||x.step<0||x.step>24||!Array.isArray(x.decisions))return null;
+  if(!x||x.version!==1||typeof x.roundId!=='string'||!(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x.roundId))||!Number.isInteger(x.seed)||x.seed<0||x.seed>4294967295||!Number.isFinite(x.bet)||x.bet<=0||x.bet>1e9||!Number.isInteger(x.step)||x.step<0||x.step>24||!Array.isArray(x.decisions))return null;
   let r=start(x);while(r.step<x.step&&active(r)){const a=r.status==='STAGE'?'spin':x.decisions.find(d=>d.stage===r.stage)?.action;if(!a)return null;r=advance(r,a);}
   const stable=v=>v&&typeof v==='object'?Array.isArray(v)?v.map(stable):Object.fromEntries(Object.keys(v).sort().map(k=>[k,stable(v[k])])):v;return JSON.stringify(stable(r))===JSON.stringify(stable(x))?r:null;
  }catch{return null;}}

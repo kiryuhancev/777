@@ -4845,7 +4845,7 @@ const VAULT_HEIST_MODEL=(()=>{
  }
  // Validate by reproducing the entire business action prefix (at most 24 transitions).
  function validate(x){try{
-  if(!x||x.version!==1||typeof x.roundId!=='string'||!(/^[a-f0-9-]{36}$/i.test(x.roundId))||!Number.isInteger(x.seed)||x.seed<0||x.seed>4294967295||!Number.isFinite(x.bet)||x.bet<=0||x.bet>1e9||!Number.isInteger(x.step)||x.step<0||x.step>24||!Array.isArray(x.decisions))return null;
+  if(!x||x.version!==1||typeof x.roundId!=='string'||!(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x.roundId))||!Number.isInteger(x.seed)||x.seed<0||x.seed>4294967295||!Number.isFinite(x.bet)||x.bet<=0||x.bet>1e9||!Number.isInteger(x.step)||x.step<0||x.step>24||!Array.isArray(x.decisions))return null;
   let r=start(x);while(r.step<x.step&&active(r)){const a=r.status==='STAGE'?'spin':x.decisions.find(d=>d.stage===r.stage)?.action;if(!a)return null;r=advance(r,a);}
   const stable=v=>v&&typeof v==='object'?Array.isArray(v)?v.map(stable):Object.fromEntries(Object.keys(v).sort().map(k=>[k,stable(v[k])])):v;return JSON.stringify(stable(r))===JSON.stringify(stable(x))?r:null;
  }catch{return null;}}
@@ -4978,7 +4978,7 @@ const VaultHeist=window.VaultHeist=(()=>{
     out.rounds=Array.isArray(x.rounds)?x.rounds.filter(validRound).slice(-C.maxLocalRounds):[];
     out.stats=x.stats&&typeof x.stats==='object'?x.stats:{};
     // Versioned, owner-bound queue; reject unknown RPCs and corrupt envelope data.
-    out.queue=Array.isArray(x.queue)?x.queue.filter(e=>e&&e.userId===id&&isId(e.id)&&['begin','settle','settings','mines','heist'].includes(e.type)&&e.payload&&typeof e.payload==='object').slice(0,C.maxPendingEvents):[];
+    out.queue=Array.isArray(x.queue)?x.queue.filter(e=>e&&e.userId===id&&isId(e.id)&&['begin','settle','settings','mines','heist'].includes(e.type)&&e.payload&&typeof e.payload==='object'&&(e.type!=='heist'||VAULT_HEIST_MODEL.validate(e.payload.p_checkpoint)&&e.payload.p_round_id===e.payload.p_checkpoint.roundId&&Number.isSafeInteger(e.payload.p_expected_revision)&&e.payload.p_expected_revision>=0&&Number.isInteger(e.payload.p_previous_step)&&e.payload.p_previous_step>=-1&&e.payload.p_previous_step<24&&e.payload.p_checkpoint.step===e.payload.p_previous_step+1)).slice(0,C.maxPendingEvents):[];
     return out;
   }
   function capturePreferences(){
