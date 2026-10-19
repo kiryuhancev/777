@@ -1,4 +1,4 @@
-> Текущее обновление панели, покупок и Scatter Boost: [SLOT_FEATURES.md](SLOT_FEATURES.md). Новые функции требуют полного `supabase_slot_features.txt`; описанные ниже старые отчёты относятся к обычным режимам.
+> Текущий визуальный экран: [HEIST_SCENE.md](HEIST_SCENE.md), обновление БД для него не нужно. Панель, покупки и Scatter Boost: [SLOT_FEATURES.md](SLOT_FEATURES.md). Новые игровые функции требуют полного `supabase_slot_features.txt`; описанные ниже старые отчёты относятся к обычным режимам.
 
 # VAULT HEIST
 

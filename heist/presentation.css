@@ -1,41 +1,269 @@
-/* All presentation scoped to the new game. */
+/* VAULT HEIST: real HTML instruments over an independent vault environment. */
 body.heist-active .app,body.heist-active #slotApp,body.heist-active #pokerApp,body.heist-active #birdApp,body.heist-active .vault-table{display:none!important}
-#heistApp[hidden]{display:none!important}#heistApp{color:#e8edf0;padding:20px 16px 30px;font-family:Arial,sans-serif;--gold:#dfaf45;--cyan:#31d7e8;--red:#d42f35;font-variant-numeric:tabular-nums}
-#heistApp *{box-sizing:border-box}#heistApp button,#heistApp select{font:700 12px Arial,sans-serif;letter-spacing:.07em;color:#e4e9ed;background:#111923;border:1px solid #50565b;border-radius:7px;padding:13px 18px;cursor:pointer}#heistApp button:hover:enabled{border-color:#dfaf45;background:#26313a}#heistApp :focus-visible{outline:2px solid #31d7e8;outline-offset:4px}#heistApp button:disabled{opacity:.4;cursor:default}#heistApp small{display:block;font-size:10px;letter-spacing:.14em;color:#b9c1c8}#heistApp [hidden]{display:none!important}
-#heistApp .heist-scene{max-width:1450px;margin:auto;border:1px solid #39434a;border-radius:20px;background-color:#090d12;background-size:cover;background-position:center;position:relative;isolation:isolate;padding:18px max(24px,calc((100% - 840px)/2)) 22px;overflow:hidden;transition:background-position .8s,box-shadow .8s}
-#heistApp .heist-scene:before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(110deg,#31d7e805,transparent 55%,rgba(212,47,53,calc(var(--alarm)*.25)));box-shadow:inset 0 0 150px #0008}
-#heistApp[data-stage='3'] .heist-scene,#heistApp[data-stage='4'] .heist-scene,#heistApp[data-stage='5'] .heist-scene{background-position:65% center;box-shadow:inset 0 -150px 180px #dfaf4515}
-#heistApp .heist-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px}#heistApp h1{font-family:Impact,'Arial Narrow',sans-serif;font-weight:900;letter-spacing:.06em;font-size:30px;margin:5px 0;color:#b9c1c8;text-shadow:0 2px 2px #000}#heistApp h1 em{font-style:normal;color:#dfaf45}#heistApp .heist-heading button{font-size:10px;background:#090d12b8}
-#heistApp .heist-progress{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:12px}#heistApp .heist-progress>div{display:flex;gap:7px;align-items:center;background:linear-gradient(140deg,#26313a,#101820);border:1px solid #48555f;border-radius:4px;padding:10px 7px;min-width:0}#heistApp .heist-progress span{font-size:9px;letter-spacing:.04em;font-weight:bold}#heistApp .heist-progress b{font-size:18px;color:#dfaf45}#heistApp .heist-progress .locked{opacity:.43}#heistApp .heist-progress .current{border-color:#dfaf45;box-shadow:inset 0 0 16px #31d7e822}#heistApp .heist-progress .completed{border-color:#31d7e8}#heistApp .heist-progress.compact>div{padding:5px 7px}#heistApp .heist-progress.compact b{font-size:12px}
-#heistApp .heist-hud{display:flex;justify-content:space-between;background:#090d12d9;border:1px solid #3b444c;border-bottom:0;padding:8px 14px;gap:16px;border-radius:9px 9px 0 0}#heistApp .heist-hud strong{font-size:14px;display:block;margin-top:4px}#heistApp .heist-security{text-align:right;min-width:150px}#heistApp #heistRisk{color:#ff6267}#heistApp #heistRiskMeter{display:flex;gap:3px;margin-top:6px}#heistApp #heistRiskMeter i{height:4px;flex:1;background:#38414a}#heistApp #heistRiskMeter i.on{background:#d42f35;box-shadow:0 0 8px #d42f3544}
-#heistApp .heist-frame{position:relative;background:linear-gradient(125deg,#66747e,#131b22 5%,#333f48 95%,#a2aeb6);padding:10px;border:1px solid #86959c;box-shadow:0 16px 38px #000b,inset 0 0 0 4px #111923;border-radius:5px}
-#heistApp .heist-reels{display:grid;grid-template-columns:repeat(5,1fr);aspect-ratio:5/2.6;border:1px solid #167d9b;background:#060b10;box-shadow:0 0 14px #31d7e818}
-#heistApp .heist-reel{display:grid;grid-template-rows:repeat(4,minmax(0,1fr));min-width:0;overflow:hidden}#heistApp .heist-cell{position:relative;background:radial-gradient(ellipse at 50% 85%,#22303b,#0b1118 75%);border-right:1px solid #4e5c6625;border-bottom:1px solid #4e5c6625;min-height:0;display:grid;place-items:center}#heistApp .heist-cell img{width:82%;height:90%;object-fit:contain;min-height:0;filter:drop-shadow(0 5px 4px #0007)}#heistApp .heist-cell small{position:absolute;bottom:4px;color:#ffd978;font-weight:bold;font-size:9px;letter-spacing:.1em;text-shadow:0 1px 4px #000}#heistApp .heist-cell.scanned:after{content:'';position:absolute;inset:5px;border:1px solid #31d7e8;clip-path:polygon(0 0,20% 0,20% 2%,2% 2%,2% 20%,0 20%,0 0,100% 0,100% 20%,98% 20%,98% 2%,80% 2%,80% 0,100% 0,100% 100%,80% 100%,80% 98%,98% 98%,98% 80%,100% 80%,100% 100%,0 100%,0 80%,2% 80%,2% 98%,20% 98%,20% 100%,0 100%)}#heistApp .heist-cell.winning{box-shadow:inset 0 0 20px #dfaf4525;border-color:#dfaf4544}#heistApp .heist-reel.rolling img{animation:heist-roll .16s linear infinite;opacity:.6}#heistApp .heist-notice{position:absolute;inset:0;background:#090d12dd;display:grid;place-items:center;text-align:center;padding:25px;font:700 28px Impact,Arial;color:#dfaf45;z-index:3;letter-spacing:.06em}#heistApp .heist-notice[data-kind='alarm']{color:#ff6267;box-shadow:inset 0 0 80px #d42f3555}#heistApp .heist-notice[data-kind='access']{color:#31d7e8}
-#heistApp .heist-results{display:grid;grid-template-columns:1fr 2fr 1fr;align-items:center;gap:10px;background:#090d12dd;border:1px solid #48555f;border-radius:7px;padding:9px 14px;margin-top:12px}#heistApp .heist-results strong{display:block;margin-top:6px;color:#ffd978;font-size:22px}#heistApp .heist-results>div:last-child{text-align:right}#heistApp #heistMessage{text-align:center;font-size:12px;color:#b9c1c8;margin:0;line-height:1.5}
-#heistApp .heist-controls{display:flex;gap:10px;align-items:center;justify-content:center;background:#0a1016ee;border:1px solid #4b565c;border-radius:12px;margin-top:12px;padding:8px}#heistApp .heist-bet{display:flex;align-items:center;border:1px solid #51595e;border-radius:7px;min-width:160px;justify-content:space-between}#heistApp .heist-bet button{border:0;background:transparent;font-size:20px;padding:12px}#heistApp .heist-bet strong{display:block;text-align:center}#heistApp .heist-bet small{text-align:center;font-size:9px}#heistApp #heistSpin{border-radius:50%;width:70px;height:70px;flex-shrink:0;padding:5px;border:4px solid #a37a30;background:radial-gradient(circle,#27313a,#090d12);outline:1px solid #4b565c;box-shadow:0 0 18px #dfaf4522,inset 0 0 0 2px #ffd97866;color:#ffd978;font-size:14px}#heistApp #heistFast[aria-pressed='true']{color:#31d7e8;border-color:#167d9b}
-#heistApp .heist-choice{position:absolute;inset:0;z-index:4;background:linear-gradient(120deg,#131b22fa,#090d12f5);padding:6% 6% 5%;display:flex;flex-direction:column;justify-content:center;text-align:center;animation:heist-panel .25s ease-out;border:1px solid #76838c}#heistApp .heist-choice h2{color:#dfaf45;font:900 32px Impact,Arial;margin:8px 0}#heistApp .heist-choice>p{font-size:11px;letter-spacing:.05em;color:#b9c1c8;margin:4px 0 16px}#heistApp .heist-choice-split{display:grid;grid-template-columns:1fr 1fr;margin:0 0 22px}#heistApp .heist-choice-split strong{font:700 40px Arial;display:block;margin:8px 0}#heistApp .heist-loot{color:#ffd978;border-right:1px solid #5b636a}#heistApp .heist-choice-risk{color:#ff6267;display:flex;flex-direction:column;justify-content:center;padding:10px}#heistApp .heist-choice-risk p{font-size:10px;color:#e3b9bb;line-height:1.7;margin:0}#heistApp #heistLootPile{height:60px;display:flex;justify-content:center}#heistApp #heistLootPile img{width:52px;height:60px;object-fit:contain;margin-left:-12px}#heistApp .heist-choice-actions{display:grid;grid-template-columns:1fr 1fr;gap:14px}#heistApp .heist-choice-actions button{padding:18px 8px;font-size:16px}#heistApp .heist-choice-actions small{font-size:9px;margin-top:8px}#heistApp #heistCollect{background:linear-gradient(#f2d08b,#c29648);color:#17140e;border-color:#ffe7ac}#heistApp #heistCollect small{color:#473a20}#heistApp #heistDeeper{background:linear-gradient(#38181c,#180e13);border-color:#d42f35;color:#ffe7e7}
-#heistApp dialog{color:#e8edf0;background:#111923;border:1px solid #687985;border-radius:12px;padding:22px;max-width:760px;width:90vw;max-height:86vh;overflow:auto}#heistApp dialog::backdrop{background:#000b}#heistApp dialog p{font-size:13px;line-height:1.7}#heistApp #heistPaytable>div{display:grid;grid-template-columns:2fr repeat(3,1fr);align-items:center;gap:8px;padding:7px;border-bottom:1px solid #39444b;font-size:12px}#heistApp #heistPaytable span{display:flex;align-items:center;gap:10px}#heistApp #heistPaytable img{width:35px;height:35px;object-fit:contain}
-@keyframes heist-roll{from{transform:translateY(-18%)}to{transform:translateY(18%)}}@keyframes heist-panel{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-@media(max-width:700px){#heistApp{padding:12px 6px}#heistApp .heist-scene{padding:18px 10px 20px;border-radius:13px}#heistApp h1{font-size:27px}#heistApp .heist-heading button{padding:10px;font-size:8px}#heistApp .heist-progress{grid-template-columns:repeat(3,1fr);gap:4px}#heistApp .heist-progress>div{padding:6px}#heistApp .heist-progress span{font-size:8px}#heistApp .heist-progress b{font-size:13px}#heistApp .heist-hud{padding:10px;gap:8px}#heistApp .heist-hud small{font-size:8px}#heistApp .heist-hud strong{font-size:11px}#heistApp .heist-security{min-width:110px}#heistApp .heist-frame{padding:6px}#heistApp .heist-reels{aspect-ratio:5/4.3}#heistApp .heist-cell small{font-size:6px;bottom:2px}#heistApp .heist-controls{display:grid;grid-template-columns:42px 1fr 60px;gap:7px;padding:9px}#heistApp .heist-controls button,#heistApp .heist-controls select{padding:12px 5px;min-width:0;font-size:10px}#heistApp .heist-bet{min-width:0}#heistApp #heistSpin{grid-column:2;grid-row:2;justify-self:center;width:76px;height:76px}#heistApp #heistAuto{grid-column:1;grid-row:2;width:70px}#heistApp #heistFast{grid-column:3;grid-row:2}#heistApp .heist-results{grid-template-columns:1fr 1fr;padding:12px}#heistApp .heist-results strong{font-size:18px}#heistApp #heistMessage{grid-column:1/-1;grid-row:2;font-size:10px}#heistApp .heist-results small{font-size:8px}#heistApp .heist-choice{position:relative;min-height:380px;margin:-1px;padding:20px 12px}#heistApp .heist-frame:has(.heist-choice:not([hidden])) .heist-reels{display:none}#heistApp .heist-choice h2{font-size:27px}#heistApp .heist-choice-split strong{font-size:28px}#heistApp .heist-choice-actions{grid-template-columns:1fr;gap:9px}#heistApp .heist-choice-actions button{padding:13px;font-size:14px}#heistApp #heistLootPile img{width:35px}#heistApp .heist-choice>p{font-size:10px}}
-@media(prefers-reduced-motion:reduce){#heistApp *,#heistApp *:before,#heistApp *:after{animation:none!important;transition:none!important}}
-#heistApp[data-stage='0'] .heist-scene{background-position:40% center}
-#heistApp[data-stage='1'] .heist-scene{background-position:46% center;box-shadow:inset 0 0 100px #167d9b18}
-#heistApp[data-stage='2'] .heist-scene{background-position:53% center;box-shadow:inset -70px 0 100px #d42f3510}
-#heistApp[data-stage='3'] .heist-scene{background-position:60% center;box-shadow:inset 0 -90px 150px #dfaf4520}
-#heistApp[data-stage='4'] .heist-scene{background-position:70% center;box-shadow:inset 0 -90px 130px #31d7e81a}
-#heistApp[data-stage='5'] .heist-scene{background-position:80% center;box-shadow:inset 0 -140px 160px #dfaf4533}
-/* Readable reel motion and a bounded, explicit win presentation. */
-#heistApp .heist-reel.rolling{display:block;overflow:hidden}#heistApp .heist-strip{height:300%;display:grid;grid-template-rows:repeat(12,minmax(0,1fr));animation:heist-strip-scroll .78s linear infinite;will-change:transform}#heistApp .heist-reel.rolling img{animation:none;opacity:.82}#heistApp .heist-reel:not(.rolling) .heist-cell{animation:heist-reel-stop .22s ease-out}
-#heistApp .heist-frame.has-wins .heist-cell:not(.winning){opacity:.36;transition:opacity .18s}#heistApp .heist-cell.winning{border:2px solid #dfaf45;box-shadow:inset 0 0 24px #dfaf4550,0 0 8px #dfaf4530;background:radial-gradient(ellipse,#5c4825,#101923 80%)}#heistApp .heist-cell.win-current{border-color:#ffe7a4;box-shadow:inset 0 0 30px #ffd97880,0 0 14px #dfaf4570}#heistApp .paying .heist-cell.win-current img{animation:heist-win-pulse .8s ease-in-out 2}
-#heistApp .heist-win-banner{position:absolute;z-index:2;left:14%;right:14%;bottom:16px;padding:13px 18px;text-align:center;background:linear-gradient(110deg,#35250bf5,#111923f5);border:1px solid #dfaf45;border-radius:9px;box-shadow:0 5px 25px #000b;pointer-events:none}#heistApp .heist-win-banner strong{display:block;font-size:27px;color:#ffe4a2;letter-spacing:.03em}#heistApp .heist-win-banner small{color:#e9d39e;margin-top:5px;font-size:10px}
-#heistApp .heist-controls{gap:10px;padding:10px}#heistApp .heist-controls>button,#heistApp .heist-auto-wrap>button{height:50px;border-radius:12px;white-space:nowrap}#heistApp #heistSpin{border-radius:12px;width:130px;height:50px;min-height:50px;border:2px solid #d0a354;outline:none;background:linear-gradient(#ffe8b1,#d9b371);color:#17130c;box-shadow:0 0 0 3px #dfaf4522;font-size:16px}#heistApp #heistBuy{background:linear-gradient(#f9cb70,#c28a38);color:#17130c;border-color:#edc278;min-width:100px}#heistApp #heistAuto[aria-pressed='true']{border-color:#dfaf45;color:#ffe7a4;background:#4a3519}#heistApp .heist-auto-wrap{position:relative}#heistApp #heistAutoMenu{position:absolute;bottom:calc(100% + 14px);left:50%;transform:translateX(-50%);width:250px;padding:16px;z-index:10;border:1px solid #dfaf45;border-radius:12px;background:#111923;box-shadow:0 12px 25px #0009}#heistApp #heistAutoMenu>div{display:flex;gap:6px;margin-top:12px}#heistApp #heistAutoMenu button{padding:11px 8px;flex:1}#heistApp .heist-spin-cost{font-size:11px;text-align:center;color:#dbc899;margin:12px 0 0}
-#heistApp .heist-shop-bet{display:flex;justify-content:center;gap:22px;align-items:center;margin:20px 0;text-align:center}#heistApp .heist-shop-bet strong{display:block;font-size:22px;margin-top:5px}#heistApp .heist-boost{width:100%;display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:10px;padding:18px;background:#14222a;border-color:#4b7b82}#heistApp .heist-boost small{letter-spacing:.03em;line-height:1.6}#heistApp .heist-boost[aria-pressed='true']{border-color:#dfaf45;background:#382b16}#heistApp #heistShopOffers{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}#heistApp #heistShopOffers article{padding:20px 16px;border:1px solid #5e6060;border-radius:12px;background:#0b1219}#heistApp #heistShopOffers h3{color:#dfaf45;margin:0 0 14px}#heistApp #heistShopOffers strong{color:#ffe7a4}#heistApp #heistShopOffers p{font-size:10px}#heistApp #heistShopOffers button{width:100%;margin-top:15px;background:#d9b371;color:#17130c}#heistApp #heistSettingsDialog button{margin:5px}#heistApp #heistSettingsDialog [aria-pressed='true']{border-color:#dfaf45;color:#ffe7a4}
-@keyframes heist-strip-scroll{from{transform:translateY(0)}to{transform:translateY(-33.333333%)}}@keyframes heist-reel-stop{from{transform:translateY(-7px)}to{transform:translateY(0)}}@keyframes heist-win-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.075)}}
-@media(max-width:700px){#heistApp .heist-controls{grid-template-columns:42px minmax(0,1fr) 64px;gap:8px}#heistApp .heist-controls>button{height:46px}#heistApp .heist-bet{grid-column:2;grid-row:1}#heistApp #heistMax{grid-column:3;grid-row:1}#heistApp .heist-auto-wrap{grid-column:1;grid-row:2}#heistApp .heist-auto-wrap>button{height:46px;padding:8px 4px;width:48px;font-size:9px}#heistApp #heistSpin{grid-column:2;grid-row:2;width:100%;height:46px;min-height:46px}#heistApp #heistBuy{grid-column:3;grid-row:2;min-width:0;padding:8px 4px}#heistApp #heistAutoMenu{left:0;transform:none;width:250px}#heistApp .heist-win-banner{left:5%;right:5%;bottom:10px;padding:9px}#heistApp .heist-win-banner strong{font-size:19px}#heistApp .heist-win-banner small{font-size:8px}#heistApp #heistShopOffers{grid-template-columns:1fr}#heistApp .heist-spin-cost{font-size:10px;line-height:1.5}}
-@media(prefers-reduced-motion:reduce){#heistApp .heist-strip{animation:none!important;transform:translateY(-33.333333%)}#heistApp .heist-cell{animation:none!important}#heistApp .heist-cell img{animation:none!important}}
-@media(max-width:700px){#heistApp .heist-controls{grid-template-columns:64px minmax(0,1fr) 64px}#heistApp #heistSettings{width:46px;justify-self:center}#heistApp #heistAuto{width:100%;height:46px;grid-column:auto;grid-row:auto}}
-body.heist-active .toast,body.swamp-active .toast{top:auto;bottom:18px;left:50%;right:auto;width:max-content;max-width:calc(100vw - 24px);height:auto;transform:translateX(-50%);text-align:center;font-size:12px;line-height:1.5}body.heist-active .toast.show,body.swamp-active .toast.show{transform:translateX(-50%)}
-#heistApp .heist-results{position:relative;min-height:64px}#heistApp .heist-win-banner{inset:0;display:flex;flex-direction:column;justify-content:center;margin:0;box-shadow:0 0 18px #dfaf4520}
-
-/* Approved originals: retain all pixels/proportions; scale their transparent canvas only. */
+#heistApp[hidden],#heistApp [hidden]{display:none!important}
+#heistApp{--gold:#d9b36a;--cyan:#38d8ee;--red:#ef3942;--reel-width:clamp(620px,calc((100svh - 485px)*1.55),890px);color:#e9e7de;padding:0 10px 24px;font:14px Arial,sans-serif;font-variant-numeric:tabular-nums}
+#heistApp *{box-sizing:border-box}
+#heistApp button{font:700 12px Arial,sans-serif;letter-spacing:.06em;color:#e9e7de;cursor:pointer;border:1px solid #758087;border-radius:5px;padding:12px 16px;background:linear-gradient(150deg,#303a3f,#10171b 22%,#090e12 75%,#263037);box-shadow:inset 0 0 0 2px #080d11,inset 0 0 0 3px #69747b45,0 3px 6px #0008}
+#heistApp button:hover:enabled{border-color:#e5bc73;color:#ffe8b7;box-shadow:inset 0 0 0 2px #080d11,0 0 14px #d9b36a30}
+#heistApp button:disabled{opacity:.42;cursor:default}
+#heistApp :focus-visible{outline:2px solid #54e6f4;outline-offset:4px}
+#heistApp small{display:block;font-size:9px;letter-spacing:.12em;color:#b9c3c5}
+#heistApp .heist-scene{max-width:1800px;min-height:760px;margin:auto;padding:20px 22px 18px;position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:center;background-color:#04090d;background-size:cover;background-position:center;border:1px solid #455058;border-radius:6px;box-shadow:inset 0 0 90px #0006,0 12px 50px #0006;overflow:hidden;transition:background-position 1.1s,box-shadow 1s}
+#heistApp .heist-scene:before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,#03070c88,transparent 22%,#02050915 75%,#02050877),linear-gradient(90deg,#0001,transparent 29% 71%,#0001);box-shadow:inset 0 0 70px #0005}
+#heistApp .heist-topbar{display:grid;grid-template-columns:minmax(250px,1.05fr) minmax(420px,1.8fr) minmax(165px,.58fr);align-items:center;gap:22px;width:100%;padding:0 4px 14px;margin-bottom:8px;border-bottom:1px solid #a4874b66;background:linear-gradient(90deg,#03080c99,transparent 60%,#05090d88)}
+#heistApp .heist-heading{min-width:0;align-self:center}
+#heistApp h1{margin:0;white-space:nowrap;font-family:Georgia,'Times New Roman',serif;font-size:clamp(36px,3.7vw,68px);font-weight:900;letter-spacing:-.07em;line-height:1.16;filter:drop-shadow(0 4px 2px #000);transform:scaleY(1.12);transform-origin:left center}
+#heistApp .heist-title-vault,#heistApp .heist-title-gold{-webkit-background-clip:text;background-clip:text;color:transparent;font-style:normal;-webkit-text-stroke:.5px #c4c7c3;background-image:linear-gradient(110deg,#e4e8e4 1%,#65737a 15%,#f6f7ed 31%,#65747b 48%,#d9dfd7 62%,#a2aeb0 76%,#edf0e6 91%)}
+#heistApp .heist-title-gold{background-image:linear-gradient(110deg,#b17c2a,#fff0bd 18%,#d29530 35%,#f4d38e 51%,#ad711d 68%,#ffedb4 85%,#d6a647);-webkit-text-stroke:.5px #e3bd72}
+#heistApp .heist-tagline{font-size:8px;letter-spacing:.23em;color:#c0cbcd;margin:12px 0 0 2px;white-space:nowrap}
+#heistApp .heist-progress{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;min-width:0;align-items:center;padding-top:12px}
+#heistApp .heist-stage-node{position:relative;min-width:0;display:grid;grid-template-rows:49px 15px;justify-items:center;align-items:center;padding:7px 3px 5px;background:linear-gradient(150deg,#3b4c54,#0a141c 16%,#050c12 80%,#53606a);border:1px solid #6a777c;border-radius:7px 7px 3px 3px;box-shadow:inset 0 0 0 2px #04090f,0 4px 8px #0008}
+#heistApp .heist-stage-node:not(:last-child):after{content:'›';position:absolute;right:-10px;top:26px;z-index:1;color:#b29758;font-size:19px;text-shadow:0 0 5px #d9b36a77}
+#heistApp .heist-stage-number{position:absolute;top:-17px;left:9px;font-size:12px;font-weight:700;background:#071219;border:1px solid #667a85;border-radius:3px;padding:1px 4px;color:#d9e9e9;line-height:16px}
+#heistApp .heist-stage-art{width:100%;height:46px;display:grid;place-items:center;min-width:0}
+#heistApp .heist-stage-art img{width:68%;height:80%;object-fit:contain}
+#heistApp .heist-stage-name{font-size:7px;letter-spacing:.015em;font-weight:bold;white-space:nowrap;max-width:100%;text-align:center}
+#heistApp .heist-stage-lock{width:12px;height:15px;position:absolute;bottom:18px;right:3px;color:#b8c8cb;filter:drop-shadow(0 2px 3px #000)}
+#heistApp .heist-stage-node.locked{opacity:.56}
+#heistApp .heist-stage-node.current,#heistApp .heist-stage-node.completed{border-color:#4febf4;background:linear-gradient(150deg,#547581,#09222b 25%,#061116);box-shadow:inset 0 0 12px #23d9ec35,0 0 13px #36deee50}
+#heistApp .heist-stage-node.preview{border-color:#b49965;opacity:.92}
+#heistApp .heist-stage-node.current .heist-stage-number,#heistApp .heist-stage-node.completed .heist-stage-number{border-color:#3cdaed;color:#bdfbff;box-shadow:0 0 8px #4ae6f566}
+#heistApp .heist-stage-node.current .heist-stage-lock,#heistApp .heist-stage-node.completed .heist-stage-lock,#heistApp .heist-stage-node.preview .heist-stage-lock{visibility:hidden}
+#heistApp .heist-security{width:100%;padding:10px 12px 8px;color:#ef3942;background:linear-gradient(135deg,#260c12dd,#09070bed);border:1px solid #9a2931;box-shadow:inset 0 0 0 3px #090b0e,inset 0 0 16px #ff283a22,0 0 16px #cf25331f;position:relative}
+#heistApp .heist-security>small{color:#ed5b61;font-size:9px;letter-spacing:.16em}
+#heistApp .heist-security-display{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:3px 0}
+#heistApp #heistRisk{font-size:26px;letter-spacing:.04em;line-height:1;font-family:'Courier New',monospace;color:#ff5961;text-shadow:0 0 12px #fa344166}
+#heistApp .heist-alarm-icon{width:25px;height:25px;color:#e33e48;filter:drop-shadow(0 0 6px #eb283c99)}
+#heistApp #heistRiskMeter{display:flex;gap:3px;height:9px;margin:6px 0;transform:skew(-16deg)}
+#heistApp #heistRiskMeter i{height:100%;flex:1;background:#42131c;border:1px solid #801f29}
+#heistApp #heistRiskMeter i.on{background:linear-gradient(#ff6d70,#d71f2f);border-color:#f6535b;box-shadow:0 0 8px #fa263f99}
+#heistApp .heist-risk-caption{display:flex;justify-content:space-between;gap:4px;font-size:7px;line-height:1.5;letter-spacing:.04em;margin:0;color:#d7656d}
+#heistApp[data-phase='base'] .heist-security{opacity:.8}
+#heistApp .heist-hud{width:min(var(--reel-width),67%);display:flex;justify-content:space-between;align-items:center;min-height:22px;padding:0 6px 5px;gap:10px}
+#heistApp .heist-hud small,#heistApp .heist-hud strong{font-size:8px;font-weight:600;letter-spacing:.1em;color:#c5d2d3;text-shadow:0 1px 4px #000}
+#heistApp .heist-frame{width:min(var(--reel-width),67%);position:relative;padding:25px 22px 23px;border:1px solid #9b9f91;border-radius:10px;background:var(--heist-frame-art,linear-gradient(135deg,#82929b,#121b22 5%,#343c41 25%,#090e13 51%,#5c6a71 92%,#929a91));background-size:100% 100%;box-shadow:0 18px 32px #000c,inset 0 0 0 3px #050a0e,inset 0 0 0 6px #8a78514d;isolation:isolate}
+#heistApp .heist-frame:before{content:'';position:absolute;inset:7px;border:1px solid #57d8e79c;box-shadow:inset 0 0 0 3px #04090b,0 0 9px #1ce0ed33;border-radius:7px;pointer-events:none;z-index:1}
+#heistApp .heist-frame-badge{position:absolute;left:29%;right:29%;top:1px;z-index:2;text-align:center;font-size:11px;line-height:21px;font-weight:800;letter-spacing:.11em;white-space:nowrap;color:#e0b870;text-shadow:0 1px 2px #000;background:linear-gradient(#323a3d,#080f14 48%,#172028);border:1px solid #8e774a;clip-path:polygon(7% 0,93% 0,100% 100%,0 100%)}
+#heistApp .heist-frame-badge span{color:#dbbf85;padding:0 5px}
+#heistApp .heist-frame-bolt{position:absolute;width:8px;height:8px;z-index:2;background:radial-gradient(circle at 30% 25%,#a3b2b7,#505a60 40%,#070c11 60%);border:1px solid #9a865a;border-radius:50%;box-shadow:0 1px 3px #000}
+#heistApp .heist-frame-bolt.top-left{left:9px;top:9px}#heistApp .heist-frame-bolt.top-right{right:9px;top:9px}#heistApp .heist-frame-bolt.bottom-left{left:9px;bottom:9px}#heistApp .heist-frame-bolt.bottom-right{right:9px;bottom:9px}
+#heistApp .heist-reels{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));aspect-ratio:5/3.22;border:1px solid #c7a46b;background:#03070a;box-shadow:0 0 0 2px #060b0f,0 0 12px #14d7eb44}
+#heistApp .heist-reel{display:grid;grid-template-rows:repeat(4,minmax(0,1fr));min-width:0;overflow:hidden}
+#heistApp .heist-cell{position:relative;min-height:0;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 65%,#10191d,#03070a 84%);border-right:1px solid #ae8b535c;border-bottom:1px solid #ae8b535c;box-shadow:inset 0 0 12px #0005}
+#heistApp .heist-cell img{width:94%;height:96%;object-fit:contain;min-height:0}
 #heistApp img.heist-symbol{scale:var(--heist-symbol-scale,1);object-fit:contain;filter:none}
+#heistApp .heist-cell small{position:absolute;bottom:3px;left:0;right:0;text-align:center;color:#ffdc8e;font-size:10px;letter-spacing:.1em;font-weight:900;text-shadow:0 2px 3px #000,0 0 8px #c38c2399}
+#heistApp .heist-cell.scanned:after{content:'';position:absolute;inset:4px;border:1px solid #34e4f2;pointer-events:none;clip-path:polygon(0 0,24% 0,24% 2%,2% 2%,2% 24%,0 24%,0 0,100% 0,100% 24%,98% 24%,98% 2%,76% 2%,76% 0,100% 0,100% 100%,76% 100%,76% 98%,98% 98%,98% 76%,100% 76%,100% 100%,0 100%,0 76%,2% 76%,2% 98%,24% 98%,24% 100%,0 100%)}
+#heistApp .heist-reel.rolling{display:block}
+#heistApp .heist-strip{height:300%;display:grid;grid-template-rows:repeat(12,minmax(0,1fr));animation:heist-strip-scroll .78s linear infinite;will-change:transform}
+#heistApp .heist-reel.rolling img{opacity:.82}
+#heistApp .heist-reel:not(.rolling) .heist-cell{animation:heist-reel-stop .22s ease-out}
+#heistApp .heist-frame.has-wins .heist-cell:not(.winning){opacity:.36;transition:opacity .18s}
+#heistApp .heist-cell.winning{border:2px solid #e9bd64;box-shadow:inset 0 0 24px #dfaf4550,0 0 8px #dfaf4530;background:radial-gradient(ellipse,#5c4825,#0a1116 82%)}
+#heistApp .heist-cell.win-current{border-color:#ffe7a4;box-shadow:inset 0 0 30px #ffd97880,0 0 14px #dfaf4570}
+#heistApp .paying .heist-cell.win-current img{animation:heist-win-pulse .8s ease-in-out 2}
+#heistApp .heist-notice{position:absolute;inset:23px 21px;z-index:3;background:#040a10ed;display:grid;place-items:center;text-align:center;padding:25px;color:#e8bc6c;font-size:28px;font-weight:900;letter-spacing:.06em;box-shadow:inset 0 0 70px #aa772522}
+#heistApp .heist-notice[data-kind='alarm']{color:#ff6267;box-shadow:inset 0 0 80px #d42f3555}
+#heistApp .heist-notice[data-kind='access']{color:#67e7f0}
+#heistApp .heist-results{position:relative;display:grid;grid-template-columns:1fr 2fr 1fr;align-items:center;gap:10px;width:min(var(--reel-width),67%);min-height:47px;background:#050b10e8;border:1px solid #71644b;border-top:0;padding:7px 12px;margin:4px 0 0}
+#heistApp .heist-results strong{display:block;color:#f6d28c;font-size:17px;margin-top:2px}
+#heistApp .heist-results>div:last-child{text-align:right}
+#heistApp .heist-results small{font-size:7px;letter-spacing:.08em}
+#heistApp #heistMessage{font-size:9px;color:#c1caca;text-align:center;margin:0;line-height:1.4}
+#heistApp .heist-win-banner{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:center;text-align:center;padding:6px;background:linear-gradient(110deg,#36260efa,#071018fa);border:1px solid #efc368;pointer-events:none;box-shadow:0 0 14px #dcb36622}
+#heistApp .heist-win-banner strong{font-size:21px;letter-spacing:.02em}
+#heistApp .heist-win-banner small{font-size:9px;margin-top:3px;color:#f0d7a7}
+#heistApp .heist-controls{width:min(1060px,94%);display:grid;grid-template-columns:44px 44px minmax(150px,210px) 72px 112px 82px 102px;justify-content:center;gap:12px;align-items:center;position:relative;z-index:2;margin-top:20px;padding:11px 16px;min-height:85px;border:1px solid #93866a;border-radius:5px;background:linear-gradient(170deg,#5c6260 0,#172025 5%,#03080c 17%,#0a1014 84%,#5c6468 99%);box-shadow:inset 0 0 0 3px #080c0e,inset 0 0 0 5px #65635b70,0 10px 25px #000c}
+#heistApp .heist-controls>button,#heistApp .heist-auto-wrap>button{height:49px;min-width:0;white-space:nowrap;padding:10px 9px}
+#heistApp #heistSettings,#heistApp #heistHelpOpen{font-size:23px;color:#d5d3c8;padding:4px;border-radius:50%;height:43px;width:43px;background:radial-gradient(circle,#20282a,#050a0d 68%);border:1px solid #a29476}
+#heistApp #heistHelpOpen{font-family:Georgia,serif;font-style:italic}
+#heistApp .heist-bet{height:51px;min-width:0;display:grid;grid-template-columns:42px 1fr 42px;align-items:center;text-align:center;border:1px solid #7f8581;border-radius:7px;box-shadow:inset 0 0 0 2px #050a0e;background:#060c10}
+#heistApp .heist-bet button{height:45px;border:0;border-radius:0;background:transparent;box-shadow:none;font-size:25px;padding:3px}
+#heistApp .heist-bet strong{display:block;font-size:18px;margin-top:2px}
+#heistApp .heist-bet small{font-size:8px}
+#heistApp #heistSpin{position:relative;width:112px;height:112px;margin:-27px 0;border-radius:50%;border:5px solid #b68a3c;outline:2px solid #080b0d;background:radial-gradient(circle at 40% 25%,#f0d593,#b78735 30%,#694714 64%,#221807 94%);box-shadow:inset 0 0 0 3px #141411,inset 0 0 0 5px #eec66d,inset 0 0 18px #ffe8aa55,0 0 0 4px #42483f,0 0 0 7px #bca46d,0 0 0 10px #0b1012,0 9px 18px #000b;font-size:22px;letter-spacing:.015em;color:#fff3ca;text-shadow:0 2px 3px #4a300e}
+#heistApp #heistSpin:hover:enabled{border-color:#ffdc86;box-shadow:inset 0 0 0 3px #141411,inset 0 0 0 5px #f8d990,0 0 0 4px #42483f,0 0 0 7px #d3b67a,0 0 0 10px #0b1012,0 0 30px #efbd5d66}
+#heistApp #heistSpin:disabled{opacity:.68}
+#heistApp[data-phase='heist'] #heistSpin,#heistApp[data-phase='choice'] #heistSpin{font-size:15px}
+#heistApp #heistBuy{color:#f8db9e;border-color:#b49b66;background:linear-gradient(140deg,#493a1f,#17130c 45%,#302416)}
+#heistApp .heist-auto-wrap{position:relative;min-width:0}
+#heistApp .heist-auto-wrap>button{width:100%}
+#heistApp #heistAuto[aria-pressed='true']{border-color:#5ce9f3;color:#9af4fc;box-shadow:inset 0 0 18px #3dd7eb22}
+#heistApp #heistAutoMenu{position:absolute;bottom:calc(100% + 18px);right:0;width:250px;padding:16px;z-index:10;border:1px solid #d9b36a;border-radius:7px;background:#0b141c;box-shadow:0 12px 25px #000c}
+#heistApp #heistAutoMenu>div{display:flex;gap:6px;margin-top:12px}
+#heistApp #heistAutoMenu button{padding:11px 8px;flex:1}
+#heistApp .heist-spin-cost{font-size:9px;text-align:center;color:#c7b98c;margin:14px 0 0;line-height:1.5;text-shadow:0 2px 3px #000}
+#heistApp .heist-choice{position:absolute;inset:24px 21px;z-index:4;padding:6% 6% 5%;display:flex;flex-direction:column;justify-content:center;text-align:center;background:radial-gradient(ellipse at 50% 15%,#24353beb,#040b12fc 75%);border:1px solid #c1a366;box-shadow:inset 0 0 45px #d9b36a10;animation:heist-panel .25s ease-out}
+#heistApp .heist-choice h2{color:#f2ce89;font:900 32px Georgia,serif;letter-spacing:.03em;margin:8px 0}
+#heistApp .heist-choice>p{font-size:11px;letter-spacing:.03em;color:#bec9cd;margin:4px 0 16px}
+#heistApp .heist-choice-split{display:grid;grid-template-columns:1fr 1fr;margin:0 0 22px}
+#heistApp .heist-choice-split strong{font:700 40px Arial;display:block;margin:8px 0}
+#heistApp .heist-loot{color:#ffd978;border-right:1px solid #7b714f}
+#heistApp .heist-choice-risk{color:#ff6267;display:flex;flex-direction:column;justify-content:center;padding:10px}
+#heistApp .heist-choice-risk p{font-size:10px;color:#dfb5b8;line-height:1.7;margin:0}
+#heistApp #heistLootPile{height:60px;display:flex;justify-content:center}
+#heistApp #heistLootPile img{width:52px;height:60px;object-fit:contain;margin-left:-12px}
+#heistApp .heist-choice-actions{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+#heistApp .heist-choice-actions button{padding:17px 8px;font-size:14px}
+#heistApp .heist-choice-actions small{font-size:8px;margin-top:8px;letter-spacing:.05em}
+#heistApp #heistCollect{background:linear-gradient(#efd39b,#a67b36);color:#17140e;border-color:#ffe7ac}
+#heistApp #heistCollect small{color:#342914}
+#heistApp #heistDeeper{background:linear-gradient(#38181c,#180e13);border-color:#c23943;color:#ffe7e7}
+#heistApp dialog{color:#e8edf0;background:linear-gradient(140deg,#1a272e,#080f16);border:1px solid #a59061;border-radius:9px;padding:22px;max-width:760px;width:90vw;max-height:86vh;overflow:auto;box-shadow:0 20px 80px #000b}
+#heistApp dialog::backdrop{background:#000b;backdrop-filter:blur(3px)}
+#heistApp dialog h2{color:#efd29c;letter-spacing:.04em}
+#heistApp dialog p{font-size:13px;line-height:1.7}
+#heistApp #heistPaytable>div{display:grid;grid-template-columns:2fr repeat(3,1fr);align-items:center;gap:8px;padding:7px;border-bottom:1px solid #39444b;font-size:12px}
+#heistApp #heistPaytable span{display:flex;align-items:center;gap:10px}
+#heistApp #heistPaytable img{width:35px;height:35px;object-fit:contain}
+#heistApp .heist-shop-bet{display:flex;justify-content:center;gap:22px;align-items:center;margin:20px 0;text-align:center}
+#heistApp .heist-shop-bet strong{display:block;font-size:22px;margin-top:5px}
+#heistApp .heist-boost{width:100%;display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:10px;padding:18px;background:#14222a;border-color:#4b7b82}
+#heistApp .heist-boost small{letter-spacing:.03em;line-height:1.6}
+#heistApp .heist-boost[aria-pressed='true']{border-color:#d9b36a;background:#382b16}
+#heistApp #heistShopOffers{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+#heistApp #heistShopOffers article{padding:20px 16px;border:1px solid #5e6060;border-radius:8px;background:#0b1219}
+#heistApp #heistShopOffers h3{color:#d9b36a;margin:0 0 14px}
+#heistApp #heistShopOffers strong{color:#ffe7a4}
+#heistApp #heistShopOffers p{font-size:10px}
+#heistApp #heistShopOffers button{width:100%;margin-top:15px;background:#d9b371;color:#17130c}
+#heistApp #heistSettingsDialog button{margin:5px}
+#heistApp #heistSettingsDialog [aria-pressed='true']{border-color:#d9b36a;color:#ffe7a4}
+#heistApp[data-stage='0'] .heist-scene{background-position:49% center}
+#heistApp[data-stage='1'] .heist-scene{background-position:50% center}
+#heistApp[data-stage='2'] .heist-scene{background-position:51% center;box-shadow:inset -70px 0 100px #d42f3512}
+#heistApp[data-stage='3'] .heist-scene{background-position:52% center;box-shadow:inset 0 -90px 150px #dfaf4518}
+#heistApp[data-stage='4'] .heist-scene{background-position:53% center;box-shadow:inset 0 -90px 130px #31d7e818}
+#heistApp[data-stage='5'] .heist-scene{background-position:54% center;box-shadow:inset 0 -140px 160px #dfaf452b}
+@keyframes heist-strip-scroll{from{transform:translateY(0)}to{transform:translateY(-33.333333%)}}
+@keyframes heist-reel-stop{from{transform:translateY(-7px)}to{transform:translateY(0)}}
+@keyframes heist-win-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.075)}}
+@keyframes heist-panel{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(max-width:1190px){
+ #heistApp .heist-scene{padding:18px 16px 18px;min-height:730px}
+ #heistApp .heist-topbar{grid-template-columns:240px minmax(0,1fr);gap:20px;padding-right:170px;position:relative;min-height:105px}
+ #heistApp h1{font-size:38px}
+ #heistApp .heist-tagline{font-size:6px;letter-spacing:.17em}
+ #heistApp .heist-stage-node{grid-template-rows:40px 15px;padding:6px 2px 3px}
+ #heistApp .heist-stage-art{height:40px}
+ #heistApp .heist-stage-name{font-size:6px}
+ #heistApp .heist-security{position:absolute;right:0;top:4px;width:154px}
+ #heistApp .heist-hud,#heistApp .heist-frame,#heistApp .heist-results{width:min(750px,78%)}
+ #heistApp .heist-controls{gap:9px;grid-template-columns:40px 40px minmax(135px,180px) 66px 104px 76px 92px;width:96%;padding:10px 12px}
+ #heistApp #heistSpin{width:104px;height:104px;font-size:20px}
+}
+@media(max-width:920px){
+ #heistApp .heist-topbar{grid-template-columns:1fr 175px;gap:15px;padding-right:0;min-height:0}
+ #heistApp .heist-heading{grid-column:1;grid-row:1}
+ #heistApp .heist-security{position:static;grid-column:2;grid-row:1;width:auto}
+ #heistApp .heist-progress{grid-column:1/-1;grid-row:2;gap:10px;padding:13px 2px 1px}
+ #heistApp .heist-stage-node{grid-template-rows:45px 15px}
+ #heistApp .heist-stage-name{font-size:8px}
+ #heistApp .heist-stage-art{height:44px}
+ #heistApp .heist-hud,#heistApp .heist-frame,#heistApp .heist-results{width:min(700px,90%)}
+ #heistApp .heist-controls{gap:7px;grid-template-columns:38px 38px minmax(125px,1fr) 57px 94px 64px 78px;width:100%;padding:10px;min-height:78px}
+ #heistApp .heist-controls>button,#heistApp .heist-auto-wrap>button{font-size:10px;padding:8px 5px}
+ #heistApp #heistSpin{width:94px;height:94px;font-size:19px;border-width:4px;margin:-20px 0}
+ #heistApp .heist-bet{grid-template-columns:34px 1fr 34px}
+ #heistApp #heistSettings,#heistApp #heistHelpOpen{width:38px;height:38px;font-size:22px}
+}
+@media(max-width:700px){
+ #heistApp{padding:0 5px 20px}
+ #heistApp .heist-scene{padding:14px 9px 15px;border-radius:5px;min-height:0;background-position:52% center;background-size:auto 100%}
+ #heistApp .heist-scene:before{background:linear-gradient(180deg,#03070c44,#02050833 65%,#020508aa)}
+ #heistApp .heist-topbar{grid-template-columns:minmax(0,1fr) 126px;gap:14px 9px;margin-bottom:6px;padding:0 2px 10px}
+ #heistApp h1{font-size:clamp(25px,7.2vw,43px);letter-spacing:-.08em}
+ #heistApp .heist-tagline{font-size:5px;letter-spacing:.08em;white-space:normal;line-height:1.6;margin-top:9px;max-width:210px}
+ #heistApp .heist-security{padding:7px 8px 6px}
+ #heistApp .heist-security>small{font-size:7px}
+ #heistApp #heistRisk{font-size:21px}
+ #heistApp .heist-alarm-icon{width:20px;height:20px}
+ #heistApp #heistRiskMeter{height:6px;gap:2px;margin:5px 0}
+ #heistApp .heist-risk-caption{font-size:5px}
+ #heistApp .heist-progress{gap:5px;padding-top:13px}
+ #heistApp .heist-stage-node{grid-template-rows:35px 16px;padding:4px 1px 2px;border-radius:4px}
+ #heistApp .heist-stage-art{height:34px}
+ #heistApp .heist-stage-name{font-size:5px;line-height:1.15;white-space:normal}
+ #heistApp .heist-stage-number{left:4px;top:-15px;font-size:9px;line-height:14px;padding:0 3px}
+ #heistApp .heist-stage-node:not(:last-child):after{font-size:13px;right:-7px;top:20px}
+ #heistApp .heist-stage-lock{height:10px;width:8px;right:2px;bottom:16px}
+ #heistApp .heist-hud,#heistApp .heist-frame,#heistApp .heist-results{width:100%}
+ #heistApp .heist-hud{min-height:21px;padding:0 3px 5px;gap:4px}
+ #heistApp .heist-hud small,#heistApp .heist-hud strong{font-size:6px;letter-spacing:.04em}
+ #heistApp .heist-frame{padding:20px 10px 12px;border-radius:7px}
+ #heistApp .heist-frame:before{inset:4px;border-radius:4px}
+ #heistApp .heist-frame-badge{left:24%;right:24%;font-size:8px;line-height:16px;letter-spacing:.08em}
+ #heistApp .heist-frame-bolt{width:5px;height:5px}
+ #heistApp .heist-frame-bolt.top-left{left:5px;top:7px}#heistApp .heist-frame-bolt.top-right{right:5px;top:7px}#heistApp .heist-frame-bolt.bottom-left{left:5px;bottom:5px}#heistApp .heist-frame-bolt.bottom-right{right:5px;bottom:5px}
+ #heistApp .heist-reels{aspect-ratio:5/4}
+ #heistApp .heist-cell img{width:96%;height:96%}
+ #heistApp .heist-cell small{font-size:6px;bottom:2px;letter-spacing:.05em}
+ #heistApp .heist-results{grid-template-columns:1fr 1fr;gap:5px;padding:7px 9px;margin-top:4px;min-height:66px}
+ #heistApp .heist-results strong{font-size:17px;margin-top:3px}
+ #heistApp .heist-results small{font-size:6px}
+ #heistApp #heistMessage{grid-column:1/-1;grid-row:2;font-size:8px}
+ #heistApp .heist-win-banner strong{font-size:18px}
+ #heistApp .heist-win-banner small{font-size:7px}
+ #heistApp .heist-controls{grid-template-columns:40px 32px minmax(0,1fr) 54px;grid-template-rows:44px 90px;gap:10px 7px;padding:10px 9px;margin-top:12px;min-height:0;border-radius:5px}
+ #heistApp #heistSettings{grid-column:1;grid-row:1}
+ #heistApp #heistHelpOpen{grid-column:2;grid-row:1;width:31px;height:31px;font-size:19px}
+ #heistApp .heist-bet{grid-column:3;grid-row:1;grid-template-columns:30px 1fr 30px;height:43px}
+ #heistApp .heist-bet button{height:40px;font-size:22px}
+ #heistApp .heist-bet strong{font-size:16px}
+ #heistApp .heist-bet small{font-size:7px}
+ #heistApp #heistMax{grid-column:4;grid-row:1;height:42px}
+ #heistApp .heist-auto-wrap{grid-column:1/3;grid-row:2}
+ #heistApp #heistAuto{height:43px;font-size:10px}
+ #heistApp #heistSpin{grid-column:3;grid-row:2;justify-self:center;width:86px;height:86px;min-height:0;margin:0;border-width:4px;font-size:18px;box-shadow:inset 0 0 0 2px #141411,inset 0 0 0 4px #eec66d,0 0 0 3px #444b40,0 0 0 5px #c7aa68,0 0 0 7px #0b1012,0 4px 10px #000b}
+ #heistApp[data-phase='heist'] #heistSpin,#heistApp[data-phase='choice'] #heistSpin{font-size:12px}
+ #heistApp #heistBuy{grid-column:4;grid-row:2;height:43px;min-width:0;font-size:8px}
+ #heistApp #heistAutoMenu{right:auto;left:0;width:250px;bottom:calc(100% + 15px)}
+ #heistApp .heist-spin-cost{font-size:8px;margin-top:9px;line-height:1.5}
+ #heistApp .heist-choice{position:relative;inset:auto;min-height:350px;margin:0;padding:20px 10px;border:1px solid #c1a366}
+ #heistApp .heist-frame:has(.heist-choice:not([hidden])) .heist-reels{display:none}
+ #heistApp .heist-frame:has(.heist-choice:not([hidden])) .heist-frame-badge{display:none}
+ #heistApp .heist-choice h2{font-size:24px}
+ #heistApp .heist-choice>p{font-size:10px;line-height:1.5}
+ #heistApp .heist-choice-split{margin-bottom:14px}
+ #heistApp .heist-choice-split strong{font-size:27px}
+ #heistApp .heist-choice-risk{padding:7px}
+ #heistApp .heist-choice-risk p{font-size:8px}
+ #heistApp .heist-choice-actions{grid-template-columns:1fr;gap:9px}
+ #heistApp .heist-choice-actions button{padding:12px 8px;font-size:12px}
+ #heistApp .heist-choice-actions small{font-size:7px}
+ #heistApp #heistLootPile{height:45px}
+ #heistApp #heistLootPile img{width:35px;height:45px}
+ #heistApp .heist-notice{inset:18px 9px 11px;font-size:21px}
+ #heistApp dialog{padding:18px 13px;width:94vw;max-height:88svh}
+ #heistApp #heistShopOffers{grid-template-columns:1fr}
+}
+@media(max-width:350px){
+ #heistApp .heist-topbar{grid-template-columns:minmax(0,1fr) 112px}
+ #heistApp h1{font-size:24px}
+ #heistApp .heist-controls{grid-template-columns:33px 26px minmax(0,1fr) 47px;gap:9px 5px;padding:9px 7px}
+ #heistApp #heistSettings{width:32px;height:32px;font-size:21px}
+ #heistApp #heistHelpOpen{width:25px;height:25px;font-size:16px}
+ #heistApp #heistSpin{width:78px;height:78px;font-size:16px}
+ #heistApp .heist-bet{grid-template-columns:28px 1fr 28px}
+ #heistApp .heist-bet strong{font-size:14px}
+ #heistApp #heistBuy{font-size:7px}
+ #heistApp .heist-stage-name{font-size:4.5px}
+}
+@media(prefers-reduced-motion:reduce){
+ #heistApp *,#heistApp *:before,#heistApp *:after{animation:none!important;transition:none!important}
+ #heistApp .heist-strip{transform:translateY(-33.333333%)}
+}
+/* Artwork is a separate transparent frame. Only the opening contains real reels. */
+#heistApp .heist-frame{aspect-ratio:29/20;padding:0;border:0;border-radius:0;background-color:transparent;background-image:var(--heist-frame-art);box-shadow:none;filter:drop-shadow(0 12px 14px #000a)}
+#heistApp .heist-frame:before,#heistApp .heist-frame-bolt{display:none}
+#heistApp .heist-reels{position:absolute;inset:8.4% 6.8% 9.6%;aspect-ratio:auto;border:1px solid #b99c61;box-shadow:0 0 8px #0008}
+#heistApp .heist-frame-badge{top:3.4%;line-height:22px;border-color:#706047;background:linear-gradient(#293035,#080e12);font-size:11px}
+#heistApp .heist-notice,#heistApp .heist-choice{inset:8.4% 6.8% 9.6%}
+@media(max-width:700px){
+ #heistApp .heist-frame{aspect-ratio:5/4;padding:0}
+ #heistApp .heist-frame-badge{top:2.9%;font-size:7px;line-height:14px;left:25%;right:25%}
+ #heistApp .heist-frame:has(.heist-choice:not([hidden])){aspect-ratio:auto;padding:25px 6.8%}
+ #heistApp .heist-choice{position:relative;inset:auto}
+}
+/* Preserve the shared toast placement fix from the prior controls release. */
+body.heist-active .toast,body.swamp-active .toast{top:auto;bottom:18px;left:50%;right:auto;width:max-content;max-width:calc(100vw - 24px);height:auto;transform:translateX(-50%);text-align:center;font-size:12px;line-height:1.5}body.heist-active .toast.show,body.swamp-active .toast.show{transform:translateX(-50%)}

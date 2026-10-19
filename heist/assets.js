@@ -15,7 +15,8 @@ const VAULT_HEIST_ASSETS={
  scatter:'__HEIST_approved-symbols/isolated_webp/scatter_vault_seal.webp__',
  grand:'__HEIST_approved-symbols/isolated_webp/grand_take.webp__',
  alarm:'__HEIST_symbols/alarm.webp__',
- environment:'__HEIST_environment.webp__'
+ environment:'__HEIST_scene-v2/environment.webp__',
+ reelFrame:'__HEIST_scene-v2/reel-frame.webp__'
 };
 
 // Display-only fit for the generous transparent padding. Original WebP bytes stay intact.
