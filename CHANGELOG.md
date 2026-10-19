@@ -1,3 +1,12 @@
+# Swamp Fishing — approved symbols and bonus-only Collector progression
+
+- Новые прозрачные Scatter (рыба влево, встроенная надпись) и Collector из предоставленного архива; отдельный портрет для шкалы.
+- Только во Free Spins: 12 рыбаков в группах по четыре, цели ×2/×3/×10, текущий multiplier и оставшиеся FS.
+- Последовательные перелёты копий Collector, подсветка порогов, reduced motion, мобильные три ряда; F5 восстанавливает checkpoint без повторной анимации/выплаты.
+- После 12 портреты остаются заполненными; действующие последующие ретриггеры на ×10 сохранены.
+- RNG, математика, выплаты, общий wallet/auth, SQL, lobby и другие игры побайтово не изменены. Обновление БД не требуется.
+- Проверки и пути: [SWAMP_VISUAL_UPDATE.md](SWAMP_VISUAL_UPDATE.md).
+
 # VAULT BREAKERS — industrial identity and release-time cores
 
 - Bird Siege визуально превращён в VAULT BREAKERS с 11 утверждёнными WebP-ассетами архива.

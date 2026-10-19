@@ -1,0 +1,12 @@
+{
+  "mode": "Chromium and actual Supabase SDK with HTTP fixture; no live DB changes",
+  "passed": [
+    "All other games/lobby/auth/wallet/SQL and entire RNG/math config remain byte-identical",
+    "Base: new left-facing Scatter, no progression panel or reserved height",
+    "Multiple Collectors fill successive slots, cross 4/8/12 thresholds, retain overflow and full meter at 16; unchanged model payouts/FS; five viewports",
+    "F5 during flight restores committed count and wallet once, without replaying a flight or reward",
+    "Reduced motion fills real progression without flying clones",
+    "Feature completion removes panel completely"
+  ],
+  "errors": []
+}

@@ -2,7 +2,13 @@
  <div class="swamp-scene">
   <div class="swamp-environment" aria-hidden="true"></div><div class="swamp-mist" aria-hidden="true"></div><div class="swamp-fireflies" aria-hidden="true"></div>
   <header class="swamp-heading"><div><small>VAULT · WORKING TITLE</small><h1 id="swampTitle">SWAMP FISHING</h1><img id="swampLogo" alt="Game logo" hidden></div><span class="swamp-format">5 × 3 <b>10 FIXED LINES</b></span></header>
-  <div class="swamp-feature-bar"><div class="swamp-fs"><small>FREE SPINS</small><strong id="swampSpins">—</strong></div><div class="swamp-meter-wrap"><small>COLLECTOR MARKS <span id="swampCollectorCount">0 / 4</span></small><div class="swamp-meter" id="swampMeter" aria-label="Four collector marks"></div></div><div class="swamp-tiers" id="swampTiers" aria-label="Collection multiplier"></div></div>
+  <div class="swamp-feature-bar" id="swampFeatureBar" hidden aria-label="Free Spins collector progression">
+   <div class="swamp-fs"><small>FREE SPINS</small><strong id="swampSpins">—</strong></div>
+   <div class="swamp-progression" id="swampMeter" role="img" aria-label="0 of 12 collectors gathered"></div>
+   <div class="swamp-current-collect"><small>COLLECT</small><strong id="swampCurrentMultiplier">×1</strong></div>
+   <div class="swamp-milestone-message" id="swampMilestoneMessage" role="status" aria-live="polite"></div>
+  </div>
+  <div id="swampProgressFlights" class="swamp-progress-flights" aria-hidden="true"></div>
   <div class="swamp-frame"><img class="swamp-lantern left" alt="" aria-hidden="true"><img class="swamp-lantern right" alt="" aria-hidden="true"><i class="swamp-bolt a"></i><i class="swamp-bolt b"></i><i class="swamp-bolt c"></i><i class="swamp-bolt d"></i>
    <div class="swamp-reels" id="swampReels" aria-label="Five reels, three rows"></div><svg id="swampLines" class="swamp-lines" viewBox="0 0 500 300" preserveAspectRatio="none" aria-hidden="true"></svg><div class="swamp-collect-layer" id="swampCollectLayer" aria-hidden="true"></div>
    <div class="swamp-transition" id="swampTransition" role="status" hidden></div>
