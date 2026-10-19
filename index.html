@@ -1709,7 +1709,50 @@ body.magnet-active .app,body.magnet-active #slotApp,body.magnet-active #pokerApp
  #magnetApp .magnet-power-track{gap:5px;padding:7px;width:100%;margin-top:7px;justify-content:space-around}#magnetApp .magnet-power-track span{font-size:14px;padding:4px 12px}
  #magnetApp dialog{padding:18px 13px}#magnetApp #magnetPaytable>div{font-size:9px;gap:5px}#magnetApp #magnetPaytable span{gap:5px}
 }
-@media(prefers-reduced-motion:reduce){#magnetApp *,#magnetApp *:before,#magnetApp *:after{animation:none!important;transition:none!important}}
+/* Clarity pass: quiet matrix; force colours exist only while an effect is active. */
+#magnetApp .magnet-scene:before{background:linear-gradient(#03080d55,#03080d88);box-shadow:inset 0 0 150px #0009}
+#magnetApp .magnet-field{background-color:#020509;background-image:linear-gradient(#91a2ae40 1px,transparent 1px),linear-gradient(90deg,#91a2ae40 1px,transparent 1px);box-shadow:inset 0 0 40px #000;border-color:#8295a1}
+#magnetApp .magnet-pay-zone{background:#09131b44;border-color:#aac1cd88}
+#magnetApp .magnet-token.positive,#magnetApp .magnet-token.negative{box-shadow:none}
+#magnetApp .magnet-symbol-art{width:96%;height:96%}
+#magnetApp .magnet-sign{width:25px;height:25px;font-size:22px;border-width:2px;box-shadow:0 2px 4px #000!important;z-index:2}
+#magnetApp .magnet-token.potential-target{outline:1px solid #d3dce644;outline-offset:-4px}
+#magnetApp .magnet-token.force-source{opacity:1;background:#b6eeff18;box-shadow:inset 0 0 0 3px #e2f7ff;z-index:4;filter:none}
+#magnetApp .magnet-token.interacting{opacity:1;background:#e6b25322;box-shadow:inset 0 0 0 2px #f8c780;z-index:3}
+#magnetApp .magnet-token.moved{opacity:1;box-shadow:inset 0 0 0 2px #f4e4bf;animation:magnet-settle .18s ease-out}
+#magnetApp .magnet-token.winning{opacity:1;background:#f5d6951a;box-shadow:inset 0 0 0 3px #f5d695;z-index:3}
+#magnetApp .magnet-effect-label{display:none;position:absolute;top:2px;left:2px;right:26px;background:#06111bf2;color:#f0f4f8;padding:3px 1px;font:bold 7px/1.2 Arial;text-align:center;z-index:3;border:1px solid #b9d2df}
+#magnetApp .force-source .magnet-effect-label{display:block}
+#magnetApp .flipping .magnet-sign{animation:magnet-flip .3s ease}
+#magnetApp .force-source[data-effect='gravity']{box-shadow:inset 0 0 0 3px var(--core);background:#f7ad4522}
+#magnetApp .force-source[data-effect='gravity']:after{animation:magnet-inward .3s ease-out infinite;border-color:var(--core);box-shadow:0 0 0 7px #f7ad4544}
+#magnetApp .force-source[data-effect='repulsor']:after{animation:magnet-shock .3s ease-out infinite;border-color:var(--negative)}
+#magnetApp .force-source[data-effect='repel']:after{content:'';position:absolute;inset:15%;border:1px solid #d7f2fc;border-radius:50%;animation:magnet-shock .3s ease-out}
+#magnetApp .magnet-ghost{position:absolute;width:20%;height:20%;z-index:0;opacity:.22;pointer-events:none;filter:grayscale(1)}
+#magnetApp #magnetForces .magnet-arrow{stroke-width:5;stroke-dasharray:none;animation:none;stroke-linecap:round;stroke-linejoin:round}
+#magnetApp #magnetForces .magnet-swap-arrow{stroke:#fff8;stroke-width:1.5;stroke-dasharray:3 4;animation:none}
+#magnetApp .magnet-reactor{opacity:.65;transition:opacity .15s,box-shadow .15s}
+#magnetApp .magnet-reactor i,#magnetApp .magnet-reactor b{box-shadow:none}
+#magnetApp .field-active .magnet-reactor{box-shadow:0 0 0 5px #07121b;opacity:.65}
+#magnetApp .field-active .magnet-reactor span{opacity:.25}
+#magnetApp[data-force='positive'] .magnet-reactor.positive,#magnetApp[data-force='negative'] .magnet-reactor.negative,#magnetApp .chain-active .magnet-reactor,#magnetApp.overdrive .magnet-reactor{opacity:1;box-shadow:0 0 0 5px #07121b,0 0 18px currentColor}
+#magnetApp[data-force='positive'] .magnet-reactor.positive span,#magnetApp[data-force='negative'] .magnet-reactor.negative span{opacity:.75}
+#magnetApp .magnet-legend{display:flex;justify-content:center;gap:15px;flex-wrap:wrap;margin:8px 0;color:#bac8d0;font-size:9px}
+#magnetApp .magnet-legend b{font-size:14px;color:var(--positive)}
+#magnetApp .magnet-legend .minus{color:var(--negative)}
+#magnetApp .magnet-legend .source{color:#e2f7ff}#magnetApp .magnet-legend .target{color:#f8c780}
+#magnetApp .magnet-diagrams{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:15px 0}
+#magnetApp .magnet-diagram{padding:12px 6px;border:1px solid #425665;background:#030910;text-align:center;font-size:10px;line-height:1.5}
+#magnetApp .magnet-diagram strong{display:block;font-size:23px;margin-bottom:6px;color:#e3f4ff}
+#magnetApp .magnet-diagram em{font-style:normal;color:var(--positive)}#magnetApp .magnet-diagram i{font-style:normal;color:var(--negative)}
+#magnetApp .magnet-special-help{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#magnetApp .magnet-special-help>div{display:grid;grid-template-columns:55px 1fr;align-items:center;border:1px solid #3b5363;padding:7px;font-size:11px;line-height:1.6}
+#magnetApp .magnet-special-help svg{width:50px;height:65px}
+#magnetApp .magnet-special-help b{display:block;color:#f2e2bc}
+@keyframes magnet-inward{from{scale:1.4;opacity:.2}to{scale:.5;opacity:1}}
+@keyframes magnet-settle{50%{filter:brightness(1.25)}}
+@media(max-width:700px){#magnetApp .magnet-sign{width:19px;height:19px;font-size:16px;border-width:1px}#magnetApp .magnet-effect-label{right:20px;font-size:5px;padding:2px 0}#magnetApp .magnet-legend{gap:8px;font-size:7px}#magnetApp .magnet-diagrams{gap:4px}#magnetApp .magnet-diagram{font-size:8px;padding:8px 3px}#magnetApp .magnet-diagram strong{font-size:19px}#magnetApp .magnet-special-help{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){#magnetApp *,#magnetApp *:before,#magnetApp *:after{animation:none!important;transition:none!important}#magnetApp .magnet-energy{display:none}}
 
 </style>
 <!-- END MAGNET STYLES -->
@@ -5341,12 +5384,19 @@ const VaultHeist=window.VaultHeist=(()=>{
   <div class="magnet-apparatus"><aside class="magnet-reactor positive" aria-hidden="true"><i></i><b>+</b><small>POSITIVE</small><span></span><i></i></aside>
    <div class="magnet-frame"><div class="magnet-buffer-label" aria-hidden="true">MAGNETIC BUFFER</div><div id="magnetField" class="magnet-field" aria-label="5 by 5 magnetic field"><div class="magnet-pay-zone" aria-hidden="true"></div><svg id="magnetForces" viewBox="0 0 500 500" preserveAspectRatio="none" aria-hidden="true"></svg></div><div class="magnet-buffer-label" aria-hidden="true">3 CENTRAL ROWS · 243 WAYS</div></div>
    <aside class="magnet-reactor negative" aria-hidden="true"><i></i><b>−</b><small>NEGATIVE</small><span></span><i></i></aside></div>
+  <div class="magnet-legend" aria-label="Field legend"><span><b>+</b> POSITIVE</span><span><b class="minus">−</b> NEGATIVE</span><span class="source">□ SOURCE</span><span class="target">□ TARGET · ↔ SWAP</span></div>
   <div class="magnet-power-track" id="magnetPowerTrack" aria-label="Overdrive field progression" hidden></div>
   <div class="magnet-result"><div><small>SPIN WIN</small><strong id="magnetWin">0</strong></div><p id="magnetMessage" role="status">The reels stop. The field starts.</p><div><small>ROUND TOTAL</small><strong id="magnetTotal">0</strong></div></div>
   <footer class="magnet-controls"><button id="magnetSettingsOpen" aria-label="Настройки">⚙︎</button><div class="magnet-bet"><button id="magnetMinus" aria-label="Уменьшить ставку">−</button><div><small>BET</small><strong id="magnetBet">20</strong></div><button id="magnetPlus" aria-label="Увеличить ставку">+</button></div><button id="magnetMax">MAX</button><button id="magnetSpin">SPIN</button><div class="magnet-auto-wrap"><button id="magnetAuto" aria-expanded="false" aria-controls="magnetAutoMenu">AUTO</button><div id="magnetAutoMenu" hidden><small>AUTO ROUNDS</small><button data-magnet-auto="10">10</button><button data-magnet-auto="25">25</button><button data-magnet-auto="50">50</button><button data-magnet-auto="100">100</button><button data-magnet-auto="-1">∞</button></div></div></footer>
   <p class="magnet-price" id="magnetPrice"></p><pre id="magnetDebug" hidden></pre>
   <dialog id="magnetSettings"><h2>REACTOR SETTINGS</h2><button id="magnetSound">SOUND</button><button id="magnetFast">FAST</button><button id="magnetSettingsClose">CLOSE</button></dialog>
-  <dialog id="magnetHelp"><button id="magnetHelpClose">CLOSE ×</button><h2>MAGNET · FIELD MANUAL</h2><p>5×5 field. The three central rows pay 243 ways from left to right (3 or more matching columns). The top and bottom rows are magnetic buffers; they affect movement and Scatters, but do not pay ways.</p><p>Blue + attracts red −; matching signs repel. A neutral ○ creates no ordinary magnetic force, but may be physically displaced by a swap. Only regular pieces move. Each piece moves at most one cell in each phase; occupied destinations swap two movable pieces. Anchors and boundaries cancel blocked moves. Wins stay on the field: no tumble or cascade.</p><div id="magnetPaytable"></div><p>Gravity pulls any nearby regular piece; a charged Magnet Wild pulls opposite signs and substitutes regular paying symbols. Repulsor pushes outward. Polarity Flip changes + ↔ − locally. Chain Magnet can add a phase; maximum 3 phases. Resolution: Gravity → Wild → Repulsor → attraction → repulsion → Flip → Chain. All effects are planned before animation.</p><p>3+ Overload Scatters anywhere on the final field start OVERDRIVE: 5 no-charge spins, FIELD POWER ×1 → ×1 → ×2 → ×3 → ×5. Power changes reach, special frequency/activation and phase budget; it does not multiply payouts. No retriggers in this version. The same initial bet applies to the entire round. Round payout is capped at 10,000× bet.</p><p>The result is evaluated after the magnetic phase. During Overdrive, winnings accumulate and are banked once at the end. Reload restores the planned final grid and remaining Overdrive spins, without replaying animation or charging again. These are client-authoritative demo credits; outcome generation remains in the browser.</p></dialog>
+  <dialog id="magnetHelp"><button id="magnetHelpClose">CLOSE ×</button><h2>MAGNET · FIELD MANUAL</h2><p>Сначала останавливаются барабаны, затем магниты меняют поле. Выигрыш считается только на окончательном поле.</p>
+   <div class="magnet-diagrams"><div class="magnet-diagram"><strong><em>+</em> → ← <i>−</i></strong>ATTRACT<br>Разные полюса притягиваются</div><div class="magnet-diagram"><strong>← <em>+ +</em> →</strong>REPEL<br>Одинаковые отталкиваются</div><div class="magnet-diagram"><strong>← <i>− −</i> →</strong>REPEL<br>Одинаковые отталкиваются</div></div>
+   <p>Белая рамка — источник силы. Янтарная рамка — цель. Толстая стрелка показывает её следующий шаг; тонкая обратная линия — обмен со второй фишкой. Источник подсвечивается первым, затем цель, затем происходит движение. Обычная фишка делает максимум один шаг за фазу. Спецсимволы закреплены; граница или закреплённая фишка блокирует движение. Нейтральная ○ не создаёт обычную магнитную силу, но может участвовать в обмене.</p>
+   <div class="magnet-diagrams"><div class="magnet-diagram"><strong>A<br>A<br>·</strong>КОЛОНКА 1<br>2 символа A</div><div class="magnet-diagram"><strong>·<br>A<br>·</strong>КОЛОНКА 2<br>1 символ A</div><div class="magnet-diagram"><strong>A<br>A<br>A</strong>КОЛОНКА 3<br>3 символа A</div></div>
+   <p><b>2 × 1 × 3 = 6 выигрышных путей.</b> Нужны одинаковые символы в 3–5 соседних колонках, начиная с левой. Они могут стоять на разных строках. Платят только три средние строки: 243 WAYS. Верхняя и нижняя — магнитные буферы; фишки могут перейти из них в игровую зону. Знак +/− влияет на движение, а не на совпадение символов. Выигравшие фишки остаются на месте — каскадов нет.</p>
+   <div id="magnetSpecialHelp" class="magnet-special-help"></div><h3>Выплата за один путь · × ставки</h3><div id="magnetPaytable"></div>
+   <p>Порядок сил: Gravity → Wild → Repulsor → притяжение → отталкивание → Flip → Chain. Максимум 3 фазы. Эффекты и результат рассчитываются до анимации; визуализация лишь показывает готовый план.</p><p>3+ Overload Scatter в любом месте окончательного поля запускают OVERDRIVE: 5 бесплатных спинов. FIELD POWER ×1 → ×1 → ×2 → ×3 → ×5 усиливает дальность, частоту/активацию спецсимволов и количество фаз, но не умножает выплаты. Ретриггеров нет. Общая выплата раунда ограничена 10 000× ставки.</p><p>В Overdrive выигрыш накапливается и зачисляется один раз в конце. После F5 восстанавливается стабильное поле и оставшиеся спины без повторной ставки или выплаты. Игра использует демонстрационные кредиты; RNG работает в браузере.</p></dialog>
  </div>
 </section>
 
@@ -5504,7 +5554,7 @@ const VaultMagnet=window.VaultMagnet=(()=>{
  function draw(grid,{winning=[]}={}){
   const win=new Set(winning);for(let i=0;i<25;i++){const t=grid[i],n=nodes[t.uid];n.style.transform=`translate(${i%5*100}%,${Math.floor(i/5)*100}%)`;n.dataset.uid=t.uid;n.dataset.cell=i;n.dataset.symbol=t.symbol;n.dataset.polarity=t.polarity;n.className=`magnet-token ${t.polarity===1?'positive':t.polarity===-1?'negative':'neutral'}${win.has(i)?' winning':''}${i<5||i>=20?' buffer':''}`;
    const sign=t.polarity===1?'+':t.polarity===-1?'−':'○';n.setAttribute('aria-label',`${label(t.symbol)}, ${sign}, row ${Math.floor(i/5)+1}, column ${i%5+1}`);
-   if(n.dataset.art!==t.symbol){n.innerHTML=art(t.symbol)+'<b class="magnet-sign"></b><small></small>';n.dataset.art=t.symbol;}
+   if(n.dataset.art!==t.symbol){n.innerHTML=art(t.symbol)+'<b class="magnet-sign"></b><small></small><span class="magnet-effect-label"></span>';n.dataset.art=t.symbol;}
    n.querySelector('b').textContent=sign;n.querySelector('small').textContent=C.symbols.some(s=>s.id===t.symbol)?'':{wild:'WILD',flip:'FLIP',gravity:'GRAVITY',repulsor:'REPULSOR',chain:'CHAIN',scatter:'OVERLOAD'}[t.symbol];
   }
  }
@@ -5523,22 +5573,70 @@ const VaultMagnet=window.VaultMagnet=(()=>{
   $('magnetDebug').hidden=!MAGNET_DEBUG;if(MAGNET_DEBUG)$('magnetDebug').textContent=JSON.stringify(round,null,2);
  }
  function schedule(){clearTimeout(timer);if(currentGame===C.id&&!document.hidden&&!busy&&(active()||auto))timer=setTimeout(spin,C.timing.next);}
- function clearFX(){root.classList.remove('field-active','reeling');$('magnetForces').replaceChildren();nodes.forEach(n=>n.classList.remove('force-source','interacting'));}
+ const effectsInFlight=new Map(),fxClasses=['potential-target','force-source','interacting','moved','flipping'];
+ function clearFX(){effectsInFlight.clear();root.classList.remove('field-active','reeling','chain-active');delete root.dataset.force;delete root.dataset.effect;delete field.dataset.playback;$('magnetForces').replaceChildren();field.querySelectorAll('.magnet-ghost').forEach(n=>n.remove());nodes.forEach(n=>{n.classList.remove(...fxClasses);delete n.dataset.effect;const caption=n.querySelector('.magnet-effect-label');if(caption)caption.textContent='';});}
+ const effectName=e=>({attract:'ATTRACT',wild:'ATTRACT',repel:'REPEL',repulsor:'REPEL',gravity:'GRAVITY',flip:'POLARITY FLIP',chain:'FIELD RECHARGED'}[e.kind]);
+ function focusEffects(){
+  nodes.forEach(n=>{n.classList.remove(...fxClasses);delete n.dataset.effect;n.querySelector('.magnet-effect-label').textContent='';});
+  for(const {e,stage} of effectsInFlight.values()){
+   const source=nodes[e.source];source.classList.add('force-source');source.dataset.effect=e.kind;
+   source.querySelector('.magnet-effect-label').textContent=C.symbols.some(s=>s.id===source.dataset.symbol)?'SOURCE':label(source.dataset.symbol);
+   const targets=e.changes?.map(c=>c.uid)??(e.target===undefined?[]:[e.target,e.swap]);
+   for(const uid of targets){nodes[uid].classList.add(stage==='source'?'potential-target':stage==='settle'?'moved':'interacting');if(e.kind==='flip'&&stage==='move')nodes[uid].classList.add('flipping');}
+  }
+ }
+ function connection(e,key,polarity){
+  const a=e.sourceCell,b=e.from,x=i=>i%5*100+50,y=i=>Math.floor(i/5)*100+50;
+  const color=e.kind==='gravity'?'#f7ad45':polarity===-1?'#ff5355':'#40e9ff';
+  const group=document.createElementNS('http://www.w3.org/2000/svg','g');group.dataset.event=key;group.dataset.kind=e.kind;
+  if(Number.isInteger(b)){
+   const dx=x(e.to)-x(b),dy=y(e.to)-y(b),endX=x(e.to)-dx*.22,endY=y(e.to)-dy*.22;
+   group.innerHTML=`<path class="magnet-link ${e.kind==='gravity'?'gravity':polarity===-1?'negative':'positive'}" d="M${x(a)},${y(a)} Q${x(b)},${y(a)} ${x(b)},${y(b)}"/><path class="magnet-arrow" style="stroke:${color}" d="M${x(b)},${y(b)} L${endX},${endY} m${-dx*.14-dy*.12},${-dy*.14+dx*.12} L${endX},${endY} l${-dx*.14+dy*.12},${-dy*.14-dx*.12}"/><path class="magnet-swap-arrow" d="M${x(e.to)},${y(e.to)+15} L${x(b)},${y(b)+15}"/><circle class="magnet-energy" r="4" fill="${color}"><animateMotion dur=".3s" repeatCount="indefinite" path="M${x(a)},${y(a)} Q${x(b)},${y(a)} ${x(b)},${y(b)}"/></circle>`;
+  }
+  $('magnetForces').append(group);return group;
+ }
+ // Presentation-only replay. Consume recorded swaps/sign changes, never resolve forces or draw RNG.
+ async function playPhase(phase,g,fast,phaseCount){
+  const grid=structuredClone(phase.beforeGrid),count=phase.effects.length;
+  const duration=fast?170:300,budget=(fast?1400:2400)/phaseCount;
+  const gap=count>1?Math.min(duration+90,Math.max(22,(budget-duration)/(count-1))):0;
+  field.style.setProperty('--magnet-motion',(fast?75:130)+'ms');
+  await Promise.all(phase.effects.map(async(e,index)=>{
+   await sleep(index*gap);if(g!==generation)return;
+   const key=`${phase.index}-${index}`,source=grid.find(t=>t.uid===e.source),entry={e,stage:'source'};
+   effectsInFlight.set(key,entry);root.dataset.effect=e.kind;root.dataset.force=source.polarity===-1?'negative':source.polarity===1?'positive':'core';field.dataset.playback=key;
+   $('magnetPhaseLabel').textContent=effectName(e);focusEffects();
+   if(MAGNET_DEBUG)$('magnetDebug').textContent=JSON.stringify({phase:phase.index+1,effect:e.kind,sourceCell:e.sourceCell,targetCell:e.from??e.changes?.map(c=>c.cell),destination:e.to??null},null,2);
+   await sleep(duration*.2);if(g!==generation)return;entry.stage='target';focusEffects();const line=connection(e,key,source.polarity);
+   await sleep(duration*.2);if(g!==generation)return;
+   const ghosts=[];
+   if(Number.isInteger(e.from)){
+    for(const cell of [e.from,e.to]){const ghost=document.createElement('div');ghost.className='magnet-ghost';ghost.style.left=`${cell%5*20}%`;ghost.style.top=`${Math.floor(cell/5)*20}%`;ghost.innerHTML=art(grid[cell].symbol);field.append(ghost);ghosts.push(ghost);}
+    [grid[e.from],grid[e.to]]=[grid[e.to],grid[e.from]];
+   }
+   if(e.kind==='flip')for(const c of e.changes)grid.find(t=>t.uid===c.uid).polarity=c.to;
+   draw(grid);entry.stage='move';focusEffects();tone();
+   await sleep(duration*.45);if(g!==generation)return;entry.stage='settle';focusEffects();line.remove();
+   await sleep(duration*.15);if(g!==generation)return;ghosts.forEach(n=>n.remove());effectsInFlight.delete(key);focusEffects();
+  }));
+  if(g!==generation)return;
+  // A render assertion guards presentation drift without touching the precomputed business checkpoint.
+  if(JSON.stringify(grid)!==JSON.stringify(phase.finalGrid))throw Error('MAGNET presentation replay mismatch');
+  draw(phase.finalGrid);delete field.dataset.playback;
+ }
  function tone(){if(!state.sound)return;try{const a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(140,a.currentTime);o.frequency.exponentialRampToValueAtTime(380,a.currentTime+.15);g.gain.setValueAtTime(.012,a.currentTime);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.2);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.2);o.onended=()=>a.close();}catch{}}
- async function reveal(previous){const g=++generation,p=round.magneticPlan,fast=state.fastGame,duration=fast?C.timing.fastPhase:C.timing.phase;busy=true;render();field.style.setProperty('--magnet-motion',duration+'ms');clearFX();root.classList.add('reeling');draw(p.initialGrid);$('magnetPhaseLabel').textContent='REELS STOPPING';await sleep(fast?250:650);if(g!==generation)return;root.classList.remove('reeling');await sleep(C.timing.pause);if(g!==generation)return;
+ async function reveal(previous){const g=++generation,p=round.magneticPlan,fast=state.fastGame;busy=true;render();clearFX();root.classList.add('reeling');draw(p.initialGrid);$('magnetPhaseLabel').textContent='REELS STOPPING';$('magnetMessage').textContent='SOURCE → TARGET → MOVE → FINAL GRID';await sleep(fast?250:650);if(g!==generation)return;root.classList.remove('reeling');await sleep(C.timing.pause);if(g!==generation)return;
   for(const phase of p.phases){
    root.classList.add('field-active');$('magnetPhaseLabel').textContent=phase.index?'CHAIN PHASE · '+(phase.index+1):'FIELD ACTIVE · MAGNETIC PHASE';
-   const lines=phase.effects.filter(e=>Number.isInteger(e.from)).map(e=>{const a=e.sourceCell,b=e.from;return `<path class="${e.kind==='gravity'?'gravity':phase.beforeGrid.find(t=>t.uid===e.target)?.polarity===-1?'negative':'positive'}" d="M${a%5*100+50},${Math.floor(a/5)*100+50} Q${b%5*100+50},${Math.floor(a/5)*100+50} ${b%5*100+50},${Math.floor(b/5)*100+50}"/>`;}).join('');$('magnetForces').innerHTML=lines;
-   const highlight=()=>{for(const e of phase.effects){nodes[e.source]?.classList.add('force-source');if(nodes[e.source])nodes[e.source].dataset.effect=e.kind;if(e.target!==undefined)nodes[e.target].classList.add('interacting');if(e.kind==='flip')nodes[e.source]?.classList.add('flipping');}};
-   highlight();tone();await sleep(fast?70:130);if(g!==generation)return;draw(phase.finalGrid);highlight();await sleep(duration);if(g!==generation)return;
-   nodes.forEach(n=>n.classList.remove('force-source','interacting','flipping'));$('magnetForces').replaceChildren();
-   if(phase.effects.some(e=>e.kind==='chain'))$('magnetPhaseLabel').textContent='FIELD RECHARGED';
+   if(phase.index){root.classList.add('chain-active');$('magnetPhaseLabel').textContent='CHAIN PHASE '+(phase.index+1);await sleep(fast?80:140);if(g!==generation)return;root.classList.remove('chain-active');}
+   await playPhase(phase,g,fast,p.phases.length);if(g!==generation)return;
   }
   clearFX();revealed=true;VaultWalletService.releasePresentation('magnet');render();const winning=p.wins.flatMap(w=>w.positions);draw(p.finalGrid,{winning});$('magnetPhaseLabel').textContent=p.winX?`${p.winX}× · FINAL GRID WIN`:'FIELD SETTLED';
-  $('magnetMessage').textContent=p.winX?`${p.wins.map(w=>`${label(w.symbol)} · ${w.ways} WAYS`).join(' / ')} · ${fmt(p.winX*round.bet)}`:'No winning ways on the final grid.';
+  const winSummary=p.wins.map(w=>`${label(w.symbol)} · ${w.length} COLS · ${w.ways} WAYS`).join(' / ');
+  $('magnetMessage').textContent=p.winX?`${winSummary} · ${fmt(p.winX*round.bet)}`:'No winning ways on the final grid.';
   if(p.winX)await sleep(fast?C.timing.fastWin:C.timing.win);if(g!==generation)return;
   if(!previous&&active()){$('magnetPhaseLabel').textContent='OVERDRIVE ONLINE · 5 SPINS';await sleep(650);if(g!==generation)return;}
-  if(round.status==='SETTLED')$('magnetMessage').textContent=`ROUND SETTLED · ${fmt(round.payout)} BANKED`;
+  if(round.status==='SETTLED')$('magnetMessage').textContent=`ROUND SETTLED · ${fmt(round.payout)} BANKED${p.winX?' · '+winSummary:''}`;
   busy=false;render();if(VaultStorage.inspect().conflict)VaultSync.flush();schedule();
  }
  function spin(){if(!ready||busy||!VaultRoundService.canPlay(C.id))return;clearTimeout(timer);const previous=active()?round:null,next=previous?M.advance(previous):M.start({seed:crypto.getRandomValues(new Uint32Array(1))[0],bet:BETS[betIndex],roundId:crypto.randomUUID()});
@@ -5555,6 +5653,7 @@ const VaultMagnet=window.VaultMagnet=(()=>{
  for(const [openId,dialog,closeId] of [['magnetSettingsOpen','magnetSettings','magnetSettingsClose'],['magnetHelpOpen','magnetHelp','magnetHelpClose']]){$(openId).onclick=()=>$(dialog).showModal();$(closeId).onclick=()=>$(dialog).close();}
  $('magnetSound').onclick=()=>{toggleSetting('sound');render();};$('magnetFast').onclick=()=>{toggleSetting('fastGame');render();};
  $('magnetPaytable').innerHTML='<div><b>SYMBOL</b><b>3</b><b>4</b><b>5</b></div>'+C.symbols.map(s=>`<div><span>${art(s.id)}${s.name}</span>${s.pays.map(p=>`<b>${M.round(p*C.waysPayScale)}×</b>`).join('')}</div>`).join('');
+ $('magnetSpecialHelp').innerHTML=Object.entries({wild:'Заменяет обычные символы при выплате. Если заряжен — притягивает противоположный знак.',flip:'Меняет + ↔ − рядом с собой. Значок и цвет меняются после импульса.',gravity:'Золотые кольца стягивают обычные фишки к ядру независимо от знака.',repulsor:'Расходящаяся волна выталкивает обычные фишки наружу.',chain:'Перезаряжает поле: перед дополнительной фазой показывается CHAIN PHASE.',scatter:'Overload: три и более Scatter запускают 5 спинов Overdrive.'}).map(([id,description])=>`<div>${art(id)}<span><b>${label(id)}</b>${description}</span></div>`).join('');
  root.querySelector('.magnet-scene').style.backgroundImage=`linear-gradient(#03090f22,#03090f55),url('${A.environment}')`;
  for(const src of new Set(Object.values(A))){const image=new Image();image.src=src;image.decode?.().catch(()=>{});}
  new MutationObserver(()=>{if(currentGame!==C.id&&!root.hidden){root.hidden=true;restore(round);for(const id of ['magnetHelp','magnetSettings'])if($(id).open)$(id).close();document.body.classList.remove('magnet-active');}}).observe(document.body,{attributes:true,attributeFilter:['class']});

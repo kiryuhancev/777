@@ -2,6 +2,18 @@
 
 Новая самостоятельная игра `magnet` в SLOTS. Источник требований и художественного направления: приложенный `MAGNET_COMPLETE_FOR_CODEX.zip`, включая полный `03_docs/MAGNET_CODEX_PROMPT.txt`. Исходный frontend сохранён в `/workspace/output/VAULT_before_MAGNET.html`; новая автономная версия — `/workspace/output/VAULT_with_MAGNET.html`.
 
+## Второй визуальный проход: читаемость
+
+Обновлены только `magnet/game.js`, `magnet/presentation.css` и `magnet/screen.html`, затем пересобран автономный HTML. Исходная версия до прохода: `/workspace/output/VAULT_before_MAGNET_clarity.html`; новая: `/workspace/output/VAULT_MAGNET_clarity.html`.
+
+Каждый записанный effect показывает источник, цель, связь и стрелку, затем ровно записанный swap/sign change и settle. Короткие списки идут последовательно с паузой, длинные — со сдвигом начала; это ограничивает суммарное время магнитного воспроизведения примерно 2.4–2.7 секунды плюс короткие объявления дополнительных фаз. Один нормальный event длится 300 ms, FAST — 170 ms. Частично перекрывающиеся подсветки учитываются отдельно, порядок применения записанных изменений сохраняется. В конце каждой фазы проверяется точное совпадение presentation-grid с неизменённым `phase.finalGrid`.
+
+Gravity использует золотые сходящиеся кольца, Repulsor — расходящуюся волну, Flip меняет и поворачивает знак, Chain предваряет следующую фазу статусом. Линии, призраки и служебные рамки удаляются. Белая рамка означает источник, янтарная — цель/обмен; выигрыш имеет отдельную светло-золотую рамку. В HELP добавлены диаграммы и пример `2 × 1 × 3 = 6 ways`. Никаких новых storage keys, RPC или SQL.
+
+`tools/magnet-clarity-check.py` проверяет normal/FAST, реальные записанные effects, итоговый DOM-grid и checkpoint, отсутствие clutter, HELP, mobile и побайтовую неизменность model/config/assets/runtime/SQL относительно `b78eef5`. Превью: `/workspace/output/magnet-clarity-{idle,attract,repel,gravity,winning,mobile,help}.png`.
+
+**GAME LOGIC UNCHANGED · MAGNETIC PLAN UNCHANGED · RNG UNCHANGED · PAYOUTS UNCHANGED.**
+
 ## Подключение
 
 Frontend публикуется существующим GitHub Pages workflow. Для подключения новой игры к существующему общему кошельку выполнить **целиком** [supabase_magnet.txt](supabase_magnet.txt) в [SQL Editor текущего проекта](https://supabase.com/dashboard/project/umccpdbopcgluwsnhlwj/sql/new), затем обновить страницу. TXT побайтово соответствует `supabase_magnet.sql`. Новые URL/ключи не нужны. Пока миграция не установлена, MAGNET не принимает ставки; остальные игры доступны.

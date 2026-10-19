@@ -1,0 +1,31 @@
+{
+  "baseline": "b78eef5",
+  "protectedFilesByteIdentical": [
+    "magnet/model.js",
+    "magnet/config.js",
+    "magnet/assets.js",
+    "vault/runtime.js",
+    "supabase_magnet.sql"
+  ],
+  "effectsObserved": [
+    "attract",
+    "repel",
+    "chain",
+    "gravity",
+    "wild",
+    "flip",
+    "repulsor"
+  ],
+  "planCheckpointAndFinalGridExact": true,
+  "noResidualEffects": true,
+  "normalAndFast": true,
+  "responsiveWidths": [
+    1440,
+    1024,
+    768,
+    390,
+    320
+  ],
+  "pageErrors": [],
+  "consoleErrors": []
+}

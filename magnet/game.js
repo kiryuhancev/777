@@ -9,7 +9,7 @@ const VaultMagnet=window.VaultMagnet=(()=>{
  function draw(grid,{winning=[]}={}){
   const win=new Set(winning);for(let i=0;i<25;i++){const t=grid[i],n=nodes[t.uid];n.style.transform=`translate(${i%5*100}%,${Math.floor(i/5)*100}%)`;n.dataset.uid=t.uid;n.dataset.cell=i;n.dataset.symbol=t.symbol;n.dataset.polarity=t.polarity;n.className=`magnet-token ${t.polarity===1?'positive':t.polarity===-1?'negative':'neutral'}${win.has(i)?' winning':''}${i<5||i>=20?' buffer':''}`;
    const sign=t.polarity===1?'+':t.polarity===-1?'−':'○';n.setAttribute('aria-label',`${label(t.symbol)}, ${sign}, row ${Math.floor(i/5)+1}, column ${i%5+1}`);
-   if(n.dataset.art!==t.symbol){n.innerHTML=art(t.symbol)+'<b class="magnet-sign"></b><small></small>';n.dataset.art=t.symbol;}
+   if(n.dataset.art!==t.symbol){n.innerHTML=art(t.symbol)+'<b class="magnet-sign"></b><small></small><span class="magnet-effect-label"></span>';n.dataset.art=t.symbol;}
    n.querySelector('b').textContent=sign;n.querySelector('small').textContent=C.symbols.some(s=>s.id===t.symbol)?'':{wild:'WILD',flip:'FLIP',gravity:'GRAVITY',repulsor:'REPULSOR',chain:'CHAIN',scatter:'OVERLOAD'}[t.symbol];
   }
  }
@@ -28,22 +28,70 @@ const VaultMagnet=window.VaultMagnet=(()=>{
   $('magnetDebug').hidden=!MAGNET_DEBUG;if(MAGNET_DEBUG)$('magnetDebug').textContent=JSON.stringify(round,null,2);
  }
  function schedule(){clearTimeout(timer);if(currentGame===C.id&&!document.hidden&&!busy&&(active()||auto))timer=setTimeout(spin,C.timing.next);}
- function clearFX(){root.classList.remove('field-active','reeling');$('magnetForces').replaceChildren();nodes.forEach(n=>n.classList.remove('force-source','interacting'));}
+ const effectsInFlight=new Map(),fxClasses=['potential-target','force-source','interacting','moved','flipping'];
+ function clearFX(){effectsInFlight.clear();root.classList.remove('field-active','reeling','chain-active');delete root.dataset.force;delete root.dataset.effect;delete field.dataset.playback;$('magnetForces').replaceChildren();field.querySelectorAll('.magnet-ghost').forEach(n=>n.remove());nodes.forEach(n=>{n.classList.remove(...fxClasses);delete n.dataset.effect;const caption=n.querySelector('.magnet-effect-label');if(caption)caption.textContent='';});}
+ const effectName=e=>({attract:'ATTRACT',wild:'ATTRACT',repel:'REPEL',repulsor:'REPEL',gravity:'GRAVITY',flip:'POLARITY FLIP',chain:'FIELD RECHARGED'}[e.kind]);
+ function focusEffects(){
+  nodes.forEach(n=>{n.classList.remove(...fxClasses);delete n.dataset.effect;n.querySelector('.magnet-effect-label').textContent='';});
+  for(const {e,stage} of effectsInFlight.values()){
+   const source=nodes[e.source];source.classList.add('force-source');source.dataset.effect=e.kind;
+   source.querySelector('.magnet-effect-label').textContent=C.symbols.some(s=>s.id===source.dataset.symbol)?'SOURCE':label(source.dataset.symbol);
+   const targets=e.changes?.map(c=>c.uid)??(e.target===undefined?[]:[e.target,e.swap]);
+   for(const uid of targets){nodes[uid].classList.add(stage==='source'?'potential-target':stage==='settle'?'moved':'interacting');if(e.kind==='flip'&&stage==='move')nodes[uid].classList.add('flipping');}
+  }
+ }
+ function connection(e,key,polarity){
+  const a=e.sourceCell,b=e.from,x=i=>i%5*100+50,y=i=>Math.floor(i/5)*100+50;
+  const color=e.kind==='gravity'?'#f7ad45':polarity===-1?'#ff5355':'#40e9ff';
+  const group=document.createElementNS('http://www.w3.org/2000/svg','g');group.dataset.event=key;group.dataset.kind=e.kind;
+  if(Number.isInteger(b)){
+   const dx=x(e.to)-x(b),dy=y(e.to)-y(b),endX=x(e.to)-dx*.22,endY=y(e.to)-dy*.22;
+   group.innerHTML=`<path class="magnet-link ${e.kind==='gravity'?'gravity':polarity===-1?'negative':'positive'}" d="M${x(a)},${y(a)} Q${x(b)},${y(a)} ${x(b)},${y(b)}"/><path class="magnet-arrow" style="stroke:${color}" d="M${x(b)},${y(b)} L${endX},${endY} m${-dx*.14-dy*.12},${-dy*.14+dx*.12} L${endX},${endY} l${-dx*.14+dy*.12},${-dy*.14-dx*.12}"/><path class="magnet-swap-arrow" d="M${x(e.to)},${y(e.to)+15} L${x(b)},${y(b)+15}"/><circle class="magnet-energy" r="4" fill="${color}"><animateMotion dur=".3s" repeatCount="indefinite" path="M${x(a)},${y(a)} Q${x(b)},${y(a)} ${x(b)},${y(b)}"/></circle>`;
+  }
+  $('magnetForces').append(group);return group;
+ }
+ // Presentation-only replay. Consume recorded swaps/sign changes, never resolve forces or draw RNG.
+ async function playPhase(phase,g,fast,phaseCount){
+  const grid=structuredClone(phase.beforeGrid),count=phase.effects.length;
+  const duration=fast?170:300,budget=(fast?1400:2400)/phaseCount;
+  const gap=count>1?Math.min(duration+90,Math.max(22,(budget-duration)/(count-1))):0;
+  field.style.setProperty('--magnet-motion',(fast?75:130)+'ms');
+  await Promise.all(phase.effects.map(async(e,index)=>{
+   await sleep(index*gap);if(g!==generation)return;
+   const key=`${phase.index}-${index}`,source=grid.find(t=>t.uid===e.source),entry={e,stage:'source'};
+   effectsInFlight.set(key,entry);root.dataset.effect=e.kind;root.dataset.force=source.polarity===-1?'negative':source.polarity===1?'positive':'core';field.dataset.playback=key;
+   $('magnetPhaseLabel').textContent=effectName(e);focusEffects();
+   if(MAGNET_DEBUG)$('magnetDebug').textContent=JSON.stringify({phase:phase.index+1,effect:e.kind,sourceCell:e.sourceCell,targetCell:e.from??e.changes?.map(c=>c.cell),destination:e.to??null},null,2);
+   await sleep(duration*.2);if(g!==generation)return;entry.stage='target';focusEffects();const line=connection(e,key,source.polarity);
+   await sleep(duration*.2);if(g!==generation)return;
+   const ghosts=[];
+   if(Number.isInteger(e.from)){
+    for(const cell of [e.from,e.to]){const ghost=document.createElement('div');ghost.className='magnet-ghost';ghost.style.left=`${cell%5*20}%`;ghost.style.top=`${Math.floor(cell/5)*20}%`;ghost.innerHTML=art(grid[cell].symbol);field.append(ghost);ghosts.push(ghost);}
+    [grid[e.from],grid[e.to]]=[grid[e.to],grid[e.from]];
+   }
+   if(e.kind==='flip')for(const c of e.changes)grid.find(t=>t.uid===c.uid).polarity=c.to;
+   draw(grid);entry.stage='move';focusEffects();tone();
+   await sleep(duration*.45);if(g!==generation)return;entry.stage='settle';focusEffects();line.remove();
+   await sleep(duration*.15);if(g!==generation)return;ghosts.forEach(n=>n.remove());effectsInFlight.delete(key);focusEffects();
+  }));
+  if(g!==generation)return;
+  // A render assertion guards presentation drift without touching the precomputed business checkpoint.
+  if(JSON.stringify(grid)!==JSON.stringify(phase.finalGrid))throw Error('MAGNET presentation replay mismatch');
+  draw(phase.finalGrid);delete field.dataset.playback;
+ }
  function tone(){if(!state.sound)return;try{const a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(140,a.currentTime);o.frequency.exponentialRampToValueAtTime(380,a.currentTime+.15);g.gain.setValueAtTime(.012,a.currentTime);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.2);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.2);o.onended=()=>a.close();}catch{}}
- async function reveal(previous){const g=++generation,p=round.magneticPlan,fast=state.fastGame,duration=fast?C.timing.fastPhase:C.timing.phase;busy=true;render();field.style.setProperty('--magnet-motion',duration+'ms');clearFX();root.classList.add('reeling');draw(p.initialGrid);$('magnetPhaseLabel').textContent='REELS STOPPING';await sleep(fast?250:650);if(g!==generation)return;root.classList.remove('reeling');await sleep(C.timing.pause);if(g!==generation)return;
+ async function reveal(previous){const g=++generation,p=round.magneticPlan,fast=state.fastGame;busy=true;render();clearFX();root.classList.add('reeling');draw(p.initialGrid);$('magnetPhaseLabel').textContent='REELS STOPPING';$('magnetMessage').textContent='SOURCE → TARGET → MOVE → FINAL GRID';await sleep(fast?250:650);if(g!==generation)return;root.classList.remove('reeling');await sleep(C.timing.pause);if(g!==generation)return;
   for(const phase of p.phases){
    root.classList.add('field-active');$('magnetPhaseLabel').textContent=phase.index?'CHAIN PHASE · '+(phase.index+1):'FIELD ACTIVE · MAGNETIC PHASE';
-   const lines=phase.effects.filter(e=>Number.isInteger(e.from)).map(e=>{const a=e.sourceCell,b=e.from;return `<path class="${e.kind==='gravity'?'gravity':phase.beforeGrid.find(t=>t.uid===e.target)?.polarity===-1?'negative':'positive'}" d="M${a%5*100+50},${Math.floor(a/5)*100+50} Q${b%5*100+50},${Math.floor(a/5)*100+50} ${b%5*100+50},${Math.floor(b/5)*100+50}"/>`;}).join('');$('magnetForces').innerHTML=lines;
-   const highlight=()=>{for(const e of phase.effects){nodes[e.source]?.classList.add('force-source');if(nodes[e.source])nodes[e.source].dataset.effect=e.kind;if(e.target!==undefined)nodes[e.target].classList.add('interacting');if(e.kind==='flip')nodes[e.source]?.classList.add('flipping');}};
-   highlight();tone();await sleep(fast?70:130);if(g!==generation)return;draw(phase.finalGrid);highlight();await sleep(duration);if(g!==generation)return;
-   nodes.forEach(n=>n.classList.remove('force-source','interacting','flipping'));$('magnetForces').replaceChildren();
-   if(phase.effects.some(e=>e.kind==='chain'))$('magnetPhaseLabel').textContent='FIELD RECHARGED';
+   if(phase.index){root.classList.add('chain-active');$('magnetPhaseLabel').textContent='CHAIN PHASE '+(phase.index+1);await sleep(fast?80:140);if(g!==generation)return;root.classList.remove('chain-active');}
+   await playPhase(phase,g,fast,p.phases.length);if(g!==generation)return;
   }
   clearFX();revealed=true;VaultWalletService.releasePresentation('magnet');render();const winning=p.wins.flatMap(w=>w.positions);draw(p.finalGrid,{winning});$('magnetPhaseLabel').textContent=p.winX?`${p.winX}× · FINAL GRID WIN`:'FIELD SETTLED';
-  $('magnetMessage').textContent=p.winX?`${p.wins.map(w=>`${label(w.symbol)} · ${w.ways} WAYS`).join(' / ')} · ${fmt(p.winX*round.bet)}`:'No winning ways on the final grid.';
+  const winSummary=p.wins.map(w=>`${label(w.symbol)} · ${w.length} COLS · ${w.ways} WAYS`).join(' / ');
+  $('magnetMessage').textContent=p.winX?`${winSummary} · ${fmt(p.winX*round.bet)}`:'No winning ways on the final grid.';
   if(p.winX)await sleep(fast?C.timing.fastWin:C.timing.win);if(g!==generation)return;
   if(!previous&&active()){$('magnetPhaseLabel').textContent='OVERDRIVE ONLINE · 5 SPINS';await sleep(650);if(g!==generation)return;}
-  if(round.status==='SETTLED')$('magnetMessage').textContent=`ROUND SETTLED · ${fmt(round.payout)} BANKED`;
+  if(round.status==='SETTLED')$('magnetMessage').textContent=`ROUND SETTLED · ${fmt(round.payout)} BANKED${p.winX?' · '+winSummary:''}`;
   busy=false;render();if(VaultStorage.inspect().conflict)VaultSync.flush();schedule();
  }
  function spin(){if(!ready||busy||!VaultRoundService.canPlay(C.id))return;clearTimeout(timer);const previous=active()?round:null,next=previous?M.advance(previous):M.start({seed:crypto.getRandomValues(new Uint32Array(1))[0],bet:BETS[betIndex],roundId:crypto.randomUUID()});
@@ -60,6 +108,7 @@ const VaultMagnet=window.VaultMagnet=(()=>{
  for(const [openId,dialog,closeId] of [['magnetSettingsOpen','magnetSettings','magnetSettingsClose'],['magnetHelpOpen','magnetHelp','magnetHelpClose']]){$(openId).onclick=()=>$(dialog).showModal();$(closeId).onclick=()=>$(dialog).close();}
  $('magnetSound').onclick=()=>{toggleSetting('sound');render();};$('magnetFast').onclick=()=>{toggleSetting('fastGame');render();};
  $('magnetPaytable').innerHTML='<div><b>SYMBOL</b><b>3</b><b>4</b><b>5</b></div>'+C.symbols.map(s=>`<div><span>${art(s.id)}${s.name}</span>${s.pays.map(p=>`<b>${M.round(p*C.waysPayScale)}×</b>`).join('')}</div>`).join('');
+ $('magnetSpecialHelp').innerHTML=Object.entries({wild:'Заменяет обычные символы при выплате. Если заряжен — притягивает противоположный знак.',flip:'Меняет + ↔ − рядом с собой. Значок и цвет меняются после импульса.',gravity:'Золотые кольца стягивают обычные фишки к ядру независимо от знака.',repulsor:'Расходящаяся волна выталкивает обычные фишки наружу.',chain:'Перезаряжает поле: перед дополнительной фазой показывается CHAIN PHASE.',scatter:'Overload: три и более Scatter запускают 5 спинов Overdrive.'}).map(([id,description])=>`<div>${art(id)}<span><b>${label(id)}</b>${description}</span></div>`).join('');
  root.querySelector('.magnet-scene').style.backgroundImage=`linear-gradient(#03090f22,#03090f55),url('${A.environment}')`;
  for(const src of new Set(Object.values(A))){const image=new Image();image.src=src;image.decode?.().catch(()=>{});}
  new MutationObserver(()=>{if(currentGame!==C.id&&!root.hidden){root.hidden=true;restore(round);for(const id of ['magnetHelp','magnetSettings'])if($(id).open)$(id).close();document.body.classList.remove('magnet-active');}}).observe(document.body,{attributes:true,attributeFilter:['class']});
