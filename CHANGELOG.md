@@ -1,3 +1,12 @@
+# VAULT HEIST — six-stage Ways slot
+
+- Новый premium heist slot 5×4 / Ways, 12 regular symbols, Master Key, Vault Seal и редкий Grand Take.
+- Шесть различных модификаторов; COLLECT / GO DEEPER, настоящий Alarm Check и unbanked bonus loot.
+- Один shared-wallet round, checkpoints до анимации, idempotent SQL RPC, RLS, cross-device conflict recovery.
+- Новая карточка SLOTS без смены Featured; исходные семь игр сохранены.
+- Полная конфигурация и симуляции 10k/100k по трём стратегиям, THRESHOLD simulator, Help/Paytable.
+- Для включения игры выполнить целиком `supabase_heist.txt`. Подробности: [VAULT_HEIST.md](VAULT_HEIST.md).
+
 # Swamp Fishing — approved symbols and bonus-only Collector progression
 
 - Новые прозрачные Scatter (рыба влево, встроенная надпись) и Collector из предоставленного архива; отдельный портрет для шкалы.

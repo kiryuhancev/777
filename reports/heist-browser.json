@@ -1,0 +1,20 @@
+{
+  "mode": "Actual Chromium + Supabase SDK HTTP fixture; RLS separately tested in PostgreSQL",
+  "passed": [
+    "Auth/lobby registration, 5x4 assets decode, base debit and settlement once, F5 exact wallet; leaving mid-animation restores safe scene",
+    "Trigger wager locked; free stage spins do not debit; F5 mid-animation and on decision; five viewports, accessible choice",
+    "Cross-device restore and competing Collect: stale branch reconciles without duplicate payout or statistics",
+    "Alarm committed before animation; reload cannot retry; only base win survives failure",
+    "Lost committed payout reply followed by F5 retries idempotently without duplicate wallet/statistics",
+    "Offline action saved locally; reconnect sends bounded queue and preserves shared wallet",
+    "Safe Deeper/F5, navigation pauses continuation; shared balance and account isolation",
+    "Missing migration disables only new slot, with no debit or poisoned outbox"
+  ],
+  "pageErrors": [],
+  "expectedConflictConsoleErrors": [
+    "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+    "VAULT sync failed {message: VAULT_WALLET_CONFLICT}",
+    "Failed to load resource: net::ERR_FAILED",
+    "VAULT sync failed {message: TypeError: Failed to fetch, details: TypeError: Failed to fetch\n    at fetch (http://12\u20262guYmluZChyKSl9KSgpLG8oNDQwKX0pKCkpKTs=:1:110650), hint: , code: }"
+  ]
+}

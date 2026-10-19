@@ -1,0 +1,19 @@
+const VAULT_HEIST_ASSETS={
+ mask:'__HEIST_symbols/mask.webp__',
+ gloves:'__HEIST_symbols/gloves.webp__',
+ flashlight:'__HEIST_symbols/flashlight.webp__',
+ card:'__HEIST_symbols/card.webp__',
+ tablet:'__HEIST_symbols/tablet.webp__',
+ bag:'__HEIST_symbols/bag.webp__',
+ cutter:'__HEIST_symbols/cutter.webp__',
+ override:'__HEIST_symbols/override.webp__',
+ gold:'__HEIST_symbols/gold.webp__',
+ diamond:'__HEIST_symbols/diamond.webp__',
+ artifact:'__HEIST_symbols/artifact.webp__',
+ core:'__HEIST_symbols/core.webp__',
+ wild:'__HEIST_symbols/wild.webp__',
+ scatter:'__HEIST_symbols/scatter.webp__',
+ grand:'__HEIST_symbols/grand.webp__',
+ alarm:'__HEIST_symbols/alarm.webp__',
+ environment:'__HEIST_environment.webp__'
+};

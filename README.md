@@ -18,3 +18,7 @@ The seventh game is **MINES**, an ARCADE vault extraction grid using the existin
 ### Latest database update: admin + Swamp controls
 
 For existing installations, run the **entire [supabase_admin_swamp.txt](supabase_admin_swamp.txt)** file once in SQL Editor, then refresh VAULT. It includes MINES activation and new bonus purchases; preserves funds/accounts; and securely enables ADMIN in the account menu for confirmed `al.kiryuhancev@yandex.ru`. See [ADMIN_SETUP.md](ADMIN_SETUP.md). Do not apply older registry migrations afterward. [SWAMP_SLOT.md](SWAMP_SLOT.md) documents the revised ~1/158 natural bonus frequency, RTP sample, AUTO choices and bonus pricing.
+
+## VAULT HEIST
+
+Новый Ways slot с шестью этапами, COLLECT / GO DEEPER и shared wallet. Для существующей БД выполнить целиком [supabase_heist.txt](supabase_heist.txt). [Конфигурация, симуляции, assets и проверки](VAULT_HEIST.md).

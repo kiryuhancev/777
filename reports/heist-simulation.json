@@ -1,0 +1,408 @@
+{
+  "config": {
+    "id": "vault_heist",
+    "version": 1,
+    "columns": 5,
+    "rows": 4,
+    "stageSpins": 3,
+    "maxWinX": 10000,
+    "waysPayScale": 1.15,
+    "profileLowDecay": 0.035,
+    "scatterChance": 0.1,
+    "wildChance": 0.012,
+    "initialLoot": {
+      "3": 23,
+      "4": 35,
+      "5": 70
+    },
+    "stages": [
+      "BLUEPRINT",
+      "ACCESS",
+      "BREACH",
+      "VAULT OPEN",
+      "DEEP CHAMBER",
+      "GRAND TAKE"
+    ],
+    "stageMultipliers": [
+      1,
+      1.25,
+      1.6,
+      2.2,
+      3.2,
+      5
+    ],
+    "alarmRisks": [
+      0.08,
+      0.12,
+      0.16,
+      0.24,
+      0.35,
+      0
+    ],
+    "profileHighBoost": [
+      1,
+      1.08,
+      1.18,
+      1.3,
+      1.45,
+      1.65
+    ],
+    "wildBoost": [
+      1,
+      1.15,
+      1.3,
+      1.45,
+      1.6,
+      1.8
+    ],
+    "scanChance": 0.12,
+    "scanMultiplier": 1.25,
+    "accessChance": 0.32,
+    "breachChance": 0.18,
+    "lootChance": 0.22,
+    "lootTokenX": 0.5,
+    "artifactChance": 0.22,
+    "artifactMultipliers": [
+      2,
+      3,
+      5
+    ],
+    "grandChance": 0.018,
+    "grandPays": [
+      4,
+      15,
+      50
+    ],
+    "alarmChance": 0.04,
+    "overrideChance": 0.025,
+    "alarmAdd": 0.02,
+    "overrideReduce": 0.03,
+    "minRisk": 0.01,
+    "maxRisk": 0.65,
+    "autoChoices": [
+      10,
+      25,
+      50,
+      100,
+      -1
+    ],
+    "timing": {
+      "initial": 170,
+      "reel": 125,
+      "fastInitial": 50,
+      "fastReel": 55,
+      "pause": 500,
+      "transition": 800
+    },
+    "symbols": [
+      {
+        "id": "mask",
+        "name": "Mask",
+        "weight": 10,
+        "tier": 0,
+        "pays": [
+          0.2,
+          0.6,
+          1.5
+        ]
+      },
+      {
+        "id": "gloves",
+        "name": "Tactical gloves",
+        "weight": 10,
+        "tier": 0,
+        "pays": [
+          0.2,
+          0.6,
+          1.5
+        ]
+      },
+      {
+        "id": "flashlight",
+        "name": "Flashlight",
+        "weight": 10,
+        "tier": 0,
+        "pays": [
+          0.2,
+          0.6,
+          1.5
+        ]
+      },
+      {
+        "id": "card",
+        "name": "Access card",
+        "weight": 10,
+        "tier": 0,
+        "pays": [
+          0.2,
+          0.6,
+          1.5
+        ]
+      },
+      {
+        "id": "tablet",
+        "name": "Hacker tablet",
+        "weight": 8,
+        "tier": 1,
+        "pays": [
+          0.4,
+          1.2,
+          3
+        ]
+      },
+      {
+        "id": "bag",
+        "name": "Duffel bag",
+        "weight": 8,
+        "tier": 1,
+        "pays": [
+          0.4,
+          1.2,
+          3
+        ]
+      },
+      {
+        "id": "cutter",
+        "name": "Laser cutter",
+        "weight": 8,
+        "tier": 1,
+        "pays": [
+          0.4,
+          1.2,
+          3
+        ]
+      },
+      {
+        "id": "override",
+        "name": "Override module",
+        "weight": 8,
+        "tier": 1,
+        "pays": [
+          0.4,
+          1.2,
+          3
+        ]
+      },
+      {
+        "id": "gold",
+        "name": "Gold bar",
+        "weight": 4,
+        "tier": 2,
+        "pays": [
+          1,
+          3,
+          8
+        ]
+      },
+      {
+        "id": "diamond",
+        "name": "Diamond",
+        "weight": 4,
+        "tier": 2,
+        "pays": [
+          1,
+          3,
+          8
+        ]
+      },
+      {
+        "id": "artifact",
+        "name": "Artifact capsule",
+        "weight": 4,
+        "tier": 2,
+        "pays": [
+          1,
+          3,
+          8
+        ]
+      },
+      {
+        "id": "core",
+        "name": "Vault core",
+        "weight": 4,
+        "tier": 2,
+        "pays": [
+          1,
+          3,
+          8
+        ]
+      }
+    ]
+  },
+  "results": [
+    {
+      "spins": 10000,
+      "strategy": "SAFE",
+      "seed": 80391,
+      "totalBet": 10000,
+      "totalPayout": 9859.610956999719,
+      "baseHits": 3864,
+      "triggers": 90,
+      "busts": 0,
+      "heistValue": 2458.0959570000005,
+      "cashouts": 90,
+      "cashoutSum": 2458.0959570000005,
+      "maxWin": 73.68,
+      "stageReach": [
+        90,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "rtp": 0.9859610956999719,
+      "baseHitRate": 0.3864,
+      "triggerFrequency": 0.009,
+      "averageRoundsBetweenHeists": 111.11111111111111,
+      "averageHeistValue": 27.312177300000005,
+      "bustRate": 0,
+      "averageCashout": 27.312177300000005
+    },
+    {
+      "spins": 10000,
+      "strategy": "BALANCED",
+      "seed": 80391,
+      "totalBet": 10000,
+      "totalPayout": 10154.903206999692,
+      "baseHits": 3864,
+      "triggers": 90,
+      "busts": 20,
+      "heistValue": 2753.388207,
+      "cashouts": 70,
+      "cashoutSum": 2753.388207,
+      "maxWin": 97.382,
+      "stageReach": [
+        90,
+        78,
+        70,
+        0,
+        0,
+        0
+      ],
+      "rtp": 1.0154903206999693,
+      "baseHitRate": 0.3864,
+      "triggerFrequency": 0.009,
+      "averageRoundsBetweenHeists": 111.11111111111111,
+      "averageHeistValue": 30.593202299999998,
+      "bustRate": 0.2222222222222222,
+      "averageCashout": 39.33411724285714
+    },
+    {
+      "spins": 10000,
+      "strategy": "AGGRESSIVE",
+      "seed": 80391,
+      "totalBet": 10000,
+      "totalPayout": 9398.438390999718,
+      "baseHits": 3864,
+      "triggers": 90,
+      "busts": 64,
+      "heistValue": 1996.923391,
+      "cashouts": 26,
+      "cashoutSum": 1996.923391,
+      "maxWin": 165.4195,
+      "stageReach": [
+        90,
+        78,
+        70,
+        54,
+        39,
+        26
+      ],
+      "rtp": 0.9398438390999718,
+      "baseHitRate": 0.3864,
+      "triggerFrequency": 0.009,
+      "averageRoundsBetweenHeists": 111.11111111111111,
+      "averageHeistValue": 22.18803767777778,
+      "bustRate": 0.7111111111111111,
+      "averageCashout": 76.80474580769231
+    },
+    {
+      "spins": 100000,
+      "strategy": "SAFE",
+      "seed": 80391,
+      "totalBet": 100000,
+      "totalPayout": 95327.75006000482,
+      "baseHits": 37844,
+      "triggers": 855,
+      "busts": 0,
+      "heistValue": 22708.01005999995,
+      "cashouts": 855,
+      "cashoutSum": 22708.01005999995,
+      "maxWin": 124.9475,
+      "stageReach": [
+        855,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "rtp": 0.9532775006000482,
+      "baseHitRate": 0.37844,
+      "triggerFrequency": 0.00855,
+      "averageRoundsBetweenHeists": 116.95906432748538,
+      "averageHeistValue": 26.559076093567192,
+      "bustRate": 0,
+      "averageCashout": 26.559076093567192
+    },
+    {
+      "spins": 100000,
+      "strategy": "BALANCED",
+      "seed": 80391,
+      "totalBet": 100000,
+      "totalPayout": 99397.7476070053,
+      "baseHits": 37844,
+      "triggers": 855,
+      "busts": 193,
+      "heistValue": 26778.007606999996,
+      "cashouts": 662,
+      "cashoutSum": 26778.007606999996,
+      "maxWin": 198.5705,
+      "stageReach": [
+        855,
+        762,
+        662,
+        0,
+        0,
+        0
+      ],
+      "rtp": 0.9939774760700529,
+      "baseHitRate": 0.37844,
+      "triggerFrequency": 0.00855,
+      "averageRoundsBetweenHeists": 116.95906432748538,
+      "averageHeistValue": 31.319307142690054,
+      "bustRate": 0.22573099415204678,
+      "averageCashout": 40.45016254833836
+    },
+    {
+      "spins": 100000,
+      "strategy": "AGGRESSIVE",
+      "seed": 80391,
+      "totalBet": 100000,
+      "totalPayout": 94605.54717300445,
+      "baseHits": 37844,
+      "triggers": 855,
+      "busts": 586,
+      "heistValue": 21985.80717300001,
+      "cashouts": 269,
+      "cashoutSum": 21985.80717300001,
+      "maxWin": 481.735,
+      "stageReach": [
+        855,
+        762,
+        662,
+        568,
+        417,
+        269
+      ],
+      "rtp": 0.9460554717300446,
+      "baseHitRate": 0.37844,
+      "triggerFrequency": 0.00855,
+      "averageRoundsBetweenHeists": 116.95906432748538,
+      "averageHeistValue": 25.714394354385973,
+      "bustRate": 0.6853801169590643,
+      "averageCashout": 81.73162517843869
+    }
+  ]
+}
