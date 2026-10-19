@@ -49,9 +49,10 @@ RLS включён для нового `vault_heist_events`: только соб
 
 - `assets/heist/environment.webp` — окружение, не flattened UI.
 - `assets/heist/lobby-card.webp` — отдельная 16:9 key art с открытой дверью, без надписей/UI.
-- `assets/heist/sources/symbols.png` — исходный прозрачный 4×4 sheet.
-- `assets/heist/symbols/` — 16 отдельных прозрачных WebP: mask, gloves, flashlight, card, tablet, bag, cutter, override, gold, diamond, artifact, core, wild, scatter, grand, alarm.
-- `tools/prepare-heist-assets.py` — техническое извлечение dominant object из каждой cell без соседних фрагментов.
+- `assets/heist/approved-symbols/isolated_webp/` — 15 утверждённых пользовательских оригиналов, подключённых без обрезки/перерисовки. Пути, соответствия и отображение: [HEIST_SYMBOLS.md](HEIST_SYMBOLS.md).
+- `assets/heist/approved-symbols/reference_crops/` — предоставленные эталоны; `manifest.json` — контрольные суммы и размеры.
+- `assets/heist/sources/symbols.png` и `assets/heist/symbols/` — сохранённый прежний сгенерированный набор; из него остаётся только служебный Alarm.
+- `tools/prepare-heist-assets.py` — историческая подготовка прежнего sheet, не используется для новых оригиналов.
 
 Настоящий HTML/CSS UI: reels, stage nodes, probability HUD, choice panel, loot pile, controls/help. Изображение не содержит кнопок/правил. Stage lighting/background shift, SCAN marks, winning frames, mechanical reel motion, короткие access/alarm/collect transitions. Учитывается reduced motion, mobile choice stack и клавиатура. Preload однократно. Аудио — короткие собственные WebAudio tones; event hooks `vault-heist:<event>` для будущих оригинальных звуков.
 

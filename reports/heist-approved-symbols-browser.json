@@ -1,0 +1,17 @@
+{
+  "mode": "Chromium + actual standalone HTML/Supabase SDK HTTP fixture; no live DB",
+  "passed": [
+    "All 15 original RGBA WebP sources decode at 512x512 and remain byte-identical in the standalone HTML",
+    "Actual authenticated starting scene uses the approved symbols on desktop and mobile",
+    "Existing paytable opens with all 13 regular/Grand Take original images decoded and using the shared contain renderer without color filters",
+    "All 15 symbols fit five viewport sizes including 320px, including the full 1.075x win pulse; contain preserves proportions and no image filter changes colors",
+    "Showcase leaves wallet/checkpoint/round history unchanged; no RNG round is created or saved; unique DOM IDs"
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "screenshots": [
+    "heist-approved-symbols-desktop.png",
+    "heist-approved-symbols-mobile.png",
+    "heist-approved-symbols-all.png"
+  ]
+}

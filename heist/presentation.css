@@ -36,3 +36,6 @@ body.heist-active .app,body.heist-active #slotApp,body.heist-active #pokerApp,bo
 @media(max-width:700px){#heistApp .heist-controls{grid-template-columns:64px minmax(0,1fr) 64px}#heistApp #heistSettings{width:46px;justify-self:center}#heistApp #heistAuto{width:100%;height:46px;grid-column:auto;grid-row:auto}}
 body.heist-active .toast,body.swamp-active .toast{top:auto;bottom:18px;left:50%;right:auto;width:max-content;max-width:calc(100vw - 24px);height:auto;transform:translateX(-50%);text-align:center;font-size:12px;line-height:1.5}body.heist-active .toast.show,body.swamp-active .toast.show{transform:translateX(-50%)}
 #heistApp .heist-results{position:relative;min-height:64px}#heistApp .heist-win-banner{inset:0;display:flex;flex-direction:column;justify-content:center;margin:0;box-shadow:0 0 18px #dfaf4520}
+
+/* Approved originals: retain all pixels/proportions; scale their transparent canvas only. */
+#heistApp img.heist-symbol{scale:var(--heist-symbol-scale,1);object-fit:contain;filter:none}

@@ -1,0 +1,216 @@
+{
+  "sourceArchive": "VAULT_HEIST_symbols_separate_for_Codex.zip",
+  "sourceArchiveSha256": "836650ac0f95ca81c96f44ef7d5ebb2686b60376e91940726e28798e7c95075c",
+  "files": [
+    {
+      "id": "mask",
+      "path": "assets/heist/approved-symbols/isolated_webp/mask.webp",
+      "sha256": "9ce3b97824b43b19b92a81c5e337bcf4fc388220393022176e08b7369b138865",
+      "width": 512,
+      "height": 512,
+      "alphaBounds": [
+        154,
+        163,
+        354,
+        348
+      ],
+      "displayScale": 2.208627
+    },
+    {
+      "id": "gloves",
+      "path": "assets/heist/approved-symbols/isolated_webp/tactical_glove.webp",
+      "sha256": "4bf87b9ce533161f587c4aff7d08a87aeb7fa4f83689bf7328fe72b9f63b7541",
+      "width": 512,
+      "height": 512,
+      "alphaBounds": [
+        160,
+        163,
+        352,
+        341
+      ],
+      "displayScale": 2.346667
+    },
+    {
+      "id": "flashlight",
+      "path": "assets/heist/approved-symbols/isolated_webp/flashlight.webp",
+      "sha256": "269552e3f3b273148729733e75e799560ed58fe0e7cacf2a23bdc12864f7b017",
+      "width": 512,
+      "height": 512,
+      "alphaBounds": [
+        148,
+        174,
+        363,
+        344
+      ],
+      "displayScale": 2.085926
+    },
+    {
+      "id": "card",
+      "path": "assets/heist/approved-symbols/isolated_webp/access_card.webp",
+      "sha256": "af673153082afe36c1ec84cdf77cb47a61c701afe7f624d431ed1ff3c58e2634",
+      "width": 512,
+      "height": 512,
+      "alphaBounds": [
+        156,
+        175,
+        362,
+        343
+      ],
+      "displayScale": 2.125283
+    },
+    {
+      "id": "tablet",
+      "path": "assets/heist/approved-symbols/isolated_webp/hacker_tablet.webp",
+      "sha256": "01db859d4674bf53474071646c090fe9b2e69e9697a1652ce7327f8074220f95",
+      "width": 512,
+      "height": 512,
+      "alphaBounds": [
+        149,
+        163,
+        366,
+        348
+      ],
+      "displayScale": 2.048
+    },
+    {
+      "id": "bag",
+      "path": "assets/heist/approved-symbols/isolated_webp/duffel_bag.webp",
+      "sha256": "52129f677dae2d3fe4914a491e5c9e6b3d194fa0693eba54b5c326a858d24aae",
+      "width": 512,
+      "height": 512,
+      "alphaBounds": [
+        154,
+        168,
+        363,
+        348
+      ],
+      "displayScale": 2.105421
+    },
+    {
+      "id": "cutter",
+      "path": "assets/heist/approved-symbols/isolated_webp/laser_cutter.webp",
+      "sha256": "7d7c582c7e391296112e94461673877a29b6a2053b27efc0614397ad427f4d54",
+      "width": 512,
+      "height": 512,
+      "alphaBounds": [
+        136,
+        168,
+        376,
+        343
+      ],
+      "displayScale": 1.877333
+    },
+    {
+      "id": "override",
+      "path": "assets/heist/approved-symbols/isolated_webp/override_module.webp",
+      "sha256": "7f0db8a66fd062c733cf08e6b255fde9b6ebec9a972c5fe662ccdc317ec3588e",
+      "width": 512,
+      "height": 512,
+      "alphaBounds": [
+        143,
+        168,
+        368,
+        343
+      ],
+      "displayScale": 1.993628
+    },
+    {
+      "id": "gold",
+      "path": "assets/heist/approved-symbols/isolated_webp/gold_bar.webp",
+      "sha256": "97a3d9b95ae394c96acecf07378e5c98ebb2abc85ca7db23282af28c99cb5797",
+      "width": 512,
+      "height": 512,
+      "alphaBounds": [
+        160,
+        168,
+        359,
+        343
+      ],
+      "displayScale": 2.187184
+    },
+    {
+      "id": "diamond",
+      "path": "assets/heist/approved-symbols/isolated_webp/diamond.webp",
+      "sha256": "44eeebc32c41b8de901b46bd19fcb66281afadac1b1d616fb700c330458c2633",
+      "width": 512,
+      "height": 512,
+      "alphaBounds": [
+        150,
+        168,
+        363,
+        343
+      ],
+      "displayScale": 2.105421
+    },
+    {
+      "id": "artifact",
+      "path": "assets/heist/approved-symbols/isolated_webp/artifact_capsule.webp",
+      "sha256": "3a940f37224e8ccba55957900b7ee68804999358cdf50458eb5d67cf13fba07f",
+      "width": 512,
+      "height": 512,
+      "alphaBounds": [
+        143,
+        166,
+        368,
+        346
+      ],
+      "displayScale": 1.993628
+    },
+    {
+      "id": "core",
+      "path": "assets/heist/approved-symbols/isolated_webp/vault_core.webp",
+      "sha256": "cedb65e4acd4a2d515ad6c35c3333634ca193d14c92625ea5a62ae0a928fc9fd",
+      "width": 512,
+      "height": 512,
+      "alphaBounds": [
+        146,
+        166,
+        366,
+        346
+      ],
+      "displayScale": 2.048
+    },
+    {
+      "id": "wild",
+      "path": "assets/heist/approved-symbols/isolated_webp/wild_master_key.webp",
+      "sha256": "4cb9b66c8a954aa0b04981d49897c10b6a56212b27be4dd3c2c7f73096bfc79b",
+      "width": 512,
+      "height": 512,
+      "alphaBounds": [
+        108,
+        151,
+        403,
+        361
+      ],
+      "displayScale": 1.522162
+    },
+    {
+      "id": "scatter",
+      "path": "assets/heist/approved-symbols/isolated_webp/scatter_vault_seal.webp",
+      "sha256": "117e2b89e8afeeb0fcb80b10b0bdbaa11f660c8bdf318063499822ca7f301c6a",
+      "width": 512,
+      "height": 512,
+      "alphaBounds": [
+        131,
+        148,
+        381,
+        363
+      ],
+      "displayScale": 1.80224
+    },
+    {
+      "id": "grand",
+      "path": "assets/heist/approved-symbols/isolated_webp/grand_take.webp",
+      "sha256": "e5fe0807eb14b0d3a146312d34908009847216b79b6d18ddee1c00bfc7e8cafd",
+      "width": 512,
+      "height": 512,
+      "alphaBounds": [
+        106,
+        148,
+        406,
+        363
+      ],
+      "displayScale": 1.501867
+    }
+  ]
+}

@@ -1,3 +1,10 @@
+# VAULT HEIST — approved original symbols
+
+- Все 15 отдельных WebP подключены из пользовательского архива напрямую: без обрезки, перекодирования и перерисовки.
+- Прозрачные поля учтены только масштабом отображения; целые предметы, исходные пропорции и свечение сохранены в reels, paytable и loot pile.
+- Оригиналы и эталоны сохранены в `assets/heist/approved-symbols/`, SHA-256 зафиксированы в manifest. Подробности: [HEIST_SYMBOLS.md](HEIST_SYMBOLS.md).
+- Текущий фон, RNG, выплаты, бонусы, wallet/auth, БД и остальные игры сохранены. Для этой замены символов SQL не нужен.
+
 # Slot controls, visible HEIST wins, bonus purchases and Scatter Boost
 
 - HEIST: более медленные strip reels с последовательными остановками; яркие выигрышные ячейки и Ways, фактическая выплата/loot, пауза даже в FAST.
