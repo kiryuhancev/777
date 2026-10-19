@@ -2,7 +2,7 @@ const SWAMP_CONFIG=Object.freeze({
  version:2,gameId:'swamp',displayName:'SWAMP FISHING',nameIsPlaceholder:true,GAME_LOGO_SRC:'',
  rows:3,reels:5,targetRtp:.96,maxWinX:50000,
  // Scatter is selected once per reel, at most one per reel. No conditioned redraws.
- scatterPerReel:.09,moneyChanceBase:.075,moneyChanceBonus:.15,collectorChance:.028,
+ scatterPerReel:.09,scatterBoost:{symbolMultiplier:1.28,costMultiplier:1.5},moneyChanceBase:.075,moneyChanceBonus:.15,collectorChance:.028,
  collectorReels:[1,2,3],collectorsPerUpgrade:4,retriggerSpins:10,multipliers:[1,2,3,10],
  freeSpins:{3:10,4:15,5:20},
  autoChoices:[10,25,50,100,-1],timing:{initial:240,reel:180,anticipation:260,fastInitial:70,fastReel:75,pause:600},

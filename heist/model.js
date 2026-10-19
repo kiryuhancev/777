@@ -3,11 +3,11 @@ const VAULT_HEIST_MODEL=(()=>{
  const C=typeof VAULT_HEIST_CONFIG!=='undefined'?VAULT_HEIST_CONFIG:require('./config.js'),clone=x=>JSON.parse(JSON.stringify(x)),round=n=>Math.round(n*1e6)/1e6;
  function seeded(seed){let a=seed>>>0;return()=>{a+=0x6D2B79F5;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
  function weighted(list,rng){let x=rng()*list.reduce((n,s)=>n+s.weight,0);for(const s of list){x-=s.weight;if(x<0)return s;}return list.at(-1);}
- function generate(stage,rng){
+ function generate(stage,rng,boost=false){
   const bonus=stage>=0,profile=C.symbols.map(s=>({...s,weight:s.weight*(bonus?(s.tier===2?C.profileHighBoost[stage]:s.tier===0?1/(1+stage*C.profileLowDecay):1):1)}));
   const grid=Array.from({length:5},()=>Array.from({length:4},()=>weighted(profile,rng).id));
   for(let c=0;c<5;c++){
-   if(!bonus&&rng()<C.scatterChance)grid[c][Math.floor(rng()*4)]='scatter';
+   if(!bonus&&rng()<C.scatterChance*(boost?C.scatterBoost.symbolMultiplier:1))grid[c][Math.floor(rng()*4)]='scatter';
    for(let r=0;r<4;r++)if(grid[c][r]!=='scatter'&&rng()<C.wildChance*(bonus?C.wildBoost[stage]:1))grid[c][r]='wild';
   }
   const marks=[],effects=[];
@@ -39,12 +39,14 @@ const VAULT_HEIST_MODEL=(()=>{
   return {...scene,wins,winX:round((winX*C.waysPayScale*artifact+tokens)*(stage>=0?C.stageMultipliers[stage]:1)),tokens,artifact,riskDelta,alarm,disabled,scatters:grid.filter(col=>col.includes('scatter')).length};
  }
  const active=r=>r&&['STAGE','CHOICE'].includes(r.status);
- function risk(r){return r.stage>=5?0:round(Math.max(C.minRisk,Math.min(C.maxRisk,C.alarmRisks[r.stage]+r.alarmModifier)));}
+ function risk(r){return r.stage>=5?0:round(Math.max(C.minRisk,Math.min(C.maxRisk,C.alarmRisks[r.stage]*(C.purchases.find(o=>o.id===r.purchaseType)?.riskMultiplier??1)+r.alarmModifier)));}
  function cap(r){if(r.baseWinX+r.lootX>=C.maxWinX){r.lootX=Math.max(0,C.maxWinX-r.baseWinX);r.status='SETTLED';r.result='max-win';}return r;}
  function finalize(r,result){r.status='SETTLED';r.result=result;r.payout=round((r.baseWinX+(result==='alarm'?0:r.lootX))*r.bet);return r;}
- function start({seed,bet,roundId}){
-  const rng=seeded(seed),outcome=evaluate(generate(-1,rng),-1,rng),baseWinX=Math.min(C.maxWinX,outcome.winX),trigger=outcome.scatters>=3;
-  const r={version:1,roundId,seed:seed>>>0,bet,step:0,status:trigger?'STAGE':'SETTLED',stage:0,remaining:trigger?C.stageSpins:0,baseWinX,lootX:trigger?C.initialLoot[outcome.scatters]:0,alarmModifier:0,decisions:[],completed:[],maxStage:0,maxRisk:0,result:trigger?'heist-triggered':'base',payout:0,outcome};
+ function start({seed,bet,roundId,version=1,scatterBoost=false,purchaseType=null}){
+  const offer=purchaseType?C.purchases.find(o=>o.id===purchaseType):null;if(purchaseType&&!offer)throw Error('Invalid Heist purchase');if(offer&&scatterBoost)throw Error('Boost does not apply to purchases');
+  const rng=seeded(seed),outcome=offer?{grid:Array.from({length:5},(_,c)=>Array.from({length:4},(_,r)=>C.symbols[(c*4+r)%C.symbols.length].id)),marks:[],effects:[],wins:[],winX:0,tokens:0,artifact:1,riskDelta:0,alarm:false,disabled:false,scatters:0}:evaluate(generate(-1,rng,scatterBoost),-1,rng),baseWinX=Math.min(C.maxWinX,outcome.winX),trigger=!!offer||outcome.scatters>=3;
+  const r={version:1,roundId,seed:seed>>>0,bet,step:0,status:trigger?'STAGE':'SETTLED',stage:0,remaining:trigger?C.stageSpins:0,baseWinX,lootX:trigger?(offer?offer.lootX:C.initialLoot[outcome.scatters]):0,alarmModifier:0,decisions:[],completed:[],maxStage:0,maxRisk:0,result:trigger?'heist-triggered':'base',payout:0,outcome};
+  if(version===2||scatterBoost||offer)Object.assign(r,{version:2,scatterBoost:!!scatterBoost,purchaseType:offer?.id||null,cost:round(bet*(offer?offer.costX:scatterBoost?C.scatterBoost.costMultiplier:1))});
   cap(r);if(r.status==='SETTLED')finalize(r,r.result);return r;
  }
  function advance(input,action){
@@ -66,10 +68,10 @@ const VAULT_HEIST_MODEL=(()=>{
  }
  // Validate by reproducing the entire business action prefix (at most 24 transitions).
  function validate(x){try{
-  if(!x||x.version!==1||typeof x.roundId!=='string'||!(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x.roundId))||!Number.isInteger(x.seed)||x.seed<0||x.seed>4294967295||!Number.isFinite(x.bet)||x.bet<=0||x.bet>1e9||!Number.isInteger(x.step)||x.step<0||x.step>24||!Array.isArray(x.decisions))return null;
+  if(!x||![1,2].includes(x.version)||typeof x.roundId!=='string'||!(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x.roundId))||!Number.isInteger(x.seed)||x.seed<0||x.seed>4294967295||!Number.isFinite(x.bet)||x.bet<=0||x.bet>1e9||!Number.isInteger(x.step)||x.step<0||x.step>24||!Array.isArray(x.decisions))return null;
   let r=start(x);while(r.step<x.step&&active(r)){const a=r.status==='STAGE'?'spin':x.decisions.find(d=>d.stage===r.stage)?.action;if(!a)return null;r=advance(r,a);}
   const stable=v=>v&&typeof v==='object'?Array.isArray(v)?v.map(stable):Object.fromEntries(Object.keys(v).sort().map(k=>[k,stable(v[k])])):v;return JSON.stringify(stable(r))===JSON.stringify(stable(x))?r:null;
  }catch{return null;}}
- return {seeded,weighted,generate,evaluate,start,advance,risk,active,validate,round};
+ return {seeded,weighted,generate,evaluate,start,advance,risk,active,validate,round,cost:r=>r.cost??r.bet};
 })();
 if(typeof module!=='undefined')module.exports=VAULT_HEIST_MODEL;

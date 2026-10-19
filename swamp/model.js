@@ -3,10 +3,10 @@ const SWAMP_MODEL=(()=>{
  const C=SWAMP_CONFIG,money=n=>Math.round(n*1e6)/1e6;
  function seeded(seed){let a=seed>>>0;return()=>{a+=0x6D2B79F5;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
  function pick(entries,rng){const sum=entries.reduce((n,e)=>n+e.weight,0);let t=rng()*sum;for(const e of entries){t-=e.weight;if(t<0)return e;}return entries[entries.length-1];}
- function generate(bonus=false,rng=Math.random,config=C){
+ function generate(bonus=false,rng=Math.random,config=C,boost=false){
   const grid=Array.from({length:5},()=>[]);
   for(let reel=0;reel<5;reel++){
-   const scatterRow=!bonus&&rng()<config.scatterPerReel?Math.floor(rng()*3):-1;
+   const scatterRow=!bonus&&rng()<config.scatterPerReel*(boost?config.scatterBoost.symbolMultiplier:1)?Math.floor(rng()*3):-1;
    for(let row=0;row<3;row++){
     if(row===scatterRow){grid[reel].push({id:'scatter'});continue;}
     if(bonus&&config.collectorReels.includes(reel)&&rng()<config.collectorChance){grid[reel].push({id:'collector'});continue;}

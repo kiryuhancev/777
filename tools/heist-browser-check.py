@@ -30,9 +30,9 @@ def route(r):
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
  def context():
-  c=b.new_context(viewport={'width':1440,'height':1080});c.route('https://**',lambda r:r.abort());c.route('https://vault-test.supabase.co/**',route);c.route('http://127.0.0.1:8777/**',lambda r:r.fulfill(content_type='text/html',body=HTML));c.add_init_script('const nt=setTimeout;window.setTimeout=(fn,ms,...a)=>nt(fn,ms===500?100000:ms,...a)');return c
+  c=b.new_context(viewport={'width':1440,'height':1080});c.route('https://**',lambda r:r.abort());c.route('https://vault-test.supabase.co/**',route);c.route('http://127.0.0.1:8777/**',lambda r:r.fulfill(content_type='text/html',body=HTML));c.add_init_script('const nt=setTimeout;window.setTimeout=(fn,ms,...a)=>nt(fn,(ms===500||ms===600)?100000:ms,...a)');return c
  def login(c,email='alice@example.test'):
-  pg=c.new_page();pg.on('pageerror',lambda e:errors.append(str(e)));pg.on('console',lambda m:expected_errors.append(m.text) if m.type=='error' else None);pg.goto('http://127.0.0.1:8777/');pg.wait_for_function('VaultSession.ready');pg.evaluate('email=>VaultAuth.signIn(email,"fixture-password")',email);pg.evaluate('VaultHeist.open()');pg.wait_for_function('VaultHeist.inspect().ready');pg.evaluate('state.fastGame=true');return pg
+  pg=c.new_page();pg.on('pageerror',lambda e:errors.append(str(e)));pg.on('console',lambda m:expected_errors.append(m.text) if m.type=='error' else None);pg.goto('http://127.0.0.1:8777/');pg.wait_for_function('VaultSession.ready');pg.evaluate('email=>VaultAuth.signIn(email,"fixture-password")',email);pg.evaluate('VaultHeist.open()');pg.wait_for_function('VaultHeist.inspect().ready');pg.evaluate('state.fastGame=true;state.fastBonus=true');return pg
  def sync(pg):pg.evaluate('VaultSync.flush()');pg.wait_for_function('!VaultStorage.inspect().data.queue.length&&!VaultStorage.inspect().conflict',timeout=20000)
  def checkpoint(pg):return pg.evaluate('VaultHeist.getCheckpoint()')
  def play(pg,s=None):

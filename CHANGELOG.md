@@ -1,3 +1,13 @@
+# Slot controls, visible HEIST wins, bonus purchases and Scatter Boost
+
+- HEIST: более медленные strip reels с последовательными остановками; яркие выигрышные ячейки и Ways, фактическая выплата/loot, пауза даже в FAST.
+- Общая панель Settings / BET / AUTO / MAX / SPIN / BONUS, выбор числа автоспинов, две покупки HEIST и переключатель Scatter Boost.
+- HEIST за 31.5× ставки; SUPER HEIST за 79×, 70× initial loot и половинный базовый Alarm Risk; решения игрока сохранены.
+- Boost в HEIST и Swamp: ×1.5 цена платного спина, базовые выплаты, без доплаты в бонусах/покупках. Общий preference с существующим Digital Derby.
+- Version-1 checkpoints совместимы; новые режимы фиксируют цену и mode в version 2. SQL RPC проверяет цены/повторы/режим и сохраняет данные.
+- Обычная математика HEIST/Swamp и остальные шесть игр не изменены. Проверки и результаты симуляций: [SLOT_FEATURES.md](SLOT_FEATURES.md).
+- Для новых функций выполнить целиком `supabase_slot_features.txt`. Обычные режимы работают с прежней БД.
+
 # VAULT HEIST — six-stage Ways slot
 
 - Новый premium heist slot 5×4 / Ways, 12 regular symbols, Master Key, Vault Seal и редкий Grand Take.

@@ -2,7 +2,7 @@
   "mode": "Chromium + actual SDK HTTP fixture, not live Supabase",
   "passed": [
     "AUTO offers 10/25/50/100/unlimited, locks bet, STOP finishes only the current spin",
-    "Normal no-anticipation spin lasts 1240ms, with deterministic result unaffected by timing",
+    "Normal no-anticipation spin lasts 1252ms, with deterministic result unaffected by timing",
     "10 FS costs 77x once; stake and paid entitlement survive immediate F5; duplicate purchase blocked",
     "Six-function toolbar fits desktop and 390/320 mobile widths, with visible >=44px controls",
     "20 FS entry costs 350x once, starts normal x1 collector progression and has its own feature UUID"

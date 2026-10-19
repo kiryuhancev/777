@@ -9,6 +9,7 @@ const VaultSwamp=window.VaultSwamp=(()=>{
  const hasBonus=()=>!!bonus&&bonus.remaining>0;
  const wager=()=>hasBonus()?bonus.bet:BETS[betIndex];
  const money=n=>Math.round(n*1e6)/1e6;
+ const boosted=()=>!!state.scatterBoost&&!!window.VaultRoundService?.swampBoostSupport,spinCost=()=>money(wager()*(hasBonus()?1:boosted()?C.scatterBoost.costMultiplier:1));
  const asset=s=>s.id==='money'?A.money[s.skin||0]:A[s.id];
  function cell(s){return `<div class="swamp-cell ${s.id}" data-symbol="${s.id}" ${s.valueX?`data-value="${s.valueX}"`:''}><img src="${asset(s)}" alt="${s.id==='money'?'Money Fish '+s.valueX+'x':s.id==='collector'?'Collector Wild':s.id.replaceAll('_',' ')}" draggable="false">${s.id==='money'?`<strong class="swamp-value">${s.valueX}×</strong>`:''}</div>`;}
  function drawColumn(i,landed=false){columns[i].innerHTML=shown[i].map(cell).join('');if(landed)columns[i].querySelectorAll('.scatter,.collector').forEach(n=>n.classList.add('landed'));}
@@ -76,7 +77,7 @@ const VaultSwamp=window.VaultSwamp=(()=>{
   by('swampSpins').textContent=view?String(view.remaining):'—';paintProgress(view,busy?!!view:hasBonus());
   scene.classList.toggle('in-bonus',busy?!!view:hasBonus());
   const locked=busy||hasBonus()||autoRunning();for(const id of ['swampBetMinus','swampBetPlus','swampMaxBet'])by(id).disabled=locked;
-  by('swampSpin').disabled=busy||autoRunning()||!window.VaultRoundService?.swampSupport||!hasBonus()&&wager()>state.balance;by('swampSpin').textContent=busy?'SPINNING':hasBonus()?'FREE SPIN':'SPIN';
+  by('swampSpin').disabled=busy||autoRunning()||!window.VaultRoundService?.swampSupport||!hasBonus()&&spinCost()>state.balance;by('swampSpin').textContent=busy?'SPINNING':hasBonus()?'FREE SPIN':'SPIN';
   by('swampAuto').disabled=!window.VaultRoundService?.swampSupport||!autoRunning()&&(hasBonus()||busy);by('swampAuto').textContent=autoRunning()?`STOP ${auto===-1?'∞':auto}`:'AUTO';by('swampAuto').setAttribute('aria-pressed',String(autoRunning()));by('swampBuy').disabled=locked;shopControls();
   root.querySelectorAll('[data-setting]').forEach(n=>n.setAttribute('aria-pressed',String(!!state[n.dataset.setting])));
  }
@@ -87,16 +88,16 @@ const VaultSwamp=window.VaultSwamp=(()=>{
  function schedule(){clearTimeout(timer);if(!document.hidden&&currentGame==='swamp'&&(hasBonus()||autoRunning()))timer=setTimeout(()=>spin(),hasBonus()?(state.fastBonus?80:350):C.timing.pause);}
  async function spin(){
   if(busy||currentGame!=='swamp'||!VaultRoundService.canPlay('swamp'))return;
-  const inBonus=hasBonus(),stake=wager();if(!inBonus&&stake>state.balance){auto=0;message('Недостаточно средств');controls();return;}
+  const inBonus=hasBonus(),stake=wager(),boost=!inBonus&&boosted(),cost=money(stake*(boost?C.scatterBoost.costMultiplier:1));if(!inBonus&&cost>state.balance){auto=0;message('Недостаточно средств');controls();return;}
   const prior=bonus?{...bonus}:null;
   // Begin checkpoints the consumed free spin before any await; the model receives its prior count.
   if(inBonus)bonus={...bonus,remaining:bonus.remaining-1,spinsPlayed:bonus.spinsPlayed+1};else{bonus=null;featureWin=0;}
   const seed=crypto.getRandomValues(new Uint32Array(1))[0];
-  const rid=VaultRoundService.begin('swamp',inBonus?0:stake,{stake,mathVersion:C.version,freeSpin:inBonus,freeSpinIndex:inBonus?prior.spinsPlayed+1:0,seed,featureId:prior?.featureId||null});
+  const rid=VaultRoundService.begin('swamp',inBonus?0:cost,{stake,baseBet:stake,scatterBoost:boost,mathVersion:C.version,freeSpin:inBonus,freeSpinIndex:inBonus?prior.spinsPlayed+1:0,seed,featureId:prior?.featureId||null});
   if(!rid){bonus=prior;controls();return;}
   busy=true;viewBonus=prior?{...prior,remaining:prior.remaining-1}:null;VaultWalletService.holdPresentation('swamp');const g=++generation;let outcome;
   try{
-   outcome=M.resolve(M.generate(inBonus,M.seeded(seed)),inBonus?prior:null);lastOutcome=outcome;
+   outcome=M.resolve(M.generate(inBonus,M.seeded(seed),C,boost),inBonus?prior:null);lastOutcome=outcome;
    if(inBonus){bonus=outcome.nextBonus;featureWin=money(bonus.totalWinX*stake);}
    else if(outcome.triggerSpins){bonus={...M.newBonus(outcome.scatters,stake,C,outcome.winX),featureId:rid};featureWin=money(outcome.winX*stake);}
    lastWin=money(outcome.winX*stake);
@@ -128,7 +129,7 @@ const VaultSwamp=window.VaultSwamp=(()=>{
  }
  function message(text){by('swampMessage').textContent=text;}
  function toggleAuto(show){by('swampAutoMenu').hidden=!show;by('swampAuto').setAttribute('aria-expanded',String(show));}
- function shopControls(){if(!by('swampShopOffers').children.length)return;by('swampShopBet').textContent=format(BETS[betIndex]);for(const b of root.querySelectorAll('[data-swamp-buy]')){const offer=C.purchases.find(x=>x.id===b.dataset.swampBuy);b.textContent=`BUY · ${format(offer.costX*BETS[betIndex])}`;b.disabled=busy||hasBonus()||autoRunning()||offer.costX*BETS[betIndex]>state.balance||!window.VaultRoundService?.swampPurchaseSupport;}by('swampShopMessage').textContent=window.VaultRoundService?.swampPurchaseSupport?'Each purchase charges the shown total once. The stake is locked throughout Free Spins.':'Для покупки бонусов требуется обновление базы.';}
+ function shopControls(){by('swampScatterBoost').disabled=busy||hasBonus()||autoRunning()||!window.VaultRoundService?.swampBoostSupport;by('swampScatterBoost').setAttribute('aria-pressed',String(boosted()));by('swampBoostInfo').textContent=window.VaultRoundService?.swampBoostSupport?`${boosted()?'АКТИВЕН · ':''}шанс символа Scatter ×${C.scatterBoost.symbolMultiplier} · цена спина ×${C.scatterBoost.costMultiplier}`:'Scatter Boost доступен после обновления базы';by('swampSpinCost').textContent=hasBonus()?'FREE SPINS · без доплаты за Boost':`Базовая ставка ${format(wager())} · цена спина ${format(spinCost())}${boosted()?' · SCATTER BOOST':''}`;if(!by('swampShopOffers').children.length)return;by('swampShopBet').textContent=format(BETS[betIndex]);for(const b of root.querySelectorAll('[data-swamp-buy]')){const offer=C.purchases.find(x=>x.id===b.dataset.swampBuy);b.textContent=`BUY · ${format(offer.costX*BETS[betIndex])}`;b.disabled=busy||hasBonus()||autoRunning()||offer.costX*BETS[betIndex]>state.balance||!window.VaultRoundService?.swampPurchaseSupport;}by('swampShopMessage').textContent=window.VaultRoundService?.swampPurchaseSupport?'Each purchase charges the shown total once. The stake is locked throughout Free Spins.':'Для покупки бонусов требуется обновление базы.';}
  async function buyFeature(type){const offer=C.purchases.find(x=>x.id===type);if(!offer||busy||hasBonus()||autoRunning()||!VaultRoundService.swampPurchaseSupport||!VaultRoundService.canPlay('swamp'))return;const stake=BETS[betIndex],cost=money(stake*offer.costX);if(cost>state.balance)return;clearProgressFX();bonus={...M.newBonus(offer.spins===20?5:3,stake),featureId:null};const id=VaultRoundService.begin('swamp',cost,{stake,purchaseStake:stake,purchaseType:offer.id,purchaseSpins:offer.spins,purchaseCostX:offer.costX,mathVersion:C.version});if(!id){bonus=null;controls();return;}featureWin=0;lastWin=0;VaultRoundService.settleWithPayout('swamp',0,'bonus-purchased',{featureId:id,purchaseType:offer.id,purchaseSpins:offer.spins,purchaseCostX:offer.costX});by('swampBonusShop').close();toggleAuto(false);busy=true;viewBonus=bonus;controls();const g=++generation;await transition(`${offer.spins} FREE SPINS`,'FEATURE PURCHASED · COLLECT ×1',g);if(g!==generation)return;busy=false;controls();schedule();}
  function getCheckpoint(){return bonus?{...bonus}:null;}
  function restore(value){clearProgressFX();window.VaultWalletService?.releasePresentation('swamp');displayedWin=0;displayedFeatureWin=0;viewBonus=null;scene.classList.remove('anticipating','collector-flash');clearTimeout(timer);generation++;bonus=M.validateBonus(value);busy=false;auto=0;featureWin=bonus?money(bonus.totalWinX*bonus.bet):0;lastWin=0;lastOutcome=null;columns.forEach(n=>n.classList.remove('rolling','anticipation'));by('swampCollectLayer').replaceChildren();by('swampLines').replaceChildren();by('swampTransition').hidden=true;shown=Array.from({length:5},(_,c)=>Array.from({length:3},(_,r)=>({id:preview[(c*3+r)%preview.length]})));drawAll();controls();message(hasBonus()?`FREE SPINS RESTORED · ${bonus.remaining}`:'10 fixed paylines · Money Fish collect in Free Spins.');}
@@ -140,6 +141,7 @@ const VaultSwamp=window.VaultSwamp=(()=>{
  by('openSwampGame').onclick=open;by('swampSpin').onclick=()=>{startAudio();spin();};by('swampAuto').onclick=()=>{if(autoRunning()){auto=0;clearTimeout(timer);toggleAuto(false);controls();if(hasBonus()&&!busy)schedule();return;}if(busy||hasBonus())return;toggleAuto(by('swampAutoMenu').hidden);};
  for(const [id,delta] of [['swampBetMinus',-1],['swampBetPlus',1],['swampMaxBet',999]])by(id).onclick=()=>{if(busy||hasBonus()||autoRunning())return;betIndex=Math.max(0,Math.min(BETS.length-1,delta===999?BETS.length-1:betIndex+delta));controls();VaultStorage.schedule();};
  root.querySelectorAll('[data-setting]').forEach(n=>n.onclick=()=>{toggleSetting(n.dataset.setting);startAudio();controls();syncAmbient();});
+ by('swampScatterBoost').onclick=()=>{if(busy||hasBonus()||autoRunning()||!window.VaultRoundService?.swampBoostSupport)return;toggleSetting('scatterBoost');controls();VaultStorage.saveLocalState();};
  by('swampBuy').onclick=()=>{if(busy||hasBonus()||autoRunning())return;toggleAuto(false);shopControls();by('swampBonusShop').showModal();};by('swampShopClose').onclick=()=>by('swampBonusShop').close();
  by('swampShopOffers').innerHTML=C.purchases.map(o=>`<article class="swamp-offer"><h3>${o.label}</h3><strong>${o.spins} FREE SPINS</strong><small>START ×1 · PROGRESS TO ×10</small><p>Cost ${o.costX}× bet · collector retriggers included</p><button data-swamp-buy="${o.id}">BUY</button></article>`).join('');root.querySelectorAll('[data-swamp-buy]').forEach(b=>b.onclick=()=>{startAudio();buyFeature(b.dataset.swampBuy);});
  for(const [id,d] of [['swampShopBetMinus',-1],['swampShopBetPlus',1]])by(id).onclick=()=>{if(busy||hasBonus()||autoRunning())return;betIndex=Math.max(0,Math.min(BETS.length-1,betIndex+d));controls();VaultStorage.schedule();};

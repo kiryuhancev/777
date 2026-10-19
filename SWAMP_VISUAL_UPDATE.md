@@ -1,3 +1,5 @@
+> Текущее обновление панели, покупок и Scatter Boost: [SLOT_FEATURES.md](SLOT_FEATURES.md). Новые функции требуют полного `supabase_slot_features.txt`; описанные ниже старые отчёты относятся к обычным режимам.
+
 # Swamp Fishing — обновление символов и Collector progression
 
 Изменён только визуальный слой Swamp Fishing. `swamp/config.js`, `swamp/model.js`, общий wallet/auth/persistence, SQL, lobby и остальные игры не изменены. Обновлять БД не требуется.

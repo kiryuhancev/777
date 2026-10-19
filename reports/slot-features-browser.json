@@ -1,0 +1,13 @@
+{
+  "mode": "Chromium + real Supabase SDK/HTTP fixture; PostgreSQL price/RLS checks separate",
+  "passed": [
+    "Normal reels take >=1.5s (2.08s measured); real rolling strips, staggered stops, visible winning cells/ways/amount and held presentation",
+    "Common Settings/Bet/AUTO/MAX/SPIN/BONUS hierarchy; count menu; priced purchase ignores enabled Boost; F5 purchase charges once",
+    "Purchased stage spins free, frozen base bet, same player choice, collect credited once and restored without duplicate stats",
+    "Heist Boost really changes seeded symbol profile, debits x1.5 and keeps base-stake payouts; mode/cost survive F5",
+    "Swamp Boost computes actual boosted grid and correct cost/payout; shared preference agrees with football slot and switches all paid prices together",
+    "Five viewport widths without overflow/duplicate IDs; old backend still runs ordinary Heist while new modes safely await migration"
+  ],
+  "pageErrors": [],
+  "consoleErrors": []
+}

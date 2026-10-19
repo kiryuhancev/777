@@ -1,3 +1,5 @@
+> Текущее обновление панели, покупок и Scatter Boost: [SLOT_FEATURES.md](SLOT_FEATURES.md). Новые функции требуют полного `supabase_slot_features.txt`; описанные ниже старые отчёты относятся к обычным режимам.
+
 # VAULT HEIST
 
 Новая самостоятельная игра `vault_heist` в категории SLOTS. Featured остаётся Digital Derby. Семь существующих игр, их математика, DOM, artwork и внутренний дизайн сохранены; проверка — `python tools/heist-isolation-check.py`.

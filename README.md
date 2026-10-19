@@ -22,3 +22,5 @@ For existing installations, run the **entire [supabase_admin_swamp.txt](supabase
 ## VAULT HEIST
 
 Новый Ways slot с шестью этапами, COLLECT / GO DEEPER и shared wallet. Для существующей БД выполнить целиком [supabase_heist.txt](supabase_heist.txt). [Конфигурация, симуляции, assets и проверки](VAULT_HEIST.md).
+
+Обновление управления слотами и покупок HEIST / Scatter Boost: [SLOT_FEATURES.md](SLOT_FEATURES.md). Incremental migration для уже установленного HEIST: [supabase_slot_features.txt](supabase_slot_features.txt).

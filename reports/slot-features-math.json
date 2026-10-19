@@ -1,0 +1,724 @@
+{
+  "heistConfig": {
+    "id": "vault_heist",
+    "version": 1,
+    "columns": 5,
+    "rows": 4,
+    "stageSpins": 3,
+    "maxWinX": 10000,
+    "waysPayScale": 1.15,
+    "profileLowDecay": 0.035,
+    "scatterChance": 0.1,
+    "wildChance": 0.012,
+    "initialLoot": {
+      "3": 23,
+      "4": 35,
+      "5": 70
+    },
+    "stages": [
+      "BLUEPRINT",
+      "ACCESS",
+      "BREACH",
+      "VAULT OPEN",
+      "DEEP CHAMBER",
+      "GRAND TAKE"
+    ],
+    "stageMultipliers": [
+      1,
+      1.25,
+      1.6,
+      2.2,
+      3.2,
+      5
+    ],
+    "alarmRisks": [
+      0.08,
+      0.12,
+      0.16,
+      0.24,
+      0.35,
+      0
+    ],
+    "profileHighBoost": [
+      1,
+      1.08,
+      1.18,
+      1.3,
+      1.45,
+      1.65
+    ],
+    "wildBoost": [
+      1,
+      1.15,
+      1.3,
+      1.45,
+      1.6,
+      1.8
+    ],
+    "scanChance": 0.12,
+    "scanMultiplier": 1.25,
+    "accessChance": 0.32,
+    "breachChance": 0.18,
+    "lootChance": 0.22,
+    "lootTokenX": 0.5,
+    "artifactChance": 0.22,
+    "artifactMultipliers": [
+      2,
+      3,
+      5
+    ],
+    "grandChance": 0.018,
+    "grandPays": [
+      4,
+      15,
+      50
+    ],
+    "alarmChance": 0.04,
+    "overrideChance": 0.025,
+    "alarmAdd": 0.02,
+    "overrideReduce": 0.03,
+    "minRisk": 0.01,
+    "maxRisk": 0.65,
+    "scatterBoost": {
+      "symbolMultiplier": 1.48,
+      "costMultiplier": 1.5
+    },
+    "purchases": [
+      {
+        "id": "heist",
+        "label": "HEIST",
+        "lootX": 23,
+        "costX": 31.5,
+        "riskMultiplier": 1
+      },
+      {
+        "id": "super",
+        "label": "SUPER HEIST",
+        "lootX": 70,
+        "costX": 79,
+        "riskMultiplier": 0.5
+      }
+    ],
+    "autoChoices": [
+      10,
+      25,
+      50,
+      100,
+      -1
+    ],
+    "timing": {
+      "initial": 360,
+      "reel": 260,
+      "fastInitial": 160,
+      "fastReel": 135,
+      "pause": 600,
+      "transition": 800,
+      "winHold": 1100,
+      "fastWinHold": 800,
+      "winGroup": 650
+    },
+    "symbols": [
+      {
+        "id": "mask",
+        "name": "Mask",
+        "weight": 10,
+        "tier": 0,
+        "pays": [
+          0.2,
+          0.6,
+          1.5
+        ]
+      },
+      {
+        "id": "gloves",
+        "name": "Tactical gloves",
+        "weight": 10,
+        "tier": 0,
+        "pays": [
+          0.2,
+          0.6,
+          1.5
+        ]
+      },
+      {
+        "id": "flashlight",
+        "name": "Flashlight",
+        "weight": 10,
+        "tier": 0,
+        "pays": [
+          0.2,
+          0.6,
+          1.5
+        ]
+      },
+      {
+        "id": "card",
+        "name": "Access card",
+        "weight": 10,
+        "tier": 0,
+        "pays": [
+          0.2,
+          0.6,
+          1.5
+        ]
+      },
+      {
+        "id": "tablet",
+        "name": "Hacker tablet",
+        "weight": 8,
+        "tier": 1,
+        "pays": [
+          0.4,
+          1.2,
+          3
+        ]
+      },
+      {
+        "id": "bag",
+        "name": "Duffel bag",
+        "weight": 8,
+        "tier": 1,
+        "pays": [
+          0.4,
+          1.2,
+          3
+        ]
+      },
+      {
+        "id": "cutter",
+        "name": "Laser cutter",
+        "weight": 8,
+        "tier": 1,
+        "pays": [
+          0.4,
+          1.2,
+          3
+        ]
+      },
+      {
+        "id": "override",
+        "name": "Override module",
+        "weight": 8,
+        "tier": 1,
+        "pays": [
+          0.4,
+          1.2,
+          3
+        ]
+      },
+      {
+        "id": "gold",
+        "name": "Gold bar",
+        "weight": 4,
+        "tier": 2,
+        "pays": [
+          1,
+          3,
+          8
+        ]
+      },
+      {
+        "id": "diamond",
+        "name": "Diamond",
+        "weight": 4,
+        "tier": 2,
+        "pays": [
+          1,
+          3,
+          8
+        ]
+      },
+      {
+        "id": "artifact",
+        "name": "Artifact capsule",
+        "weight": 4,
+        "tier": 2,
+        "pays": [
+          1,
+          3,
+          8
+        ]
+      },
+      {
+        "id": "core",
+        "name": "Vault core",
+        "weight": 4,
+        "tier": 2,
+        "pays": [
+          1,
+          3,
+          8
+        ]
+      }
+    ]
+  },
+  "swampConfig": {
+    "version": 2,
+    "gameId": "swamp",
+    "displayName": "SWAMP FISHING",
+    "nameIsPlaceholder": true,
+    "GAME_LOGO_SRC": "",
+    "rows": 3,
+    "reels": 5,
+    "targetRtp": 0.96,
+    "maxWinX": 50000,
+    "scatterPerReel": 0.09,
+    "scatterBoost": {
+      "symbolMultiplier": 1.28,
+      "costMultiplier": 1.5
+    },
+    "moneyChanceBase": 0.075,
+    "moneyChanceBonus": 0.15,
+    "collectorChance": 0.028,
+    "collectorReels": [
+      1,
+      2,
+      3
+    ],
+    "collectorsPerUpgrade": 4,
+    "retriggerSpins": 10,
+    "multipliers": [
+      1,
+      2,
+      3,
+      10
+    ],
+    "freeSpins": {
+      "3": 10,
+      "4": 15,
+      "5": 20
+    },
+    "autoChoices": [
+      10,
+      25,
+      50,
+      100,
+      -1
+    ],
+    "timing": {
+      "initial": 240,
+      "reel": 180,
+      "anticipation": 260,
+      "fastInitial": 70,
+      "fastReel": 75,
+      "pause": 600
+    },
+    "purchases": [
+      {
+        "id": "bonus",
+        "spins": 10,
+        "costX": 77,
+        "label": "BONUS"
+      },
+      {
+        "id": "super",
+        "spins": 20,
+        "costX": 350,
+        "label": "SUPER BONUS"
+      }
+    ],
+    "symbols": [
+      {
+        "id": "bobber",
+        "weight": 23,
+        "pays": [
+          1,
+          3,
+          12
+        ]
+      },
+      {
+        "id": "hook",
+        "weight": 20,
+        "pays": [
+          1.2,
+          4,
+          16
+        ]
+      },
+      {
+        "id": "insect",
+        "weight": 17,
+        "pays": [
+          1.5,
+          5,
+          20
+        ]
+      },
+      {
+        "id": "bait_jar",
+        "weight": 14,
+        "pays": [
+          2,
+          7,
+          28
+        ]
+      },
+      {
+        "id": "lantern",
+        "weight": 11,
+        "pays": [
+          2.5,
+          10,
+          40
+        ]
+      },
+      {
+        "id": "tackle_box",
+        "weight": 8,
+        "pays": [
+          3,
+          14,
+          60
+        ]
+      },
+      {
+        "id": "fish_01",
+        "weight": 5,
+        "pays": [
+          5,
+          22,
+          100
+        ]
+      },
+      {
+        "id": "catfish",
+        "weight": 2,
+        "pays": [
+          8,
+          40,
+          200
+        ]
+      }
+    ],
+    "lineScale": 0.97,
+    "money": [
+      {
+        "x": 2,
+        "weight": 60000
+      },
+      {
+        "x": 5,
+        "weight": 27000
+      },
+      {
+        "x": 10,
+        "weight": 9000
+      },
+      {
+        "x": 15,
+        "weight": 2500
+      },
+      {
+        "x": 20,
+        "weight": 1000
+      },
+      {
+        "x": 25,
+        "weight": 400
+      },
+      {
+        "x": 50,
+        "weight": 99
+      },
+      {
+        "x": 2000,
+        "weight": 1
+      }
+    ],
+    "paylines": [
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      [
+        0,
+        1,
+        2,
+        1,
+        0
+      ],
+      [
+        2,
+        1,
+        0,
+        1,
+        2
+      ],
+      [
+        0,
+        0,
+        1,
+        2,
+        2
+      ],
+      [
+        2,
+        2,
+        1,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        1,
+        2,
+        2,
+        2,
+        1
+      ],
+      [
+        0,
+        1,
+        1,
+        1,
+        0
+      ]
+    ]
+  },
+  "seed": {
+    "heist": 830451,
+    "swamp": 953174
+  },
+  "results": [
+    {
+      "game": "vault_heist",
+      "mode": "heist",
+      "strategy": "SAFE",
+      "sum": 2572953.773963464,
+      "square": 68319680.7028693,
+      "triggers": 100000,
+      "busts": 0,
+      "max": 140.494062,
+      "spins": 100000,
+      "costX": 31.5,
+      "meanPayoutX": 25.72953773963464,
+      "rtp": 0.8168107218931632,
+      "standardError": 0.000462095032358942,
+      "rtp95": [
+        0.8159050156297396,
+        0.8177164281565867
+      ],
+      "triggerFrequency": 1
+    },
+    {
+      "game": "vault_heist",
+      "mode": "heist",
+      "strategy": "BALANCED",
+      "sum": 2991719.136970055,
+      "square": 144341431.62724352,
+      "triggers": 100000,
+      "busts": 19455,
+      "max": 576.495,
+      "spins": 100000,
+      "costX": 31.5,
+      "meanPayoutX": 29.917191369700546,
+      "rtp": 0.9497521069746205,
+      "standardError": 0.002350870231909432,
+      "rtp95": [
+        0.945144401320078,
+        0.954359812629163
+      ],
+      "triggerFrequency": 1
+    },
+    {
+      "game": "vault_heist",
+      "mode": "heist",
+      "strategy": "AGGRESSIVE",
+      "sum": 2457645.300921009,
+      "square": 263163350.77823356,
+      "triggers": 100000,
+      "busts": 66924,
+      "max": 1018.164,
+      "spins": 100000,
+      "costX": 31.5,
+      "meanPayoutX": 24.576453009210088,
+      "rtp": 0.7802048574352409,
+      "standardError": 0.004520473808066718,
+      "rtp95": [
+        0.7713447287714301,
+        0.7890649860990517
+      ],
+      "triggerFrequency": 1
+    },
+    {
+      "game": "swamp",
+      "mode": "normal",
+      "sum": 963562.6409982261,
+      "square": 372167599.31625164,
+      "triggers": 6312,
+      "max": 4313.563999999999,
+      "spins": 1000000,
+      "costX": 1,
+      "meanPayoutX": 0.9635626409982261,
+      "rtp": 0.9635626409982261,
+      "standardError": 0.019267567214184673,
+      "rtp95": [
+        0.9257982092584242,
+        1.0013270727380281
+      ],
+      "triggerFrequency": 0.006312
+    },
+    {
+      "game": "swamp",
+      "mode": "boost",
+      "sum": 1441263.7849989408,
+      "square": 805737233.8470691,
+      "triggers": 12658,
+      "max": 5454.794999999998,
+      "spins": 1000000,
+      "costX": 1.5,
+      "meanPayoutX": 1.4412637849989407,
+      "rtp": 0.9608425233326271,
+      "standardError": 0.018899265036257887,
+      "rtp95": [
+        0.9237999638615616,
+        0.9978850828036926
+      ],
+      "triggerFrequency": 0.012658
+    },
+    {
+      "game": "vault_heist",
+      "mode": "boost",
+      "strategy": "SAFE",
+      "sum": 137943.57978901456,
+      "square": 2448830.604253983,
+      "triggers": 2591,
+      "busts": 0,
+      "max": 91.31,
+      "spins": 100000,
+      "costX": 1.5,
+      "meanPayoutX": 1.3794357978901457,
+      "rtp": 0.9196238652600971,
+      "standardError": 0.010018973760274165,
+      "rtp95": [
+        0.8999866766899597,
+        0.9392610538302345
+      ],
+      "triggerFrequency": 0.02591
+    },
+    {
+      "game": "vault_heist",
+      "mode": "boost",
+      "strategy": "BALANCED",
+      "sum": 146051.68052101764,
+      "square": 4271868.442116081,
+      "triggers": 2591,
+      "busts": 555,
+      "max": 311.098,
+      "spins": 100000,
+      "costX": 1.5,
+      "meanPayoutX": 1.4605168052101765,
+      "rtp": 0.9736778701401176,
+      "standardError": 0.013430574585683133,
+      "rtp95": [
+        0.9473539439521788,
+        1.0000017963280565
+      ],
+      "triggerFrequency": 0.02591
+    },
+    {
+      "game": "vault_heist",
+      "mode": "boost",
+      "strategy": "AGGRESSIVE",
+      "sum": 129185.3905610114,
+      "square": 6941976.21867277,
+      "triggers": 2591,
+      "busts": 1774,
+      "max": 516.1545,
+      "spins": 100000,
+      "costX": 1.5,
+      "meanPayoutX": 1.291853905610114,
+      "rtp": 0.8612359370734093,
+      "standardError": 0.01735266558752255,
+      "rtp95": [
+        0.8272247125218651,
+        0.8952471616249534
+      ],
+      "triggerFrequency": 0.02591
+    },
+    {
+      "game": "vault_heist",
+      "mode": "super",
+      "strategy": "SAFE",
+      "sum": 7272953.773964749,
+      "square": 531077335.4553574,
+      "triggers": 100000,
+      "busts": 0,
+      "max": 187.494062,
+      "spins": 100000,
+      "costX": 79,
+      "meanPayoutX": 72.72953773964748,
+      "rtp": 0.9206270599955377,
+      "standardError": 0.00018425308251137577,
+      "rtp95": [
+        0.9202659239538155,
+        0.92098819603726
+      ],
+      "triggerFrequency": 1
+    },
+    {
+      "game": "vault_heist",
+      "mode": "super",
+      "strategy": "BALANCED",
+      "sum": 7567310.474777997,
+      "square": 673676747.8210738,
+      "triggers": 100000,
+      "busts": 10084,
+      "max": 623.495,
+      "spins": 100000,
+      "costX": 79,
+      "meanPayoutX": 75.67310474777996,
+      "rtp": 0.9578874018706324,
+      "standardError": 0.0012723557340585862,
+      "rtp95": [
+        0.9553935846318775,
+        0.9603812191093872
+      ],
+      "triggerFrequency": 1
+    },
+    {
+      "game": "vault_heist",
+      "mode": "super",
+      "strategy": "AGGRESSIVE",
+      "sum": 7234071.071549023,
+      "square": 1023195278.1219975,
+      "triggers": 100000,
+      "busts": 40250,
+      "max": 1588.1035,
+      "spins": 100000,
+      "costX": 79,
+      "meanPayoutX": 72.34071071549023,
+      "rtp": 0.9157051989302561,
+      "standardError": 0.002830118858245879,
+      "rtp95": [
+        0.9101581659680942,
+        0.9212522318924181
+      ],
+      "triggerFrequency": 1
+    }
+  ]
+}

@@ -7,7 +7,8 @@ const VAULT_HEIST_CONFIG=Object.freeze({
  scanChance:.12,scanMultiplier:1.25,accessChance:.32,breachChance:.18,lootChance:.22,lootTokenX:.5,
  artifactChance:.22,artifactMultipliers:[2,3,5],grandChance:.018,grandPays:[4,15,50],
  alarmChance:.04,overrideChance:.025,alarmAdd:.02,overrideReduce:.03,minRisk:.01,maxRisk:.65,
- autoChoices:[10,25,50,100,-1],timing:{initial:170,reel:125,fastInitial:50,fastReel:55,pause:500,transition:800},
+ scatterBoost:{symbolMultiplier:1.48,costMultiplier:1.5},purchases:[{id:'heist',label:'HEIST',lootX:23,costX:31.5,riskMultiplier:1},{id:'super',label:'SUPER HEIST',lootX:70,costX:79,riskMultiplier:.5}],
+ autoChoices:[10,25,50,100,-1],timing:{initial:360,reel:260,fastInitial:160,fastReel:135,pause:600,transition:800,winHold:1100,fastWinHold:800,winGroup:650},
  symbols:[
   {id:'mask',name:'Mask',weight:10,tier:0,pays:[.2,.6,1.5]},
   {id:'gloves',name:'Tactical gloves',weight:10,tier:0,pays:[.2,.6,1.5]},

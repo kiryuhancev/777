@@ -12,7 +12,7 @@
   let authBusy=false;
   let owner='guest',data=defaults(),client=null,clientRevision=0,suppress=false,localTimer=null,syncTimer=null,syncing=null,identityEpoch=0,connecting=null,connectionUser=null,settingsFingerprint='',conflict=false,locked=false,releaseLock=null,lockHeld=false,storageAvailable=true,profileRemote=true;
   let walletPresentation=null;
-  let canonicalBalance=state.balance,walletMutation=0,recovering=null,tableSupport=false,tableSupportPromise=null,swampSupport=false,swampSupportPromise=null,swampPurchaseSupport=false,minesSupport=false,minesSupportPromise=null;
+  let canonicalBalance=state.balance,walletMutation=0,recovering=null,tableSupport=false,tableSupportPromise=null,swampSupport=false,swampSupportPromise=null,swampPurchaseSupport=false,swampBoostSupport=false,minesSupport=false,minesSupportPromise=null;
   const byId=id=>document.getElementById(id);
   const status=text=>{if(!storageAvailable&&/сохран|Saved|Offline|pending/i.test(text))text='Сохранение недоступно — не перезагружайте страницу';const node=byId('vaultSyncStatus');if(node)node.textContent=text;};
   function configured(){
@@ -91,21 +91,21 @@
     data.queue.push({id:uuid(),userId:owner,type,payload:copy(payload)});scheduleSync();return true;
   }
   function scheduleSync(){clearTimeout(syncTimer);syncTimer=setTimeout(()=>VaultSync.flush(),C.syncDebounceMs);}
-  let heistSupport=false;
+  let heistSupport=false,heistFeatures=false;
   window.VaultHeistBridge={
-    get ready(){return heistSupport;},
-    async connect(){if(heistSupport)return true;if(!client||owner==='guest')return false;const cached=read('heist-schema'),known=cached?.version===1&&cached.project===C.supabaseUrl;if(!navigator.onLine&&known){heistSupport=true;return true;}try{const r=await client.rpc('heist_capabilities');if(r.error){if(known&&/fetch|network|offline/i.test(r.error.message||'')){heistSupport=true;return true;}return false;}heistSupport=r.data?.version===1;if(heistSupport)write('heist-schema',{version:1,project:C.supabaseUrl});return heistSupport;}catch{return false;}},
+    get ready(){return heistSupport;},get featuresReady(){return heistFeatures;},
+    async connect(){if(heistSupport)return true;if(!client||owner==='guest')return false;const cached=read('heist-schema'),known=cached?.version===1&&cached.project===C.supabaseUrl;if(!navigator.onLine&&known){heistSupport=true;heistFeatures=cached.features===true;return true;}try{const r=await client.rpc('heist_capabilities');if(r.error){if(known&&/fetch|network|offline/i.test(r.error.message||'')){heistSupport=true;heistFeatures=cached.features===true;return true;}return false;}heistSupport=r.data?.version>=1;heistFeatures=r.data?.purchaseVersion===1&&r.data?.boostVersion===1;if(heistSupport)write('heist-schema',{version:1,features:heistFeatures,project:C.supabaseUrl});return heistSupport;}catch{return false;}},
     commit(candidate){
       if(!heistSupport||!VaultRoundService.canPlay('vault_heist'))return false;
       const r=VAULT_HEIST_MODEL.validate(candidate),previous=data.recovery.heistRound;
-      if(!r||data.queue.length>=C.maxPendingEvents-2||!storageAvailable)return false;
+      if(!r||r.version===2&&!heistFeatures||data.queue.length>=C.maxPendingEvents-2||!storageAvailable)return false;
       const start=r.step===0&&r.roundId!==previous?.roundId;
-      if(start&&(VAULT_HEIST_MODEL.active(previous)||r.bet>canonicalBalance)||!start&&(previous?.roundId!==r.roundId||!VAULT_HEIST_MODEL.active(previous)||r.step!==previous.step+1))return false;
-      const delta=(start?-r.bet:0)+(r.status==='SETTLED'?r.payout:0);if(amount(canonicalBalance+delta)===null)return false;
+      if(start&&(VAULT_HEIST_MODEL.active(previous)||VAULT_HEIST_MODEL.cost(r)>canonicalBalance)||!start&&(previous?.roundId!==r.roundId||!VAULT_HEIST_MODEL.active(previous)||r.step!==previous.step+1))return false;
+      const delta=(start?-VAULT_HEIST_MODEL.cost(r):0)+(r.status==='SETTLED'?r.payout:0);if(amount(canonicalBalance+delta)===null)return false;
       enqueue('heist',{p_round_id:r.roundId,p_previous_step:start?-1:previous.step,p_expected_revision:clientRevision,p_checkpoint:r});clientRevision++;
       data.recovery.heistRound=copy(r);canonicalBalance=amount(canonicalBalance+delta);data.balance=canonicalBalance;walletMutation++;
       if(r.status==='SETTLED'){
-       const record={roundId:r.roundId,gameId:'vault_heist',status:'settled',bet:r.bet,stake:r.bet,payout:r.payout,multiplier:r.payout/r.bet,result:r.result,metadata:{baseWin:r.baseWinX,heistTriggered:r.step>0||r.outcome.scatters>=3,startStage:0,maxStageReached:r.maxStage,decisions:r.decisions,heistLoot:r.lootX,alarmFailure:r.result==='alarm',collected:r.result!=='alarm',finalPayout:r.payout,maxRiskReached:r.maxRisk},startedAt:Date.now(),settledAt:Date.now()};
+       const record={roundId:r.roundId,gameId:'vault_heist',status:'settled',bet:VAULT_HEIST_MODEL.cost(r),stake:r.bet,payout:r.payout,multiplier:r.payout/r.bet,result:r.result,metadata:{purchaseType:r.purchaseType||null,scatterBoost:!!r.scatterBoost,baseBet:r.bet,cost:VAULT_HEIST_MODEL.cost(r),baseWin:r.baseWinX,heistTriggered:!!r.purchaseType||r.step>0||r.outcome.scatters>=3,startStage:0,maxStageReached:r.maxStage,decisions:r.decisions,heistLoot:r.lootX,alarmFailure:r.result==='alarm',collected:r.result!=='alarm',finalPayout:r.payout,maxRiskReached:r.maxRisk},startedAt:Date.now(),settledAt:Date.now()};
        if(!data.rounds.some(x=>x.roundId===r.roundId)){data.rounds.push(record);data.rounds=data.rounds.slice(-C.maxLocalRounds);localStats(record);}
       }
       VaultStorage.saveLocalState();refreshBalanceUI();return true;
@@ -135,10 +135,10 @@
     async checkSwampSupport(){
       if(swampSupport)return true;if(swampSupportPromise)return swampSupportPromise;if(!client||VaultSession.mode!=='authenticated')return false;
       const cached=read('swamp-schema');
-      if(!navigator.onLine&&cached?.version>=1&&cached.project===C.supabaseUrl){swampSupport=true;swampPurchaseSupport=cached.purchaseVersion===1;return true;}
-      swampSupportPromise=(async()=>{try{const {data:result,error}=await client.rpc('swamp_slot_capabilities');if(error)throw error;swampSupport=result?.version>=1;swampPurchaseSupport=result?.purchaseVersion===1;if(swampSupport){write('swamp-schema',{version:result.version,purchaseVersion:result.purchaseVersion||0,project:C.supabaseUrl});settingsFingerprint='';VaultStorage.schedule();}return swampSupport;}catch(e){if(cached?.version>=1&&cached.project===C.supabaseUrl&&/fetch|network|offline/i.test(e.message||'')){swampSupport=true;swampPurchaseSupport=cached.purchaseVersion===1;return true;}console.error('VAULT swamp schema unavailable',e);return false;}finally{swampSupportPromise=null;}})();return swampSupportPromise;
+      if(!navigator.onLine&&cached?.version>=1&&cached.project===C.supabaseUrl){swampSupport=true;swampPurchaseSupport=cached.purchaseVersion===1;swampBoostSupport=cached.boostVersion===1;return true;}
+      swampSupportPromise=(async()=>{try{const {data:result,error}=await client.rpc('swamp_slot_capabilities');if(error)throw error;swampSupport=result?.version>=1;swampPurchaseSupport=result?.purchaseVersion===1;swampBoostSupport=result?.boostVersion===1;if(swampSupport){write('swamp-schema',{version:result.version,purchaseVersion:result.purchaseVersion||0,boostVersion:result.boostVersion||0,project:C.supabaseUrl});settingsFingerprint='';VaultStorage.schedule();}return swampSupport;}catch(e){if(cached?.version>=1&&cached.project===C.supabaseUrl&&/fetch|network|offline/i.test(e.message||'')){swampSupport=true;swampPurchaseSupport=cached.purchaseVersion===1;swampBoostSupport=cached.boostVersion===1;return true;}console.error('VAULT swamp schema unavailable',e);return false;}finally{swampSupportPromise=null;}})();return swampSupportPromise;
     },
-    get swampSupport(){return swampSupport;},get swampPurchaseSupport(){return swampPurchaseSupport;},
+    get swampSupport(){return swampSupport;},get swampPurchaseSupport(){return swampPurchaseSupport;},get swampBoostSupport(){return swampBoostSupport;},
     async checkTableSupport(){
       if(tableSupport)return true;if(tableSupportPromise)return tableSupportPromise;
       if(!client||VaultSession.mode!=='authenticated')return false;
@@ -317,9 +317,9 @@
             const candidate=VAULT_HEIST_MODEL.validate(payload.p_checkpoint);if(!candidate)continue;
             if(round&&round.status!=='started')continue;
             if(heistCursor?.roundId===id&&heistCursor.step>=candidate.step)continue;
-            if(payload.p_previous_step===-1){if(heistCursor&&VAULT_HEIST_MODEL.active(heistCursor)||candidate.bet>balance||window.VaultAccess?.isBlocked)continue;}
+            if(payload.p_previous_step===-1){if(heistCursor&&VAULT_HEIST_MODEL.active(heistCursor)||VAULT_HEIST_MODEL.cost(candidate)>balance||window.VaultAccess?.isBlocked)continue;}
             else if(heistCursor?.roundId!==id||heistCursor.step!==payload.p_previous_step)continue;
-            payload.p_expected_revision=revision;balance=amount(balance-(payload.p_previous_step===-1?candidate.bet:0)+(candidate.status==='SETTLED'?candidate.payout:0));revision++;heistCursor=candidate;next.push(event);continue;
+            payload.p_expected_revision=revision;balance=amount(balance-(payload.p_previous_step===-1?VAULT_HEIST_MODEL.cost(candidate):0)+(candidate.status==='SETTLED'?candidate.payout:0));revision++;heistCursor=candidate;next.push(event);continue;
           }
           // A remote Mines round is the stable cursor. Discard a stale local branch without replaying its picks or payout.
           if((payload.p_game_id==='mines'||event.type==='mines')&&round){mineRewinds.add(id);continue;}
