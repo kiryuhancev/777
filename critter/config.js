@@ -1,4 +1,4 @@
-const CRITTER_CONFIG=Object.freeze({version:3,id:'critter',columns:5,rows:5,minCluster:5,maxCascades:12,maxWinX:10000,
+const CRITTER_CONFIG=Object.freeze({version:4,id:'critter',columns:5,rows:5,minCluster:5,maxWinX:10000,
  wildChance:.018,scatterChance:.016,payScale:0.000699792925918,
  sizes:[5,6,7,8,9,10,15],
  symbols:[

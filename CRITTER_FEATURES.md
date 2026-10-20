@@ -1,3 +1,5 @@
+> Новая review-версия v4 без каскадов: [CRITTER_NO_CASCADE.md](CRITTER_NO_CASCADE.md). Ниже — история предыдущих правил, не спецификация v4.
+
 # Critter Chaos — Running Wild + Buy Features
 
 Ветка `feature/critter-buy-running-wilds`, база40c014c. Обновлена существующая игра, source assets и остальные игры сохранены. В production эта ветка автоматически не публикуется.

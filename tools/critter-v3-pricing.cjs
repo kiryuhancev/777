@@ -1,6 +1,6 @@
 /* Offline, simulation-only snapshot omission. Never imported by the frontend. */
-const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path'),assert=require('node:assert/strict'),M=require('../critter/model');
-const moduleBox={exports:{}};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../critter/model.js'),'utf8').replace('const copy=v=>JSON.parse(JSON.stringify(v))','const copy=v=>v'),{module:moduleBox,require:p=>require(path.join(__dirname,'../critter',p))});const F=moduleBox.exports,id='11111111-1111-4111-8111-111111111111';
+const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path'),assert=require('node:assert/strict'),M=require('../critter/model-v3');
+const moduleBox={exports:{}};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../critter/model-v3.js'),'utf8').replace('const copy=v=>JSON.parse(JSON.stringify(v))','const copy=v=>v'),{module:moduleBox,require:p=>require(path.join(__dirname,'../critter',p))});const F=moduleBox.exports,id='11111111-1111-4111-8111-111111111111';
 const modes={normal:{},boost:{scatterBoost:true},bonus:{purchaseType:'bonus'},super:{purchaseType:'super'}};
 for(let seed=0;seed<100;seed++)for(const mode of Object.values(modes)){const args={seed,bet:1,roundId:id,...mode},a=M.start(args),b=F.start(args);assert.equal(a.payout,b.payout);assert.equal(JSON.stringify(a.bonus?.spins.at(-1).finalGrid),JSON.stringify(b.bonus?.spins.at(-1).finalGrid));}
 const n=Number(process.argv[2]||100000),buys=Number(process.argv[3]||5000),rng=M.seeded(20261022),s=Object.fromEntries(Object.keys(modes).map(k=>[k,{sum:0,sq:0,n:0,hits:0,bonus:0,super:0,moves:0,scatters:0}]));

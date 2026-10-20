@@ -1,0 +1,13 @@
+{
+  "mode": "Chromium + actual SDK owned HTTP fixtures; not live DB/mobile device",
+  "passed": [
+    "Shared HUD structure unchanged; three BONUS choices with live prices; 320\u20131440px uniform symbols/cat, no horizontal overflow",
+    "Base: one result, standard x1 Wild, no movement/cascade/refill; double click charges and logs once",
+    "Configurable genuine Scatter boost, free toggle and indicator; independent preference survives F5",
+    "SUPER20: actual pre-win hop/trails and readable multiplier; F5 mid-hop restores exact positions/personal multipliers/remaining FS, same plan and no duplicate settlement; full bonus completes/clears",
+    "Normal BONUS BUY10 and SUPER20 retain one price per round; completed F5 never resumes/repays",
+    "Lobby navigation pauses/resumes existing feature without buying/free reroll",
+    "Full-cost affordability, unique IDs and no console/page errors",
+    "Signout clears account-specific plan and recovery progress"
+  ]
+}

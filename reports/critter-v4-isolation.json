@@ -1,0 +1,11 @@
+{
+  "baseline": "7611de9",
+  "protectedFiles": 193,
+  "checks": [
+    "All other games/assets/animation and Universal HUD byte-identical",
+    "Shared wallet, generic rounds and auth unchanged",
+    "Only owner-bound Critter progress added to recovery",
+    "Embedded source outside Critter/runtime byte-identical",
+    "SQL atomic wallet/statistics/access/grants unchanged; legacy3 exact freeze"
+  ]
+}

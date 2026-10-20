@@ -1,0 +1,24 @@
+{
+  "mode": "isolated PostgreSQL only",
+  "passed": [
+    "win: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "loss: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "bonus: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "super: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "boost: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "buy: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "buySuper: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "v1: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "v2: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "v3: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "Altered payout and blocked new bet rejected; migration repeat-safe; existing MAGNET/Heist/begin RPC byte-identical",
+    "lost-persistent: v4 tampering rejected",
+    "bad-move: v4 tampering rejected",
+    "bad-multiplier: v4 tampering rejected",
+    "bad-cost: v4 tampering rejected",
+    "cascade: v4 tampering rejected",
+    "bad-win: v4 tampering rejected",
+    "base-wild: v4 tampering rejected",
+    "100 independent buy plans: SQL cluster evaluation, movement and multiplier validation agree with real JS model"
+  ]
+}

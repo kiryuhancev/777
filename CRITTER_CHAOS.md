@@ -1,3 +1,5 @@
+> Новая review-версия v4 без каскадов: [CRITTER_NO_CASCADE.md](CRITTER_NO_CASCADE.md). Ниже — история предыдущих правил, не спецификация v4.
+
 > Новые features v3: [CRITTER_FEATURES.md](CRITTER_FEATURES.md).
 > История v2: [CRITTER_UPDATE.md](CRITTER_UPDATE.md). Ниже — историческая спецификация v1; её бонус и RTP не описывают новую версию.
 

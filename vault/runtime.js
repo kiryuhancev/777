@@ -7,7 +7,7 @@
   const isId=x=>typeof x==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x);
   const amount=x=>Number.isFinite(Number(x))&&Number(x)>=0&&Number(x)<=1e12?Math.round(Number(x)*1e6)/1e6:null;
   const copy=x=>JSON.parse(JSON.stringify(x));
-  const defaults=()=>({balance:C.guestStartingBalance,revision:0,walletConfirmed:false,settings:{sound:true,music:false,fastGame:false,fastBonus:false,scatterBoost:false},bets:{slot:2,poker:2,bird:1,blackjack:2,baccarat:2,swamp:2,mines:2,vault_heist:2,magnet:2,critter:2,critterBoost:false,minesCount:3,baccaratType:'PLAYER'},lastGame:'lobby',settingsUpdatedAt:0,recovery:{slotBonus:null,swampBonus:null,minesRound:null,heistRound:null,magnetRound:null,critterRound:null,openRounds:{}},rounds:[],stats:{},queue:[]});
+  const defaults=()=>({balance:C.guestStartingBalance,revision:0,walletConfirmed:false,settings:{sound:true,music:false,fastGame:false,fastBonus:false,scatterBoost:false},bets:{slot:2,poker:2,bird:1,blackjack:2,baccarat:2,swamp:2,mines:2,vault_heist:2,magnet:2,critter:2,critterBoost:false,minesCount:3,baccaratType:'PLAYER'},lastGame:'lobby',settingsUpdatedAt:0,recovery:{slotBonus:null,swampBonus:null,minesRound:null,heistRound:null,magnetRound:null,critterRound:null,critterProgress:null,openRounds:{}},rounds:[],stats:{},queue:[]});
   const VaultSession=window.VaultSession={mode:'guest',user:null,profile:null,ready:false};
   let authBusy=false;
   let owner='guest',data=defaults(),client=null,clientRevision=0,suppress=false,localTimer=null,syncTimer=null,syncing=null,identityEpoch=0,connecting=null,connectionUser=null,settingsFingerprint='',conflict=false,locked=false,releaseLock=null,lockHeld=false,storageAvailable=true,profileRemote=true;
@@ -40,6 +40,7 @@
     out.recovery.slotBonus=validBonus(x.recovery?.slotBonus);out.recovery.swampBonus=SWAMP_MODEL.validateBonus(x.recovery?.swampBonus);out.recovery.minesRound=MINES_MODEL.validate(x.recovery?.minesRound);out.recovery.heistRound=VAULT_HEIST_MODEL.validate(x.recovery?.heistRound);
     out.recovery.magnetRound=MAGNET_ROUNDS.validate(x.recovery?.magnetRound);
     out.recovery.critterRound=CRITTER_MODEL.validate(x.recovery?.critterRound);
+    out.recovery.critterProgress=CRITTER_MODEL.validateProgress(out.recovery.critterRound,x.recovery?.critterProgress);
     for(const game of games){const r=x.recovery?.openRounds?.[game];if(validRound(r)&&r.gameId===game&&r.status==='started'&&(game!=='mines'||out.recovery.minesRound?.status==='PLAYING'&&out.recovery.minesRound.roundId===r.roundId))out.recovery.openRounds[game]=copy(r);}
     out.rounds=Array.isArray(x.rounds)?x.rounds.filter(validRound).slice(-C.maxLocalRounds):[];
     out.stats=x.stats&&typeof x.stats==='object'?x.stats:{};
@@ -121,7 +122,7 @@
     async connect(){
       if(critterSupport)return true;if(!client||owner==='guest')return false;
       if(critterConnection)return critterConnection;
-      const known=read('critter-schema'),cached=known?.version===3&&known.project===C.supabaseUrl;
+      const known=read('critter-schema'),cached=known?.version===4&&known.project===C.supabaseUrl;
       if(!navigator.onLine&&cached){critterSupport=true;return true;}
       critterConnectionError='';const expectedOwner=owner;
       critterConnection=(async()=>{
@@ -136,8 +137,8 @@
               critterConnectionError=error.code==='PGRST202'||responseStatus===404?'schema':responseStatus===401||responseStatus===403||error.code==='42501'?'permission':'connection';
               console.error('VAULT Critter connection failed',{code:error.code,status:responseStatus,message:error.message});return false;
             }
-            critterSupport=cap?.version>=2&&cap?.featuresVersion===3;
-            if(critterSupport)write('critter-schema',{version:3,project:C.supabaseUrl});else critterConnectionError='version';
+            critterSupport=cap?.version>=2&&cap?.gameplayVersion===4;
+            if(critterSupport)write('critter-schema',{version:4,project:C.supabaseUrl});else critterConnectionError='version';
             return critterSupport;
           }catch(error){
             if(owner!==expectedOwner)return false;
@@ -149,17 +150,25 @@
       })();
       try{return await critterConnection;}finally{critterConnection=null;}
     },
+    saveProgress(candidate){
+      const r=data.recovery.critterRound,p=CRITTER_MODEL.validateProgress(r,candidate),old=CRITTER_MODEL.validateProgress(r,data.recovery.critterProgress);
+      if(owner==='guest'||!p||old&&(p.nextSpin<old.nextSpin||old.baseDone&&!p.baseDone||old.complete&&!p.complete))return false;
+      const previous=data.recovery.critterProgress;data.recovery.critterProgress=p;
+      if(!VaultStorage.saveLocalState({preferences:false})){data.recovery.critterProgress=previous;return false;}
+      if(!p.complete)walletPresentation={owner,game:'critter',balance:amount(Math.max(0,canonicalBalance-r.payout+Math.min(r.payout,CRITTER_MODEL.round(((p.baseDone?r.base.winX:0)+p.bonusTotalX)*r.bet))))};
+      refreshBalanceUI();return true;
+    },
     commit(candidate){
       if(!critterSupport||!VaultRoundService.canPlay('critter')||!storageAvailable||data.queue.length>=C.maxPendingEvents-2)return false;
       const r=CRITTER_MODEL.validate(candidate);if(!r||CRITTER_MODEL.cost(r)>canonicalBalance||data.rounds.some(x=>x.roundId===r.roundId)||data.recovery.critterRound?.roundId===r.roundId)return false;
       const balance=amount(canonicalBalance-CRITTER_MODEL.cost(r)+r.payout);if(balance===null)return false;
-      const rollback={balance:canonicalBalance,revision:clientRevision,mutation:walletMutation,queue:[...data.queue],rounds:[...data.rounds],stats:data.stats.critter?copy(data.stats.critter):null,checkpoint:data.recovery.critterRound};
+      const rollback={balance:canonicalBalance,revision:clientRevision,mutation:walletMutation,queue:[...data.queue],rounds:[...data.rounds],stats:data.stats.critter?copy(data.stats.critter):null,checkpoint:data.recovery.critterRound,progress:data.recovery.critterProgress};
       if(enqueue('critter',{p_round_id:r.roundId,p_expected_revision:clientRevision,p_checkpoint:r})===false)return false;
-      clientRevision++;canonicalBalance=balance;data.balance=balance;walletMutation++;data.recovery.critterRound=copy(r);
-      const record={roundId:r.roundId,gameId:'critter',status:'settled',bet:CRITTER_MODEL.cost(r),stake:r.bet,payout:r.payout,multiplier:r.winX,result:r.result,metadata:{seed:r.seed,purchaseType:r.purchaseType||null,scatterBoost:!!r.scatterBoost,baseBet:r.bet,cost:CRITTER_MODEL.cost(r),bonus:!!r.bonus,cascades:r.base.steps.length+(r.bonus?.spins||[r.bonus?.plan]).filter(Boolean).reduce((n,p)=>n+p.steps.length,0),runningWilds:[r.base,...(r.bonus?.spins||(r.bonus?[r.bonus.plan]:[]))].flatMap(p=>p.steps).reduce((n,s)=>n+s.moves.length,0)},startedAt:Date.now(),settledAt:Date.now()};
+      clientRevision++;canonicalBalance=balance;data.balance=balance;walletMutation++;data.recovery.critterRound=copy(r);data.recovery.critterProgress=CRITTER_MODEL.progress(r);
+      const record={roundId:r.roundId,gameId:'critter',status:'settled',bet:CRITTER_MODEL.cost(r),stake:r.bet,payout:r.payout,multiplier:r.winX,result:r.result,metadata:{seed:r.seed,purchaseType:r.purchaseType||null,scatterBoost:!!r.scatterBoost,baseBet:r.bet,cost:CRITTER_MODEL.cost(r),bonus:!!r.bonus,cascades:r.version===4?0:r.base.steps.length+(r.bonus?.spins||[r.bonus?.plan]).filter(Boolean).reduce((n,p)=>n+p.steps.length,0),runningWilds:r.version===4?(r.bonus?.spins||[]).reduce((n,p)=>n+p.movements.length,0):[r.base,...(r.bonus?.spins||(r.bonus?[r.bonus.plan]:[]))].flatMap(p=>p.steps).reduce((n,s)=>n+s.moves.length,0)},startedAt:Date.now(),settledAt:Date.now()};
       data.rounds.push(record);data.rounds=data.rounds.slice(-C.maxLocalRounds);localStats(record);
       if(!VaultStorage.saveLocalState()){
-        canonicalBalance=rollback.balance;data.balance=rollback.balance;clientRevision=rollback.revision;walletMutation=rollback.mutation;data.queue=rollback.queue;data.rounds=rollback.rounds;data.recovery.critterRound=rollback.checkpoint;
+        canonicalBalance=rollback.balance;data.balance=rollback.balance;clientRevision=rollback.revision;walletMutation=rollback.mutation;data.queue=rollback.queue;data.rounds=rollback.rounds;data.recovery.critterRound=rollback.checkpoint;data.recovery.critterProgress=rollback.progress;
         if(rollback.stats)data.stats.critter=rollback.stats;else delete data.stats.critter;return false;
       }
       refreshBalanceUI();return true;
@@ -307,7 +316,7 @@
       clearTimeout(autoState.timer);clearTimeout(bonusAutoTimer);bonusAutoTimer=null;
       pokerState.deck=[];pokerState.discard=[];pokerState.player=[];pokerState.dealer=[];pokerState.community=[];pokerState.choice=[];pokerState.phase='idle';pokerState.resolved=false;pokerState.winner='';pokerState.result='';pokerState.playerEval=null;pokerState.dealerEval=null;pokerState.peekUntil=0;pokerState.dealerHiddenRevealed=false;pokerState.tacticalUsed=false;pokerState.spent=0;
       resetBirdRecovery();VaultTables.reset();VaultSwamp.restore(data.recovery.swampBonus);VaultHeist.restore(data.recovery.heistRound);
-      VaultMagnet.restore(data.recovery.magnetRound);VaultCritter.restore(data.recovery.critterRound);
+      VaultMagnet.restore(data.recovery.magnetRound);VaultCritter.restore(data.recovery.critterRound,data.recovery.critterProgress);
       const b=validBonus(data.recovery.slotBonus);
       state.bonus=!!b&&b.freeSpins>0;state.bonusType=b?.type||'normal';state.slotProfile=state.bonus?b.type:'base';state.size=state.bonus?b.size:5;state.freeSpins=state.bonus?b.freeSpins:0;state.bonusLevel=state.bonus?b.level:0;state.scatterProgress=state.bonus?b.progress:0;state.bonusSpinsPlayed=state.bonus?b.spins:0;state.bonusTotalWin=state.bonus?b.totalWin:0;state.bonusCascades=state.bonus?b.cascades:0;state.bonusPurchaseCost=state.bonus?b.purchaseCost:0;state.sticky=new Map(state.bonus?b.sticky.map(([k,v])=>[k.replace(',',':'),v]):[]);state.grid=blankGrid(state.size);state.cascade=0;state.lastWin=0;state.pendingBonusPurchaseCost=0;
       document.body.classList.toggle('bonus',state.bonus);fillGrid();render();
@@ -368,7 +377,7 @@
     if(wallet&&remote.rounds.some(r=>!['mines','vault_heist','magnet','critter'].includes(r.game_id))){conflict=true;status('Восстанавливаем раздачу…');}
     if(wallet){canonicalBalance=amount(remote.wallet.balance);data.balance=canonicalBalance;data.walletConfirmed=true;data.revision=Number(remote.wallet.revision)||0;clientRevision=data.revision;data.recovery.slotBonus=validBonus(remote.wallet.recovery?.slotBonus);data.recovery.swampBonus=SWAMP_MODEL.validateBonus(remote.wallet.recovery?.swampBonus);data.recovery.minesRound=MINES_MODEL.validate(remote.wallet.recovery?.minesRound);data.recovery.heistRound=VAULT_HEIST_MODEL.validate(remote.wallet.recovery?.heistRound);}
     if(wallet)data.recovery.magnetRound=MAGNET_ROUNDS.validate(remote.wallet.recovery?.magnetRound);
-    if(wallet)data.recovery.critterRound=CRITTER_MODEL.validate(remote.wallet.recovery?.critterRound);
+    if(wallet){data.recovery.critterRound=CRITTER_MODEL.validate(remote.wallet.recovery?.critterRound);data.recovery.critterProgress=CRITTER_MODEL.validateProgress(data.recovery.critterRound,data.recovery.critterProgress);}
     const s=remote.settings,ts=Date.parse(s.updated_at)||0;
     if(ts>=data.settingsUpdatedAt){data.settings={sound:s.sound_enabled,music:s.music_enabled,fastGame:s.fast_mode,fastBonus:s.fast_bonus,scatterBoost:s.scatter_boost};data.bets=validBets(s.selected_bets);data.lastGame=screens.includes(s.last_game_id)?s.last_game_id:'lobby';data.settingsUpdatedAt=ts;}
     if(wallet)data.stats=Object.fromEntries(remote.stats.map(s=>[s.game_id,s]));rememberSession();
@@ -456,7 +465,7 @@
         if(events.some(e=>e.payload?.p_game_id==='slot'&&rejected.has(e.payload.p_round_id))){data.recovery.slotBonus=validBonus(wallet.recovery?.slotBonus);suppress=true;VaultRecovery.restore();suppress=false;}
         data.recovery.swampBonus=swampCursor;VaultSwamp.restore(swampCursor);
         data.recovery.heistRound=heistCursor;VaultHeist.restore(heistCursor);data.recovery.minesRound=minesCursor;VaultRecovery.restoreMines();
-        data.recovery.magnetRound=magnetCursor;VaultMagnet.restore(magnetCursor);data.recovery.critterRound=critterCursor;VaultCritter.restore(critterCursor);
+        data.recovery.magnetRound=magnetCursor;VaultMagnet.restore(magnetCursor);data.recovery.critterRound=critterCursor;data.recovery.critterProgress=CRITTER_MODEL.validateProgress(critterCursor,data.recovery.critterProgress);VaultCritter.restore(critterCursor,data.recovery.critterProgress);
         data.queue=next;data.rounds=data.rounds.filter(r=>!rejected.has(r.roundId)&&!mineRewinds.has(r.roundId)&&!(r.gameId==='vault_heist'&&events.some(e=>e.type==='heist'&&e.payload.p_round_id===r.roundId))&&!(r.gameId==='magnet'&&events.some(e=>e.type==='magnet'&&e.payload.p_round_id===r.roundId)));canonicalBalance=balance;data.balance=balance;data.walletConfirmed=true;data.revision=Number(wallet.revision);clientRevision=revision;walletMutation++;conflict=false;
         VaultStorage.saveLocalState({preferences:false});refreshBalanceUI();renderIdentity();status('Сохраняем прогресс…');scheduleSync();if(currentGame==='swamp')VaultSwamp.resume();if(currentGame==='vault_heist')VaultHeist.resume();
         if(currentGame==='magnet')VaultMagnet.resume();if(currentGame==='critter')VaultCritter.resume();

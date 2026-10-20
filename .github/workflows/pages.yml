@@ -25,6 +25,7 @@ jobs:
           node tools/critter-math-tests.cjs
           node tools/critter-v2-math-tests.cjs
           node tools/critter-v3-tests.cjs
+          node tools/critter-v4-tests.cjs
           node tools/slot-features-tests.cjs --modes-only
           node tools/heist-math-tests.cjs
           node tools/mines-math-tests.cjs

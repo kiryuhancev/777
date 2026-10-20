@@ -112,3 +112,10 @@ body.critter-active .app,body.critter-active #slotApp,body.critter-active #poker
 #critterApp .critter-shop-actions button{flex:1;min-width:0}
 #critterApp #critterShopConfirm{background:linear-gradient(#ffe7a0,#d6a64f);color:#152335;border-color:#ffebae}
 @media(max-width:430px){#critterApp .critter-shop-options label{padding:11px 8px}#critterApp .critter-shop-actions button{font-size:10px;padding:12px 6px}}
+
+/* v4 persistent identities and multiplier upgrades; artwork always scales uniformly. */
+#critterApp .critter-cell.persistent-wild{outline:1px solid #70ffe3;outline-offset:-2px}
+#critterApp .critter-wild-multiplier{max-width:96%;font-size:clamp(9px,1.8vw,19px);overflow-wrap:anywhere}
+#critterApp .critter-wild-multiplier.upgraded{animation:critter-upgrade .24s ease-out}
+@keyframes critter-upgrade{50%{scale:1.12;background:#ffe29a;color:#102335;box-shadow:0 0 12px #74ffe5}}
+@media(prefers-reduced-motion:reduce){#critterApp .critter-wild-multiplier.upgraded{animation:none}}
