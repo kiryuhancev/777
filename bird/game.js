@@ -252,8 +252,9 @@ for(const [id,direction] of [['birdSteerLeft',-1],['birdSteerRight',1]]){
   for(const event of ['pointerup','pointercancel','lostpointercapture'])button.addEventListener(event,()=>{birdState.steer=0;});
 }
 el('birdSoundBtn').onclick=()=>{toggleSetting('sound');updateBirdUI();};
-let birdAnimLast=performance.now(),birdUiClock=0;
+let birdAnimLast=performance.now(),birdUiClock=0,birdFrame=null;
 function birdLoop(now){
+  birdFrame=null;
   const dt=Math.min(BIRD_PHYSICS.SETTINGS.MAX_FRAME_DELTA,Math.max(0,(now-birdAnimLast)/1000));birdAnimLast=now;
   if(document.body.classList.contains('bird-active')&&!document.hidden){
     if(birdState.active){birdState.accumulator+=dt;while(birdState.accumulator>=BIRD_PHYSICS.SETTINGS.DT){birdState.accumulator-=BIRD_PHYSICS.SETTINGS.DT;updateBirdPhysics(BIRD_PHYSICS.SETTINGS.DT);if(!birdState.active)break;}}
@@ -272,6 +273,17 @@ function birdLoop(now){
     birdState.particles=birdState.particles.filter(p=>p.life>0);
     drawBirdGame();birdUiClock+=dt;if(birdUiClock>.1){updateBirdUI();birdUiClock=0;}
   }else{birdState.accumulator=0;clearBirdInput();}
-  requestAnimationFrame(birdLoop);
+  if(document.body.classList.contains('bird-active')&&!document.hidden)birdFrame=requestAnimationFrame(birdLoop);
 }
-requestAnimationFrame(birdLoop);
+// Sleep outside this game. Resuming starts a fresh clock, never a catch-up physics burst.
+function syncBirdLoop(){
+  if(document.body.classList.contains('bird-active')&&!document.hidden){
+    if(birdFrame===null){birdAnimLast=performance.now();birdFrame=requestAnimationFrame(birdLoop);}
+  }else{
+    if(birdFrame!==null)cancelAnimationFrame(birdFrame);
+    birdFrame=null;birdState.accumulator=0;clearBirdInput();
+  }
+}
+new MutationObserver(syncBirdLoop).observe(document.body,{attributes:true,attributeFilter:['class']});
+document.addEventListener('visibilitychange',syncBirdLoop);
+syncBirdLoop();

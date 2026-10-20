@@ -1,0 +1,13 @@
+{
+  "passed": [
+    "Cacheable build works at nested /777/: auth and all10 game screens, real image decode, mobile bounds, no missing relative URLs",
+    "Bird RAF sleeps in lobby/hidden document and resumes on entry/visibility without a duplicate loop",
+    "100 unchanged balance renders: zero scrollWidth reads; external text/resize invalidate layout; mobile formatting remains correct",
+    "Delayed Alice profile PATCH after signout/Bob signin never replaces Bob profile or persisted identity",
+    "Delayed same-account refresh after A\u2192B switch cannot apply A wallet/profile/recovery to B",
+    "Delayed admin failure after identity switch cannot repopulate the next account admin UI"
+  ],
+  "pageErrors": [],
+  "imageRequests": 100,
+  "uniqueImagesRequested": 98
+}

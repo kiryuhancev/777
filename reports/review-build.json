@@ -1,0 +1,13 @@
+{
+  "sourceHtmlBytes": 32704893,
+  "webHtmlBytes": 969461,
+  "uniqueImageBytes": 21435498,
+  "uniqueImages": 100,
+  "protectedFiles": 213,
+  "checks": [
+    "Every extracted image byte-identical; all non-image code/markup byte-identical",
+    "UMD SDK data URL retained; published verifier hashes generated HTML",
+    "Interrupted embedding leaves last good standalone source intact",
+    "All other game controllers/math/art/SQL and animation engines unchanged; Bird active loop body byte-identical, only scheduling changes"
+  ]
+}

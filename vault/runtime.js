@@ -359,7 +359,7 @@
       const names=['профиль','кошелёк','настройки','статистика','история раундов'];
       for(let i=0;i<responses.length;i++)if(responses[i].error){
         const error=responses[i].error;console.error('VAULT account load failed: '+names[i],error);
-        status('Не удалось загрузить: '+names[i]+'. Проверьте SQL-настройку Supabase.');
+        if(uid===owner&&epoch===identityEpoch)status('Не удалось загрузить: '+names[i]+'. Проверьте SQL-настройку Supabase.');
         throw Object.assign(Error('Could not load account data'),{vaultComponent:/fetch|network/i.test(error.message||'')?null:names[i],cause:error});
       }
       const [profile,wallet,settings,stats,rounds]=responses.map(r=>r.data);
@@ -369,7 +369,8 @@
     async update({username,avatar_url=null}){
       if(!client||owner==='guest')return {error:'Could not update profile'};
       if(typeof username!=='string'||username.trim().length<1||username.length>40||avatar_url!==null&&!/^https:\/\//.test(avatar_url))return {error:'Invalid profile'};
-      try{const {data:profile,error}=await client.from('profiles').update({username:username.trim(),avatar_url}).eq('id',owner).select().single();if(error)throw error;VaultSession.profile=profile;rememberSession();renderIdentity();return {data:profile};}catch(e){console.error('VAULT profile update failed',e);return {error:'Could not update profile'};}
+      const uid=owner,epoch=identityEpoch;
+      try{const {data:profile,error}=await client.from('profiles').update({username:username.trim(),avatar_url}).eq('id',uid).select().single();if(error)throw error;if(owner!==uid||identityEpoch!==epoch)return {error:'Session changed'};VaultSession.profile=profile;rememberSession();renderIdentity();return {data:profile};}catch(e){console.error('VAULT profile update failed',e);return {error:'Could not update profile'};}
     },
   };
   function applyRemote(remote,{wallet=true}={}){
@@ -508,6 +509,7 @@
           status(storageAvailable?'Сохранено':'Сохранение недоступно');if(currentGame==='swamp'&&!VaultSwamp.isBusy)VaultSwamp.resume();
           if(currentGame==='magnet'&&!VaultMagnet.isBusy)VaultMagnet.resume();if(currentGame==='critter'&&!VaultCritter.isBusy)VaultCritter.resume();
         }catch(e){
+          if(owner!==uid||identityEpoch!==epoch)return;
           console.error('VAULT sync failed',e);
           if(String(e.message||'').includes('VAULT_ACCOUNT_DISABLED')){window.VaultAccess?.markBlocked();conflict=true;setTimeout(recoverWallet,0);}
           else if(String(e.message||'').includes('VAULT_WALLET_CONFLICT')||/Round mismatch|Round missing|Queue identity/.test(String(e.message||''))){conflict=true;status('Восстанавливаем кошелёк…');renderIdentity();setTimeout(recoverWallet,0);}
@@ -525,7 +527,8 @@
     const uid=user?.id||'guest';if(uid!=='guest'&&!isId(uid))throw Error('Invalid identity');
     if(connecting&&connectionUser===uid)return connecting;
     if(VaultSession.ready&&uid===owner){
-      if(uid!=='guest'){try{const mutation=walletMutation,remote=await VaultProfileService.load({previewWallet:!profileRemote});VaultSession.profile=remote.profile;profileRemote=true;if(mutation===walletMutation&&!VaultRoundService.anyActive()&&!data.queue.length){capturePreferences();const screen=currentGame;applyRemote(remote);data.lastGame=screen;suppress=true;restorePreferences();VaultRecovery.restore();suppress=false;updateUI();updatePokerUI();updateBirdUI();refreshBalanceUI();}renderIdentity();scheduleSync();}catch(e){console.error('VAULT reconnect pending',e);status(e.vaultComponent?'Не удалось загрузить: '+e.vaultComponent+'. Проверьте SQL-настройку Supabase.':'Offline — прогресс сохранён локально');}}
+      const epoch=identityEpoch;
+      if(uid!=='guest'){try{const mutation=walletMutation,remote=await VaultProfileService.load({previewWallet:!profileRemote});if(owner!==uid||identityEpoch!==epoch)return;VaultSession.profile=remote.profile;profileRemote=true;if(mutation===walletMutation&&!VaultRoundService.anyActive()&&!data.queue.length){capturePreferences();const screen=currentGame;applyRemote(remote);data.lastGame=screen;suppress=true;restorePreferences();VaultRecovery.restore();suppress=false;updateUI();updatePokerUI();updateBirdUI();refreshBalanceUI();}renderIdentity();scheduleSync();}catch(e){if(owner!==uid||identityEpoch!==epoch)return;console.error('VAULT reconnect pending',e);status(e.vaultComponent?'Не удалось загрузить: '+e.vaultComponent+'. Проверьте SQL-настройку Supabase.':'Offline — прогресс сохранён локально');}}
       return;
     }
     if(VaultRoundService.anyActive()&&VaultSession.ready&&uid!==owner)throw Error('Finish active rounds before switching account');

@@ -2,20 +2,26 @@
 (()=>{
  'use strict';
  const $=id=>document.getElementById(id),q=(root,s)=>root.querySelector(s);
+ const balanceFormats=new Map(),balanceLayouts=new WeakMap();let balanceLayoutVersion=0;
+ window.addEventListener('resize',()=>{balanceLayoutVersion++;},{passive:true});
+ const numberFormat=decimals=>{if(!balanceFormats.has(decimals))balanceFormats.set(decimals,new Intl.NumberFormat('ru-RU',{maximumFractionDigits:decimals}));return balanceFormats.get(decimals);};
  const text=(node,value)=>{value=String(value??'');if(node.textContent!==value)node.textContent=value;};
  // Read-only display formatting: never feeds a number back into the wallet.
  function parseBalance(value){if(typeof value==='number')return Number.isFinite(value)?value:null;const s=String(value).replace(/[\s\u00a0\u202f]/g,'').replace(',','.');return /^\d+(\.\d+)?$/.test(s)?Number(s):null;}
  function formatBalanceForDisplay(value,{mobile=matchMedia('(max-width:760px)').matches,compact=false}={}){
   const n=parseBalance(value);if(n===null)return String(value??'—');
-  if(compact){const d=n>=1e12?1e12:n>=1e9?1e9:n>=1e6?1e6:1e3,u=d===1e12?'T':d===1e9?'B':d===1e6?'M':'K';return new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(n/d)+u;}
+  if(compact){const d=n>=1e12?1e12:n>=1e9?1e9:n>=1e6?1e6:1e3,u=d===1e12?'T':d===1e9?'B':d===1e6?'M':'K';return numberFormat(2).format(n/d)+u;}
   let decimals=mobile?Math.max(0,9-Math.max(1,Math.trunc(n).toString().length)):4,result='';
-  for(let i=0;i<3;i++){result=new Intl.NumberFormat('ru-RU',{maximumFractionDigits:decimals}).format(n);const integer=result.split(',')[0].replace(/\D/g,'').length,next=mobile?Math.max(0,9-integer):4;if(next===decimals)break;decimals=next;}
+  for(let i=0;i<3;i++){result=numberFormat(decimals).format(n);const integer=result.split(',')[0].replace(/\D/g,'').length,next=mobile?Math.max(0,9-integer):4;if(next===decimals)break;decimals=next;}
   return result;
  }
  window.formatBalanceForDisplay=formatBalanceForDisplay;
  function balanceDisplay(node,value){
-  text(node,formatBalanceForDisplay(value));node.title=String(value);node.dataset.fullBalance=String(value);node.style.fontSize='';
-  if(matchMedia('(max-width:760px)').matches&&node.scrollWidth>node.clientWidth+1){node.style.setProperty('font-size','10px','important');if(node.scrollWidth>node.clientWidth+1)text(node,formatBalanceForDisplay(value,{mobile:true,compact:true}));}
+  const mobile=matchMedia('(max-width:760px)').matches,previous=balanceLayouts.get(node),raw=String(value);
+  if(previous?.value===raw&&previous.mobile===mobile&&previous.version===balanceLayoutVersion&&previous.text===node.textContent)return;
+  text(node,formatBalanceForDisplay(value,{mobile}));node.title=String(value);node.dataset.fullBalance=String(value);node.style.fontSize='';
+  if(mobile&&node.scrollWidth>node.clientWidth+1){node.style.setProperty('font-size','10px','important');if(node.scrollWidth>node.clientWidth+1)text(node,formatBalanceForDisplay(value,{mobile:true,compact:true}));}
+  balanceLayouts.set(node,{value:raw,mobile,version:balanceLayoutVersion,text:node.textContent});
  }
  window.BalanceDisplay={format:formatBalanceForDisplay,render:balanceDisplay};
  const configs=[
@@ -167,6 +173,8 @@
   configs.forEach(create);
   window.BonusFeatureModal={open:id=>{const c=configs.find(c=>c.id===id);if(c?.buy)$(c.buy).click();},close:()=>{document.querySelectorAll('.slot-bonus-dialog').forEach(n=>{if(n.tagName==='DIALOG')n.close();else if(n.classList.contains('show'))closeBonusShop();});}};window.BonusPurchaseConfirmation={cancel:()=>document.querySelectorAll('.slot-purchase-confirmation[open]').forEach(n=>n.querySelector('[data-no]').click())};
   window.VaultSlotHud={states:Object.freeze(['IDLE','SPINNING','RESOLVING','FEATURE','BONUS_INTRO','BONUS_ACTIVE','BIG_WIN','AUTOPLAY','INSUFFICIENT_BALANCE','DISABLED']),instances,getState:id=>instances.find(n=>n.id===id)?.getState(),refresh:()=>instances.forEach(n=>n.render())};
+  if(document.fonts)document.fonts.ready.then(()=>{balanceLayoutVersion++;VaultSlotHud.refresh();});
+  if(typeof ResizeObserver!=='undefined'){const observer=new ResizeObserver(()=>{balanceLayoutVersion++;});for(const node of document.querySelectorAll('.slot-balance,.lobby-balance'))observer.observe(node);}
   VaultSlotHud.refresh();setInterval(()=>{if(!document.hidden)VaultSlotHud.refresh();},150);
  }
  init();

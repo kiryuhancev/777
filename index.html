@@ -4877,8 +4877,9 @@ for(const [id,direction] of [['birdSteerLeft',-1],['birdSteerRight',1]]){
   for(const event of ['pointerup','pointercancel','lostpointercapture'])button.addEventListener(event,()=>{birdState.steer=0;});
 }
 el('birdSoundBtn').onclick=()=>{toggleSetting('sound');updateBirdUI();};
-let birdAnimLast=performance.now(),birdUiClock=0;
+let birdAnimLast=performance.now(),birdUiClock=0,birdFrame=null;
 function birdLoop(now){
+  birdFrame=null;
   const dt=Math.min(BIRD_PHYSICS.SETTINGS.MAX_FRAME_DELTA,Math.max(0,(now-birdAnimLast)/1000));birdAnimLast=now;
   if(document.body.classList.contains('bird-active')&&!document.hidden){
     if(birdState.active){birdState.accumulator+=dt;while(birdState.accumulator>=BIRD_PHYSICS.SETTINGS.DT){birdState.accumulator-=BIRD_PHYSICS.SETTINGS.DT;updateBirdPhysics(BIRD_PHYSICS.SETTINGS.DT);if(!birdState.active)break;}}
@@ -4897,9 +4898,20 @@ function birdLoop(now){
     birdState.particles=birdState.particles.filter(p=>p.life>0);
     drawBirdGame();birdUiClock+=dt;if(birdUiClock>.1){updateBirdUI();birdUiClock=0;}
   }else{birdState.accumulator=0;clearBirdInput();}
-  requestAnimationFrame(birdLoop);
+  if(document.body.classList.contains('bird-active')&&!document.hidden)birdFrame=requestAnimationFrame(birdLoop);
 }
-requestAnimationFrame(birdLoop);
+// Sleep outside this game. Resuming starts a fresh clock, never a catch-up physics burst.
+function syncBirdLoop(){
+  if(document.body.classList.contains('bird-active')&&!document.hidden){
+    if(birdFrame===null){birdAnimLast=performance.now();birdFrame=requestAnimationFrame(birdLoop);}
+  }else{
+    if(birdFrame!==null)cancelAnimationFrame(birdFrame);
+    birdFrame=null;birdState.accumulator=0;clearBirdInput();
+  }
+}
+new MutationObserver(syncBirdLoop).observe(document.body,{attributes:true,attributeFilter:['class']});
+document.addEventListener('visibilitychange',syncBirdLoop);
+syncBirdLoop();
 // END BIRD GAME V2
 
 window.addEventListener('resize',resizeCell);
@@ -5696,8 +5708,8 @@ const VaultAdmin=window.VaultAdmin=(()=>{
  function lock(value){busy=value;by('vaultAdminUsers').querySelectorAll('button').forEach(n=>n.disabled=value);by('vaultAdminBalanceForm').querySelector('button').disabled=value||!selected;by('vaultAdminAccessToggle').disabled=value||!selected||selected.is_admin;}
  async function identity(){VaultAccess.identity();const session=window.VaultSession,id=session?.ready&&session.mode==='authenticated'?session.user.id:null;if(id===owner)return;owner=id;epoch++;authorized=false;busy=false;by('vaultProfileMenu').classList.remove('vault-admin-role');entry.hidden=true;users=[];selected=null;request=null;by('vaultAdminUsers').replaceChildren();by('vaultAdminDetail').hidden=true;for(const id of ['vaultAdminUserTitle','vaultAdminUserMeta','vaultAdminRounds','vaultAdminAudit','vaultAdminStatus'])by(id).replaceChildren();by('vaultAdminBalanceForm').reset();by('vaultAdminAccessForm').reset();by('vaultAdminSearch').reset();offset=0;if(dialog.open)dialog.close();if(!id||session.user.email?.toLowerCase()!==hint)return;const e=epoch;try{const r=await VaultAdminService.context();if(e!==epoch||id!==owner)return;authorized=r?.isAdmin===true;entry.hidden=!authorized;by('vaultProfileMenu').classList.toggle('vault-admin-role',authorized);}catch{/* Older databases keep their normal UI; no admin access is inferred. */}}
  function renderUsers(){by('vaultAdminUsers').replaceChildren();for(const u of users){const b=document.createElement('button');b.type='button';b.classList.toggle('selected',selected?.user_id===u.user_id);const name=document.createElement('strong');name.textContent=u.username||'Player';const meta=document.createElement('span');meta.textContent=`${u.email} · ${u.enabled?'ДОСТУП ОТКРЫТ':'СТАВКИ ОСТАНОВЛЕНЫ'}${u.online?' · НЕДАВНО В СЕТИ':''}`;meta.className=!u.enabled?'admin-blocked':u.online?'admin-online':'';const balance=document.createElement('b');balance.textContent=fmt(u.balance);b.append(name,meta,balance);b.onclick=()=>select(u);by('vaultAdminUsers').append(b);}if(!users.length){const p=document.createElement('p');p.textContent='Пользователи не найдены';by('vaultAdminUsers').append(p);}text('vaultAdminPage',offset/30+1);by('vaultAdminPrev').disabled=offset===0;by('vaultAdminNext').disabled=users.length<30;}
- async function load({keep=true}={}){if(!authorized)return;const e=epoch,g=++listGeneration,old=keep?selected?.user_id:null;status('Загрузка пользователей…');try{const r=await VaultAdminService.users(by('vaultAdminQuery').value.trim(),offset);if(e!==epoch||g!==listGeneration)return;users=Array.isArray(r)?r:[];selected=users.find(u=>u.user_id===old)||null;renderUsers();status('');if(selected)await select(selected);else by('vaultAdminDetail').hidden=true;}catch(e){status(message(e));}}
- async function select(u){selected=u;renderUsers();const e=epoch,g=++detailGeneration;by('vaultAdminDetail').hidden=false;text('vaultAdminUserTitle',u.username+' · '+u.email);text('vaultAdminUserMeta',`Баланс: ${fmt(u.balance)} · revision ${u.revision}\nПоследний вход: ${date(u.last_sign_in_at)}\nПоследняя активность: ${date(u.last_seen_at)}\nПоследний раунд: ${date(u.last_round_at)}\nРаундов: ${u.rounds_played} · ${u.enabled?'Новые ставки разрешены':'Новые ставки приостановлены'}`);text('vaultAdminAccessToggle',u.enabled?'ПРИОСТАНОВИТЬ НОВЫЕ СТАВКИ':'РАЗРЕШИТЬ НОВЫЕ СТАВКИ');by('vaultAdminRounds').replaceChildren();by('vaultAdminAudit').replaceChildren();lock(busy);try{const r=await VaultAdminService.activity(u.user_id);if(e!==epoch||g!==detailGeneration)return;for(const round of r.rounds||[]){const n=document.createElement('div');n.className='vault-admin-entry';n.textContent=`${round.game_id.toUpperCase()} · ${round.status} · ставка ${fmt(round.bet)} · выплата ${fmt(round.payout)}\n${date(round.created_at)}`;by('vaultAdminRounds').append(n);}for(const a of r.audit||[]){const n=document.createElement('div');n.className='vault-admin-entry';n.textContent=`${date(a.created_at)} · ${a.action} · ${a.operation||''}${a.new_balance!=null?' → '+fmt(a.new_balance):''}\n${a.reason}`;by('vaultAdminAudit').append(n);}}catch(e){if(g===detailGeneration)status(message(e));}}
+ async function load({keep=true}={}){if(!authorized)return;const e=epoch,g=++listGeneration,old=keep?selected?.user_id:null;status('Загрузка пользователей…');try{const r=await VaultAdminService.users(by('vaultAdminQuery').value.trim(),offset);if(e!==epoch||g!==listGeneration)return;users=Array.isArray(r)?r:[];selected=users.find(u=>u.user_id===old)||null;renderUsers();status('');if(selected)await select(selected);else by('vaultAdminDetail').hidden=true;}catch(error){if(e===epoch&&g===listGeneration)status(message(error));}}
+ async function select(u){selected=u;renderUsers();const e=epoch,g=++detailGeneration;by('vaultAdminDetail').hidden=false;text('vaultAdminUserTitle',u.username+' · '+u.email);text('vaultAdminUserMeta',`Баланс: ${fmt(u.balance)} · revision ${u.revision}\nПоследний вход: ${date(u.last_sign_in_at)}\nПоследняя активность: ${date(u.last_seen_at)}\nПоследний раунд: ${date(u.last_round_at)}\nРаундов: ${u.rounds_played} · ${u.enabled?'Новые ставки разрешены':'Новые ставки приостановлены'}`);text('vaultAdminAccessToggle',u.enabled?'ПРИОСТАНОВИТЬ НОВЫЕ СТАВКИ':'РАЗРЕШИТЬ НОВЫЕ СТАВКИ');by('vaultAdminRounds').replaceChildren();by('vaultAdminAudit').replaceChildren();lock(busy);try{const r=await VaultAdminService.activity(u.user_id);if(e!==epoch||g!==detailGeneration)return;for(const round of r.rounds||[]){const n=document.createElement('div');n.className='vault-admin-entry';n.textContent=`${round.game_id.toUpperCase()} · ${round.status} · ставка ${fmt(round.bet)} · выплата ${fmt(round.payout)}\n${date(round.created_at)}`;by('vaultAdminRounds').append(n);}for(const a of r.audit||[]){const n=document.createElement('div');n.className='vault-admin-entry';n.textContent=`${date(a.created_at)} · ${a.action} · ${a.operation||''}${a.new_balance!=null?' → '+fmt(a.new_balance):''}\n${a.reason}`;by('vaultAdminAudit').append(n);}}catch(error){if(e===epoch&&g===detailGeneration)status(message(error));}}
  async function perform(kind){if(busy||!authorized||!selected)return;const e=epoch,u=selected;let payload;
   if(kind==='balance'){const amount=Number(by('vaultAdminAmount').value),operation=by('vaultAdminOperation').value,reason=by('vaultAdminReason').value.trim();if(!Number.isFinite(amount)||amount<0||amount>1e12||reason.length<3)return;payload={p_user_id:u.user_id,p_operation:operation,p_amount:amount,p_reason:reason,p_expected_revision:u.revision};}
   else{const reason=by('vaultAdminAccessReason').value.trim();if(reason.length<3)return;payload={p_user_id:u.user_id,p_enabled:!u.enabled,p_reason:reason};}
@@ -7344,7 +7356,7 @@ const VaultCritter=window.VaultCritter=(()=>{
       const names=['профиль','кошелёк','настройки','статистика','история раундов'];
       for(let i=0;i<responses.length;i++)if(responses[i].error){
         const error=responses[i].error;console.error('VAULT account load failed: '+names[i],error);
-        status('Не удалось загрузить: '+names[i]+'. Проверьте SQL-настройку Supabase.');
+        if(uid===owner&&epoch===identityEpoch)status('Не удалось загрузить: '+names[i]+'. Проверьте SQL-настройку Supabase.');
         throw Object.assign(Error('Could not load account data'),{vaultComponent:/fetch|network/i.test(error.message||'')?null:names[i],cause:error});
       }
       const [profile,wallet,settings,stats,rounds]=responses.map(r=>r.data);
@@ -7354,7 +7366,8 @@ const VaultCritter=window.VaultCritter=(()=>{
     async update({username,avatar_url=null}){
       if(!client||owner==='guest')return {error:'Could not update profile'};
       if(typeof username!=='string'||username.trim().length<1||username.length>40||avatar_url!==null&&!/^https:\/\//.test(avatar_url))return {error:'Invalid profile'};
-      try{const {data:profile,error}=await client.from('profiles').update({username:username.trim(),avatar_url}).eq('id',owner).select().single();if(error)throw error;VaultSession.profile=profile;rememberSession();renderIdentity();return {data:profile};}catch(e){console.error('VAULT profile update failed',e);return {error:'Could not update profile'};}
+      const uid=owner,epoch=identityEpoch;
+      try{const {data:profile,error}=await client.from('profiles').update({username:username.trim(),avatar_url}).eq('id',uid).select().single();if(error)throw error;if(owner!==uid||identityEpoch!==epoch)return {error:'Session changed'};VaultSession.profile=profile;rememberSession();renderIdentity();return {data:profile};}catch(e){console.error('VAULT profile update failed',e);return {error:'Could not update profile'};}
     },
   };
   function applyRemote(remote,{wallet=true}={}){
@@ -7493,6 +7506,7 @@ const VaultCritter=window.VaultCritter=(()=>{
           status(storageAvailable?'Сохранено':'Сохранение недоступно');if(currentGame==='swamp'&&!VaultSwamp.isBusy)VaultSwamp.resume();
           if(currentGame==='magnet'&&!VaultMagnet.isBusy)VaultMagnet.resume();if(currentGame==='critter'&&!VaultCritter.isBusy)VaultCritter.resume();
         }catch(e){
+          if(owner!==uid||identityEpoch!==epoch)return;
           console.error('VAULT sync failed',e);
           if(String(e.message||'').includes('VAULT_ACCOUNT_DISABLED')){window.VaultAccess?.markBlocked();conflict=true;setTimeout(recoverWallet,0);}
           else if(String(e.message||'').includes('VAULT_WALLET_CONFLICT')||/Round mismatch|Round missing|Queue identity/.test(String(e.message||''))){conflict=true;status('Восстанавливаем кошелёк…');renderIdentity();setTimeout(recoverWallet,0);}
@@ -7510,7 +7524,8 @@ const VaultCritter=window.VaultCritter=(()=>{
     const uid=user?.id||'guest';if(uid!=='guest'&&!isId(uid))throw Error('Invalid identity');
     if(connecting&&connectionUser===uid)return connecting;
     if(VaultSession.ready&&uid===owner){
-      if(uid!=='guest'){try{const mutation=walletMutation,remote=await VaultProfileService.load({previewWallet:!profileRemote});VaultSession.profile=remote.profile;profileRemote=true;if(mutation===walletMutation&&!VaultRoundService.anyActive()&&!data.queue.length){capturePreferences();const screen=currentGame;applyRemote(remote);data.lastGame=screen;suppress=true;restorePreferences();VaultRecovery.restore();suppress=false;updateUI();updatePokerUI();updateBirdUI();refreshBalanceUI();}renderIdentity();scheduleSync();}catch(e){console.error('VAULT reconnect pending',e);status(e.vaultComponent?'Не удалось загрузить: '+e.vaultComponent+'. Проверьте SQL-настройку Supabase.':'Offline — прогресс сохранён локально');}}
+      const epoch=identityEpoch;
+      if(uid!=='guest'){try{const mutation=walletMutation,remote=await VaultProfileService.load({previewWallet:!profileRemote});if(owner!==uid||identityEpoch!==epoch)return;VaultSession.profile=remote.profile;profileRemote=true;if(mutation===walletMutation&&!VaultRoundService.anyActive()&&!data.queue.length){capturePreferences();const screen=currentGame;applyRemote(remote);data.lastGame=screen;suppress=true;restorePreferences();VaultRecovery.restore();suppress=false;updateUI();updatePokerUI();updateBirdUI();refreshBalanceUI();}renderIdentity();scheduleSync();}catch(e){if(owner!==uid||identityEpoch!==epoch)return;console.error('VAULT reconnect pending',e);status(e.vaultComponent?'Не удалось загрузить: '+e.vaultComponent+'. Проверьте SQL-настройку Supabase.':'Offline — прогресс сохранён локально');}}
       return;
     }
     if(VaultRoundService.anyActive()&&VaultSession.ready&&uid!==owner)throw Error('Finish active rounds before switching account');
@@ -7671,20 +7686,26 @@ const VaultCritter=window.VaultCritter=(()=>{
 (()=>{
  'use strict';
  const $=id=>document.getElementById(id),q=(root,s)=>root.querySelector(s);
+ const balanceFormats=new Map(),balanceLayouts=new WeakMap();let balanceLayoutVersion=0;
+ window.addEventListener('resize',()=>{balanceLayoutVersion++;},{passive:true});
+ const numberFormat=decimals=>{if(!balanceFormats.has(decimals))balanceFormats.set(decimals,new Intl.NumberFormat('ru-RU',{maximumFractionDigits:decimals}));return balanceFormats.get(decimals);};
  const text=(node,value)=>{value=String(value??'');if(node.textContent!==value)node.textContent=value;};
  // Read-only display formatting: never feeds a number back into the wallet.
  function parseBalance(value){if(typeof value==='number')return Number.isFinite(value)?value:null;const s=String(value).replace(/[\s\u00a0\u202f]/g,'').replace(',','.');return /^\d+(\.\d+)?$/.test(s)?Number(s):null;}
  function formatBalanceForDisplay(value,{mobile=matchMedia('(max-width:760px)').matches,compact=false}={}){
   const n=parseBalance(value);if(n===null)return String(value??'—');
-  if(compact){const d=n>=1e12?1e12:n>=1e9?1e9:n>=1e6?1e6:1e3,u=d===1e12?'T':d===1e9?'B':d===1e6?'M':'K';return new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(n/d)+u;}
+  if(compact){const d=n>=1e12?1e12:n>=1e9?1e9:n>=1e6?1e6:1e3,u=d===1e12?'T':d===1e9?'B':d===1e6?'M':'K';return numberFormat(2).format(n/d)+u;}
   let decimals=mobile?Math.max(0,9-Math.max(1,Math.trunc(n).toString().length)):4,result='';
-  for(let i=0;i<3;i++){result=new Intl.NumberFormat('ru-RU',{maximumFractionDigits:decimals}).format(n);const integer=result.split(',')[0].replace(/\D/g,'').length,next=mobile?Math.max(0,9-integer):4;if(next===decimals)break;decimals=next;}
+  for(let i=0;i<3;i++){result=numberFormat(decimals).format(n);const integer=result.split(',')[0].replace(/\D/g,'').length,next=mobile?Math.max(0,9-integer):4;if(next===decimals)break;decimals=next;}
   return result;
  }
  window.formatBalanceForDisplay=formatBalanceForDisplay;
  function balanceDisplay(node,value){
-  text(node,formatBalanceForDisplay(value));node.title=String(value);node.dataset.fullBalance=String(value);node.style.fontSize='';
-  if(matchMedia('(max-width:760px)').matches&&node.scrollWidth>node.clientWidth+1){node.style.setProperty('font-size','10px','important');if(node.scrollWidth>node.clientWidth+1)text(node,formatBalanceForDisplay(value,{mobile:true,compact:true}));}
+  const mobile=matchMedia('(max-width:760px)').matches,previous=balanceLayouts.get(node),raw=String(value);
+  if(previous?.value===raw&&previous.mobile===mobile&&previous.version===balanceLayoutVersion&&previous.text===node.textContent)return;
+  text(node,formatBalanceForDisplay(value,{mobile}));node.title=String(value);node.dataset.fullBalance=String(value);node.style.fontSize='';
+  if(mobile&&node.scrollWidth>node.clientWidth+1){node.style.setProperty('font-size','10px','important');if(node.scrollWidth>node.clientWidth+1)text(node,formatBalanceForDisplay(value,{mobile:true,compact:true}));}
+  balanceLayouts.set(node,{value:raw,mobile,version:balanceLayoutVersion,text:node.textContent});
  }
  window.BalanceDisplay={format:formatBalanceForDisplay,render:balanceDisplay};
  const configs=[
@@ -7836,6 +7857,8 @@ const VaultCritter=window.VaultCritter=(()=>{
   configs.forEach(create);
   window.BonusFeatureModal={open:id=>{const c=configs.find(c=>c.id===id);if(c?.buy)$(c.buy).click();},close:()=>{document.querySelectorAll('.slot-bonus-dialog').forEach(n=>{if(n.tagName==='DIALOG')n.close();else if(n.classList.contains('show'))closeBonusShop();});}};window.BonusPurchaseConfirmation={cancel:()=>document.querySelectorAll('.slot-purchase-confirmation[open]').forEach(n=>n.querySelector('[data-no]').click())};
   window.VaultSlotHud={states:Object.freeze(['IDLE','SPINNING','RESOLVING','FEATURE','BONUS_INTRO','BONUS_ACTIVE','BIG_WIN','AUTOPLAY','INSUFFICIENT_BALANCE','DISABLED']),instances,getState:id=>instances.find(n=>n.id===id)?.getState(),refresh:()=>instances.forEach(n=>n.render())};
+  if(document.fonts)document.fonts.ready.then(()=>{balanceLayoutVersion++;VaultSlotHud.refresh();});
+  if(typeof ResizeObserver!=='undefined'){const observer=new ResizeObserver(()=>{balanceLayoutVersion++;});for(const node of document.querySelectorAll('.slot-balance,.lobby-balance'))observer.observe(node);}
   VaultSlotHud.refresh();setInterval(()=>{if(!document.hidden)VaultSlotHud.refresh();},150);
  }
  init();

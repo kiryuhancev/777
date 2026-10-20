@@ -1,6 +1,8 @@
+> Ревью и оптимизации производительности: [CODE_REVIEW.md](CODE_REVIEW.md). Веб-сборка `python3 tools/build-site.py` создаёт `_site/index.html` и `_site/assets/embedded/`; размещать нужно **весь `_site`**. Корневой `index.html` остаётся автономным файлом.
+
 # 777
 
-Браузерный игровой хаб: **DIGITAL DERBY**, Poker Blitz и VAULT BREAKERS.
+Браузерный игровой хаб VAULT: **DIGITAL DERBY**, Poker Blitz, VAULT BREAKERS, Blackjack, Baccarat, Swamp Fishing, Mines, VAULT Heist, MAGNET и Critter Chaos.
 
 [Открыть игры](https://kiryuhancev.github.io/777/). Для локального запуска достаточно
 открыть `index.html`: изображения и логотип DIGITAL DERBY встроены в файл.

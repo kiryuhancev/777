@@ -1,3 +1,11 @@
+# Оптимизации после ревью
+
+- Веб-HTML32,7→0,97МБ;100 уникальных изображений вынесены в файлы с SHA-256 именами. Standalone сохранён.
+- Кеш форматирования/измерений баланса; Bird RAF останавливается вне игры и в скрытой вкладке.
+- Защита от запоздалых ответов profile/account refresh/sync/admin при смене пользователя.
+- Embed выполняет одну атомарную замену HTML. Математика/SQL без изменений; новая миграция не требуется.
+- Проверки и ограничения: `CODE_REVIEW.md`.
+
 # Release2026-10-20 — shared UI, Critter and Swamp
 
 - Completed the accumulated UI/gameplay changes and versioned mathematical calibration targeting≈96%.

@@ -1,0 +1,72 @@
+{
+  "checks": [
+    {
+      "command": "node tools/magnet-math-tests.cjs",
+      "passed": true
+    },
+    {
+      "command": "node tools/magnet-v2-tests.cjs",
+      "passed": true
+    },
+    {
+      "command": "node tools/critter-math-tests.cjs",
+      "passed": true
+    },
+    {
+      "command": "node tools/critter-v2-math-tests.cjs",
+      "passed": true
+    },
+    {
+      "command": "node tools/critter-v3-tests.cjs",
+      "passed": true
+    },
+    {
+      "command": "node tools/critter-v4-tests.cjs",
+      "passed": true
+    },
+    {
+      "command": "node tools/critter-v5-tests.cjs",
+      "passed": true
+    },
+    {
+      "command": "node tools/slot-features-tests.cjs --modes-only",
+      "passed": true
+    },
+    {
+      "command": "node tools/heist-math-tests.cjs",
+      "passed": true
+    },
+    {
+      "command": "node tools/mines-math-tests.cjs",
+      "passed": true
+    },
+    {
+      "command": "node tools/swamp-math-tests.cjs",
+      "passed": true
+    },
+    {
+      "command": "node tools/swamp-levels-tests.cjs",
+      "passed": true
+    },
+    {
+      "command": "node tools/swamp-v4-tests.cjs",
+      "passed": true
+    },
+    {
+      "command": "node tools/table-rules-tests.cjs",
+      "passed": true
+    },
+    {
+      "command": "node tools/math-tests.cjs",
+      "passed": true
+    },
+    {
+      "command": "node tools/bird-physics-tests.cjs",
+      "passed": true
+    },
+    {
+      "command": "node tools/bird-round-tests.cjs",
+      "passed": true
+    }
+  ]
+}
