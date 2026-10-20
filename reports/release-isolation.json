@@ -1,0 +1,10 @@
+{
+  "baseline": "b4454b4",
+  "protectedFiles": 170,
+  "checks": [
+    "Other games, assets, Universal HUD, analog animation engine byte-identical",
+    "Only embedded Critter/Swamp modules and version capability gates changed",
+    "Existing wallet lock/revision/debit/credit/statistics bodies unchanged after masking Swamp validation hooks and versioned price/15-spin guards",
+    "Unified TXT equals SQL; migrations repeat-safe in isolated PostgreSQL"
+  ]
+}

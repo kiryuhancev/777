@@ -1,0 +1,9 @@
+{
+  "mathSuites": "All17 commands in Pages math step passed locally (including legacy models, current Critter5/Swamp4, Bird physics/rounds).",
+  "browser": "Critter real renderer, all4 Swamp levels and pending-gate F5, stale-revision rebase, shared confirmation/boost, mobile320\u20131440, no uncaught page errors.",
+  "auth": "15 actual-SDK owned HTTP fixture cases passed; no live account credentials used.",
+  "boot": "Healthy/hung/crash recovery cases passed.",
+  "sql": "Unified migration twice in isolated PostgreSQL; legacy+new validators, own-user RLS, duplicate IDs, exact debit/credit/stats;61 Swamp rounds/60FS.",
+  "isolation": "170 protected other-game/asset/HUD files byte-identical to b4454b4; generic financial bodies unchanged outside versioned Swamp guards.",
+  "productionDatabase": "Not applied: no administrative production SQL access. Operator must run whole VAULT_RELEASE_SETUP.txt."
+}

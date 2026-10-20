@@ -8,7 +8,7 @@ errors=[];checks=[]
 def level_route(r):
  if r.request.url.endswith('/begin_game_round'):
   payload=r.request.post_data_json;m=payload.get('p_metadata',{});n=payload.get('p_recovery',{}).get('swampBonus')
-  if m.get('mathVersion')==3 and m.get('freeSpin') and n and (n.get('phase')!='playing' or 'previousTier' in n):return r.fulfill(status=400,content_type='application/json',body=json.dumps({'message':'VAULT_WALLET_CONFLICT'}))
+  if m.get('mathVersion') in (3,4) and m.get('freeSpin') and n and (n.get('phase')!='playing' or 'previousTier' in n):return r.fulfill(status=400,content_type='application/json',body=json.dumps({'message':'VAULT_WALLET_CONFLICT'}))
  return critter_route(r)
 
 with sync_playwright() as p:

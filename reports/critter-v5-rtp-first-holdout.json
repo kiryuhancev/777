@@ -1,0 +1,61 @@
+{
+  "bonus": {
+    "n": 100000,
+    "mean": 48.26240754037057,
+    "se": 0.5988646055196372
+  },
+  "super": {
+    "n": 100000,
+    "mean": 468.4480684894325,
+    "se": 4.305803546718776
+  },
+  "base": {
+    "n": 1000000,
+    "mean": 0.3392583581731386,
+    "se": 0.0007461398271361597
+  },
+  "boostBase": {
+    "n": 1000000,
+    "mean": 0.32944158833806564,
+    "se": 0.0007341023887529645
+  },
+  "baseRtp": {
+    "mean": 0.9548597593643513,
+    "se": 0.004863158125952678,
+    "ci95": [
+      0.9453279694374841,
+      0.9643915492912185
+    ]
+  },
+  "boostRtp": {
+    "mean": 0.9500790725448798,
+    "se": 0.006150059467758678,
+    "ci95": [
+      0.9380249559880728,
+      0.9621331891016868
+    ]
+  },
+  "bonusRtp": {
+    "mean": 0.9652481508074113,
+    "se": 0.011977292110392744,
+    "ci95": [
+      0.9417726582710415,
+      0.9887236433437812
+    ]
+  },
+  "superRtp": {
+    "mean": 0.936896136978865,
+    "se": 0.008611607093437551,
+    "ci95": [
+      0.9200173870757273,
+      0.9537748868820026
+    ]
+  },
+  "note": "Independent seed; stratified Monte Carlo estimate, not certified RTP. Natural-trigger bonus uses same feature RNG distribution. Cap and per-win rounding included.",
+  "phase": "First independent holdout, before300k-per-feature refinement; retained rather than discarded.",
+  "payScales": {
+    "base": 3.12218372868267,
+    "normal": 0.22831500038398772,
+    "super": 0.0012890032899911946
+  }
+}

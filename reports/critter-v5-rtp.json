@@ -1,0 +1,210 @@
+{
+  "bonus": {
+    "n": 100000,
+    "mean": 48.388947271249975,
+    "se": 0.6007057231662651
+  },
+  "super": {
+    "n": 100000,
+    "mean": 476.6127196188786,
+    "se": 4.3334963946066445
+  },
+  "base": {
+    "n": 1000000,
+    "mean": 0.3392583581731386,
+    "se": 0.0007461398271361597
+  },
+  "boostBase": {
+    "n": 1000000,
+    "mean": 0.32944158833806564,
+    "se": 0.0007341023887529645
+  },
+  "baseRtp": {
+    "mean": 0.9608678527021516,
+    "se": 0.004882899945941418,
+    "ci95": [
+      0.9512973688081064,
+      0.9704383365961967
+    ]
+  },
+  "boostRtp": {
+    "mean": 0.9595147847711666,
+    "se": 0.006180047806412081,
+    "ci95": [
+      0.9474018910705989,
+      0.9716276784717343
+    ]
+  },
+  "bonusRtp": {
+    "mean": 0.9677789454249995,
+    "se": 0.012014114463325303,
+    "ci95": [
+      0.9442312810768818,
+      0.9913266097731172
+    ]
+  },
+  "superRtp": {
+    "mean": 0.9532254392377572,
+    "se": 0.008666992789213289,
+    "ci95": [
+      0.9362381333708991,
+      0.9702127451046152
+    ]
+  },
+  "note": "Independent seed; stratified Monte Carlo estimate, not certified RTP. Natural-trigger bonus uses same feature RNG distribution. Cap and per-win rounding included.",
+  "seed": 78102026,
+  "config": {
+    "version": 5,
+    "id": "critter",
+    "columns": 5,
+    "rows": 5,
+    "minCluster": 5,
+    "maxWinX": 10000,
+    "wildChance": 0.018,
+    "scatterChance": 0.016,
+    "payScale": 3.122183728683,
+    "payScales": {
+      "base": 3.122183728683,
+      "normal": 0.23129493968,
+      "super": 0.001288816678
+    },
+    "sizes": [
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      15
+    ],
+    "symbols": [
+      {
+        "id": "ten",
+        "name": "10",
+        "weight": 24,
+        "pays": [
+          0.2,
+          0.3,
+          0.45,
+          0.65,
+          0.9,
+          1.4,
+          3
+        ]
+      },
+      {
+        "id": "jack",
+        "name": "J",
+        "weight": 20,
+        "pays": [
+          0.25,
+          0.4,
+          0.55,
+          0.8,
+          1.2,
+          1.8,
+          4
+        ]
+      },
+      {
+        "id": "king",
+        "name": "K",
+        "weight": 16,
+        "pays": [
+          0.3,
+          0.45,
+          0.7,
+          1,
+          1.5,
+          2.2,
+          5
+        ]
+      },
+      {
+        "id": "ace",
+        "name": "A",
+        "weight": 12,
+        "pays": [
+          0.4,
+          0.6,
+          0.9,
+          1.3,
+          1.8,
+          2.8,
+          6
+        ]
+      },
+      {
+        "id": "cat",
+        "name": "Street Cat",
+        "weight": 10,
+        "pays": [
+          0.6,
+          0.9,
+          1.3,
+          1.8,
+          2.5,
+          4,
+          8
+        ]
+      },
+      {
+        "id": "pigeon",
+        "name": "Cool Pigeon",
+        "weight": 8,
+        "pays": [
+          0.8,
+          1.2,
+          1.7,
+          2.5,
+          3.5,
+          5,
+          10
+        ]
+      },
+      {
+        "id": "possum",
+        "name": "Possum",
+        "weight": 6,
+        "pays": [
+          1,
+          1.5,
+          2.2,
+          3,
+          4.5,
+          7,
+          15
+        ]
+      },
+      {
+        "id": "bulldog",
+        "name": "Bulldog",
+        "weight": 4,
+        "pays": [
+          1.5,
+          2.2,
+          3,
+          4.5,
+          6,
+          10,
+          25
+        ]
+      }
+    ],
+    "bonus": {
+      "spins": 10,
+      "superSpins": 20
+    },
+    "features": {
+      "scatterMultiplier": 1.5,
+      "boostCost": 2.675265,
+      "bonusCost": 50,
+      "superCost": 500
+    }
+  },
+  "seeds": {
+    "featuresHoldout": 78102026,
+    "baseStreamsHoldout": 770102026,
+    "refinementFit": 660102026
+  }
+}

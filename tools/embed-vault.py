@@ -76,7 +76,7 @@ p.write_text(s)
 s=p.read_text()
 def swamp_assets(text):
  return re.sub(r'__SWAMP_([^\s\'"<>]+)__',lambda m:'data:image/webp;base64,'+base64.b64encode((ROOT/'assets/swamp'/m[1]).read_bytes()).decode(),text)
-for name,text,tag in [('SWAMP STYLES',swamp_assets((ROOT/'swamp/presentation.css').read_text()),'style'),('SWAMP SCREEN',(ROOT/'swamp/screen.html').read_text(),None),('SWAMP MODULE',swamp_assets('\n'.join((ROOT/'swamp'/f).read_text() for f in ['config-v2.js','model-v1.js','config.js','model.js','assets.js','game.js'])),'script')]:
+for name,text,tag in [('SWAMP STYLES',swamp_assets((ROOT/'swamp/presentation.css').read_text()),'style'),('SWAMP SCREEN',(ROOT/'swamp/screen.html').read_text(),None),('SWAMP MODULE',swamp_assets('\n'.join((ROOT/'swamp'/f).read_text() for f in ['config-v2.js','model-v1.js','config-v3.js','model-v2.js','config.js','model.js','assets.js','game.js'])),'script')]:
  block=f'<!-- BEGIN {name} -->\n'+(f'<{tag}>\n{text}\n</{tag}>' if tag else text)+f'\n<!-- END {name} -->'
  pattern=rf'<!-- BEGIN {name} -->[\s\S]*?<!-- END {name} -->'
  if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
@@ -145,7 +145,7 @@ p.write_text(s)
 s=p.read_text()
 def critter_assets(text):
  return re.sub(r'__CRITTER_([^\s\x27"<>]+)__',lambda m:'data:image/'+('png' if m[1].endswith('.png') else 'webp')+';base64,'+base64.b64encode((ROOT/'assets/critter'/m[1]).read_bytes()).decode(),text)
-for name,text,tag in [('CRITTER STYLES',(ROOT/'critter/presentation.css').read_text(),'style'),('CRITTER SCREEN',(ROOT/'critter/screen.html').read_text(),None),('CRITTER MODULE',critter_assets('\n'.join((ROOT/'critter'/f).read_text() for f in ['config-v1.js','model-v1.js','config-v2.js','model-v2.js','config-v3.js','model-v3.js','config.js','model.js','assets.js','game.js'])),'script')]:
+for name,text,tag in [('CRITTER STYLES',(ROOT/'critter/presentation.css').read_text(),'style'),('CRITTER SCREEN',(ROOT/'critter/screen.html').read_text(),None),('CRITTER MODULE',critter_assets('\n'.join((ROOT/'critter'/f).read_text() for f in ['config-v1.js','model-v1.js','config-v2.js','model-v2.js','config-v3.js','model-v3.js','config-v4.js','model-v4.js','config.js','model.js','assets.js','game.js'])),'script')]:
  block=f'<!-- BEGIN {name} -->\n'+(f'<{tag}>\n{text}\n</{tag}>' if tag else text)+f'\n<!-- END {name} -->'
  pattern=rf'<!-- BEGIN {name} -->[\s\S]*?<!-- END {name} -->'
  if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)

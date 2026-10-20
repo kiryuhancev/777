@@ -26,11 +26,13 @@ jobs:
           node tools/critter-v2-math-tests.cjs
           node tools/critter-v3-tests.cjs
           node tools/critter-v4-tests.cjs
+          node tools/critter-v5-tests.cjs
           node tools/slot-features-tests.cjs --modes-only
           node tools/heist-math-tests.cjs
           node tools/mines-math-tests.cjs
           node tools/swamp-math-tests.cjs
           node tools/swamp-levels-tests.cjs
+          node tools/swamp-v4-tests.cjs
           node tools/table-rules-tests.cjs
           node tools/math-tests.cjs
           node tools/bird-physics-tests.cjs

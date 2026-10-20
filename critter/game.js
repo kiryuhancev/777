@@ -118,7 +118,7 @@ const VaultCritter=window.VaultCritter=(()=>{
  }
  function restore(value,savedProgress=null){
   generation++;busy=false;auto=0;shownX=0;clearTimeout(timer);clearFX();if(window.VaultWalletService)VaultWalletService.releasePresentation(C.id);
-  round=M.validate(value);progress=round?.version===4?(M.validateProgress(round,savedProgress)||M.progress(round,{baseDone:true,nextSpin:round.bonus?.spinCount||0,complete:true})):null;
+  round=M.validate(value);progress=round?.version>=4?(M.validateProgress(round,savedProgress)||M.progress(round,{baseDone:true,nextSpin:round.bonus?.spinCount||0,complete:true})):null;
   shownX=progress&&!progress.complete?M.round((progress.baseDone?round.base.winX:0)+progress.bonusTotalX):round?.winX||0;
   const stable=progress&&!progress.complete?(progress.nextSpin?round.bonus.spins[progress.nextSpin-1].updatedGrid:round.base.finalGrid):round?.version<4?finalGrid(round):round?.base?.finalGrid;
   draw(stable||M.spinPlan(1977).initialGrid);$('critterAutoMenu').hidden=true;$('critterAuto').setAttribute('aria-expanded','false');
@@ -130,7 +130,7 @@ const VaultCritter=window.VaultCritter=(()=>{
   $('critterReconnect').hidden=true;$('critterMessage').textContent='Подключаем Critter Chaos…';
   ready=await VaultCritterBridge.connect();if(currentGame!==C.id)return;
   render();$('critterReconnect').hidden=ready;
-  const messages={schema:'БД не видит функции Critter Chaos. Проверьте выполнение полного supabase_critter_v4.txt в подключённом проекте.',permission:'Нет доступа к функциям Critter Chaos. Проверьте права authenticated из supabase_critter_v4.txt.',version:'Версия функций Critter Chaos несовместима. Выполните актуальный supabase_critter_v4.txt.',connection:'Не удалось проверить Critter Chaos: сервер временно недоступен. Повторим подключение при восстановлении сети.'};
+  const messages={schema:'БД не видит функции Critter Chaos. Проверьте выполнение полного VAULT_RELEASE_SETUP.txt в подключённом проекте.',permission:'Нет доступа к функциям Critter Chaos. Проверьте права authenticated из VAULT_RELEASE_SETUP.txt.',version:'Версия функций Critter Chaos несовместима. Выполните актуальный VAULT_RELEASE_SETUP.txt.',connection:'Не удалось проверить Critter Chaos: сервер временно недоступен. Повторим подключение при восстановлении сети.'};
   $('critterMessage').textContent=ready?'5+ CONNECTED SYMBOLS · ONE RESULT PER SPIN':messages[VaultCritterBridge.connectionError]||messages.connection;if(!resumeFeature())schedule();
  }
  async function open(){if(!VaultSession.ready||VaultSession.mode!=='authenticated')return;currentGame=C.id;document.body.classList.remove('lobby-mode','slot-active','poker-active','bird-active','table-active','swamp-active','mines-active','heist-active','magnet-active');document.body.classList.add('game-mode','critter-active');root.hidden=false;VaultStorage.schedule();syncMusic();ready=VaultCritterBridge.ready;render();if(!ready)await connect();else if(!resumeFeature())schedule();}
@@ -158,7 +158,7 @@ const VaultCritter=window.VaultCritter=(()=>{
  document.addEventListener('click',e=>{if(!e.target.closest('.critter-auto-wrap')){$('critterAutoMenu').hidden=true;$('critterAuto').setAttribute('aria-expanded','false');}});
  for(const [openId,id,closeId] of [['critterSettingsOpen','critterSettings','critterSettingsClose'],['critterHelpOpen','critterHelp','critterHelpClose']]){$(openId).onclick=()=>$(id).showModal();$(closeId).onclick=()=>$(id).close();}
  $('critterSound').onclick=()=>{toggleSetting('sound');render();};$('critterFast').onclick=()=>{toggleSetting('fastGame');render();};
- $('critterPaytable').innerHTML='<div class="critter-pay-row"><b>SYMBOL · × BET</b>'+C.sizes.map(n=>'<b>'+n+'+</b>').join('')+'</div>'+C.symbols.map(s=>'<div class="critter-pay-row"><span>'+art(s.id)+s.name+'</span>'+s.pays.map(p=>'<b>'+fmt(M.round(p*C.payScale))+'×</b>').join('')+'</div>').join('')+'<p class="critter-pay-specials">'+art('wild')+' Base Wild = x1. В бонусе Wild сохраняется и бегает каждый Free Spin; выигрыш удваивает его личный множитель для следующих спинов. '+art('scatter')+' 3+ Scatter → Dumpster Dash.</p>';
+ $('critterPaytable').innerHTML=['base','normal','super'].map(mode=>'<h3>'+({base:'BASE GAME',normal:'BONUS',super:'SUPER BONUS'}[mode])+'</h3><div class="critter-pay-row"><b>SYMBOL · × BET</b>'+C.sizes.map(n=>'<b>'+n+'+</b>').join('')+'</div>'+C.symbols.map(s=>'<div class="critter-pay-row"><span>'+art(s.id)+s.name+'</span>'+s.pays.map(p=>'<b>'+fmt(M.round(p*C.payScales[mode]))+'×</b>').join('')+'</div>').join('')).join('')+'<p>Each mode uses its displayed paytable. Base Wild is x1; bonus Wild multipliers add together and double after a win for subsequent Free Spins. Maximum whole-round win10,000× bet.</p>';
  $('critterLogo').src=A.logo;$('critterDashRunner').src=A.wild;root.querySelector('.critter-scene').style.backgroundImage=`linear-gradient(#060b1833,#09091a55),url('${A.background}')`;
  for(const src of Object.values(A)){const img=new Image();img.src=src;img.decode?.().catch(()=>{});}
  new MutationObserver(()=>{if(currentGame!==C.id&&!root.hidden){root.hidden=true;restore(round,progress);for(const id of ['critterHelp','critterSettings','critterBonusShop'])if($(id).open)$(id).close();document.body.classList.remove('critter-active');}}).observe(document.body,{attributes:true,attributeFilter:['class']});

@@ -84,7 +84,7 @@ const VaultSwamp=window.VaultSwamp=(()=>{
  function markAcknowledged(b){try{localStorage.setItem(presentationKey(),JSON.stringify({version:1,token:gateToken(b),updatedAt:Date.now()}));}catch{}}
  function closeGate(){pendingGate=false;if(popup.open)popup.close();}
  function showGate(){
-  if(!bonus||bonus.version!==2||bonus.phase==='playing')return false;
+  if(!bonus||bonus.version<2||bonus.phase==='playing')return false;
   if(acknowledged(bonus)){if(bonus.phase==='complete'){bonus=null;controls();return false;}bonus=M.acknowledge(bonus);VaultRecovery.checkpointSwamp();controls();return false;}
   pendingGate=true;gateArmedAt=performance.now()+180;clearTimeout(timer);toggleAuto(false);
   const phase=bonus.phase,level=bonus.tier+1;
@@ -131,16 +131,16 @@ const VaultSwamp=window.VaultSwamp=(()=>{
   // Begin checkpoints the consumed free spin before any await; the model receives its prior count.
   if(inBonus)bonus={...bonus,remaining:bonus.remaining-1,spinsPlayed:bonus.spinsPlayed+1};else{bonus=null;featureWin=0;}
   const seed=crypto.getRandomValues(new Uint32Array(1))[0];
-  const rid=VaultRoundService.begin('swamp',inBonus?0:cost,{stake,baseBet:stake,scatterBoost:boost,mathVersion:C.version,freeSpin:inBonus,freeSpinIndex:inBonus?prior.spinsPlayed+1:0,seed,featureId:prior?.featureId||null});
+  const rid=VaultRoundService.begin('swamp',inBonus?0:cost,{stake,baseBet:stake,scatterBoost:boost,mathVersion:prior?.version===1?2:prior?.version===2?3:C.version,freeSpin:inBonus,freeSpinIndex:inBonus?prior.spinsPlayed+1:0,seed,featureId:prior?.featureId||null});
   if(!rid){bonus=prior;controls();return;}
   busy=true;viewBonus=prior?{...prior,remaining:prior.remaining-1}:null;VaultWalletService.holdPresentation('swamp');const g=++generation;let outcome;
   try{
-   outcome=M.resolve(M.generate(inBonus,M.seeded(seed),C,boost),inBonus?prior:null);lastOutcome=outcome;
+   outcome=M.resolve(M.generate(inBonus,M.seeded(seed),inBonus?M.configForBonus(prior):C,boost),inBonus?prior:null);lastOutcome=outcome;
    if(inBonus){bonus=outcome.nextBonus;featureWin=money(bonus.totalWinX*stake);}
    else if(outcome.triggerSpins){bonus={...M.newBonus(outcome.scatters,stake,C,outcome.winX),featureId:rid};featureWin=money(outcome.winX*stake);}
    lastWin=money(outcome.winX*stake);
    // Wallet, entitlement and final result are one stable local checkpoint before animation.
-   VaultRoundService.settleWithPayout('swamp',lastWin,outcome.winX>0?'win':'no-win',{mathVersion:C.version,seed,featureId:bonus?.featureId||prior?.featureId||rid,freeSpin:inBonus,scatters:outcome.scatters,collectors:outcome.collectors.length,moneyFish:outcome.fish.map(f=>f.valueX),multiplier:outcome.multiplier,lineWinX:outcome.lineWinX,collectedX:outcome.collectedX,retriggerSpins:outcome.awardedSpins,winX:outcome.winX,capped:outcome.capped});
+   VaultRoundService.settleWithPayout('swamp',lastWin,outcome.winX>0?'win':'no-win',{mathVersion:prior?.version===1?2:prior?.version===2?3:C.version,seed,featureId:bonus?.featureId||prior?.featureId||rid,freeSpin:inBonus,scatters:outcome.scatters,collectors:outcome.collectors.length,moneyFish:outcome.fish.map(f=>f.valueX),multiplier:outcome.multiplier,lineWinX:outcome.lineWinX,collectedX:outcome.collectedX,retriggerSpins:outcome.awardedSpins,winX:outcome.winX,capped:outcome.capped});
   }catch(e){console.error('VAULT swamp round failed',e);VaultRoundService.finish('swamp','interrupted','cancelled');busy=false;VaultWalletService.releasePresentation('swamp');auto=0;message('Не удалось завершить спин. Ставка сохранена в истории.');controls();return;}
   clearProgressFX();
   if(!inBonus&&auto>0)auto--;by('swampLines').replaceChildren();by('swampCollectLayer').replaceChildren();root.querySelector('.swamp-frame').classList.remove('has-win');controls();message(inBonus?'The swamp wakes…':'Casting into the dark…');
@@ -183,8 +183,8 @@ const VaultSwamp=window.VaultSwamp=(()=>{
   // Reconstruct only the visual board from the last owned, already settled seed.
   // No resolve/settle, wallet change, entitlement consumption or new RNG draw.
   const saved=window.VaultStorage?.inspect().data.rounds;
-  const record=saved?.findLast(r=>r.gameId==='swamp'&&r.status==='settled'&&r.metadata?.mathVersion===C.version&&Number.isInteger(r.metadata?.seed)&&r.metadata.seed>=0&&r.metadata.seed<=4294967295);
-  return record?(record.metadata.presentationTrigger===true?M.purchaseTrigger(record.metadata.seed):M.generate(record.metadata.freeSpin===true,M.seeded(record.metadata.seed),C,record.metadata.scatterBoost===true)):Array.from({length:5},(_,c)=>Array.from({length:3},(_,r)=>({id:preview[(c*3+r)%preview.length]})));
+  const record=saved?.findLast(r=>r.gameId==='swamp'&&r.status==='settled'&&[2,3,C.version].includes(r.metadata?.mathVersion)&&Number.isInteger(r.metadata?.seed)&&r.metadata.seed>=0&&r.metadata.seed<=4294967295);
+  return record?(record.metadata.presentationTrigger===true?M.purchaseTrigger(record.metadata.seed):M.generate(record.metadata.freeSpin===true,M.seeded(record.metadata.seed),M.configForBonus({version:record.metadata.mathVersion===2?1:record.metadata.mathVersion===3?2:3}),record.metadata.scatterBoost===true)):Array.from({length:5},(_,c)=>Array.from({length:3},(_,r)=>({id:preview[(c*3+r)%preview.length]})));
  }
  function restore(value){closeGate();clearProgressFX();window.VaultWalletService?.releasePresentation('swamp');displayedWin=0;displayedFeatureWin=0;viewBonus=null;scene.classList.remove('anticipating','collector-flash');clearTimeout(timer);generation++;bonus=M.validateBonus(value);busy=false;auto=0;featureWin=bonus?money(bonus.totalWinX*bonus.bet):0;lastWin=0;lastOutcome=null;columns.forEach(n=>n.classList.remove('rolling','anticipation'));by('swampCollectLayer').replaceChildren();by('swampLines').replaceChildren();by('swampTransition').hidden=true;shown=recoveryGrid();drawAll();controls();message(hasBonus()?`FREE SPINS RESTORED · ${bonus.remaining}`:'10 fixed paylines · Money Fish collect in Free Spins.');}
  async function open(){if(!VaultSession.ready||VaultSession.mode!=='authenticated')return;currentGame='swamp';document.body.classList.remove('lobby-mode','slot-active','poker-active','bird-active','table-active');document.body.classList.add('game-mode','swamp-active');root.hidden=false;VaultStorage.schedule();syncMusic();preload();startAudio();controls();

@@ -1,0 +1,172 @@
+{
+  "config": {
+    "version": 5,
+    "id": "critter",
+    "columns": 5,
+    "rows": 5,
+    "minCluster": 5,
+    "maxWinX": 10000,
+    "wildChance": 0.018,
+    "scatterChance": 0.016,
+    "payScale": 3.122183728683,
+    "payScales": {
+      "base": 3.122183728683,
+      "normal": 0.23129493968,
+      "super": 0.001288816678
+    },
+    "sizes": [
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      15
+    ],
+    "symbols": [
+      {
+        "id": "ten",
+        "name": "10",
+        "weight": 24,
+        "pays": [
+          0.2,
+          0.3,
+          0.45,
+          0.65,
+          0.9,
+          1.4,
+          3
+        ]
+      },
+      {
+        "id": "jack",
+        "name": "J",
+        "weight": 20,
+        "pays": [
+          0.25,
+          0.4,
+          0.55,
+          0.8,
+          1.2,
+          1.8,
+          4
+        ]
+      },
+      {
+        "id": "king",
+        "name": "K",
+        "weight": 16,
+        "pays": [
+          0.3,
+          0.45,
+          0.7,
+          1,
+          1.5,
+          2.2,
+          5
+        ]
+      },
+      {
+        "id": "ace",
+        "name": "A",
+        "weight": 12,
+        "pays": [
+          0.4,
+          0.6,
+          0.9,
+          1.3,
+          1.8,
+          2.8,
+          6
+        ]
+      },
+      {
+        "id": "cat",
+        "name": "Street Cat",
+        "weight": 10,
+        "pays": [
+          0.6,
+          0.9,
+          1.3,
+          1.8,
+          2.5,
+          4,
+          8
+        ]
+      },
+      {
+        "id": "pigeon",
+        "name": "Cool Pigeon",
+        "weight": 8,
+        "pays": [
+          0.8,
+          1.2,
+          1.7,
+          2.5,
+          3.5,
+          5,
+          10
+        ]
+      },
+      {
+        "id": "possum",
+        "name": "Possum",
+        "weight": 6,
+        "pays": [
+          1,
+          1.5,
+          2.2,
+          3,
+          4.5,
+          7,
+          15
+        ]
+      },
+      {
+        "id": "bulldog",
+        "name": "Bulldog",
+        "weight": 4,
+        "pays": [
+          1.5,
+          2.2,
+          3,
+          4.5,
+          6,
+          10,
+          25
+        ]
+      }
+    ],
+    "bonus": {
+      "spins": 10,
+      "superSpins": 20
+    },
+    "features": {
+      "scatterMultiplier": 1.5,
+      "boostCost": 2.675265,
+      "bonusCost": 50,
+      "superCost": 500
+    }
+  },
+  "seed": 94102026,
+  "fullBaseCycles": {
+    "n": 500000,
+    "triggers": 3567,
+    "rtp": 0.9485732352068716,
+    "se": 0.05924287253139541,
+    "ci95": [
+      0.8324572050453366,
+      1.0646892653684066
+    ]
+  },
+  "fullBoostCycles": {
+    "n": 500000,
+    "triggers": 10770,
+    "rtp": 0.9132027784940896,
+    "se": 0.03868359232107314,
+    "ci95": [
+      0.8373829375447862,
+      0.989022619443393
+    ]
+  }
+}

@@ -6,7 +6,7 @@ exec(compile(source.read_text().split('\nwith sync_playwright() as p:')[0],str(s
 globals().update({k:v for k,v in ns.items() if not k.startswith('__')})
 errors=[];checks=[]
 def shared_route(r):
- if r.request.url.split('/')[-1] in ['heist_capabilities','swamp_slot_capabilities']:return r.fulfill(content_type='application/json',body=json.dumps({'version':2,'purchaseVersion':1,'boostVersion':1,'siteAdminVersion':1,'bonusVersion':2}),headers={'Access-Control-Allow-Origin':'*'})
+ if r.request.url.split('/')[-1] in ['heist_capabilities','swamp_slot_capabilities']:return r.fulfill(content_type='application/json',body=json.dumps({'version':2,'purchaseVersion':1,'boostVersion':1,'siteAdminVersion':1,'bonusVersion':2,'mathVersion':4}),headers={'Access-Control-Allow-Origin':'*'})
  return critter_route(r)
 
 with sync_playwright() as p:

@@ -1,6 +1,6 @@
 const fs=require('fs'),vm=require('vm'),cp=require('child_process'),assert=require('assert/strict'),H=require('../heist/model.js'),C=require('../heist/config.js');
 function load(files,source=f=>fs.readFileSync(f,'utf8')){const b=vm.createContext({});vm.runInContext(files.map(source).join('\n')+'\nglobalThis.H=typeof VAULT_HEIST_MODEL!=="undefined"?VAULT_HEIST_MODEL:null;globalThis.S=typeof SWAMP_MODEL!=="undefined"?SWAMP_MODEL:null;',b);return b;}
-const compare=!process.argv.includes('--modes-only'),old=compare?load(['heist/config.js','heist/model.js','swamp/config.js','swamp/model.js'],f=>cp.execFileSync('git',['show','cb4f619:'+f],{encoding:'utf8'})):null,now=load(['swamp/config.js','swamp/model.js']),S=now.S,id='11111111-1111-4111-8111-111111111111';
+const compare=!process.argv.includes('--modes-only'),old=compare?load(['heist/config.js','heist/model.js','swamp/config.js','swamp/model.js'],f=>cp.execFileSync('git',['show','cb4f619:'+f],{encoding:'utf8'})):null,now=load(['swamp/config-v2.js','swamp/model-v1.js','swamp/config-v3.js','swamp/model-v2.js','swamp/config.js','swamp/model.js']),S=now.S,id='11111111-1111-4111-8111-111111111111';
 const same=(a,b)=>assert.equal(JSON.stringify(a),JSON.stringify(b));
 for(let seed=1;compare&&seed<=500;seed++){
  let a=old.H.start({seed,bet:20,roundId:id}),b=H.start({seed,bet:20,roundId:id});same(a,b);while(H.active(b)){const action=b.status==='STAGE'?'spin':'deeper';a=old.H.advance(a,action);b=H.advance(b,action);same(a,b);}assert(H.validate(b));

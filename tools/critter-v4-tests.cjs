@@ -1,4 +1,4 @@
-const assert=require('node:assert/strict'),M=require('../critter/model'),C=M.config,id='11111111-1111-4111-8111-111111111111';
+const assert=require('node:assert/strict'),M=require('../critter/model-v4'),C=M.config,id='11111111-1111-4111-8111-111111111111';
 assert.deepEqual(C.symbols,M.v3.config.symbols);for(const k of ['payScale','scatterChance','wildChance','maxWinX'])assert.equal(C[k],M.v3.config[k]);
 // Explicit x8+x2 proof: base substitution remains x1; bonus sums to x10.
 const sample=Array.from({length:25},(_,uid)=>({uid,symbol:C.symbols[(uid+3)%8].id}));

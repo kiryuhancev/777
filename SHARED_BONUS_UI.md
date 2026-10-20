@@ -1,3 +1,5 @@
+> Release update2026-10-20: subsequent calibration and deployment instructions are in [RELEASE_NOTES.md](RELEASE_NOTES.md). The original implementation/test notes below are historical; use VAULT_RELEASE_SETUP.txt for the current database migration.
+
 # Shared bonus UI and Critter square tiles
 
 Presentation-only update. Existing wager/purchase handlers and prices, RNG, paytables, wallet/settlement unchanged.

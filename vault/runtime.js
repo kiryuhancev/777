@@ -122,7 +122,7 @@
     async connect(){
       if(critterSupport)return true;if(!client||owner==='guest')return false;
       if(critterConnection)return critterConnection;
-      const known=read('critter-schema'),cached=known?.version===4&&known.project===C.supabaseUrl;
+      const known=read('critter-schema'),cached=known?.version===5&&known.project===C.supabaseUrl;
       if(!navigator.onLine&&cached){critterSupport=true;return true;}
       critterConnectionError='';const expectedOwner=owner;
       critterConnection=(async()=>{
@@ -137,8 +137,8 @@
               critterConnectionError=error.code==='PGRST202'||responseStatus===404?'schema':responseStatus===401||responseStatus===403||error.code==='42501'?'permission':'connection';
               console.error('VAULT Critter connection failed',{code:error.code,status:responseStatus,message:error.message});return false;
             }
-            critterSupport=cap?.version>=2&&cap?.gameplayVersion===4;
-            if(critterSupport)write('critter-schema',{version:4,project:C.supabaseUrl});else critterConnectionError='version';
+            critterSupport=cap?.version>=2&&cap?.gameplayVersion===4&&cap?.mathVersion===5;
+            if(critterSupport)write('critter-schema',{version:5,project:C.supabaseUrl});else critterConnectionError='version';
             return critterSupport;
           }catch(error){
             if(owner!==expectedOwner)return false;
@@ -165,7 +165,7 @@
       const rollback={balance:canonicalBalance,revision:clientRevision,mutation:walletMutation,queue:[...data.queue],rounds:[...data.rounds],stats:data.stats.critter?copy(data.stats.critter):null,checkpoint:data.recovery.critterRound,progress:data.recovery.critterProgress};
       if(enqueue('critter',{p_round_id:r.roundId,p_expected_revision:clientRevision,p_checkpoint:r})===false)return false;
       clientRevision++;canonicalBalance=balance;data.balance=balance;walletMutation++;data.recovery.critterRound=copy(r);data.recovery.critterProgress=CRITTER_MODEL.progress(r);
-      const record={roundId:r.roundId,gameId:'critter',status:'settled',bet:CRITTER_MODEL.cost(r),stake:r.bet,payout:r.payout,multiplier:r.winX,result:r.result,metadata:{seed:r.seed,purchaseType:r.purchaseType||null,scatterBoost:!!r.scatterBoost,baseBet:r.bet,cost:CRITTER_MODEL.cost(r),bonus:!!r.bonus,cascades:r.version===4?0:r.base.steps.length+(r.bonus?.spins||[r.bonus?.plan]).filter(Boolean).reduce((n,p)=>n+p.steps.length,0),runningWilds:r.version===4?(r.bonus?.spins||[]).reduce((n,p)=>n+p.movements.length,0):[r.base,...(r.bonus?.spins||(r.bonus?[r.bonus.plan]:[]))].flatMap(p=>p.steps).reduce((n,s)=>n+s.moves.length,0)},startedAt:Date.now(),settledAt:Date.now()};
+      const record={roundId:r.roundId,gameId:'critter',status:'settled',bet:CRITTER_MODEL.cost(r),stake:r.bet,payout:r.payout,multiplier:r.winX,result:r.result,metadata:{seed:r.seed,purchaseType:r.purchaseType||null,scatterBoost:!!r.scatterBoost,baseBet:r.bet,cost:CRITTER_MODEL.cost(r),bonus:!!r.bonus,cascades:r.version>=4?0:r.base.steps.length+(r.bonus?.spins||[r.bonus?.plan]).filter(Boolean).reduce((n,p)=>n+p.steps.length,0),runningWilds:r.version>=4?(r.bonus?.spins||[]).reduce((n,p)=>n+p.movements.length,0):[r.base,...(r.bonus?.spins||(r.bonus?[r.bonus.plan]:[]))].flatMap(p=>p.steps).reduce((n,s)=>n+s.moves.length,0)},startedAt:Date.now(),settledAt:Date.now()};
       data.rounds.push(record);data.rounds=data.rounds.slice(-C.maxLocalRounds);localStats(record);
       if(!VaultStorage.saveLocalState()){
         canonicalBalance=rollback.balance;data.balance=rollback.balance;clientRevision=rollback.revision;walletMutation=rollback.mutation;data.queue=rollback.queue;data.rounds=rollback.rounds;data.recovery.critterRound=rollback.checkpoint;data.recovery.critterProgress=rollback.progress;
@@ -229,8 +229,8 @@
     async checkSwampSupport(){
       if(swampSupport)return true;if(swampSupportPromise)return swampSupportPromise;if(!client||VaultSession.mode!=='authenticated')return false;
       const cached=read('swamp-schema');
-      if(!navigator.onLine&&cached?.version>=1&&cached.bonusVersion===2&&cached.project===C.supabaseUrl){swampSupport=true;swampPurchaseSupport=cached.purchaseVersion===1;swampBoostSupport=cached.boostVersion===1;return true;}
-      swampSupportPromise=(async()=>{try{const {data:result,error}=await client.rpc('swamp_slot_capabilities');if(error)throw error;swampSupport=result?.version>=1&&result?.bonusVersion===2;swampPurchaseSupport=result?.purchaseVersion===1;swampBoostSupport=result?.boostVersion===1;if(swampSupport){write('swamp-schema',{version:result.version,purchaseVersion:result.purchaseVersion||0,boostVersion:result.boostVersion||0,bonusVersion:result.bonusVersion||0,project:C.supabaseUrl});settingsFingerprint='';VaultStorage.schedule();}return swampSupport;}catch(e){if(cached?.version>=1&&cached.bonusVersion===2&&cached.project===C.supabaseUrl&&/fetch|network|offline/i.test(e.message||'')){swampSupport=true;swampPurchaseSupport=cached.purchaseVersion===1;swampBoostSupport=cached.boostVersion===1;return true;}console.error('VAULT swamp schema unavailable',e);return false;}finally{swampSupportPromise=null;}})();return swampSupportPromise;
+      if(!navigator.onLine&&cached?.version>=1&&cached.bonusVersion===2&&cached.mathVersion===4&&cached.project===C.supabaseUrl){swampSupport=true;swampPurchaseSupport=cached.purchaseVersion===1;swampBoostSupport=cached.boostVersion===1;return true;}
+      swampSupportPromise=(async()=>{try{const {data:result,error}=await client.rpc('swamp_slot_capabilities');if(error)throw error;swampSupport=result?.version>=1&&result?.bonusVersion===2&&result?.mathVersion===4;swampPurchaseSupport=result?.purchaseVersion===1;swampBoostSupport=result?.boostVersion===1;if(swampSupport){write('swamp-schema',{version:result.version,purchaseVersion:result.purchaseVersion||0,boostVersion:result.boostVersion||0,bonusVersion:result.bonusVersion||0,mathVersion:result.mathVersion||0,project:C.supabaseUrl});settingsFingerprint='';VaultStorage.schedule();}return swampSupport;}catch(e){if(cached?.version>=1&&cached.bonusVersion===2&&cached.mathVersion===4&&cached.project===C.supabaseUrl&&/fetch|network|offline/i.test(e.message||'')){swampSupport=true;swampPurchaseSupport=cached.purchaseVersion===1;swampBoostSupport=cached.boostVersion===1;return true;}console.error('VAULT swamp schema unavailable',e);return false;}finally{swampSupportPromise=null;}})();return swampSupportPromise;
     },
     get swampSupport(){return swampSupport;},get swampPurchaseSupport(){return swampPurchaseSupport;},get swampBoostSupport(){return swampBoostSupport;},
     async checkTableSupport(){

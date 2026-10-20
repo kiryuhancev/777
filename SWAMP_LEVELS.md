@@ -1,3 +1,5 @@
+> Release update2026-10-20: subsequent calibration and deployment instructions are in [RELEASE_NOTES.md](RELEASE_NOTES.md). The original implementation/test notes below are historical; use VAULT_RELEASE_SETUP.txt for the current database migration.
+
 # Swamp Fishing — deferred sequential bonus levels
 
 Implemented after the shared BONUS/balance/Critter tile update (`SHARED_BONUS_UI.md`). Review branch only; no production deployment/database changes.

@@ -1,3 +1,10 @@
+# Release2026-10-20 — shared UI, Critter and Swamp
+
+- Completed the accumulated UI/gameplay changes and versioned mathematical calibration targeting≈96%.
+- Added one transaction/repeat-safe `VAULT_RELEASE_SETUP.txt` for production schema alignment; production SQL is not executed by Pages.
+- Frozen legacy models preserve already-settled rounds and bonus recovery. Current paytables are explicit; collect values remain literal.
+- Verification, statistical uncertainty and setup: `RELEASE_NOTES.md`. Earlier entries below describe historical review snapshots.
+
 # Swamp Fishing —15-spins sequential levels
 
 - One bonus from3+ Scatter; Intro/Level Up/Complete wait for Space/tap. Purchased entry uses shared confirmation and non-paying3Scatter analog presentation, with one77× debit.

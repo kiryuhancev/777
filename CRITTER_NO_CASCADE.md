@@ -1,3 +1,5 @@
+> Release update2026-10-20: subsequent calibration and deployment instructions are in [RELEASE_NOTES.md](RELEASE_NOTES.md). The original implementation/test notes below are historical; use VAULT_RELEASE_SETUP.txt for the current database migration.
+
 # Critter Chaos v4 — single-result gameplay
 
 Status: review branch `feature/critter-single-spin-v4`; **not deployed**. Gameplay/recovery implementation is complete; RTP preservation is **not** complete. No production database changes were made.

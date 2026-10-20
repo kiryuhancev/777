@@ -1,0 +1,308 @@
+{
+  "bonus": {
+    "n": 150000,
+    "mean": 73.14829958666674,
+    "se": 0.3704680385246035
+  },
+  "base": {
+    "n": 750000,
+    "mean": 0.4891619176601488,
+    "se": 0.002119708113936276
+  },
+  "baseRtp": {
+    "mean": 0.9530157229741072,
+    "se": 0.0031641898436735286,
+    "ci95": [
+      0.946813910880507,
+      0.9592175350677073
+    ]
+  },
+  "boostBase": {
+    "n": 750000,
+    "mean": 0.4818871833561532,
+    "se": 0.002110926347254852
+  },
+  "boostRtp": {
+    "mean": 0.9556958718215559,
+    "se": 0.0034963668873323624,
+    "ci95": [
+      0.9488429927223845,
+      0.9625487509207273
+    ]
+  },
+  "buyRtp": {
+    "mean": 0.9499779167099577,
+    "se": 0.004811273227592254,
+    "ci95": [
+      0.9405478211838768,
+      0.9594080122360384
+    ]
+  },
+  "fullBaseCycles": {
+    "n": 500000,
+    "triggers": 3176,
+    "rtp": 0.9476948634260357,
+    "se": 0.01700983210654951,
+    "ci95": [
+      0.9143555924971987,
+      0.9810341343548727
+    ]
+  },
+  "fullBoostCycles": {
+    "n": 500000,
+    "triggers": 6402,
+    "rtp": 0.9636046999709651,
+    "se": 0.016611195912114945,
+    "ci95": [
+      0.9310467559832198,
+      0.9961626439587103
+    ]
+  },
+  "note": "Independent seeds; Monte Carlo estimate, not certified RTP; complete capped features, actual paid-cycle cross-check; fish sum \u00d7 collector count \u00d7 tier multiplier unchanged.",
+  "config": {
+    "version": 4,
+    "gameId": "swamp",
+    "displayName": "SWAMP FISHING",
+    "nameIsPlaceholder": true,
+    "GAME_LOGO_SRC": "",
+    "rows": 3,
+    "reels": 5,
+    "targetRtp": 0.96,
+    "maxWinX": 50000,
+    "scatterPerReel": 0.09,
+    "scatterBoost": {
+      "symbolMultiplier": 1.28,
+      "costMultiplier": 1.481493
+    },
+    "moneyChanceBase": 0.075,
+    "moneyChanceBonus": 0.15,
+    "collectorChance": 0.019971165935,
+    "collectorReels": [
+      1,
+      2,
+      3
+    ],
+    "collectorsPerUpgrade": 4,
+    "retriggerSpins": 15,
+    "multipliers": [
+      1,
+      2,
+      3,
+      10
+    ],
+    "freeSpins": {
+      "3": 15,
+      "4": 15,
+      "5": 15
+    },
+    "autoChoices": [
+      10,
+      25,
+      50,
+      100,
+      -1
+    ],
+    "timing": {
+      "initial": 240,
+      "reel": 180,
+      "anticipation": 260,
+      "fastInitial": 70,
+      "fastReel": 75,
+      "pause": 600
+    },
+    "purchases": [
+      {
+        "id": "bonus",
+        "spins": 15,
+        "costX": 77,
+        "label": "BONUS"
+      }
+    ],
+    "symbols": [
+      {
+        "id": "bobber",
+        "weight": 23,
+        "pays": [
+          1,
+          3,
+          12
+        ]
+      },
+      {
+        "id": "hook",
+        "weight": 20,
+        "pays": [
+          1.2,
+          4,
+          16
+        ]
+      },
+      {
+        "id": "insect",
+        "weight": 17,
+        "pays": [
+          1.5,
+          5,
+          20
+        ]
+      },
+      {
+        "id": "bait_jar",
+        "weight": 14,
+        "pays": [
+          2,
+          7,
+          28
+        ]
+      },
+      {
+        "id": "lantern",
+        "weight": 11,
+        "pays": [
+          2.5,
+          10,
+          40
+        ]
+      },
+      {
+        "id": "tackle_box",
+        "weight": 8,
+        "pays": [
+          3,
+          14,
+          60
+        ]
+      },
+      {
+        "id": "fish_01",
+        "weight": 5,
+        "pays": [
+          5,
+          22,
+          100
+        ]
+      },
+      {
+        "id": "catfish",
+        "weight": 2,
+        "pays": [
+          8,
+          40,
+          200
+        ]
+      }
+    ],
+    "lineScale": 1.033793398052,
+    "money": [
+      {
+        "x": 2,
+        "weight": 60000
+      },
+      {
+        "x": 5,
+        "weight": 27000
+      },
+      {
+        "x": 10,
+        "weight": 9000
+      },
+      {
+        "x": 15,
+        "weight": 2500
+      },
+      {
+        "x": 20,
+        "weight": 1000
+      },
+      {
+        "x": 25,
+        "weight": 400
+      },
+      {
+        "x": 50,
+        "weight": 99
+      },
+      {
+        "x": 2000,
+        "weight": 1
+      }
+    ],
+    "paylines": [
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      [
+        0,
+        1,
+        2,
+        1,
+        0
+      ],
+      [
+        2,
+        1,
+        0,
+        1,
+        2
+      ],
+      [
+        0,
+        0,
+        1,
+        2,
+        2
+      ],
+      [
+        2,
+        2,
+        1,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        1,
+        2,
+        2,
+        2,
+        1
+      ],
+      [
+        0,
+        1,
+        1,
+        1,
+        0
+      ]
+    ]
+  },
+  "seeds": {
+    "stratifiedHoldout": 870102026,
+    "paidCycles": 904102026,
+    "fit": 119102026
+  }
+}
