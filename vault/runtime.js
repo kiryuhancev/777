@@ -525,14 +525,14 @@
       const guestPreferences=migrate?copy({settings:data.settings,bets:data.bets,lastGame:data.lastGame}):null;
       VaultStorage.flush();VaultSession.ready=false;identityEpoch++;conflict=false;profileRemote=uid==='guest';owner=uid;data=loadBucket(uid);clientRevision=data.revision+data.queue.filter(e=>!['settings','mines'].includes(e.type)).length;VaultSession.mode=uid==='guest'?'guest':'authenticated';VaultSession.user=user?{id:user.id,email:user.email,user_metadata:{username:user.user_metadata?.username}}:null;
       const marker=read('session');VaultSession.profile=uid!=='guest'&&marker?.project===C.supabaseUrl&&marker.user?.id===uid?marker.profile:null;
-      await acquireLock();
+      window.VaultBootDiagnostics?.phase('ACCOUNT_LOCK');await acquireLock();
       if(uid!=='guest'&&!cachedOnly){
-        try{const remote=await VaultProfileService.load({previewWallet:true});applyRemote(remote,{wallet:data.queue.length===0&&Object.keys(data.recovery.openRounds).every(game=>game==='mines')});}
+        try{window.VaultBootDiagnostics?.phase('ACCOUNT_LOAD');const remote=await VaultProfileService.load({previewWallet:true});applyRemote(remote,{wallet:data.queue.length===0&&Object.keys(data.recovery.openRounds).every(game=>game==='mines')});}
         catch(e){console.error('VAULT remote load failed',e);const cached=read(`user:${uid}`);profileRemote=!e.vaultComponent&&cached?.version===C.storageVersion&&cached.data?.walletConfirmed===true&&amount(cached.data?.balance)!==null;status(e.vaultComponent?'Не удалось загрузить: '+e.vaultComponent+'. Проверьте SQL-настройку Supabase.':'Offline — прогресс сохранён локально');}
       }
       if(cachedOnly)profileRemote=true;
       if(guestPreferences){Object.assign(data,guestPreferences);data.settingsUpdatedAt=Date.now();enqueue('settings',{settings:{...data.settings,bets:data.bets,lastGame:data.lastGame},updatedAt:new Date(data.settingsUpdatedAt).toISOString()});}
-      suppress=true;canonicalBalance=data.balance;restorePreferences();VaultRecovery.restore();suppress=false;
+      window.VaultBootDiagnostics?.phase('GAME_RECOVERY');suppress=true;canonicalBalance=data.balance;restorePreferences();VaultRecovery.restore();suppress=false;
       VaultSession.ready=true;rememberSession();renderIdentity();showSavedScreen();VaultStorage.saveLocalState({preferences:false});
       if(conflict)setTimeout(recoverWallet,0);
       if(!locked&&!conflict&&(uid==='guest'||profileRemote))status(uid==='guest'?'Локальное сохранение':'Sync pending');scheduleSync();
@@ -579,7 +579,7 @@
     async restoreSession(){
       if(!configured()||location.protocol==='file:')return switchIdentity(null);
       try{
-        const sdk=await loadSDK();
+        window.VaultBootDiagnostics?.phase('SDK_LOAD');const sdk=await loadSDK();window.VaultBootDiagnostics?.phase('SESSION_RESTORE');
         client=sdk.createClient(C.supabaseUrl,C.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:NS+'auth'},global:{fetch:supabaseFetch}});
         client.auth.onAuthStateChange((event,session)=>{
           // Keep asynchronous DB work outside the Supabase auth callback lock.
@@ -590,7 +590,7 @@
           },0);
         });
         const {data:sessionData,error}=await client.auth.getSession();if(error)throw error;
-        return await switchIdentity(sessionData.session?.user||null);
+        window.VaultBootDiagnostics?.phase('IDENTITY_RESTORE');return await switchIdentity(sessionData.session?.user||null);
       }catch(e){
         console.error('VAULT session restore unavailable',e);
         return switchIdentity(null);

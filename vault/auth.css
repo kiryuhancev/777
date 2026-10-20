@@ -1,5 +1,5 @@
 /* Account controls only; no selectors modify game screens. */
-.vault-booting> :not(#vaultBoot):not(script):not(style){visibility:hidden!important}
+.vault-booting> :not(#vaultBoot):not(#vaultBootRecovery):not(script):not(style){visibility:hidden!important}
 .vault-boot{position:fixed;inset:0;z-index:20000;display:grid;place-items:center;background:#10080c;color:#e5d3a6;font:800 24px system-ui;letter-spacing:.22em}
 .vault-boot[hidden]{display:none}
 .lobby .vault-account-bar{display:flex;align-items:center;gap:20px}
@@ -131,3 +131,12 @@ body.vault-signed-out .vault-auth-dialog form{width:100%}
 /* Authentication failures stay next to the action and remain readable on phones. */
 .vault-auth-dialog #vaultAuthMessage:empty{display:none}
 .vault-auth-dialog #vaultAuthMessage:not(:empty){display:block;margin:14px 0;padding:12px 14px;border:1px solid #e5d3a66b;border-radius:10px;background:#4a202bcc;color:#f0e3c4;font-size:13px;line-height:1.5}
+/* Early startup recovery remains visible while the application is gated. */
+.vault-booting>#vaultBootRecovery{visibility:visible!important}
+#vaultBootRecovery{position:fixed;inset:0;z-index:21000;display:grid;place-items:center;padding:24px;background:#10080c;color:#f0e3c4;font:16px system-ui}
+#vaultBootRecovery>div{width:min(440px,100%);padding:30px;border:1px solid #e5d3a644;border-radius:20px;background:#180d12}
+#vaultBootRecovery strong{color:#e5d3a6;font-size:24px}
+#vaultBootRecovery h1{font-size:22px;line-height:1.3;margin-top:30px}
+#vaultBootRecovery p{line-height:1.6;color:#c9b990}
+#vaultBootRecovery small{display:block;font:12px monospace;color:#c9b990}
+#vaultBootRecovery button{width:100%;margin-top:24px;padding:16px;border:0;border-radius:12px;background:#e5d3a6;color:#180d12;font-weight:800;cursor:pointer}

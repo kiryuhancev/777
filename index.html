@@ -1,6 +1,31 @@
 <!doctype html>
 <html lang="ru">
 <head>
+<!-- BEGIN VAULT BOOT GUARD -->
+<script>
+/* Runs before game modules. Never changes auth, wallet, storage or game readiness. */
+(()=>{
+ 'use strict';
+ const diagnostic={code:'STARTUP_PENDING',phase:'HTML_MODULES',line:0,column:0};let panel=null,finished=false,timer;
+ function healthy(){return document.body&&!document.body.classList.contains('vault-booting')&&document.getElementById('vaultBoot')?.hidden;}
+ function stop(){finished=true;clearTimeout(timer);panel?.remove();observer.disconnect();}
+ function show(){
+  if(healthy()){stop();return;}
+  if(!document.body){timer=setTimeout(show,1000);return;}
+  if(panel)return;
+  panel=document.createElement('section');panel.id='vaultBootRecovery';panel.setAttribute('role','alert');panel.setAttribute('aria-live','polite');
+  const box=document.createElement('div'),brand=document.createElement('strong'),title=document.createElement('h1'),message=document.createElement('p'),code=document.createElement('small'),retry=document.createElement('button');
+  brand.textContent='V A U L T';title.textContent='Не удалось завершить загрузку';message.textContent='Запуск занял слишком много времени. Повтори загрузку. Сохранённые данные останутся на месте.';code.id='vaultBootDiagnostic';code.textContent=diagnostic.code+' · '+diagnostic.phase+(diagnostic.line?' · '+diagnostic.line+':'+diagnostic.column:'');retry.type='button';retry.textContent='ПОВТОРИТЬ ЗАГРУЗКУ';
+  retry.onclick=()=>{const url=new URL(location.href);url.searchParams.set('vault_reload',Date.now());location.replace(url.href);};box.append(brand,title,message,code,retry);panel.append(box);document.body.append(panel);retry.focus();
+ }
+ const observer=new MutationObserver(()=>{if(healthy())stop();});observer.observe(document.documentElement,{attributes:true,attributeFilter:['class','hidden'],childList:true,subtree:true});
+ window.addEventListener('error',event=>{if(finished)return;if(event instanceof ErrorEvent){diagnostic.code='JS_STARTUP_ERROR';diagnostic.line=event.lineno||0;diagnostic.column=event.colno||0;const node=document.getElementById('vaultBootDiagnostic');if(node)node.textContent=diagnostic.code+' · '+diagnostic.phase+' · '+diagnostic.line+':'+diagnostic.column;}},true);
+ timer=setTimeout(show,30000);
+ window.VaultBootDiagnostics={phase(value){if(finished)return;diagnostic.phase=value;const node=document.getElementById('vaultBootDiagnostic');if(node)node.textContent=diagnostic.code+' · '+value+(diagnostic.line?' · '+diagnostic.line+':'+diagnostic.column:'');},inspect:()=>({...diagnostic,finished,recoveryVisible:!!panel?.isConnected})};
+})();
+
+</script>
+<!-- END VAULT BOOT GUARD -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#07100c" />
@@ -886,7 +911,7 @@ body:not(.slot-active) .derby-footballer span{animation-play-state:paused}
 <!-- BEGIN VAULT STYLES -->
 <style>
 /* Account controls only; no selectors modify game screens. */
-.vault-booting> :not(#vaultBoot):not(script):not(style){visibility:hidden!important}
+.vault-booting> :not(#vaultBoot):not(#vaultBootRecovery):not(script):not(style){visibility:hidden!important}
 .vault-boot{position:fixed;inset:0;z-index:20000;display:grid;place-items:center;background:#10080c;color:#e5d3a6;font:800 24px system-ui;letter-spacing:.22em}
 .vault-boot[hidden]{display:none}
 .lobby .vault-account-bar{display:flex;align-items:center;gap:20px}
@@ -1018,6 +1043,15 @@ body.vault-signed-out .vault-auth-dialog form{width:100%}
 /* Authentication failures stay next to the action and remain readable on phones. */
 .vault-auth-dialog #vaultAuthMessage:empty{display:none}
 .vault-auth-dialog #vaultAuthMessage:not(:empty){display:block;margin:14px 0;padding:12px 14px;border:1px solid #e5d3a66b;border-radius:10px;background:#4a202bcc;color:#f0e3c4;font-size:13px;line-height:1.5}
+/* Early startup recovery remains visible while the application is gated. */
+.vault-booting>#vaultBootRecovery{visibility:visible!important}
+#vaultBootRecovery{position:fixed;inset:0;z-index:21000;display:grid;place-items:center;padding:24px;background:#10080c;color:#f0e3c4;font:16px system-ui}
+#vaultBootRecovery>div{width:min(440px,100%);padding:30px;border:1px solid #e5d3a644;border-radius:20px;background:#180d12}
+#vaultBootRecovery strong{color:#e5d3a6;font-size:24px}
+#vaultBootRecovery h1{font-size:22px;line-height:1.3;margin-top:30px}
+#vaultBootRecovery p{line-height:1.6;color:#c9b990}
+#vaultBootRecovery small{display:block;font:12px monospace;color:#c9b990}
+#vaultBootRecovery button{width:100%;margin-top:24px;padding:16px;border:0;border-radius:12px;background:#e5d3a6;color:#180d12;font-weight:800;cursor:pointer}
 </style>
 <!-- END VAULT STYLES -->
 <!-- BEGIN VAULT CONFIG -->
@@ -6879,14 +6913,14 @@ const VaultCritter=window.VaultCritter=(()=>{
       const guestPreferences=migrate?copy({settings:data.settings,bets:data.bets,lastGame:data.lastGame}):null;
       VaultStorage.flush();VaultSession.ready=false;identityEpoch++;conflict=false;profileRemote=uid==='guest';owner=uid;data=loadBucket(uid);clientRevision=data.revision+data.queue.filter(e=>!['settings','mines'].includes(e.type)).length;VaultSession.mode=uid==='guest'?'guest':'authenticated';VaultSession.user=user?{id:user.id,email:user.email,user_metadata:{username:user.user_metadata?.username}}:null;
       const marker=read('session');VaultSession.profile=uid!=='guest'&&marker?.project===C.supabaseUrl&&marker.user?.id===uid?marker.profile:null;
-      await acquireLock();
+      window.VaultBootDiagnostics?.phase('ACCOUNT_LOCK');await acquireLock();
       if(uid!=='guest'&&!cachedOnly){
-        try{const remote=await VaultProfileService.load({previewWallet:true});applyRemote(remote,{wallet:data.queue.length===0&&Object.keys(data.recovery.openRounds).every(game=>game==='mines')});}
+        try{window.VaultBootDiagnostics?.phase('ACCOUNT_LOAD');const remote=await VaultProfileService.load({previewWallet:true});applyRemote(remote,{wallet:data.queue.length===0&&Object.keys(data.recovery.openRounds).every(game=>game==='mines')});}
         catch(e){console.error('VAULT remote load failed',e);const cached=read(`user:${uid}`);profileRemote=!e.vaultComponent&&cached?.version===C.storageVersion&&cached.data?.walletConfirmed===true&&amount(cached.data?.balance)!==null;status(e.vaultComponent?'Не удалось загрузить: '+e.vaultComponent+'. Проверьте SQL-настройку Supabase.':'Offline — прогресс сохранён локально');}
       }
       if(cachedOnly)profileRemote=true;
       if(guestPreferences){Object.assign(data,guestPreferences);data.settingsUpdatedAt=Date.now();enqueue('settings',{settings:{...data.settings,bets:data.bets,lastGame:data.lastGame},updatedAt:new Date(data.settingsUpdatedAt).toISOString()});}
-      suppress=true;canonicalBalance=data.balance;restorePreferences();VaultRecovery.restore();suppress=false;
+      window.VaultBootDiagnostics?.phase('GAME_RECOVERY');suppress=true;canonicalBalance=data.balance;restorePreferences();VaultRecovery.restore();suppress=false;
       VaultSession.ready=true;rememberSession();renderIdentity();showSavedScreen();VaultStorage.saveLocalState({preferences:false});
       if(conflict)setTimeout(recoverWallet,0);
       if(!locked&&!conflict&&(uid==='guest'||profileRemote))status(uid==='guest'?'Локальное сохранение':'Sync pending');scheduleSync();
@@ -6933,7 +6967,7 @@ const VaultCritter=window.VaultCritter=(()=>{
     async restoreSession(){
       if(!configured()||location.protocol==='file:')return switchIdentity(null);
       try{
-        const sdk=await loadSDK();
+        window.VaultBootDiagnostics?.phase('SDK_LOAD');const sdk=await loadSDK();window.VaultBootDiagnostics?.phase('SESSION_RESTORE');
         client=sdk.createClient(C.supabaseUrl,C.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:NS+'auth'},global:{fetch:supabaseFetch}});
         client.auth.onAuthStateChange((event,session)=>{
           // Keep asynchronous DB work outside the Supabase auth callback lock.
@@ -6944,7 +6978,7 @@ const VaultCritter=window.VaultCritter=(()=>{
           },0);
         });
         const {data:sessionData,error}=await client.auth.getSession();if(error)throw error;
-        return await switchIdentity(sessionData.session?.user||null);
+        window.VaultBootDiagnostics?.phase('IDENTITY_RESTORE');return await switchIdentity(sessionData.session?.user||null);
       }catch(e){
         console.error('VAULT session restore unavailable',e);
         return switchIdentity(null);
