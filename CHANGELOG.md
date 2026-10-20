@@ -1,3 +1,10 @@
+# Плавность выпадения символов
+
+- Падение без повторного запуска easing внутри траектории; увеличены длительности, уменьшены bounce и убраны короткие shake/squash. Дистанция входа зависит от фактического ряда.
+- Устранён конфликт CSS transition с WAAPI, особенно в MAGNET: анимация использует конечную позицию клетки и не прыгает при завершении.
+- Убраны служебные WAAPI-анимации на каждую посадку. Hooks остаются однократными, progression по-прежнему ждёт animation.finished.
+- HUD получает компактный read-only state вместо регулярного structuredClone полного раунда. Математика/финансовые операции сохранены.
+
 # Symbol Drop Animation System
 
 - Общий promise-based animation engine: Classic, Premium Smooth, Impact, NORMAL/QUICK/TURBO, sequential/staggered, reduced motion, landing overrides, Scatter suspense и audio hooks без SFX в core.

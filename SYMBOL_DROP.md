@@ -13,9 +13,9 @@
 
 | Mode | Fall | Symbol stagger | Column stagger | Landing | Overshoot | Games |
 |---|---:|---:|---:|---:|---:|---|
-| classic |120ms|18ms|45ms|60ms|4%|Digital Derby, Swamp Fishing|
-| premium |185ms|25ms|60ms|100ms|1%|VAULT Heist, MAGNET|
-| impact |95ms|12ms|35ms|85ms|8%|Critter Chaos|
+| classic |240ms|20ms|55ms|85ms|2.5%|Digital Derby, Swamp Fishing|
+| premium |300ms|24ms|65ms|90ms|0%|VAULT Heist, MAGNET|
+| impact |210ms|16ms|45ms|95ms|4.5%|Critter Chaos|
 
 NORMAL1.0 / QUICK0.65 / TURBO0.4. Существующий FAST переключает NORMAL↔QUICK. TURBO и смена пресета доступны через API/debug, без добавления постоянных кнопок в HUD. Скорость фиксируется для текущего play; следующая анимация получает новые настройки.
 
@@ -23,7 +23,7 @@ NORMAL1.0 / QUICK0.65 / TURBO0.4. Существующий FAST переключ
 
 `STAGGERED_COLUMNS` — стандарт. `SEQUENTIAL_COLUMNS` дожидается предыдущей колонки. При двух уже представленных Scatter последняя подходящая колонка получает420ms suspense; колонка с уже лежащим Scatter исключается. Итоговые символы не меняются. Reduced Motion берётся из OS media query, общей настройки HUD или config: fade/slide8px за90ms, без shake/bounce/hero glow.
 
-Scatter/Wild/Collector получают один landing pulse. MAGNET specials — cyan Magnetic Lock-In с коротким локальным snap; енот Wild — дополнительный squash/stretch hop. В Turbo эффекты уменьшены. Running Wild, магнитные swaps, collect, выбор Heist и bonus transitions остаются собственными последующими этапами игры.
+Scatter/Wild/Collector получают один landing pulse. MAGNET specials — cyan Magnetic Lock-In; Impact использует мягкий короткий bounce без shake/squash. В Turbo эффекты уменьшены, fall длится не менее100ms (без Reduced Motion не менее145ms). Running Wild, магнитные swaps, collect, выбор Heist и bonus transitions остаются собственными последующими этапами игры.
 
 ## API / события
 
@@ -43,6 +43,8 @@ await VaultSymbolDrop.play('swamp', {
 Hooks: onSymbolEnter, onSymbolLand, onColumnLand, onGridSettled, onSpecialSymbolLand. Подписка `VaultSymbolDrop.on(hook, callback)` возвращает unsubscribe. Также публикуются window events `vault-symbol-drop:<hook>`. Payload: game, roundId, phase, column/row/symbol, mode, speedProfile, reducedMotion, time. Enter timers используются только для hook notification; progression зависит от animation.finished promises. SFX в core отсутствуют: Swamp сохраняет свои column tones и ambient collector/anticipation через listeners.
 
 `onGridSettled` следует после всех посадок и landing effects. Возвращаемый promise дополнительно ждёт win/no-win/feature settle pause; только затем контроллер показывает собственные wins/features и в конце снимает busy. AUTO scheduling и settlement остались у исходных контроллеров. Начальный drop, Derby gravity/refill, Critter refill и MAGNET Respin используют этот barrier вместо фиксированного reel timeout. Существующие тайминги bonus/collect/Running Wild не переписаны.
+
+Падение — один непрерывный easing segment. На время drop отключается CSS transition клетки; исходной позицией служит конечный inline transform, а не промежуточная матрица текущего CSS-перемещения. Это устраняет финальный скачок MAGNET. Посадки не создают отдельных clock-анимаций на каждую клетку: notification timers не управляют progression. HUD использует маленький `getHudState()` без копирования checkpoint/grid/cascade plans на каждом обновлении.
 
 Derby по-прежнему генерирует результат по каскадам: каждый animation play получает только уже сгенерированный текущий этап. Для полной предварительной генерации всего paid round понадобилась бы отдельная переработка исходного controller/math flow; в этой задаче она не выполняется.
 

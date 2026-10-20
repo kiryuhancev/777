@@ -13,7 +13,7 @@
  const controllers={swamp:()=>window.VaultSwamp,vault_heist:()=>window.VaultHeist,magnet:()=>window.VaultMagnet,critter:()=>window.VaultCritter};
  function snapshot(c){
   const originalAuto=$(c.auto),autoLabel=originalAuto.textContent,autoplayRemaining=/STOP/.test(autoLabel)?autoLabel.replace(/STOP\s*[·]?\s*/,''):0;
-  const controller=controllers[c.id]?.(),details=controller?.inspect(),round=details?.round,bonus=details?.bonus;
+  const controller=controllers[c.id]?.(),details=controller?.getHudState?.(),round=details?.round,bonus=details?.bonus;
   const busy=c.id==='slot'?state.busy:!!controller?.isBusy;
   const feature=c.id==='slot'?state.bonus:c.id==='swamp'?!!bonus&&bonus.remaining>0:!!round&&round.status!=='SETTLED';
   let statusText=busy?'SPINNING':feature?'BONUS ACTIVE':'BASE GAME',featureInfo='';

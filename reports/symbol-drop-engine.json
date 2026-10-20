@@ -1,23 +1,24 @@
 {
   "passed": [
     "Classic/Premium/Impact \u00d7 Normal/Quick/Turbo: fixed art/cells unchanged, no RNG, all hooks exactly once, finished promises and zero residual animations",
+    "CSS transition conflict: inline target preserved during/after drop, single continuous fall segment, no final position jump",
     "Two Scatter hero pulses once, suspense on final column, sequential/staggered, reduced motion, clean cancellation, mobile390px"
   ],
   "durationsMs": {
     "classic": {
-      "normal": 407,
-      "quick": 266.7999999821186,
-      "turbo": 169.30000001192093
+      "normal": 598.0999999940395,
+      "quick": 385.10000002384186,
+      "turbo": 253.40000000596046
     },
     "premium": {
-      "normal": 587.5,
-      "quick": 387.69999998807907,
-      "turbo": 237.40000000596046
+      "normal": 708.0999999940395,
+      "quick": 470.5,
+      "turbo": 292.80000001192093
     },
     "impact": {
-      "normal": 350.80000001192093,
-      "quick": 244,
-      "turbo": 151.40000000596046
+      "normal": 545.3000000119209,
+      "quick": 361.40000000596046,
+      "turbo": 241.89999997615814
     }
   },
   "pageErrors": []

@@ -1,5 +1,6 @@
 /* Local contact glow only; never shake a frame or page. */
 [data-slot-drop-mask]{overflow:hidden!important}
+[data-slot-drop-active]{transition:none!important;will-change:transform,opacity}
 [data-slot-landing]::after{content:'';position:absolute;inset:3%;border:2px solid #ffe3a2;border-radius:12px;background:radial-gradient(ellipse,#f6c96940,transparent 70%);pointer-events:none;opacity:0;animation:slot-contact-glow var(--slot-landing-duration,120ms) ease-out var(--slot-landing-delay,0ms);z-index:8}
 [data-slot-landing="classic"]::after,[data-slot-landing="reduced"]::after{display:none}
 [data-slot-landing="magnetic"]::after{border-color:#6df8ff;background:radial-gradient(ellipse,#53e5ff66,transparent 70%)}

@@ -23,6 +23,10 @@ with sync_playwright() as p:
    durations[mode,speed]=result['elapsed']
   assert durations[mode,'turbo']<durations[mode,'quick']<durations[mode,'normal'],durations
  passed.append('Classic/Premium/Impact × Normal/Quick/Turbo: fixed art/cells unchanged, no RNG, all hooks exactly once, finished promises and zero residual animations')
+ # An existing CSS move must not be baked into the drop as an intermediate position.
+ transition=page.evaluate('''async()=>{const n=grid.children[0];n.style.opacity='.6';n.style.transition='transform 2s linear';n.style.transform='translateX(0px)';getComputedStyle(n).transform;n.style.transform='translateX(80px)';const pending=VaultSymbolDrop.play('swamp',{root:grid,cells:[{node:n,column:0,row:0,symbol:'regular'}],rows:3,settle:false,mode:'classic'});const a=n.getAnimations().find(a=>a.effect.getKeyframes().length===3);a.currentTime=120;const mid=new DOMMatrix(getComputedStyle(n).transform).m41;const frames=a.effect.getKeyframes();await pending;const end=new DOMMatrix(getComputedStyle(n).transform).m41;n.style.transition='none';n.style.transform='';const opacity=Number(getComputedStyle(n).opacity);n.style.opacity='';return {mid,end,opacity,frames:frames.length,active:n.hasAttribute('data-slot-drop-active')};}''')
+ assert abs(transition['mid']-80)<.01 and abs(transition['end']-80)<.01 and abs(transition['opacity']-.6)<.01 and not transition['active'],transition
+ passed.append('CSS transition conflict: inline target preserved during/after drop, single continuous fall segment, no final position jump')
  page.select_option('#mode','classic');page.select_option('#speed','normal');page.check('#anticipation')
  special=page.evaluate('''async()=>{const t=performance.now();await previewPlay();const e=VaultSymbolDrop.inspect().events.filter(e=>e.time>=t);return {special:e.filter(e=>e.hook==='onSpecialSymbolLand').length,suspense:e.filter(e=>e.hook==='onSymbolEnter'&&e.anticipation).length,columns:[0,1,2,3,4].map(c=>Math.min(...e.filter(e=>e.hook==='onSymbolEnter'&&e.column===c).map(e=>e.time-t)))};}''')
  assert special['special']==2 and special['suspense']==3,special
