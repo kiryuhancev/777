@@ -1,3 +1,9 @@
+# Universal Slot HUD
+
+- Единый модуль для Digital Derby, Swamp Fishing, VAULT Heist, MAGNET и Critter Chaos: одинаковый control order, верхняя панель, settings/auto/bet/info окна и mobile layout. Пять скинов на CSS variables.
+- Исходные обработчики SPIN/ставок/MAX/bonus purchase сохранены. BONUS скрыт у MAGNET/Critter, где покупки нет. Общий wallet и settings; дополнительная локальная preference Reduced Motion.
+- Математика, RNG, выплаты, settlement/auth и table games не изменены; полное совпадение прежнего embedded source после исключения только двух новых HUD-блоков. Ветка и резервная предыдущая версия сохранены. Подробнее: `SLOT_HUD.md`.
+
 # Critter Chaos — подключение после обновления БД
 
 - Проверка функций различает отсутствующую миграцию, недостаточные права и сбой сети. Временные сбои повторяются до3 попыток; повтор подключения доступен без F5, при возвращении сети запускается автоматически.

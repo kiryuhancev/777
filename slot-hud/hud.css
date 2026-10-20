@@ -1,0 +1,75 @@
+/* Shared geometry. Skins override tokens only. Scoped away from lobby/table games. */
+[data-slot-skin]{--sh-panel:#101a25;--sh-secondary:#080d15;--sh-border:#8a7452;--sh-text:#fff0ca;--sh-muted:#c4b79c;--sh-accent:#edbd58;--sh-light:#ffe7a4;--sh-glow:#e8ac342b;--sh-radius:14px;--sh-trim:#433525}
+[data-slot-skin="slot"]{--sh-panel:#071f28;--sh-secondary:#03131c;--sh-border:#5c9fac;--sh-accent:#e8bc5d;--sh-glow:#00c8ff30;--sh-trim:#203c42}
+[data-slot-skin="swamp"]{--sh-panel:#1b251b;--sh-secondary:#101710;--sh-border:#907044;--sh-accent:#e5a64d;--sh-glow:#b6cb4928;--sh-trim:#493c25}
+[data-slot-skin="vault_heist"]{--sh-panel:#161e22;--sh-secondary:#080e12;--sh-border:#99805a;--sh-accent:#e6ae49;--sh-glow:#1ccde52c;--sh-trim:#343a3a}
+[data-slot-skin="magnet"]{--sh-panel:#13232d;--sh-secondary:#06121b;--sh-border:#64878d;--sh-accent:#ef9e45;--sh-glow:#00d6f236;--sh-trim:#253f48}
+[data-slot-skin="critter"]{--sh-panel:#142337;--sh-secondary:#0b1021;--sh-border:#a48152;--sh-accent:#f9aa53;--sh-glow:#31e5d13b;--sh-trim:#574255}
+body .slot-hud-source{display:none!important}
+body [data-slot-hud] [hidden]{display:none!important}
+body [data-slot-hud]{box-sizing:border-box;color:var(--sh-text);font:700 13px Arial,sans-serif;font-variant-numeric:tabular-nums;isolation:isolate;width:min(900px,100%);margin:12px auto;position:relative;z-index:5;border:2px solid var(--sh-border);border-radius:var(--sh-radius);background:linear-gradient(180deg,var(--sh-trim),var(--sh-panel) 16%,var(--sh-secondary) 85%,var(--sh-trim));box-shadow:inset 0 0 0 3px #0009,inset 0 0 0 5px #e4b86920,0 8px 24px #0009}
+body [data-slot-hud] small{display:block!important;font:600 9px Arial,sans-serif!important;letter-spacing:.09em!important;color:var(--sh-muted)!important;text-transform:uppercase;line-height:1.4!important}
+body .slot-top-status{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);min-height:72px;padding:9px 12px;gap:10px;align-items:stretch;text-align:center}
+body .slot-top-status.slot-has-feature{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) minmax(0,1fr)}
+body .slot-top-status>div{display:flex;flex-direction:column;justify-content:center;gap:4px;padding:2px 10px;min-width:0}
+body .slot-top-status>div+div{border-left:1px solid var(--sh-border)}
+body .slot-status-win strong{font-size:23px;color:var(--sh-light)}
+body .slot-status-mode strong{font-size:15px;letter-spacing:.07em}
+body .slot-status-feature strong{font-size:12px;line-height:1.4;overflow-wrap:anywhere}
+body .slot-bottom-controls{display:grid;grid-template-columns:48px minmax(94px,1.1fr) 44px minmax(80px,.9fr) 44px 66px 58px 96px 78px;align-items:center;padding:10px 13px;gap:7px;min-height:101px}
+body .slot-bottom-controls:not(:has([data-control="bonus"])){grid-template-columns:48px minmax(94px,1.4fr) 44px minmax(80px,1fr) 44px 66px 58px 96px}
+body .slot-bottom-controls>button,body .slot-shared-modal button{box-sizing:border-box;position:static!important;inset:auto!important;grid-area:auto!important;transform:none!important;translate:none!important;scale:none!important;float:none!important;margin:0!important;min-width:0!important;width:100%!important;min-height:46px!important;height:48px!important;max-width:none!important;padding:7px!important;border:1px solid var(--sh-border)!important;border-radius:10px!important;background:linear-gradient(#ffffff12,transparent 48%),var(--sh-secondary)!important;color:var(--sh-text)!important;font:800 12px Arial,sans-serif!important;letter-spacing:.03em!important;text-shadow:none!important;box-shadow:inset 0 0 0 2px #0009,0 2px 3px #0008!important;cursor:pointer}
+body .slot-bottom-controls>button:hover:enabled,body .slot-shared-modal button:hover:enabled{border-color:var(--sh-light)!important;background-color:var(--sh-panel)!important}
+body .slot-bottom-controls>button:disabled,body .slot-shared-modal button:disabled{opacity:.4!important;cursor:not-allowed!important;filter:saturate(.25)}
+body .slot-bottom-controls>button:focus-visible,body .slot-shared-modal button:focus-visible{outline:3px solid var(--sh-accent);outline-offset:3px}
+body .slot-bottom-controls>[data-control="spin"]{width:96px!important;height:96px!important;border-radius:50%!important;min-height:96px!important;background:radial-gradient(circle at 35% 25%,var(--sh-light),var(--sh-accent) 46%,#594016 84%)!important;border:3px solid var(--sh-light)!important;outline:4px solid var(--sh-border);box-shadow:inset 0 0 0 5px #38230b,0 0 26px var(--sh-glow)!important;color:#1e1508!important;font-size:17px!important;letter-spacing:.04em!important;line-height:1!important;overflow:hidden}
+body .slot-bottom-controls>[data-control="spin"]:before{content:'↻';display:block;font:38px Arial;line-height:.9;margin-bottom:4px}
+body .slot-bottom-controls>[data-control="spin"]:after{display:none!important}
+body .slot-bottom-controls>[data-control="bet-minus"],body .slot-bottom-controls>[data-control="bet-plus"]{font-size:26px!important}
+body .slot-bottom-controls>[data-control="settings"]{font-size:25px!important}
+body .slot-bottom-controls>[data-control="bonus"]{color:var(--sh-light)!important}
+body .slot-bottom-controls .slot-balance{border:1px solid var(--sh-border);border-radius:9px;background:var(--sh-secondary);padding:8px 4px;min-height:48px;text-align:center;min-width:0}
+body .slot-bottom-controls .slot-balance strong,body .slot-bottom-controls .slot-bet-value strong{display:block!important;font:bold 15px Arial,sans-serif!important;line-height:1.5!important;color:var(--sh-text)!important;white-space:nowrap;letter-spacing:0!important}
+body .slot-bottom-controls .slot-balance strong{color:var(--sh-light)!important;font-size:14px!important}
+body .slot-shared-modal,body dialog.slot-bonus-dialog{box-sizing:border-box;width:min(600px,calc(100vw - 24px))!important;max-width:calc(100vw - 24px)!important;max-height:85dvh!important;margin:auto!important;padding:22px!important;border:2px solid var(--sh-border)!important;border-radius:var(--sh-radius)!important;background:linear-gradient(140deg,var(--sh-panel),var(--sh-secondary))!important;color:var(--sh-text)!important;box-shadow:0 24px 90px #000c;overflow:auto;font:14px/1.6 Arial,sans-serif}
+body .slot-shared-modal::backdrop,body dialog.slot-bonus-dialog::backdrop{background:#050509c9;backdrop-filter:blur(5px)}
+body .slot-shared-modal>header{display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid var(--sh-border);padding-bottom:14px;margin-bottom:16px}
+body .slot-shared-modal h2{font:700 20px Arial!important;letter-spacing:.08em;margin:5px 0!important;color:var(--sh-light)!important}
+body .slot-shared-modal header small{font:10px Arial;color:var(--sh-muted);letter-spacing:.06em}
+body .slot-shared-modal [data-close]{width:44px!important;font-size:24px!important;flex-shrink:0}
+body .slot-shared-modal .slot-modal-body{display:grid;gap:10px;min-width:0}
+body .slot-shared-modal[data-popup="auto"] .slot-modal-body,body .slot-shared-modal[data-popup="bet"] .slot-modal-body{grid-template-columns:repeat(3,minmax(0,1fr))}
+body .slot-info-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+body .slot-shared-modal .slot-info-tabs button{font-size:10px!important}
+body .slot-shared-modal button[aria-pressed="true"]{border-color:var(--sh-light)!important;color:var(--sh-light)!important;box-shadow:inset 0 -3px var(--sh-accent)!important}
+body .slot-info-copy{display:block!important;max-width:100%;overflow-x:auto}
+body .slot-shared-modal img,body .slot-shared-modal svg{max-width:100%;max-height:80px;object-fit:contain}
+body .slot-shared-modal .slot-info-copy>div{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px;border-bottom:1px solid #ffffff18;padding:7px 0;font-size:12px;align-items:center}
+body .slot-shared-modal .slot-info-copy span{min-width:0;overflow-wrap:anywhere}
+body .slot-shared-modal .slot-info-copy span img,body .slot-shared-modal .slot-info-copy span svg{width:40px;height:40px}
+body .slot-bonus-dialog:not(dialog){background:#050509c9;backdrop-filter:blur(5px)}
+body .slot-bonus-dialog .game-modal-card{background:linear-gradient(140deg,var(--sh-panel),var(--sh-secondary));border:2px solid var(--sh-border);color:var(--sh-text);width:min(600px,calc(100vw - 24px));max-height:85dvh;overflow:auto}
+body .slot-reduced-motion [data-slot-skin] *,body.slot-reduced-motion [data-slot-skin] *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+@media(max-width:780px){
+ body .slot-bottom-controls,body .slot-bottom-controls:not(:has([data-control="bonus"])){grid-template-columns:46px 58px minmax(56px,1fr) 82px 64px;grid-template-rows:54px 86px;gap:8px;padding:10px;min-height:0}
+ body .slot-bottom-controls>[data-control="balance"]{grid-column:1/3;grid-row:1}
+ body .slot-bottom-controls>[data-control="bet-minus"]{grid-column:3;grid-row:1;width:44px!important;justify-self:end}
+ body .slot-bottom-controls>[data-control="bet"]{grid-column:4;grid-row:1}
+ body .slot-bottom-controls>[data-control="bet-plus"]{grid-column:5;grid-row:1;width:44px!important;justify-self:start}
+ body .slot-bottom-controls>[data-control="settings"]{grid-column:1!important;grid-row:2!important}
+ body .slot-bottom-controls>[data-control="auto"]{grid-column:2!important;grid-row:2!important;font-size:10px!important}
+ body .slot-bottom-controls>[data-control="max"]{grid-column:3!important;grid-row:2!important}
+ body .slot-bottom-controls>[data-control="spin"]{grid-column:4!important;grid-row:2!important;width:78px!important;height:78px!important;min-height:78px!important;justify-self:center;font-size:12px!important}
+ body .slot-bottom-controls>[data-control="spin"]:before{font-size:31px}
+ body .slot-bottom-controls>[data-control="bonus"]{grid-column:5!important;grid-row:2!important;font-size:10px!important}
+ body .slot-bottom-controls:not(:has([data-control="bonus"]))>[data-control="spin"]{grid-column:4/6!important}
+ body .slot-top-status{padding:8px 5px;gap:3px;min-height:65px}
+ body .slot-top-status>div{padding:2px 4px;gap:3px}
+ body .slot-status-win strong{font-size:18px}
+ body .slot-status-mode strong{font-size:11px;overflow-wrap:anywhere}
+ body .slot-status-feature strong{font-size:9px}
+ body [data-slot-hud] small{font-size:8px!important;letter-spacing:.03em!important}
+ body .slot-shared-modal,body dialog.slot-bonus-dialog{padding:14px!important}
+}
+@media(max-width:370px){body .slot-bottom-controls,body .slot-bottom-controls:not(:has([data-control="bonus"])){grid-template-columns:44px 44px minmax(44px,1fr) 68px 48px;gap:5px;padding:8px 6px}body .slot-bottom-controls>[data-control="spin"]{width:66px!important;height:66px!important;min-height:66px!important}body .slot-bottom-controls>[data-control="bonus"]{font-size:9px!important}body .slot-bottom-controls .slot-balance strong{font-size:12px!important}body .slot-bottom-controls .slot-bet-value strong{font-size:13px!important}}
+@media(prefers-reduced-motion:reduce){body [data-slot-hud] *,body .slot-shared-modal *{animation:none!important;transition:none!important}}

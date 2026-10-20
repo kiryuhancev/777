@@ -146,4 +146,11 @@ if "id:'critter',element:'openCritterGame'" not in s:
  s=s.replace("{id:'magnet',element:'openMagnetGame'","{id:'critter',element:'openCritterGame',category:'slots',isNew:true},{id:'magnet',element:'openMagnetGame'",1)
 art='data:image/webp;base64,'+base64.b64encode((ROOT/'assets/critter/references/02_scene_alt.webp').read_bytes()).decode()
 s=re.sub(r'(<img id="critterLobbyArt")([^>]*)(>)',lambda m:m[1]+re.sub(r' src="[^"]*"','',m[2])+' src="'+art+'"'+m[3],s)
+# One presentation module adapts all five slot controllers after their handlers exist.
+for name,path,tag in [('SLOT HUD STYLES','hud.css','style'),('SLOT HUD MODULE','hud.js','script')]:
+ text=(ROOT/'slot-hud'/path).read_text()
+ block=f'<!-- BEGIN {name} -->\n<{tag}>\n{text}\n</{tag}>\n<!-- END {name} -->'
+ pattern=rf'<!-- BEGIN {name} -->[\s\S]*?<!-- END {name} -->'
+ if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
+ else:s=s.replace('</head>' if tag=='style' else '</body>',block+('\n</head>' if tag=='style' else '\n</body>'),1)
 p.write_text(s)

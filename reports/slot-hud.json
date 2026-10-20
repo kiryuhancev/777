@@ -1,0 +1,12 @@
+{
+  "mode": "real SDK + HTTP fixtures, not live backend",
+  "passed": [
+    "slot: shared order, real bet controls/quick choice, settings, info tabs, bonus support and responsive geometry",
+    "swamp: shared order, real bet controls/quick choice, settings, info tabs, bonus support and responsive geometry",
+    "vault_heist: shared order, real bet controls/quick choice, settings, info tabs, bonus support and responsive geometry",
+    "magnet: shared order, real bet controls/quick choice, settings, info tabs, bonus support and responsive geometry",
+    "critter: shared order, real bet controls/quick choice, settings, info tabs, bonus support and responsive geometry",
+    "Shared wallet; single round after double click; AUTO stops future rounds; no duplicate IDs or JS errors; Poker untouched"
+  ],
+  "pageErrors": []
+}

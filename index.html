@@ -1899,6 +1899,86 @@ body.critter-active .app,body.critter-active #slotApp,body.critter-active #poker
 
 </style>
 <!-- END CRITTER STYLES -->
+<!-- BEGIN SLOT HUD STYLES -->
+<style>
+/* Shared geometry. Skins override tokens only. Scoped away from lobby/table games. */
+[data-slot-skin]{--sh-panel:#101a25;--sh-secondary:#080d15;--sh-border:#8a7452;--sh-text:#fff0ca;--sh-muted:#c4b79c;--sh-accent:#edbd58;--sh-light:#ffe7a4;--sh-glow:#e8ac342b;--sh-radius:14px;--sh-trim:#433525}
+[data-slot-skin="slot"]{--sh-panel:#071f28;--sh-secondary:#03131c;--sh-border:#5c9fac;--sh-accent:#e8bc5d;--sh-glow:#00c8ff30;--sh-trim:#203c42}
+[data-slot-skin="swamp"]{--sh-panel:#1b251b;--sh-secondary:#101710;--sh-border:#907044;--sh-accent:#e5a64d;--sh-glow:#b6cb4928;--sh-trim:#493c25}
+[data-slot-skin="vault_heist"]{--sh-panel:#161e22;--sh-secondary:#080e12;--sh-border:#99805a;--sh-accent:#e6ae49;--sh-glow:#1ccde52c;--sh-trim:#343a3a}
+[data-slot-skin="magnet"]{--sh-panel:#13232d;--sh-secondary:#06121b;--sh-border:#64878d;--sh-accent:#ef9e45;--sh-glow:#00d6f236;--sh-trim:#253f48}
+[data-slot-skin="critter"]{--sh-panel:#142337;--sh-secondary:#0b1021;--sh-border:#a48152;--sh-accent:#f9aa53;--sh-glow:#31e5d13b;--sh-trim:#574255}
+body .slot-hud-source{display:none!important}
+body [data-slot-hud] [hidden]{display:none!important}
+body [data-slot-hud]{box-sizing:border-box;color:var(--sh-text);font:700 13px Arial,sans-serif;font-variant-numeric:tabular-nums;isolation:isolate;width:min(900px,100%);margin:12px auto;position:relative;z-index:5;border:2px solid var(--sh-border);border-radius:var(--sh-radius);background:linear-gradient(180deg,var(--sh-trim),var(--sh-panel) 16%,var(--sh-secondary) 85%,var(--sh-trim));box-shadow:inset 0 0 0 3px #0009,inset 0 0 0 5px #e4b86920,0 8px 24px #0009}
+body [data-slot-hud] small{display:block!important;font:600 9px Arial,sans-serif!important;letter-spacing:.09em!important;color:var(--sh-muted)!important;text-transform:uppercase;line-height:1.4!important}
+body .slot-top-status{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);min-height:72px;padding:9px 12px;gap:10px;align-items:stretch;text-align:center}
+body .slot-top-status.slot-has-feature{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) minmax(0,1fr)}
+body .slot-top-status>div{display:flex;flex-direction:column;justify-content:center;gap:4px;padding:2px 10px;min-width:0}
+body .slot-top-status>div+div{border-left:1px solid var(--sh-border)}
+body .slot-status-win strong{font-size:23px;color:var(--sh-light)}
+body .slot-status-mode strong{font-size:15px;letter-spacing:.07em}
+body .slot-status-feature strong{font-size:12px;line-height:1.4;overflow-wrap:anywhere}
+body .slot-bottom-controls{display:grid;grid-template-columns:48px minmax(94px,1.1fr) 44px minmax(80px,.9fr) 44px 66px 58px 96px 78px;align-items:center;padding:10px 13px;gap:7px;min-height:101px}
+body .slot-bottom-controls:not(:has([data-control="bonus"])){grid-template-columns:48px minmax(94px,1.4fr) 44px minmax(80px,1fr) 44px 66px 58px 96px}
+body .slot-bottom-controls>button,body .slot-shared-modal button{box-sizing:border-box;position:static!important;inset:auto!important;grid-area:auto!important;transform:none!important;translate:none!important;scale:none!important;float:none!important;margin:0!important;min-width:0!important;width:100%!important;min-height:46px!important;height:48px!important;max-width:none!important;padding:7px!important;border:1px solid var(--sh-border)!important;border-radius:10px!important;background:linear-gradient(#ffffff12,transparent 48%),var(--sh-secondary)!important;color:var(--sh-text)!important;font:800 12px Arial,sans-serif!important;letter-spacing:.03em!important;text-shadow:none!important;box-shadow:inset 0 0 0 2px #0009,0 2px 3px #0008!important;cursor:pointer}
+body .slot-bottom-controls>button:hover:enabled,body .slot-shared-modal button:hover:enabled{border-color:var(--sh-light)!important;background-color:var(--sh-panel)!important}
+body .slot-bottom-controls>button:disabled,body .slot-shared-modal button:disabled{opacity:.4!important;cursor:not-allowed!important;filter:saturate(.25)}
+body .slot-bottom-controls>button:focus-visible,body .slot-shared-modal button:focus-visible{outline:3px solid var(--sh-accent);outline-offset:3px}
+body .slot-bottom-controls>[data-control="spin"]{width:96px!important;height:96px!important;border-radius:50%!important;min-height:96px!important;background:radial-gradient(circle at 35% 25%,var(--sh-light),var(--sh-accent) 46%,#594016 84%)!important;border:3px solid var(--sh-light)!important;outline:4px solid var(--sh-border);box-shadow:inset 0 0 0 5px #38230b,0 0 26px var(--sh-glow)!important;color:#1e1508!important;font-size:17px!important;letter-spacing:.04em!important;line-height:1!important;overflow:hidden}
+body .slot-bottom-controls>[data-control="spin"]:before{content:'↻';display:block;font:38px Arial;line-height:.9;margin-bottom:4px}
+body .slot-bottom-controls>[data-control="spin"]:after{display:none!important}
+body .slot-bottom-controls>[data-control="bet-minus"],body .slot-bottom-controls>[data-control="bet-plus"]{font-size:26px!important}
+body .slot-bottom-controls>[data-control="settings"]{font-size:25px!important}
+body .slot-bottom-controls>[data-control="bonus"]{color:var(--sh-light)!important}
+body .slot-bottom-controls .slot-balance{border:1px solid var(--sh-border);border-radius:9px;background:var(--sh-secondary);padding:8px 4px;min-height:48px;text-align:center;min-width:0}
+body .slot-bottom-controls .slot-balance strong,body .slot-bottom-controls .slot-bet-value strong{display:block!important;font:bold 15px Arial,sans-serif!important;line-height:1.5!important;color:var(--sh-text)!important;white-space:nowrap;letter-spacing:0!important}
+body .slot-bottom-controls .slot-balance strong{color:var(--sh-light)!important;font-size:14px!important}
+body .slot-shared-modal,body dialog.slot-bonus-dialog{box-sizing:border-box;width:min(600px,calc(100vw - 24px))!important;max-width:calc(100vw - 24px)!important;max-height:85dvh!important;margin:auto!important;padding:22px!important;border:2px solid var(--sh-border)!important;border-radius:var(--sh-radius)!important;background:linear-gradient(140deg,var(--sh-panel),var(--sh-secondary))!important;color:var(--sh-text)!important;box-shadow:0 24px 90px #000c;overflow:auto;font:14px/1.6 Arial,sans-serif}
+body .slot-shared-modal::backdrop,body dialog.slot-bonus-dialog::backdrop{background:#050509c9;backdrop-filter:blur(5px)}
+body .slot-shared-modal>header{display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid var(--sh-border);padding-bottom:14px;margin-bottom:16px}
+body .slot-shared-modal h2{font:700 20px Arial!important;letter-spacing:.08em;margin:5px 0!important;color:var(--sh-light)!important}
+body .slot-shared-modal header small{font:10px Arial;color:var(--sh-muted);letter-spacing:.06em}
+body .slot-shared-modal [data-close]{width:44px!important;font-size:24px!important;flex-shrink:0}
+body .slot-shared-modal .slot-modal-body{display:grid;gap:10px;min-width:0}
+body .slot-shared-modal[data-popup="auto"] .slot-modal-body,body .slot-shared-modal[data-popup="bet"] .slot-modal-body{grid-template-columns:repeat(3,minmax(0,1fr))}
+body .slot-info-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+body .slot-shared-modal .slot-info-tabs button{font-size:10px!important}
+body .slot-shared-modal button[aria-pressed="true"]{border-color:var(--sh-light)!important;color:var(--sh-light)!important;box-shadow:inset 0 -3px var(--sh-accent)!important}
+body .slot-info-copy{display:block!important;max-width:100%;overflow-x:auto}
+body .slot-shared-modal img,body .slot-shared-modal svg{max-width:100%;max-height:80px;object-fit:contain}
+body .slot-shared-modal .slot-info-copy>div{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px;border-bottom:1px solid #ffffff18;padding:7px 0;font-size:12px;align-items:center}
+body .slot-shared-modal .slot-info-copy span{min-width:0;overflow-wrap:anywhere}
+body .slot-shared-modal .slot-info-copy span img,body .slot-shared-modal .slot-info-copy span svg{width:40px;height:40px}
+body .slot-bonus-dialog:not(dialog){background:#050509c9;backdrop-filter:blur(5px)}
+body .slot-bonus-dialog .game-modal-card{background:linear-gradient(140deg,var(--sh-panel),var(--sh-secondary));border:2px solid var(--sh-border);color:var(--sh-text);width:min(600px,calc(100vw - 24px));max-height:85dvh;overflow:auto}
+body .slot-reduced-motion [data-slot-skin] *,body.slot-reduced-motion [data-slot-skin] *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+@media(max-width:780px){
+ body .slot-bottom-controls,body .slot-bottom-controls:not(:has([data-control="bonus"])){grid-template-columns:46px 58px minmax(56px,1fr) 82px 64px;grid-template-rows:54px 86px;gap:8px;padding:10px;min-height:0}
+ body .slot-bottom-controls>[data-control="balance"]{grid-column:1/3;grid-row:1}
+ body .slot-bottom-controls>[data-control="bet-minus"]{grid-column:3;grid-row:1;width:44px!important;justify-self:end}
+ body .slot-bottom-controls>[data-control="bet"]{grid-column:4;grid-row:1}
+ body .slot-bottom-controls>[data-control="bet-plus"]{grid-column:5;grid-row:1;width:44px!important;justify-self:start}
+ body .slot-bottom-controls>[data-control="settings"]{grid-column:1!important;grid-row:2!important}
+ body .slot-bottom-controls>[data-control="auto"]{grid-column:2!important;grid-row:2!important;font-size:10px!important}
+ body .slot-bottom-controls>[data-control="max"]{grid-column:3!important;grid-row:2!important}
+ body .slot-bottom-controls>[data-control="spin"]{grid-column:4!important;grid-row:2!important;width:78px!important;height:78px!important;min-height:78px!important;justify-self:center;font-size:12px!important}
+ body .slot-bottom-controls>[data-control="spin"]:before{font-size:31px}
+ body .slot-bottom-controls>[data-control="bonus"]{grid-column:5!important;grid-row:2!important;font-size:10px!important}
+ body .slot-bottom-controls:not(:has([data-control="bonus"]))>[data-control="spin"]{grid-column:4/6!important}
+ body .slot-top-status{padding:8px 5px;gap:3px;min-height:65px}
+ body .slot-top-status>div{padding:2px 4px;gap:3px}
+ body .slot-status-win strong{font-size:18px}
+ body .slot-status-mode strong{font-size:11px;overflow-wrap:anywhere}
+ body .slot-status-feature strong{font-size:9px}
+ body [data-slot-hud] small{font-size:8px!important;letter-spacing:.03em!important}
+ body .slot-shared-modal,body dialog.slot-bonus-dialog{padding:14px!important}
+}
+@media(max-width:370px){body .slot-bottom-controls,body .slot-bottom-controls:not(:has([data-control="bonus"])){grid-template-columns:44px 44px minmax(44px,1fr) 68px 48px;gap:5px;padding:8px 6px}body .slot-bottom-controls>[data-control="spin"]{width:66px!important;height:66px!important;min-height:66px!important}body .slot-bottom-controls>[data-control="bonus"]{font-size:9px!important}body .slot-bottom-controls .slot-balance strong{font-size:12px!important}body .slot-bottom-controls .slot-bet-value strong{font-size:13px!important}}
+@media(prefers-reduced-motion:reduce){body [data-slot-hud] *,body .slot-shared-modal *{animation:none!important;transition:none!important}}
+
+</style>
+<!-- END SLOT HUD STYLES -->
 </head>
 <body class="lobby-mode vault-booting vault-signed-out">
 
@@ -6799,5 +6879,130 @@ const VaultCritter=window.VaultCritter=(()=>{
 })();
 </script>
 <!-- END VAULT RUNTIME -->
+<!-- BEGIN SLOT HUD MODULE -->
+<script>
+/* Presentation adapters only. Existing controllers own every wager, outcome and settlement. */
+(()=>{
+ 'use strict';
+ const $=id=>document.getElementById(id),q=(root,s)=>root.querySelector(s);
+ const text=(node,value)=>{value=String(value??'');if(node.textContent!==value)node.textContent=value;};
+ const configs=[
+  {id:'slot',name:'Digital Derby',root:'.app',scene:'.arena-inner',frame:'.derby-stage',fallback:'.field-wrap',bar:'.controls',top:'.hud',minus:'betMinus',plus:'betPlus',bet:'betValue',max:'maxBetBtn',spin:'spinBtn',auto:'autoBtn',buy:'buyBtn',shop:'bonusShopModal',win:'lastWin',choices:'#autoPopover [data-auto-count]',count:'autoCount',hide:['.bonus-total-hud'],pay:null},
+  {id:'swamp',name:'Swamp Fishing',root:'#swampApp',scene:'.swamp-scene',frame:'.swamp-frame',bar:'.swamp-controls',top:'.swamp-result',minus:'swampBetMinus',plus:'swampBetPlus',bet:'swampBetValue',max:'swampMaxBet',spin:'swampSpin',auto:'swampAuto',buy:'swampBuy',shop:'swampBonusShop',win:'swampLastWin',choices:'[data-swamp-auto]',count:'swampAuto',help:'.swamp-info-body',pay:'swampPaytable'},
+  {id:'vault_heist',name:'VAULT Heist',root:'#heistApp',scene:'.heist-scene',frame:'.heist-frame',bar:'.heist-controls',top:'.heist-hud',minus:'heistMinus',plus:'heistPlus',bet:'heistBet',max:'heistMax',spin:'heistSpin',auto:'heistAuto',buy:'heistBuy',shop:'heistBonusShop',win:'heistBaseWin',choices:'[data-heist-auto]',count:'heistAuto',help:'#heistHelp',pay:'heistPaytable',hide:['#heistHelpOpen']},
+  {id:'magnet',name:'MAGNET',root:'#magnetApp',scene:'.magnet-scene',frame:'.magnet-apparatus',bar:'.magnet-controls',top:'.magnet-readout',minus:'magnetMinus',plus:'magnetPlus',bet:'magnetBet',max:'magnetMax',spin:'magnetSpin',auto:'magnetAuto',win:'magnetWin',choices:'[data-magnet-auto]',count:'magnetAuto',help:'#magnetHelp',pay:'magnetPaytable',hide:['.magnet-result','.magnet-v2-balance','#magnetHelpOpen']},
+  {id:'critter',name:'Critter Chaos',root:'#critterApp',scene:'.critter-scene',frame:'.critter-frame',bar:'.critter-controls',top:'.critter-readout',minus:'critterMinus',plus:'critterPlus',bet:'critterBet',max:'critterMax',spin:'critterSpin',auto:'critterAuto',win:'critterWin',choices:'[data-critter-auto]',count:'critterAuto',help:'#critterHelp',pay:'critterPaytable',hide:['.critter-wallet','#critterHelpOpen']}
+ ];
+ const controllers={swamp:()=>window.VaultSwamp,vault_heist:()=>window.VaultHeist,magnet:()=>window.VaultMagnet,critter:()=>window.VaultCritter};
+ function snapshot(c){
+  const originalAuto=$(c.auto),autoLabel=originalAuto.textContent,autoplayRemaining=/STOP/.test(autoLabel)?autoLabel.replace(/STOP\s*[·]?\s*/,''):0;
+  const controller=controllers[c.id]?.(),details=controller?.inspect(),round=details?.round,bonus=details?.bonus;
+  const busy=c.id==='slot'?state.busy:!!controller?.isBusy;
+  const feature=c.id==='slot'?state.bonus:c.id==='swamp'?!!bonus&&bonus.remaining>0:!!round&&round.status!=='SETTLED';
+  let statusText=busy?'SPINNING':feature?'BONUS ACTIVE':'BASE GAME',featureInfo='';
+  if(c.id==='slot'){statusText=state.cascade?`CASCADE ${state.cascade}`:statusText;featureInfo=state.bonus?`${state.freeSpins} FREE SPINS · ${state.sticky.size} WILDS`:'';}
+  if(c.id==='swamp')featureInfo=bonus?`${bonus.remaining} FREE SPINS · ${$('swampCurrentMultiplier').textContent}`:'';
+  if(c.id==='vault_heist'){statusText=round?.status==='CHOICE'?'COLLECT OR GO DEEPER':busy?'RESOLVING':feature?'HEIST ACTIVE':'BASE GAME';featureInfo=feature?`${$('heistStageLabel').textContent} · ${$('heistLoot').textContent}`:'';}
+  if(c.id==='magnet'){statusText=$('magnetPhaseLabel').textContent||statusText;featureInfo=feature?`${$('magnetCounter').textContent} · ${$('magnetMultiplier').textContent}`:'';}
+  if(c.id==='critter'){statusText=busy?($('critterStatus').textContent.includes('CASCADE')?'RESOLVING':'SPINNING'):'BASE GAME';featureInfo=busy&&round?.bonus?'DUMPSTER DASH':busy?$('critterCascade').textContent:'';}
+  const canChangeBet=!$(c.minus).disabled&&!busy;
+  const insufficient=!feature&&BETS[c.id==='slot'?state.betIndex:controller?.betIndex||0]>state.balance;
+  return {balance:VaultWalletService.formatBalance(),bet:c.id==='slot'?bet():BETS[controller?.betIndex||0],betSteps:BETS,win:c.id==='vault_heist'&&round?.status==='SETTLED'?Number(round.payout).toLocaleString('ru-RU'):$(c.win).textContent,state:busy?'SPINNING':feature?'BONUS_ACTIVE':autoplayRemaining?'AUTOPLAY':insufficient?'INSUFFICIENT_BALANCE':$(c.spin).disabled?'DISABLED':'IDLE',autoplayRemaining,canSpin:!$(c.spin).disabled,canChangeBet,canBuyBonus:!!c.buy&&!$(c.buy).disabled,statusText,featureInfo,busy,feature};
+ }
+ const instances=[];
+ function create(c){
+  const root=document.querySelector(c.root),scene=q(root,c.scene),legacy=q(root,c.bar);
+  if(!root||!scene||!legacy)throw Error('Slot HUD adapter missing: '+c.id);
+  root.dataset.slotSkin=c.id;
+  const upper=document.createElement('section');upper.className='slot-top-status';upper.dataset.slotHud='';upper.setAttribute('aria-label',c.name+' status');
+  upper.innerHTML='<div class="slot-status-win"><small>LAST WIN</small><strong>0</strong></div><div class="slot-status-mode"><strong>BASE GAME</strong><small>GOOD LUCK</small></div><div class="slot-status-feature" hidden><small>FEATURE INFO</small><strong></strong></div>';
+  const before=(c.id==='swamp'?q(root,'.swamp-feature-bar'):null)||q(root,c.top)||q(root,c.frame)||scene.firstChild;before.parentNode.insertBefore(upper,before);
+  const hud=document.createElement('footer');hud.className='slot-bottom-controls';hud.dataset.slotHud='';hud.setAttribute('aria-label',c.name+' controls');
+  hud.innerHTML='<button data-action="settings" aria-label="Settings">⚙</button><div class="slot-balance" data-control="balance"><small>BALANCE</small><strong>—</strong></div><div data-mount="minus"></div><button class="slot-bet-value" data-action="bet" aria-label="Choose bet"><small>BET</small></button><div data-mount="plus"></div><button data-action="auto">AUTO</button><div data-mount="max"></div><div data-mount="spin"></div>'+(c.buy?'<div data-mount="buy"></div>':'');
+  legacy.before(hud);
+  for(const [key,control] of [['minus','bet-minus'],['plus','bet-plus'],['max','max'],['spin','spin'],['buy','bonus']]){
+   if(!c[key])continue;const node=$(c[key]);node.dataset.control=control;node.setAttribute('aria-label',control==='spin'?'Spin':control==='bonus'?'Buy bonus':control==='max'?'Maximum bet':control==='bet-minus'?'Decrease bet':'Increase bet');q(hud,`[data-mount="${key}"]`).replaceWith(node);
+  }
+  const betDisplay=document.createElement('strong');q(hud,'[data-action="bet"]').append(betDisplay);
+  q(hud,'[data-action="settings"]').dataset.control='settings';q(hud,'[data-action="auto"]').dataset.control='auto';q(hud,'[data-action="bet"]').dataset.control='bet';
+  legacy.classList.add('slot-hud-source');
+  for(const selector of [c.top,...c.hide||[]])q(root,selector)?.classList.add('slot-hud-source');
+  // Remove duplicate permanent settings/help surfaces; controller targets remain mounted.
+  if(c.id==='swamp')q(root,'.swamp-info').classList.add('slot-hud-source');
+  if(c.id==='slot')$('slotHelp').classList.add('slot-hud-source');
+  const modal=document.createElement('dialog');modal.className='slot-shared-modal';modal.dataset.slotSkin=c.id;modal.setAttribute('aria-label',c.name+' menu');
+  modal.innerHTML='<header><div><small>VAULT · '+c.name+'</small><h2></h2></div><button data-close aria-label="Close">×</button></header><div class="slot-modal-body"></div>';
+  root.append(modal);const body=q(modal,'.slot-modal-body');let popup='',focus=null;
+  function close(){modal.close();popup='';focus?.focus({preventScroll:true});}
+  q(modal,'[data-close]').onclick=close;
+  modal.addEventListener('click',e=>{if(e.target===modal){const b=modal.getBoundingClientRect();if(e.clientX<b.left||e.clientX>b.right||e.clientY<b.top||e.clientY>b.bottom)close();}});
+  modal.addEventListener('close',()=>{popup='';});
+  function show(kind,title){focus=document.activeElement;popup=kind;text(q(modal,'h2'),title);body.replaceChildren();modal.dataset.popup=kind;if(!modal.open)modal.showModal();}
+  function button(label,action){const n=document.createElement('button');n.textContent=label;n.onclick=action;body.append(n);return n;}
+  function info(tab='SYMBOLS'){
+   show('info','PAYTABLE & INFO');
+   const tabs=document.createElement('nav');tabs.className='slot-info-tabs';tabs.setAttribute('aria-label','Info sections');body.append(tabs);
+   const content=document.createElement('section');body.append(content);
+   for(const name of ['SYMBOLS','RULES','FEATURES','PAYOUTS']){const n=document.createElement('button');n.textContent=name;n.setAttribute('aria-pressed',String(name===tab));n.onclick=()=>info(name);tabs.append(n);}
+   const help=c.help?q(root,c.help):null;
+   if(tab==='PAYOUTS'||tab==='SYMBOLS'){
+    const source=c.pay?$(c.pay):$('symbolList');
+    if(source){const copy=source.cloneNode(true);copy.removeAttribute('id');copy.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));copy.querySelectorAll('button').forEach(n=>n.remove());copy.hidden=false;copy.classList.add('slot-info-copy');content.append(copy);}
+    else content.textContent='5+ connected identical symbols pay according to the existing Digital Derby paytable.';
+   }else{
+    const paragraphs=help?[...help.querySelectorAll('p')].map(n=>n.textContent):c.id==='slot'?['Digital Derby: 5+ matching symbols connected by sides form a paying cluster. Cascades refill the field. Winning Wilds stay for the cascade sequence.','Scatter symbols trigger Weekend League Free Spins. The BONUS menu lists the existing offers and Scatter Boost price.']:[];
+    for(const value of paragraphs.filter(p=>tab==='FEATURES'?/bonus|wild|scatter|free spin|chamber|collect|wheel|dumpster|overdrive|бонус|множител/i.test(p):true)){const p=document.createElement('p');p.textContent=value;content.append(p);}
+    if(c.id==='magnet'){const manual=$('magnetModernManual');if(manual&&tab==='FEATURES'){const copy=manual.cloneNode(true);copy.removeAttribute('id');copy.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));content.append(copy);}}
+   }
+  }
+  function settings(){
+   show('settings','SETTINGS');
+   for(const [key,label] of [['sound','Sound'],['music','Music'],['fastGame','Quick Spin'],['fastBonus','Quick Bonus']]){const n=button(label+' · '+(state[key]?'ON':'OFF'),()=>{toggleSetting(key);settings();});n.setAttribute('aria-pressed',String(!!state[key]));}
+   const motion=button('Reduced Motion · '+(document.body.classList.contains('slot-reduced-motion')?'ON':'OFF'),()=>{document.body.classList.toggle('slot-reduced-motion');try{localStorage.setItem('vault:v1:hud',JSON.stringify({version:1,reducedMotion:document.body.classList.contains('slot-reduced-motion')}));}catch{}settings();});motion.setAttribute('aria-pressed',String(document.body.classList.contains('slot-reduced-motion')));
+   for(const [label,tab] of [['Paytable','PAYOUTS'],['Rules','RULES'],['Info','FEATURES']])button(label,()=>info(tab));
+  }
+  const choices=[...root.querySelectorAll(c.choices)];
+  function auto(){
+   if(snapshot(c).autoplayRemaining){$(c.auto).click();render();return;}
+   if($(c.auto).disabled)return;
+   show('auto','AUTOPLAY');
+   const counts=c.id==='slot'?[10,25,50,100,-1]:choices.map(n=>Number(n.dataset[c.count])).filter(n=>[10,25,50,100,-1].includes(n));
+   for(const count of counts)button(count<0?'∞':String(count),()=>{if($(c.auto).disabled){close();return;}close();if(c.id==='slot')setAutoMode(count);else choices.find(n=>Number(n.dataset[c.count])===count)?.click();render();});
+  }
+  function setBet(value){if(!snapshot(c).canChangeBet)return;const index=BETS.indexOf(value);if(index<0)return;const target=c.id==='slot'?state:controllers[c.id]();target.betIndex=index;if(c.id==='slot')updateUI();VaultStorage.schedule();render();}
+  q(hud,'[data-action="settings"]').onclick=settings;
+  q(hud,'[data-action="auto"]').onclick=auto;
+  q(hud,'[data-action="bet"]').onclick=()=>{if(!snapshot(c).canChangeBet)return;show('bet','CHOOSE BET');for(const value of BETS)button(Number(value).toLocaleString('ru-RU'),()=>{setBet(value);close();});};
+  // Use the same dialog chrome for existing feature purchase bodies and handlers.
+  if(c.shop){
+   const shop=$(c.shop);shop.classList.add('slot-bonus-dialog');shop.dataset.slotSkin=c.id;
+   if(shop.tagName==='DIALOG'){shop.addEventListener('click',e=>{if(e.target===shop){const r=shop.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)shop.close();}});}
+   else{shop.setAttribute('role','dialog');shop.setAttribute('aria-modal','true');shop.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();closeBonusShop();$(c.buy).focus();}if(e.key==='Tab'){const all=[...shop.querySelectorAll('button:not(:disabled)')];if(e.shiftKey&&document.activeElement===all[0]){e.preventDefault();all.at(-1).focus();}else if(!e.shiftKey&&document.activeElement===all.at(-1)){e.preventDefault();all[0].focus();}}});$(c.buy).addEventListener('click',()=>{if(shop.classList.contains('show'))$('bonusShopClose').focus();});}
+  }
+  let lastWin='0';
+  function render(){
+   if(currentGame!==c.id){if(modal.open)close();return;}
+   const s=snapshot(c);hud.dataset.state=s.state;
+   text(q(hud,'.slot-balance strong'),s.balance);text(betDisplay,Number(s.bet).toLocaleString('ru-RU'));q(hud,'[data-action="bet"]').disabled=!s.canChangeBet;
+   const autoButton=q(hud,'[data-action="auto"]');text(autoButton,s.autoplayRemaining?'STOP · '+s.autoplayRemaining:'AUTO');autoButton.disabled=$(c.auto).disabled;autoButton.setAttribute('aria-pressed',String(!!s.autoplayRemaining));autoButton.setAttribute('aria-expanded',String(modal.open&&popup==='auto'));
+   if(!s.busy)lastWin=s.win;text(q(upper,'.slot-status-win strong'),lastWin);
+   text(q(upper,'.slot-status-mode strong'),s.statusText);text(q(upper,'.slot-status-mode small'),s.state==='INSUFFICIENT_BALANCE'?'INSUFFICIENT BALANCE':s.autoplayRemaining?'AUTOPLAY · '+s.autoplayRemaining:c.name.toUpperCase());
+   const feature=q(upper,'.slot-status-feature');feature.hidden=!s.featureInfo;text(q(feature,'strong'),s.featureInfo);
+   upper.classList.toggle('slot-has-feature',!!s.featureInfo);
+   if(modal.open&&(popup==='bet'||popup==='auto')&&(s.busy||s.feature))close();
+  }
+  instances.push({id:c.id,root,hud,upper,modal,render,getState:()=>snapshot(c),actions:{spin:()=>$(c.spin).click(),setBet,startAutoplay:count=>{if(c.id==='slot')setAutoMode(count);else choices.find(n=>Number(n.dataset[c.count])===count)?.click();},stopAutoplay:()=>{if(snapshot(c).autoplayRemaining)$(c.auto).click();},openSettings:settings,openPaytable:info}});
+ }
+ function init(){
+  try{const pref=JSON.parse(localStorage.getItem('vault:v1:hud'));if(pref?.version===1&&pref.reducedMotion===true)document.body.classList.add('slot-reduced-motion');}catch{}
+  configs.forEach(create);
+  window.VaultSlotHud={states:Object.freeze(['IDLE','SPINNING','RESOLVING','FEATURE','BONUS_INTRO','BONUS_ACTIVE','BIG_WIN','AUTOPLAY','INSUFFICIENT_BALANCE','DISABLED']),instances,getState:id=>instances.find(n=>n.id===id)?.getState(),refresh:()=>instances.forEach(n=>n.render())};
+  VaultSlotHud.refresh();setInterval(()=>{if(!document.hidden)VaultSlotHud.refresh();},150);
+ }
+ init();
+})();
+
+</script>
+<!-- END SLOT HUD MODULE -->
 </body>
 </html>
