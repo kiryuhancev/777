@@ -1,0 +1,11 @@
+{
+  "baseline": "40c014c",
+  "protectedFiles": 191,
+  "checks": [
+    "Other game source/assets/models, auth/config and unrelated schema byte-identical",
+    "Only Critter HUD adapter/status/affordability changed; other games retain identical controls",
+    "Whole embedded site outside Critter/runtime/HUD blocks byte-identical",
+    "Shared wallet unaffected; Critter uses immutable total cost in commit and rebase",
+    "SQL atomic wallet/statistics/access/grants tail unchanged; feature price/movement validation extended"
+  ]
+}

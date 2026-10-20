@@ -1,4 +1,5 @@
-> Актуальная v2: [CRITTER_UPDATE.md](CRITTER_UPDATE.md). Ниже — историческая спецификация v1; её бонус и RTP не описывают новую версию.
+> Новые features v3: [CRITTER_FEATURES.md](CRITTER_FEATURES.md).
+> История v2: [CRITTER_UPDATE.md](CRITTER_UPDATE.md). Ниже — историческая спецификация v1; её бонус и RTP не описывают новую версию.
 
 # Critter Chaos
 

@@ -9,15 +9,15 @@ def critter_route(r):
  name=r.request.url.split('/')[-1]
  if name not in ['critter_capabilities','settle_critter_round']:return magnet_route(r)
  def reply(v,status=200):return r.fulfill(status=status,content_type='application/json',body=json.dumps(v),headers={'Access-Control-Allow-Origin':'*'})
- if name=='critter_capabilities':return reply({'version':2}) if not missing_critter else reply({'message':'Not installed'},404)
+ if name=='critter_capabilities':return reply({'version':2,'featuresVersion':3,'roundVersions':[1,2,3]}) if not missing_critter else reply({'message':'Not installed'},404)
  if cloud.offline:return r.abort('internetdisconnected')
  payload=r.request.post_data_json;uid=json.loads(base64.urlsafe_b64decode(r.request.headers['authorization'].split('.')[1]+'==='))['sub'];w=cloud.rows[uid]['wallets'];c=payload['p_checkpoint'];rid=c['roundId'];old=cloud.rounds.get(rid)
  if old:return reply({'balance':w['balance'],'revision':w['revision'],'duplicate':True}) if old['user_id']==uid and old.get('checkpoint')==c else reply({'message':'VAULT_WALLET_CONFLICT'},400)
  if not cloud.access.get(uid,True):return reply({'message':'VAULT_ACCOUNT_DISABLED'},400)
- if payload['p_expected_revision']!=w['revision'] or w['balance']<c['bet']:return reply({'message':'VAULT_WALLET_CONFLICT'},400)
- w['balance']=round(w['balance']-c['bet']+c['payout'],6);w['revision']+=1;w['recovery']['critterRound']=c
- cloud.rounds[rid]={'user_id':uid,'p_game_id':'critter','p_bet':c['bet'],'status':'settled','payout':c['payout'],'checkpoint':c}
- st=cloud.stats.setdefault((uid,'critter'),{'game_id':'critter','rounds_played':0,'total_wagered':0,'total_won':0});st['rounds_played']+=1;st['total_wagered']+=c['bet'];st['total_won']+=c['payout']
+ if payload['p_expected_revision']!=w['revision'] or w['balance']<c.get('cost',c['bet']):return reply({'message':'VAULT_WALLET_CONFLICT'},400)
+ w['balance']=round(w['balance']-c.get('cost',c['bet'])+c['payout'],6);w['revision']+=1;w['recovery']['critterRound']=c
+ cloud.rounds[rid]={'user_id':uid,'p_game_id':'critter','p_bet':c.get('cost',c['bet']),'status':'settled','payout':c['payout'],'checkpoint':c}
+ st=cloud.stats.setdefault((uid,'critter'),{'game_id':'critter','rounds_played':0,'total_wagered':0,'total_won':0});st['rounds_played']+=1;st['total_wagered']+=c.get('cost',c['bet']);st['total_won']+=c['payout']
  return reply({'balance':w['balance'],'revision':w['revision'],'duplicate':False})
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])

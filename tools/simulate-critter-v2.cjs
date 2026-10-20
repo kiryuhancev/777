@@ -1,4 +1,4 @@
-const M=require('../critter/model'),fs=require('node:fs');
+const M=require('../critter/model-v2'),fs=require('node:fs');
 const n=Number(process.argv[2]||200000),seed=Number(process.argv[3]||92571),rng=M.seeded(seed),id='11111111-1111-4111-8111-111111111111';
 const acc=()=>({sum:0,sq:0,hits:0,bonuses:0,superBonuses:0,caps:0,max:0,baseSum:0,bonusSum:0});const old=acc(),next=acc();
 function add(a,r){a.sum+=r.payout;a.sq+=r.payout*r.payout;a.hits+=r.payout>0;a.bonuses+=!!r.bonus;a.superBonuses+=r.bonus?.kind==='super';a.caps+=r.winX===10000;a.max=Math.max(a.max,r.winX);a.baseSum+=r.base.winX;a.bonusSum+=r.bonus?.winX||0;}

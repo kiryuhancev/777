@@ -1,5 +1,5 @@
 // Historical initial200k exploration; final expanded calibration is documented in reports/critter-v2-recalibration.json. Does not edit config.
-const M=require('../critter/model'),fs=require('node:fs'),n=200000,rng=M.seeded(42917),raw=[];
+const M=require('../critter/model-v2'),fs=require('node:fs'),n=200000,rng=M.seeded(42917),raw=[];
 for(let i=0;i<n;i++){
  const r=M.start({seed:Math.floor(rng()*4294967296),bet:1,roundId:'11111111-1111-4111-8111-111111111111'});
  raw.push([r.base,...(r.bonus?.spins||[])].reduce((n,p)=>n+p.steps.reduce((n,s)=>n+s.wins.reduce((n,w)=>n+w.rawWinX*w.multiplier,0),0),0));

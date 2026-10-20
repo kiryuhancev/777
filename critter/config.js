@@ -1,4 +1,4 @@
-const CRITTER_CONFIG=Object.freeze({version:2,id:'critter',columns:5,rows:5,minCluster:5,maxCascades:12,maxWinX:10000,
+const CRITTER_CONFIG=Object.freeze({version:3,id:'critter',columns:5,rows:5,minCluster:5,maxCascades:12,maxWinX:10000,
  wildChance:.018,scatterChance:.016,payScale:0.000699792925918,
  sizes:[5,6,7,8,9,10,15],
  symbols:[
@@ -11,6 +11,7 @@ const CRITTER_CONFIG=Object.freeze({version:2,id:'critter',columns:5,rows:5,minC
   {id:'possum',name:'Possum',weight:6,pays:[1,1.5,2.2,3,4.5,7,15]},
   {id:'bulldog',name:'Bulldog',weight:4,pays:[1.5,2.2,3,4.5,6,10,25]}
  ],
- bonus:{spins:10,superSpins:20}
+ bonus:{spins:10,superSpins:20},
+ features:{scatterMultiplier:1.5,boostCost:3,bonusCost:50,superCost:500}
 });
 if(typeof module!=='undefined')module.exports=CRITTER_CONFIG;

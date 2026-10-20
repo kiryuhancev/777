@@ -16,7 +16,7 @@ with sync_playwright() as p:
   page.evaluate(op);page.wait_for_timeout(350);page.evaluate('VaultSlotHud.refresh()')
   root=page.locator(f'[data-slot-skin="{game}"]').first;hud=root.locator('.slot-bottom-controls')
   order=hud.locator(':scope > [data-control]').evaluate_all('(nodes)=>nodes.map(n=>n.dataset.control)')
-  expected=['settings','balance','bet-minus','bet','bet-plus','auto','max','spin']+(['bonus'] if game in ['slot','swamp','vault_heist'] else [])
+  expected=['settings','balance','bet-minus','bet','bet-plus','auto','max','spin']+(['bonus'] if game in ['slot','swamp','vault_heist','critter'] else [])
   assert order==expected,(game,order)
   assert root.locator('.slot-status-feature').is_hidden()
   reel=root.locator({'slot':'.derby-stage','swamp':'.swamp-frame','vault_heist':'.heist-frame','magnet':'.magnet-apparatus','critter':'.critter-frame'}[game])
@@ -28,11 +28,11 @@ with sync_playwright() as p:
   hud.locator('[data-control="auto"]').click();assert dialog.is_visible();assert dialog.locator('.slot-modal-body button').all_text_contents()==['10','25','50','100','∞'];page.keyboard.press('Escape')
   hud.locator('[data-control="settings"]').click();assert dialog.is_visible();dialog.get_by_role('button',name='Sound ·',exact=False).click();assert page.evaluate('state.sound') is False;dialog.get_by_role('button',name='Sound ·',exact=False).click()
   dialog.get_by_role('button',name='Paytable',exact=True).click();assert dialog.locator('nav button').count()==4;dialog.get_by_role('button',name='RULES',exact=True).click();assert dialog.locator('.slot-modal-body section').inner_text().strip();page.keyboard.press('Escape');assert not dialog.is_visible()
-  if game in ['slot','swamp','vault_heist']:
+  if game in ['slot','swamp','vault_heist','critter']:
    hud.locator('[data-control="bonus"]').click();page.wait_for_timeout(100)
    if game=='slot':assert page.locator('#bonusShopModal').evaluate('(n)=>n.classList.contains("show")');page.keyboard.press('Escape')
    else:
-    shop=page.locator('#swampBonusShop' if game=='swamp' else '#heistBonusShop');assert shop.is_visible();page.keyboard.press('Escape');assert not shop.is_visible()
+    shop=page.locator({'swamp':'#swampBonusShop','vault_heist':'#heistBonusShop','critter':'#critterBonusShop'}[game]);assert shop.is_visible();page.keyboard.press('Escape');assert not shop.is_visible()
   for width in [320,390,430,768,1440]:
    page.set_viewport_size({'width':width,'height':1100});page.wait_for_timeout(80)
    dimensions=hud.evaluate('n=>({w:n.clientWidth,s:n.scrollWidth,children:[...n.children].map(c=>({id:c.dataset.control,rect:c.getBoundingClientRect().toJSON()}))})')

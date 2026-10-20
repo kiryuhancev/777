@@ -92,3 +92,23 @@ body.critter-active .app,body.critter-active #slotApp,body.critter-active #poker
 #critterApp .critter-cell.active-wild:after{content:'WILD'}
 
 #critterApp .persistent-bonus .critter-dash-track{display:none}
+
+/* Original proportions: contained artwork and a uniform moving Wild sprite. */
+#critterApp .critter-cell>svg,#critterApp .critter-cell>img{object-fit:contain;object-position:center;transform:none}
+#critterApp .critter-runner>img{width:100%;height:100%;display:block;object-fit:contain}
+#critterApp .running-source .critter-wild-multiplier{opacity:0}
+#critterApp .critter-boost-indicator{width:min(700px,100%);margin:6px 0;padding:8px 12px;border:1px solid #59ded5;border-radius:8px;background:#10283c;color:#9dfff0;text-align:center;font-size:11px}
+#critterApp #critterBonusShop{width:min(540px,94vw)}
+#critterApp .critter-shop-bet{display:flex;align-items:center;justify-content:center;gap:22px;text-align:center;margin-bottom:15px}
+#critterApp .critter-shop-bet strong{font-size:20px}
+#critterApp .critter-shop-options{padding:0;border:0;margin:12px 0;min-width:0}
+#critterApp .critter-shop-options legend{font-size:10px;color:#b9ccdf;margin-bottom:8px}
+#critterApp .critter-shop-options label{display:flex;align-items:center;gap:12px;margin:8px 0;padding:14px;border:1px solid #5c6a87;border-radius:10px;background:#121c31;cursor:pointer}
+#critterApp .critter-shop-options label:has(:checked){border-color:#f8d586;background:#213448}
+#critterApp .critter-shop-options span{display:grid;gap:6px;min-width:0}
+#critterApp .critter-shop-options small{line-height:1.5;font-size:9px}
+#critterApp .critter-shop-options strong{color:#ffe39a;font-size:14px}
+#critterApp .critter-shop-actions{display:flex;gap:10px}
+#critterApp .critter-shop-actions button{flex:1;min-width:0}
+#critterApp #critterShopConfirm{background:linear-gradient(#ffe7a0,#d6a64f);color:#152335;border-color:#ffebae}
+@media(max-width:430px){#critterApp .critter-shop-options label{padding:11px 8px}#critterApp .critter-shop-actions button{font-size:10px;padding:12px 6px}}

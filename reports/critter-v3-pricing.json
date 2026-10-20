@@ -1,0 +1,233 @@
+{
+  "seed": 20261022,
+  "config": {
+    "version": 3,
+    "id": "critter",
+    "columns": 5,
+    "rows": 5,
+    "minCluster": 5,
+    "maxCascades": 12,
+    "maxWinX": 10000,
+    "wildChance": 0.018,
+    "scatterChance": 0.016,
+    "payScale": 0.000699792925918,
+    "sizes": [
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      15
+    ],
+    "symbols": [
+      {
+        "id": "ten",
+        "name": "10",
+        "weight": 24,
+        "pays": [
+          0.2,
+          0.3,
+          0.45,
+          0.65,
+          0.9,
+          1.4,
+          3
+        ]
+      },
+      {
+        "id": "jack",
+        "name": "J",
+        "weight": 20,
+        "pays": [
+          0.25,
+          0.4,
+          0.55,
+          0.8,
+          1.2,
+          1.8,
+          4
+        ]
+      },
+      {
+        "id": "king",
+        "name": "K",
+        "weight": 16,
+        "pays": [
+          0.3,
+          0.45,
+          0.7,
+          1,
+          1.5,
+          2.2,
+          5
+        ]
+      },
+      {
+        "id": "ace",
+        "name": "A",
+        "weight": 12,
+        "pays": [
+          0.4,
+          0.6,
+          0.9,
+          1.3,
+          1.8,
+          2.8,
+          6
+        ]
+      },
+      {
+        "id": "cat",
+        "name": "Street Cat",
+        "weight": 10,
+        "pays": [
+          0.6,
+          0.9,
+          1.3,
+          1.8,
+          2.5,
+          4,
+          8
+        ]
+      },
+      {
+        "id": "pigeon",
+        "name": "Cool Pigeon",
+        "weight": 8,
+        "pays": [
+          0.8,
+          1.2,
+          1.7,
+          2.5,
+          3.5,
+          5,
+          10
+        ]
+      },
+      {
+        "id": "possum",
+        "name": "Possum",
+        "weight": 6,
+        "pays": [
+          1,
+          1.5,
+          2.2,
+          3,
+          4.5,
+          7,
+          15
+        ]
+      },
+      {
+        "id": "bulldog",
+        "name": "Bulldog",
+        "weight": 4,
+        "pays": [
+          1.5,
+          2.2,
+          3,
+          4.5,
+          6,
+          10,
+          25
+        ]
+      }
+    ],
+    "bonus": {
+      "spins": 10,
+      "superSpins": 20
+    },
+    "features": {
+      "scatterMultiplier": 1.5,
+      "boostCost": 3,
+      "bonusCost": 50,
+      "superCost": 600
+    }
+  },
+  "results": {
+    "normal": {
+      "paidCycles": 100000,
+      "meanPayoutX": 0.7894985237398563,
+      "mean95X": [
+        0.6750018819775608,
+        0.9039951655021518
+      ],
+      "bonusPct": 0.897,
+      "superPct": 0.099,
+      "meanFinalScatters": 0.43477,
+      "bonusWildMoves": 266716,
+      "suggestedCostFactor": 1,
+      "finalCostFactor": 1,
+      "estimatedRtpAtFinalPricePct": 78.94985237398564,
+      "approx95RtpAtFinalPricePct": [
+        67.50018819775609,
+        90.39951655021518
+      ]
+    },
+    "boost": {
+      "paidCycles": 100000,
+      "meanPayoutX": 2.6545981348496834,
+      "mean95X": [
+        2.4381021269399072,
+        2.8710941427594596
+      ],
+      "bonusPct": 2.587,
+      "superPct": 0.383,
+      "meanFinalScatters": 0.64525,
+      "bonusWildMoves": 908956,
+      "suggestedCostFactor": 2.77,
+      "finalCostFactor": 3,
+      "estimatedRtpAtFinalPricePct": 88.48660449498944,
+      "approx95RtpAtFinalPricePct": [
+        81.27007089799692,
+        95.70313809198198
+      ]
+    },
+    "bonus": {
+      "paidCycles": 5000,
+      "meanPayoutX": 44.94013702159998,
+      "mean95X": [
+        42.334253414794176,
+        47.546020628405785
+      ],
+      "bonusPct": 100,
+      "superPct": 0,
+      "meanFinalScatters": 0,
+      "bonusWildMoves": 798652,
+      "suggestedCostFactor": 46.82,
+      "finalCostFactor": 50,
+      "estimatedRtpAtFinalPricePct": 89.88027404319998,
+      "approx95RtpAtFinalPricePct": [
+        84.66850682958835,
+        95.09204125681157
+      ]
+    },
+    "super": {
+      "paidCycles": 5000,
+      "meanPayoutX": 460.66359482819996,
+      "mean95X": [
+        453.3385251692133,
+        467.9886644871866
+      ],
+      "bonusPct": 100,
+      "superPct": 100,
+      "meanFinalScatters": 0,
+      "bonusWildMoves": 7397505,
+      "suggestedCostFactor": 479.86,
+      "finalCostFactor": 500,
+      "estimatedRtpAtFinalPricePct": 92.13271896563998,
+      "approx95RtpAtFinalPricePct": [
+        90.66770503384267,
+        93.59773289743733
+      ]
+    }
+  },
+  "notes": "Exploratory pricing sample; cost factor target96% in new modes, not certification. Normal base config/payout/RNG unchanged, bonus now runs Wilds so overall return changes. Snapshot-omitted source agrees on100 seeds per mode. Final prices are rounded fixed3/50/500 multiples, deliberately not the raw fitted96% prices. Payout samples are independent of purchase price.",
+  "finalPrices": {
+    "normal": 1,
+    "boost": 3,
+    "bonus": 50,
+    "super": 500
+  }
+}

@@ -1944,6 +1944,26 @@ body.critter-active .app,body.critter-active #slotApp,body.critter-active #poker
 
 #critterApp .persistent-bonus .critter-dash-track{display:none}
 
+/* Original proportions: contained artwork and a uniform moving Wild sprite. */
+#critterApp .critter-cell>svg,#critterApp .critter-cell>img{object-fit:contain;object-position:center;transform:none}
+#critterApp .critter-runner>img{width:100%;height:100%;display:block;object-fit:contain}
+#critterApp .running-source .critter-wild-multiplier{opacity:0}
+#critterApp .critter-boost-indicator{width:min(700px,100%);margin:6px 0;padding:8px 12px;border:1px solid #59ded5;border-radius:8px;background:#10283c;color:#9dfff0;text-align:center;font-size:11px}
+#critterApp #critterBonusShop{width:min(540px,94vw)}
+#critterApp .critter-shop-bet{display:flex;align-items:center;justify-content:center;gap:22px;text-align:center;margin-bottom:15px}
+#critterApp .critter-shop-bet strong{font-size:20px}
+#critterApp .critter-shop-options{padding:0;border:0;margin:12px 0;min-width:0}
+#critterApp .critter-shop-options legend{font-size:10px;color:#b9ccdf;margin-bottom:8px}
+#critterApp .critter-shop-options label{display:flex;align-items:center;gap:12px;margin:8px 0;padding:14px;border:1px solid #5c6a87;border-radius:10px;background:#121c31;cursor:pointer}
+#critterApp .critter-shop-options label:has(:checked){border-color:#f8d586;background:#213448}
+#critterApp .critter-shop-options span{display:grid;gap:6px;min-width:0}
+#critterApp .critter-shop-options small{line-height:1.5;font-size:9px}
+#critterApp .critter-shop-options strong{color:#ffe39a;font-size:14px}
+#critterApp .critter-shop-actions{display:flex;gap:10px}
+#critterApp .critter-shop-actions button{flex:1;min-width:0}
+#critterApp #critterShopConfirm{background:linear-gradient(#ffe7a0,#d6a64f);color:#152335;border-color:#ffebae}
+@media(max-width:430px){#critterApp .critter-shop-options label{padding:11px 8px}#critterApp .critter-shop-actions button{font-size:10px;padding:12px 6px}}
+
 </style>
 <!-- END CRITTER STYLES -->
 <!-- BEGIN SLOT HUD STYLES -->
@@ -6112,13 +6132,18 @@ const VaultMagnet=window.VaultMagnet=(()=>{
  <div class="critter-scene">
   <header class="critter-heading"><img id="critterLogo" alt="Critter Chaos"><button id="critterHelpOpen" aria-haspopup="dialog">PAYTABLE ⓘ</button></header>
   <div class="critter-readout"><div><small id="critterMode">NEON BACKSTREET · 5×5</small><strong id="critterStatus" role="status">READY FOR CHAOS</strong></div><div><small>ROUND WIN</small><strong id="critterWin">0</strong></div></div>
+  <p id="critterBoostIndicator" class="critter-boost-indicator" hidden></p>
   <div class="critter-frame"><div class="critter-rail"><span>5+ CONNECTED SYMBOLS</span><span id="critterCascade">CASCADE 0</span></div><div id="critterGrid" class="critter-grid" aria-label="5 by 5 cluster slot"><svg id="critterPaths" viewBox="0 0 500 500" aria-hidden="true"></svg></div><p id="critterMessage" role="status">MATCH CLUSTERS · WATCH THE RACCOONS RUN</p></div>
   <button id="critterReconnect" hidden>ПОВТОРИТЬ ПОДКЛЮЧЕНИЕ</button>
-  <footer class="critter-controls"><button id="critterSettingsOpen" aria-label="Настройки">⚙</button><div class="critter-bet"><button id="critterMinus" aria-label="Уменьшить ставку">−</button><div><small>BET</small><strong id="critterBet">20</strong></div><button id="critterPlus" aria-label="Увеличить ставку">+</button></div><button id="critterMax">MAX</button><button id="critterSpin">SPIN</button><div class="critter-auto-wrap"><button id="critterAuto" aria-expanded="false" aria-controls="critterAutoMenu">AUTO</button><div id="critterAutoMenu" hidden><small>AUTO ROUNDS</small><button data-critter-auto="10">10</button><button data-critter-auto="25">25</button><button data-critter-auto="50">50</button><button data-critter-auto="100">100</button><button data-critter-auto="-1">∞</button></div></div></footer>
+  <footer class="critter-controls"><button id="critterSettingsOpen" aria-label="Настройки">⚙</button><div class="critter-bet"><button id="critterMinus" aria-label="Уменьшить ставку">−</button><div><small>BET</small><strong id="critterBet">20</strong></div><button id="critterPlus" aria-label="Увеличить ставку">+</button></div><button id="critterMax">MAX</button><button id="critterSpin">SPIN</button><div class="critter-auto-wrap"><button id="critterAuto" aria-expanded="false" aria-controls="critterAutoMenu">AUTO</button><div id="critterAutoMenu" hidden><small>AUTO ROUNDS</small><button data-critter-auto="10">10</button><button data-critter-auto="25">25</button><button data-critter-auto="50">50</button><button data-critter-auto="100">100</button><button data-critter-auto="-1">∞</button></div></div><button id="critterBuy">BONUS</button></footer>
   <div class="critter-wallet"><small>PERSONAL BALANCE</small><strong id="critterBalance">—</strong><p>ONE BET · ALL CASCADES + EARNED BONUS</p></div>
   <div id="critterBonusOverlay" class="critter-bonus-overlay" role="dialog" aria-modal="true" aria-label="Dumpster Dash Bonus" hidden><div class="critter-bonus-card"><small>3+ SCATTER · BONUS TRIGGERED</small><h2>DUMPSTER DASH</h2><p id="critterBonusMessage">PERSISTENT WILDS · EVERY SPIN STARTS AT x1</p><div class="critter-dash-track"><img id="critterDashRunner" alt="Running raccoon"><i></i></div><div id="critterBonusBins" class="critter-bonus-bins"></div><p>NO LEVELS · WILDS STAY UNTIL BONUS ENDS</p></div></div>
+  <dialog id="critterBonusShop" aria-labelledby="critterShopTitle"><h2 id="critterShopTitle">BUY FEATURES</h2><div class="critter-shop-bet"><button id="critterShopMinus" aria-label="Decrease bet">−</button><div><small>CURRENT BET</small><strong id="critterShopBet"></strong></div><button id="critterShopPlus" aria-label="Increase bet">+</button></div><fieldset class="critter-shop-options"><legend>SELECT FEATURE</legend>
+<label><input type="radio" name="critter-feature" value="boost" checked><span><b>CHANCE BOOST</b><small>SCATTER PROBABILITY ×1.5 · FULL PRICE PER SPIN</small><strong id="critterPriceboost"></strong></span></label>
+<label><input type="radio" name="critter-feature" value="bonus"><span><b>BONUS BUY</b><small>10 SPINS · PERSISTENT RUNNING WILDS</small><strong id="critterPricebonus"></strong></span></label>
+<label><input type="radio" name="critter-feature" value="super"><span><b>SUPER BONUS BUY</b><small>20 SPINS · MORE TIME TO ACCUMULATE WILDS</small><strong id="critterPricesuper"></strong></span></label></fieldset><p id="critterShopNote"></p><div class="critter-shop-actions"><button id="critterShopCancel">CANCEL</button><button id="critterShopConfirm">BUY</button></div></dialog>
   <dialog id="critterSettings"><h2>CHAOS SETTINGS</h2><button id="critterSound">SOUND</button><button id="critterFast">FAST</button><button id="critterSettingsClose">CLOSE</button></dialog>
-  <dialog id="critterHelp"><button id="critterHelpClose">CLOSE ×</button><h2>CRITTER CHAOS · PAYTABLE</h2><p>Поле 5×5. Выигрывают группы из 5+ одинаковых символов, соприкасающихся сторонами; диагонали не считаются. Платит размер кластера, а не линия или количество ways.</p><div id="critterPaytable"></div><p><b>RUNNING WILD:</b> енот заменяет обычные символы. В основной игре, если он участвовал в выигрыше, обычные выигравшие фишки удаляются, поле пополняется, затем енот перебегает в случайную клетку с обычным символом и меняется с ним местами. Несколько активных енотов бегут по очереди. Неактивный Wild остаётся на месте до конца раунда. Цель выбирается RNG, выигрыш после прыжка не гарантирован.</p><p>Wild может участвовать в разных оплачиваемых типах кластеров. Изолированная группа из 5+ Wild платит как Bulldog один раз; если она вошла в обычный выигрышный кластер, отдельной выплаты за неё нет. Wild остаются закреплёнными во время падения обычных фишек. Максимум12 оплачиваемых каскадов на поле; последняя комбинация оплачивается, после неё поле не пополняется.</p><p><b>WILD MULTIPLIER:</b> каждый новый Wild — x1. Выигрыш оплачивается с текущим множителем; затем участвующий Wild удваивается: x1 → x2 → x4 → x8. За каскад Wild повышается один раз, даже если участвует в нескольких кластерах. Несколько Wild в кластере используют самый высокий множитель, без сложения или перемножения. Следующий спин снова начинается с x1.</p><p><b>3+ SCATTER:</b> учитываются один раз после базовых каскадов и дают10 бонусных спинов при3 Scatter; 4+ Scatter дают SUPER —20 спинов. Внутренних уровней нет. Все выпавшие Wild остаются на своих позициях до конца бонуса; новые добавляются. В бонусе Wild не бегают. Каждый новый спин обнуляет только множитель до x1. Дополнительной ставки, cash-приза и общего случайного множителя нет.</p><p>Выигрыш — сумма базовых и бонусных каскадов. Общий максимум10 000× ставки сохранён. Бонусные поля рассчитываются до анимации; цель по выплате не задаётся. Новые правила меняют RTP; текущую оценку см. в отчёте симуляции.</p><p>Один round ID и одна ставка за всё. Выплата и статистика учитываются один раз. F5 пропускает незавершённую анимацию и показывает окончательный результат уже рассчитанного раунда, без повторного списания/прыжка/бонуса. Демонстрационные кредиты с client-authoritative RNG.</p></dialog>
+  <dialog id="critterHelp"><button id="critterHelpClose">CLOSE ×</button><h2>CRITTER CHAOS · PAYTABLE</h2><p>Поле 5×5. Выигрывают группы из 5+ одинаковых символов, соприкасающихся сторонами; диагонали не считаются. Платит размер кластера, а не линия или количество ways.</p><div id="critterPaytable"></div><p><b>RUNNING WILD:</b> енот заменяет обычные символы. В основной игре, если он участвовал в выигрыше, обычные выигравшие фишки удаляются, поле пополняется, затем енот перебегает в случайную клетку с обычным символом и меняется с ним местами. Несколько активных енотов бегут по очереди. Неактивный Wild остаётся на месте до конца раунда. Цель выбирается RNG, выигрыш после прыжка не гарантирован.</p><p>Wild может участвовать в разных оплачиваемых типах кластеров. Изолированная группа из 5+ Wild платит как Bulldog один раз; если она вошла в обычный выигрышный кластер, отдельной выплаты за неё нет. Wild остаются закреплёнными во время падения обычных фишек. Максимум12 оплачиваемых каскадов на поле; последняя комбинация оплачивается, после неё поле не пополняется.</p><p><b>WILD MULTIPLIER:</b> каждый новый Wild — x1. Выигрыш оплачивается с текущим множителем; затем участвующий Wild удваивается: x1 → x2 → x4 → x8. За каскад Wild повышается один раз, даже если участвует в нескольких кластерах. Несколько Wild в кластере используют самый высокий множитель, без сложения или перемножения. Следующий спин снова начинается с x1.</p><p><b>3+ SCATTER:</b> учитываются один раз после базовых каскадов и дают10 бонусных спинов при3 Scatter; 4+ Scatter дают SUPER —20 спинов. Внутренних уровней нет. Все выпавшие Wild сохраняются до конца бонуса; новые добавляются. В бонусе участвующие в выигрыше Wild бегут по тем же правилам, что и в основной игре; их новые позиции сохраняются перед следующим спином. Каждый новый спин обнуляет только множитель до x1. Дополнительной ставки, cash-приза и общего случайного множителя нет.</p><p>Выигрыш — сумма базовых и бонусных каскадов. Общий максимум10 000× ставки сохранён. Бонусные поля рассчитываются до анимации; цель по выплате не задаётся. Новые правила меняют RTP; текущую оценку см. в отчёте симуляции.</p><p>CHANCE BOOST реально повышает вероятность Scatter с1.6% до2.4% на draw обычного поля; бонусные draws не меняются. Полная стоимость каждого усиленного SPIN показана в BONUS. Покупка BONUS/SUPER сразу запускает10/20 спинов без подставных Scatter, один раз списывая указанную цену.</p><p>Один round ID и одна ставка за всё. Выплата и статистика учитываются один раз. F5 пропускает незавершённую анимацию и показывает окончательный результат уже рассчитанного раунда, без повторного списания/прыжка/бонуса. Демонстрационные кредиты с client-authoritative RNG.</p></dialog>
  </div>
 </section>
 
@@ -6198,7 +6223,7 @@ const CRITTER_MODEL_V1=(()=>{
 })();
 if(typeof module!=='undefined')module.exports=CRITTER_MODEL_V1;
 
-const CRITTER_CONFIG=Object.freeze({version:2,id:'critter',columns:5,rows:5,minCluster:5,maxCascades:12,maxWinX:10000,
+const CRITTER_CONFIG_V2=Object.freeze({version:2,id:'critter',columns:5,rows:5,minCluster:5,maxCascades:12,maxWinX:10000,
  wildChance:.018,scatterChance:.016,payScale:0.000699792925918,
  sizes:[5,6,7,8,9,10,15],
  symbols:[
@@ -6213,12 +6238,12 @@ const CRITTER_CONFIG=Object.freeze({version:2,id:'critter',columns:5,rows:5,minC
  ],
  bonus:{spins:10,superSpins:20}
 });
-if(typeof module!=='undefined')module.exports=CRITTER_CONFIG;
+if(typeof module!=='undefined')module.exports=CRITTER_CONFIG_V2;
 
 /* Pure seeded cluster cascade plan. No DOM, wallet, account inputs or animation RNG. */
-const CRITTER_MODEL=(()=>{
+const CRITTER_MODEL_V2=(()=>{
  const legacy=typeof module!=='undefined'&&module.exports?require('./model-v1.js'):CRITTER_MODEL_V1;
- const C=typeof module!=='undefined'&&module.exports?require('./config.js'):CRITTER_CONFIG;
+ const C=typeof module!=='undefined'&&module.exports?require('./config-v2.js'):CRITTER_CONFIG_V2;
  const copy=v=>JSON.parse(JSON.stringify(v)),round=n=>Math.round(n*1e6)/1e6;
  const regular=id=>C.symbols.some(s=>s.id===id);
  function seeded(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=Math.imul(a^a>>>15,a|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
@@ -6279,6 +6304,95 @@ const CRITTER_MODEL=(()=>{
  function validate(v){try{if(v?.version===1)return legacy.validate(v);if(v?.version!==2||v.gameId!=='critter'||v.status!=='SETTLED')return null;const r=start(v);return JSON.stringify(canonical(r))===JSON.stringify(canonical(v))?r:null;}catch{return null;}}
  return {legacy,config:C,seeded,channel,evaluate,cascade,start,validate,canonical,validGrid,round};
 })();
+if(typeof module!=='undefined')module.exports=CRITTER_MODEL_V2;
+
+const CRITTER_CONFIG=Object.freeze({version:3,id:'critter',columns:5,rows:5,minCluster:5,maxCascades:12,maxWinX:10000,
+ wildChance:.018,scatterChance:.016,payScale:0.000699792925918,
+ sizes:[5,6,7,8,9,10,15],
+ symbols:[
+  {id:'ten',name:'10',weight:24,pays:[.2,.3,.45,.65,.9,1.4,3]},
+  {id:'jack',name:'J',weight:20,pays:[.25,.4,.55,.8,1.2,1.8,4]},
+  {id:'king',name:'K',weight:16,pays:[.3,.45,.7,1,1.5,2.2,5]},
+  {id:'ace',name:'A',weight:12,pays:[.4,.6,.9,1.3,1.8,2.8,6]},
+  {id:'cat',name:'Street Cat',weight:10,pays:[.6,.9,1.3,1.8,2.5,4,8]},
+  {id:'pigeon',name:'Cool Pigeon',weight:8,pays:[.8,1.2,1.7,2.5,3.5,5,10]},
+  {id:'possum',name:'Possum',weight:6,pays:[1,1.5,2.2,3,4.5,7,15]},
+  {id:'bulldog',name:'Bulldog',weight:4,pays:[1.5,2.2,3,4.5,6,10,25]}
+ ],
+ bonus:{spins:10,superSpins:20},
+ features:{scatterMultiplier:1.5,boostCost:3,bonusCost:50,superCost:500}
+});
+if(typeof module!=='undefined')module.exports=CRITTER_CONFIG;
+
+/* Pure seeded cluster cascade plan. No DOM, wallet, account inputs or animation RNG. */
+const CRITTER_MODEL=(()=>{
+ const legacy=typeof module!=='undefined'&&module.exports?require('./model-v1.js'):CRITTER_MODEL_V1;
+ const previous=typeof module!=='undefined'&&module.exports?require('./model-v2.js'):CRITTER_MODEL_V2;
+ const C=typeof module!=='undefined'&&module.exports?require('./config.js'):CRITTER_CONFIG;
+ const copy=v=>JSON.parse(JSON.stringify(v)),round=n=>Math.round(n*1e6)/1e6;
+ const regular=id=>C.symbols.some(s=>s.id===id);
+ function seeded(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=Math.imul(a^a>>>15,a|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
+ const channel=(seed,n)=>(seed^Math.imul(n+1,0x9e3779b9))>>>0;
+ function pick(a,rng){let n=rng()*a.reduce((s,t)=>s+t.w,0);return a.find(t=>(n-=t.w)<0)||a.at(-1);}
+ function shuffle(a,rng){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+ const neighbours=i=>[i%5?i-1:null,i%5<4?i+1:null,i>=5?i-5:null,i<20?i+5:null].filter(n=>n!==null);
+ function validGrid(g){return Array.isArray(g)&&g.length===25&&new Set(g.map(t=>t?.uid)).size===25&&g.every(t=>Number.isInteger(t.uid)&&t.uid>=0&&t.uid<10000&&(regular(t.symbol)||['wild','scatter'].includes(t.symbol)));}
+ function components(grid,allowed){const seen=new Set(),out=[];for(let i=0;i<25;i++)if(!seen.has(i)&&allowed(grid[i])){const q=[i],group=[];seen.add(i);while(q.length){const j=q.pop();group.push(j);for(const k of neighbours(j))if(!seen.has(k)&&allowed(grid[k])){seen.add(k);q.push(k);}}out.push(group.sort((a,b)=>a-b));}return out;}
+ function evaluate(grid){
+  if(!validGrid(grid))throw Error('Invalid Critter grid');const wins=[];
+  const payout=(s,n)=>s.pays[C.sizes.reduce((v,size,i)=>n>=size?i:v,0)];
+  for(const s of C.symbols)for(const positions of components(grid,t=>t.symbol===s.id||t.symbol==='wild'))if(positions.length>=C.minCluster&&positions.some(i=>grid[i].symbol===s.id))wins.push({symbol:s.id,size:positions.length,positions,rawWinX:payout(s,positions.length),winX:round(payout(s,positions.length)*C.payScale)});
+  for(const positions of components(grid,t=>t.symbol==='wild'))if(positions.length>=C.minCluster&&!wins.some(w=>positions.some(i=>w.positions.includes(i))))wins.push({symbol:'wild',size:positions.length,positions,rawWinX:payout(C.symbols.at(-1),positions.length),winX:round(payout(C.symbols.at(-1),positions.length)*C.payScale)});
+  for(const w of wins){w.multiplier=Math.max(1,...w.positions.filter(i=>grid[i].symbol==='wild').map(i=>grid[i].multiplier||1));w.winX=round(w.winX*w.multiplier);}
+  const positions=[...new Set(wins.flatMap(w=>w.positions))];return {wins,winX:round(wins.reduce((n,w)=>n+w.winX,0)),rawWinX:round(wins.reduce((n,w)=>n+w.rawWinX,0)),activeWilds:positions.filter(i=>grid[i].symbol==='wild').map(i=>grid[i].uid)};
+ }
+ function cascade(seed,{bonus=false,persistentWilds=[],scatterBoost=false}={}){
+  const rng=seeded(seed);let uid=0;
+  const scatterChance=bonus?0:C.scatterChance*(scatterBoost?C.features.scatterMultiplier:1);
+  const draw=()=>{const n=rng(),symbol=n<scatterChance?'scatter':n<scatterChance+C.wildChance?'wild':pick(C.symbols.map(s=>({id:s.id,w:s.weight})),rng).id;return {uid:uid++,symbol,...(symbol==='wild'?{multiplier:1}:{})};};
+  let grid=Array.from({length:25},draw);shuffle(grid.flatMap((t,i)=>regular(t.symbol)?[i]:[]),rng);for(const i of persistentWilds)grid[i].symbol='wild';for(const t of grid)if(t.symbol==='wild')t.multiplier=1;const drops=[];
+  const initialGrid=copy(grid),steps=[];let rawWinX=0,winX=0,limitReached=false;
+  for(let index=0;index<C.maxCascades;index++){
+   const result=evaluate(grid);if(!result.wins.length)break;rawWinX=round(rawWinX+result.rawWinX);winX=round(winX+result.winX);
+   const step={index,grid:copy(grid),...result,removed:[],gravityGrid:null,moves:[],nextGrid:null};
+   if(index===C.maxCascades-1){limitReached=true;steps.push(step);break;}
+   const remove=new Set(result.wins.flatMap(w=>w.positions).filter(i=>regular(grid[i].symbol)).map(i=>grid[i].uid));step.removed=[...remove];
+   const next=copy(grid).map(t=>remove.has(t.uid)?null:t);
+   for(const t of next)if(t&&result.activeWilds.includes(t.uid))t.multiplier=(t.multiplier||1)*2;
+   // Wilds remain anchors during gravity. Scatter identities survive and may fall.
+   for(let col=0;col<5;col++){
+    let bottom=4;while(bottom>=0){if(next[bottom*5+col]?.symbol==='wild'){bottom--;continue;}let top=bottom;while(top>=0&&next[top*5+col]?.symbol!=='wild')top--;const cells=[];for(let row=top+1;row<=bottom;row++)cells.push(row*5+col);const pieces=cells.map(i=>next[i]).filter(Boolean);const missing=cells.length-pieces.length;const filled=[...Array.from({length:missing},draw),...pieces];cells.forEach((i,n)=>next[i]=filled[n]);bottom=top;}
+   }
+   step.gravityGrid=copy(next);const destinations=new Set();
+   for(const wild of result.activeWilds.sort((a,b)=>a-b)){
+    const from=next.findIndex(t=>t.uid===wild),eligible=next.flatMap((t,i)=>regular(t.symbol)&&!destinations.has(i)?[i]:[]);
+    if(!eligible.length)continue;const to=eligible[Math.floor(rng()*eligible.length)];[next[from],next[to]]=[next[to],next[from]];destinations.add(to);step.moves.push({uid:wild,from,to});
+   }
+   step.nextGrid=copy(next);steps.push(step);grid=next;
+  }
+  return {initialGrid,steps,finalGrid:copy(grid),rawWinX,winX,scatters:grid.filter(t=>t.symbol==='scatter').length,limitReached,drops};
+ }
+ function start({seed,bet,roundId,purchaseType=null,scatterBoost=false}){
+  if(!Number.isInteger(seed)||seed<0||seed>4294967295||!Number.isFinite(bet)||bet<=0||bet>1e9||typeof roundId!=='string'||!/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(roundId))throw Error('Invalid Critter round');
+  if(![null,'bonus','super'].includes(purchaseType)||typeof scatterBoost!=='boolean'||purchaseType&&scatterBoost)throw Error('Invalid Critter feature');
+  const base=purchaseType?emptyBase():cascade(channel(seed,0),{scatterBoost}),triggered=!!purchaseType||base.scatters>=3;let bonus=null;
+  if(triggered){
+   const spins=[],kind=purchaseType==='super'||!purchaseType&&base.scatters>=4?'super':'normal',spinCount=kind==='super'?C.bonus.superSpins:C.bonus.spins;let persistentWilds=[],bonusWin=0;
+   for(let i=0;i<spinCount;i++){
+    const plan=cascade(channel(seed,i+2),{bonus:true,persistentWilds});spins.push(plan);bonusWin=round(bonusWin+plan.winX);
+    persistentWilds=plan.finalGrid.flatMap((t,pos)=>t.symbol==='wild'?[pos]:[]);
+   }
+   bonus={kind,spins,spinCount,persistentWilds,winX:bonusWin};
+  }
+  const winX=round(Math.min(C.maxWinX,base.winX+(bonus?.winX||0)));
+  return {version:3,purchaseType,scatterBoost,cost:cost({bet,purchaseType,scatterBoost}),roundId,gameId:'critter',seed,bet,status:'SETTLED',base,bonus,winX,payout:round(winX*bet),result:bonus?'persistent-wilds':'base'};
+ }
+ function emptyBase(){const grid=Array.from({length:25},(_,uid)=>({uid,symbol:C.symbols[uid%C.symbols.length].id}));return {initialGrid:copy(grid),steps:[],finalGrid:copy(grid),rawWinX:0,winX:0,scatters:0,limitReached:false,drops:[]};}
+ function cost(r){return r.version&&r.version<3?r.bet:round(r.bet*(r.purchaseType?C.features[r.purchaseType+'Cost']:r.scatterBoost?C.features.boostCost:1));}
+ function canonical(v){return v&&typeof v==='object'?Array.isArray(v)?v.map(canonical):Object.fromEntries(Object.keys(v).sort().map(k=>[k,canonical(v[k])])):v;}
+ function validate(v){try{if(v?.version===1)return legacy.validate(v);if(v?.version===2)return previous.validate(v);if(v?.version!==3||v.gameId!=='critter'||v.status!=='SETTLED')return null;const r=start(v);return JSON.stringify(canonical(r))===JSON.stringify(canonical(v))?r:null;}catch{return null;}}
+ return {legacy,previous,cost,config:C,seeded,channel,evaluate,cascade,start,validate,canonical,validGrid,round};
+})();
 if(typeof module!=='undefined')module.exports=CRITTER_MODEL;
 
 const CRITTER_ASSETS={
@@ -6294,38 +6408,58 @@ const CRITTER_SPRITES={ten:[0,85,320,310],jack:[320,85,280,310],king:[600,85,295
 
 const VaultCritter=window.VaultCritter=(()=>{
  const C=CRITTER_CONFIG,M=CRITTER_MODEL,A=CRITTER_ASSETS,$=id=>document.getElementById(id),root=$('critterApp'),gridEl=$('critterGrid');
- let round=null,betIndex=2,busy=false,ready=false,auto=0,timer=null,generation=0,shownX=0;
+ let round=null,betIndex=2,boost=false,busy=false,ready=false,auto=0,timer=null,generation=0,shownX=0;
  const sleep=ms=>new Promise(r=>setTimeout(r,ms)),fmt=n=>Number(n).toLocaleString('ru-RU',{maximumFractionDigits:6});
  const finalGrid=r=>r.bonus?.spins?.at(-1)?.finalGrid||r.bonus?.plan?.finalGrid||r.base.finalGrid;
+ const spinCost=()=>M.cost({bet:BETS[betIndex],scatterBoost:!!boost});
  const name=id=>C.symbols.find(s=>s.id===id)?.name||{wild:'Running Wild',scatter:'Scatter'}[id];
  const atlas=document.createElementNS('http://www.w3.org/2000/svg','svg');atlas.setAttribute('width','0');atlas.setAttribute('height','0');atlas.style.position='absolute';atlas.setAttribute('aria-hidden','true');atlas.innerHTML=`<defs><image id="critterAtlasImage" href="${A.sheet}" width="1200" height="900"/>${Object.entries(CRITTER_SPRITES).map(([id,[x,y,w,h]])=>`<clipPath id="critterClip${id}" clipPathUnits="userSpaceOnUse"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>`).join('')}</defs>`;root.prepend(atlas);
  const cells=Array.from({length:25},(_,i)=>{const n=document.createElement('div');n.className='critter-cell';n.style.setProperty('--column',i%5);gridEl.append(n);return n;});
- function art(id){return ['wild','scatter'].includes(id)?`<img src="${A[id]}" alt="">`:`<svg preserveAspectRatio="none" viewBox="${CRITTER_SPRITES[id].join(' ')}" aria-hidden="true"><use href="#critterAtlasImage" clip-path="url(#critterClip${id})"/></svg>`;}
+ function art(id){return ['wild','scatter'].includes(id)?`<img src="${A[id]}" alt="">`:`<svg preserveAspectRatio="xMidYMid meet" viewBox="${CRITTER_SPRITES[id].join(' ')}" aria-hidden="true"><use href="#critterAtlasImage" clip-path="url(#critterClip${id})"/></svg>`;}
  function draw(grid,{wins=[],activeWilds=[]}={}){gridEl.classList.toggle('has-wins',wins.length>0);const winning=new Set(wins.flatMap(w=>w.positions)),active=new Set(activeWilds);for(let i=0;i<25;i++){const t=grid[i],n=cells[i];n.className='critter-cell'+(winning.has(i)?' winning':'')+(active.has(t.uid)?' active-wild':'');n.dataset.uid=t.uid;n.setAttribute('aria-label',`${name(t.symbol)}, row ${Math.floor(i/5)+1}, column ${i%5+1}`);if(n.dataset.symbol!==t.symbol){n.innerHTML=art(t.symbol);n.dataset.symbol=t.symbol;}n.querySelector('.critter-wild-multiplier')?.remove();if(t.symbol==='wild'){const badge=document.createElement('span');badge.className='critter-wild-multiplier';badge.textContent='x'+(t.multiplier||1);badge.setAttribute('aria-label','Wild multiplier '+(t.multiplier||1));n.append(badge);}}}
  function clearFX(){$('critterBonusOverlay').classList.remove('persistent-bonus');gridEl.classList.remove('has-wins');root.classList.remove('critter-reeling');$('critterPaths').replaceChildren();$('critterBonusOverlay').hidden=true;gridEl.querySelectorAll('.critter-runner').forEach(n=>n.remove());cells.forEach(n=>n.classList.remove('winning','active-wild','removing','falling','destination'));}
  function render(){
   root.classList.toggle('critter-fast',state.fastGame);
   $('critterBet').textContent=fmt(BETS[betIndex]);$('critterWin').textContent=fmt(Math.min(C.maxWinX,shownX)*(round?.bet||BETS[betIndex]));$('critterBalance').textContent=window.VaultWalletService?VaultWalletService.formatBalance():'—';
   for(const id of ['critterMinus','critterPlus','critterMax'])$(id).disabled=busy||!!auto;
-  $('critterSpin').disabled=busy||!ready||BETS[betIndex]>state.balance||!!auto;$('critterSpin').textContent=busy?'…':'SPIN';
+  $('critterSpin').disabled=busy||!ready||spinCost()>state.balance||!!auto;$('critterSpin').textContent=busy?'…':'SPIN';
   $('critterAuto').disabled=!ready||busy&&!auto;$('critterAuto').textContent=auto?`STOP ${auto===-1?'∞':auto}`:'AUTO';
+  $('critterBuy').disabled=busy||!!auto||!ready;
+  $('critterBoostIndicator').hidden=!boost;$('critterBoostIndicator').textContent='CHANCE BOOST · SCATTER ×'+C.features.scatterMultiplier+' · SPIN '+fmt(spinCost());
+  if($('critterBonusShop').open)renderShop();
   $('critterSound').textContent=state.sound?'SOUND ON':'SOUND OFF';$('critterFast').textContent=state.fastGame?'FAST ON':'FAST OFF';
  }
  function schedule(){clearTimeout(timer);if(currentGame===C.id&&!document.hidden&&!busy&&auto)timer=setTimeout(spin,state.fastGame?450:850);}
  function tone(){if(!state.sound)return;try{const a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.frequency.setValueAtTime(330,a.currentTime);o.frequency.exponentialRampToValueAtTime(660,a.currentTime+.12);g.gain.setValueAtTime(.012,a.currentTime);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.16);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.16);o.onended=()=>a.close();}catch{}}
- async function showPlan(plan,g,{bonus=false,multiplier=1}={}){
+ function makeWildRunner(multiplier,label='Running Wild'){
+  const runner=document.createElement('div'),img=document.createElement('img'),badge=document.createElement('span');runner.className='critter-runner';runner.setAttribute('aria-label',label+' x'+(multiplier||1));img.src=A.wild;img.alt='';badge.className='critter-wild-multiplier';badge.textContent='x'+(multiplier||1);runner.append(img,badge);return runner;
+ }
+ async function runBonusWilds(step,g,fast,reduced){
+  $('critterStatus').textContent='RUNNING WILDS · '+step.moves.length;$('critterMessage').textContent='BONUS RACCOON RUN · MULTIPLIERS TRAVEL WITH THE WILDS';
+  const paths=[],animations=[],runners=[],width=gridEl.clientWidth,height=gridEl.clientHeight,duration=reduced?60:fast?220:340;
+  for(const move of step.moves){
+   const wild=step.gravityGrid[move.from],runner=makeWildRunner(wild.multiplier,'Bonus Running Wild');runner.style.left=(move.from%5*20)+'%';runner.style.top=(Math.floor(move.from/5)*20)+'%';gridEl.append(runner);runners.push(runner);
+   cells[move.from].classList.add('running-source');cells[move.to].classList.add('destination');
+   const dx=(move.to%5-move.from%5)*width/5,dy=(Math.floor(move.to/5)-Math.floor(move.from/5))*height/5,startY=Math.floor(move.from/5)*height/5,midY=reduced?dy/2:Math.max(0,Math.min(height*.8,startY+dy/2-height*.06))-startY;
+   const x=i=>i%5*100+50,y=i=>Math.floor(i/5)*100+50;paths.push(`<path d="M${x(move.from)},${y(move.from)} Q${(x(move.from)+x(move.to))/2},${Math.max(50,(y(move.from)+y(move.to))/2-50)} ${x(move.to)},${y(move.to)}"/>`);
+   const a=runner.animate([{transform:'translate(0,0)'},{transform:`translate(${dx/2}px,${midY}px) scale(${reduced?1:.94})`,offset:.5},{transform:`translate(${dx}px,${dy}px)`}],{duration,fill:'forwards',easing:'ease-in-out'});animations.push(a);
+  }
+  $('critterPaths').innerHTML=paths.join('');await Promise.all(animations.map(a=>a.finished.catch(()=>{})));animations.forEach(a=>a.cancel());runners.forEach(n=>n.remove());if(g!==generation)return false;$('critterPaths').replaceChildren();draw(step.nextGrid);return true;
+ }
+ async function showPlan(plan,g,{bonus=false,multiplier=1,persistentPositions=[]}={}){
   const fast=state.fastGame,reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  draw(plan.initialGrid);$('critterStatus').textContent=bonus?'BONUS SPIN · PERSISTENT WILDS':'REELS STOPPING';await VaultSymbolDrop.play(C.id,{root:gridEl,cells:plan.initialGrid.map((t,i)=>({node:cells[i],column:i%5,row:Math.floor(i/5),symbol:t.symbol})),rows:5,roundId:round.roundId,hasWin:!!plan.steps.length,feature:bonus,speedProfile:fast?'quick':'normal'});if(g!==generation)return false;
+  draw(plan.initialGrid);$('critterStatus').textContent=bonus?'BONUS SPIN · PERSISTENT WILDS':'REELS STOPPING';await VaultSymbolDrop.play(C.id,{root:gridEl,cells:plan.initialGrid.flatMap((t,i)=>persistentPositions.includes(i)?[]:[{node:cells[i],column:i%5,row:Math.floor(i/5),symbol:t.symbol}]),rows:5,roundId:round.roundId,hasWin:!!plan.steps.length,feature:bonus,speedProfile:fast?'quick':'normal'});if(g!==generation)return false;
   for(const step of plan.steps){
    draw(step.grid,{wins:step.wins,activeWilds:step.activeWilds});$('critterCascade').textContent='CASCADE '+(step.index+1);$('critterStatus').textContent='CLUSTER WIN · '+fmt(step.winX*multiplier)+'×';$('critterMessage').textContent=step.wins.map(w=>name(w.symbol)+' · '+w.size+' CONNECTED').join(' / ');shownX=M.round(Math.min(C.maxWinX,shownX+step.winX*multiplier));render();tone();await sleep(fast?230:550);if(g!==generation)return false;
    if(!step.gravityGrid)break;
    const removed=new Set(step.removed);cells.forEach(n=>{if(removed.has(Number(n.dataset.uid)))n.classList.add('removing');});await sleep(fast?100:200);if(g!==generation)return false;
    draw(step.gravityGrid);$('critterStatus').textContent='REFILL';const refill=step.gravityGrid.flatMap((t,i)=>{const previous=step.grid.findIndex(x=>x.uid===t.uid);return previous===i?[]:[{node:cells[i],column:i%5,row:Math.floor(i/5),symbol:t.symbol,fromRows:previous<0?undefined:Math.max(1,Math.floor(i/5)-Math.floor(previous/5))}];});await VaultSymbolDrop.play(C.id,{root:gridEl,cells:refill,rows:5,roundId:round.roundId,phase:'cascade',settle:false,speedProfile:fast?'quick':'normal'});if(g!==generation)return false;
+   if(bonus&&step.moves.length&&!await runBonusWilds(step,g,fast,reduced))return false;
    const visible=structuredClone(step.gravityGrid);
-   for(const move of step.moves){
+   for(const move of bonus?[]:step.moves){
     $('critterStatus').textContent='RUNNING WILD';$('critterMessage').textContent='RACCOON RUN · '+(move.from+1)+' → '+(move.to+1);cells[move.from].classList.add('active-wild','running-source');cells[move.to].classList.add('destination');
     const x=i=>i%5*100+50,y=i=>Math.floor(i/5)*100+50,bend=Math.min(Math.floor(move.from/5),Math.floor(move.to/5))===0?1:-1;$('critterPaths').innerHTML=`<path d="M${x(move.from)},${y(move.from)} Q${(x(move.from)+x(move.to))/2},${Math.max(50,Math.min(450,(y(move.from)+y(move.to))/2+bend*80))} ${x(move.to)},${y(move.to)}"/>`;
-    const runner=document.createElement('img');runner.src=A.wild;runner.className='critter-runner';runner.alt='Running Wild';runner.style.left=(move.from%5*20)+'%';runner.style.top=(Math.floor(move.from/5)*20)+'%';gridEl.append(runner);
+    const runner=makeWildRunner(visible[move.from].multiplier);runner.style.left=(move.from%5*20)+'%';runner.style.top=(Math.floor(move.from/5)*20)+'%';gridEl.append(runner);
     const dx=(move.to%5-move.from%5)*gridEl.clientWidth/5,dy=(Math.floor(move.to/5)-Math.floor(move.from/5))*gridEl.clientHeight/5,startY=Math.floor(move.from/5)*gridEl.clientHeight/5,midY=Math.max(0,Math.min(gridEl.clientHeight*.8,startY+dy/2+bend*gridEl.clientHeight*.08))-startY,duration=reduced?50:fast?190:350;
     if(!reduced)runner.animate([{transform:'translate(0,0) rotate(0)'},{transform:`translate(${dx/2}px,${midY}px) rotate(${dx<0?-8:8}deg) scale(.88)`,offset:.5},{transform:`translate(${dx}px,${dy}px) rotate(0)`}],{duration,fill:'forwards',easing:'ease-in-out'});
     await sleep(duration);if(g!==generation)return false;runner.remove();$('critterPaths').replaceChildren();[visible[move.from],visible[move.to]]=[visible[move.to],visible[move.from]];draw(visible);
@@ -6334,7 +6468,7 @@ const VaultCritter=window.VaultCritter=(()=>{
   }
   draw(plan.finalGrid);$('critterStatus').textContent=plan.limitReached?'CASCADE LIMIT · LAST WIN PAID':'FIELD SETTLED';return true;
  }
- async function reveal(){const g=++generation;busy=true;shownX=0;clearFX();render();$('critterMode').textContent='NEON BACKSTREET · 5×5';$('critterCascade').textContent='CASCADE 0';if(!await showPlan(round.base,g))return;
+ async function reveal(){const g=++generation;busy=true;shownX=0;clearFX();render();$('critterMode').textContent='NEON BACKSTREET · 5×5';$('critterCascade').textContent='CASCADE 0';if(!round.purchaseType&&!await showPlan(round.base,g))return;
   if(round.bonus&&!round.bonus.spins){
    const b=round.bonus,fast=state.fastGame,awards=[{label:'CASH',text:'+'+b.cashX+'×'},{label:'WILD DROP',text:'+'+b.extraWilds+' WILDS'},{label:'MULTIPLIER',text:'×'+b.multiplier}];
    $('critterBonusOverlay').hidden=false;$('critterBonusMessage').textContent='ALL THREE DUMPSTERS · ALL THREE REWARDS';$('critterBonusBins').innerHTML=awards.map(a=>`<div class="critter-bonus-bin"><img src="${A.scatter}" alt="Dumpster"><small>${a.label}</small><strong>?</strong></div>`).join('');$('critterDashRunner').style.left='0';await sleep(fast?350:700);if(g!==generation)return;
@@ -6349,26 +6483,42 @@ const VaultCritter=window.VaultCritter=(()=>{
    for(let i=0;i<b.spins.length;i++){
     $('critterMode').textContent=(b.kind==='super'?'SUPER · ':'')+'BONUS SPIN '+(i+1)+' / '+b.spinCount;
     $('critterCascade').textContent='CASCADE 0';
-    if(!await showPlan(b.spins[i],g,{bonus:true}))return;
+    if(!await showPlan(b.spins[i],g,{bonus:true,persistentPositions:i?b.spins[i-1].finalGrid.flatMap((t,pos)=>t.symbol==='wild'?[pos]:[]):[]}))return;
     $('critterMessage').textContent=b.spins[i].finalGrid.filter(t=>t.symbol==='wild').length+' PERSISTENT WILDS · NEXT SPIN STARTS AT x1';
     await sleep(state.fastGame?220:450);if(g!==generation)return;
    }
   }
   if(g!==generation)return;clearFX();shownX=round.winX;VaultWalletService.releasePresentation('critter');busy=false;render();$('critterStatus').textContent=round.payout?'ROUND WIN · '+fmt(round.winX)+'×':'NO WIN THIS ROUND';$('critterMessage').textContent=round.bonus?`BONUS COMPLETE · ${fmt(round.payout)} TOTAL BANKED`:`ROUND SETTLED · ${fmt(round.payout)} BANKED`;if(VaultStorage.inspect().conflict)VaultSync.flush();schedule();
  }
- function spin(){if(!ready||busy||!VaultRoundService.canPlay(C.id))return;clearTimeout(timer);const next=M.start({seed:crypto.getRandomValues(new Uint32Array(1))[0],bet:BETS[betIndex],roundId:crypto.randomUUID()});VaultWalletService.holdPresentation(C.id,{stake:next.bet});if(!VaultCritterBridge.commit(next)){VaultWalletService.releasePresentation(C.id);auto=0;render();$('critterMessage').textContent='Progress is being restored. Try again shortly.';return;}round=next;if(auto>0)auto--;reveal();}
+ function spin(purchaseType=null){if(![null,'bonus','super'].includes(purchaseType))purchaseType=null;if(!ready||busy||!VaultRoundService.canPlay(C.id))return;clearTimeout(timer);const next=M.start({seed:crypto.getRandomValues(new Uint32Array(1))[0],bet:BETS[betIndex],roundId:crypto.randomUUID(),purchaseType,scatterBoost:!purchaseType&&!!boost});VaultWalletService.holdPresentation(C.id,{stake:M.cost(next)});if(!VaultCritterBridge.commit(next)){VaultWalletService.releasePresentation(C.id);auto=0;render();$('critterMessage').textContent='Progress is being restored. Try again shortly.';return;}round=next;if(auto>0)auto--;reveal();}
  function restore(value){generation++;busy=false;auto=0;shownX=0;clearTimeout(timer);clearFX();if(window.VaultWalletService)VaultWalletService.releasePresentation(C.id);round=M.validate(value);shownX=round?.winX||0;draw(round?(finalGrid(round)):M.cascade(1977).initialGrid);$('critterAutoMenu').hidden=true;$('critterAuto').setAttribute('aria-expanded','false');$('critterMode').textContent=round?.bonus?'DUMPSTER DASH · FINAL RESULT':'NEON BACKSTREET · 5×5';$('critterStatus').textContent=round?'STABLE RESULT RESTORED':'READY FOR CHAOS';$('critterMessage').textContent=round?`ROUND SETTLED · ${fmt(round.payout)} BANKED`:'MATCH CLUSTERS · WATCH THE RACCOONS RUN';render();}
  async function connect(){
   $('critterReconnect').hidden=true;$('critterMessage').textContent='Подключаем Critter Chaos…';
   ready=await VaultCritterBridge.connect();if(currentGame!==C.id)return;
   render();$('critterReconnect').hidden=ready;
-  const messages={schema:'БД не видит функции Critter Chaos. Проверьте выполнение полного supabase_critter_v2.txt в подключённом проекте.',permission:'Нет доступа к функциям Critter Chaos. Проверьте права authenticated из supabase_critter_v2.txt.',version:'Версия функций Critter Chaos несовместима. Выполните актуальный supabase_critter_v2.txt.',connection:'Не удалось проверить Critter Chaos: сервер временно недоступен. Повторим подключение при восстановлении сети.'};
+  const messages={schema:'БД не видит функции Critter Chaos. Проверьте выполнение полного supabase_critter_v3.txt в подключённом проекте.',permission:'Нет доступа к функциям Critter Chaos. Проверьте права authenticated из supabase_critter_v3.txt.',version:'Версия функций Critter Chaos несовместима. Выполните актуальный supabase_critter_v3.txt.',connection:'Не удалось проверить Critter Chaos: сервер временно недоступен. Повторим подключение при восстановлении сети.'};
   $('critterMessage').textContent=ready?'MATCH CLUSTERS · WATCH THE RACCOONS RUN':messages[VaultCritterBridge.connectionError]||messages.connection;schedule();
  }
  async function open(){if(!VaultSession.ready||VaultSession.mode!=='authenticated')return;currentGame=C.id;document.body.classList.remove('lobby-mode','slot-active','poker-active','bird-active','table-active','swamp-active','mines-active','heist-active','magnet-active');document.body.classList.add('game-mode','critter-active');root.hidden=false;VaultStorage.schedule();syncMusic();ready=VaultCritterBridge.ready;render();if(!ready)await connect();else schedule();}
+
+ let shopChoice='boost';
+ function renderShop(){
+  const bet=BETS[betIndex];$('critterShopBet').textContent=fmt(bet);
+  for(const mode of ['boost','bonus','super']){const factor=mode==='boost'?C.features.boostCost:C.features[mode+'Cost'];$('critterPrice'+mode).textContent=fmt(M.round(bet*factor))+' · '+factor+'× BET';}
+  const price=M.cost({bet,purchaseType:shopChoice==='boost'?null:shopChoice,scatterBoost:shopChoice==='boost'});
+  $('critterShopConfirm').disabled=busy||!!auto||!ready||(shopChoice!=='boost'&&price>state.balance);
+  $('critterShopConfirm').textContent=shopChoice==='boost'?(boost?'DISABLE CHANCE BOOST':'ENABLE CHANCE BOOST'):'BUY · '+fmt(price);
+  $('critterShopNote').textContent=shopChoice==='boost'?'При включении деньги не списываются. Указанная полная стоимость оплачивается за каждый следующий SPIN.':(price>state.balance?'Недостаточно средств. ':'')+'Одна покупка за всю бонусную игру. Дополнительной ставки за бонусные спины нет.';
+ }
+ $('critterBuy').onclick=()=>{if(busy||auto||!ready)return;renderShop();$('critterBonusShop').showModal();};
+ root.querySelectorAll('[name="critter-feature"]').forEach(n=>n.onchange=()=>{shopChoice=n.value;renderShop();});
+ $('critterShopMinus').onclick=()=>{if(!busy&&!auto){betIndex=Math.max(0,betIndex-1);render();VaultStorage.schedule();}};
+ $('critterShopPlus').onclick=()=>{if(!busy&&!auto){betIndex=Math.min(BETS.length-1,betIndex+1);render();VaultStorage.schedule();}};
+ $('critterShopCancel').onclick=()=>$('critterBonusShop').close();
+ $('critterShopConfirm').onclick=()=>{if(busy||auto||!ready)return;if(shopChoice==='boost'){boost=!boost;render();VaultStorage.schedule();$('critterBonusShop').close();}else{const mode=shopChoice,price=M.cost({bet:BETS[betIndex],purchaseType:mode});if(price>state.balance)return;$('critterBonusShop').close();spin(mode);}};
  $('critterReconnect').onclick=connect;
  window.addEventListener('online',()=>{if(currentGame===C.id&&!ready)connect();});
- $('openCritterGame').onclick=open;$('critterSpin').onclick=spin;
+ $('openCritterGame').onclick=open;$('critterSpin').onclick=()=>spin();
  for(const [id,d] of [['critterMinus',-1],['critterPlus',1],['critterMax',999]])$(id).onclick=()=>{if(busy||auto)return;betIndex=d===999?BETS.length-1:Math.max(0,Math.min(BETS.length-1,betIndex+d));render();VaultStorage.schedule();};
  $('critterAuto').onclick=()=>{if(auto){auto=0;clearTimeout(timer);$('critterAutoMenu').hidden=true;$('critterAuto').setAttribute('aria-expanded','false');render();return;}$('critterAutoMenu').hidden=!$('critterAutoMenu').hidden;$('critterAuto').setAttribute('aria-expanded',String(!$('critterAutoMenu').hidden));};root.querySelectorAll('[data-critter-auto]').forEach(n=>n.onclick=()=>{auto=Number(n.dataset.critterAuto);$('critterAutoMenu').hidden=true;$('critterAuto').setAttribute('aria-expanded','false');spin();});
  document.addEventListener('click',e=>{if(!e.target.closest('.critter-auto-wrap')){$('critterAutoMenu').hidden=true;$('critterAuto').setAttribute('aria-expanded','false');}});
@@ -6377,9 +6527,9 @@ const VaultCritter=window.VaultCritter=(()=>{
  $('critterPaytable').innerHTML='<div class="critter-pay-row"><b>SYMBOL · × BET</b>'+C.sizes.map(n=>'<b>'+n+'+</b>').join('')+'</div>'+C.symbols.map(s=>'<div class="critter-pay-row"><span>'+art(s.id)+s.name+'</span>'+s.pays.map(p=>'<b>'+fmt(M.round(p*C.payScale))+'×</b>').join('')+'</div>').join('')+'<p class="critter-pay-specials">'+art('wild')+' Wild начинает с x1; после участия в выигрыше удваивается для следующего каскада. В base game перебегает после выигрыша; в бонусе остаётся закреплённым. '+art('scatter')+' 3+ Scatter → Dumpster Dash.</p>';
  $('critterLogo').src=A.logo;$('critterDashRunner').src=A.wild;root.querySelector('.critter-scene').style.backgroundImage=`linear-gradient(#060b1833,#09091a55),url('${A.background}')`;
  for(const src of Object.values(A)){const img=new Image();img.src=src;img.decode?.().catch(()=>{});}
- new MutationObserver(()=>{if(currentGame!==C.id&&!root.hidden){root.hidden=true;restore(round);for(const id of ['critterHelp','critterSettings'])if($(id).open)$(id).close();document.body.classList.remove('critter-active');}}).observe(document.body,{attributes:true,attributeFilter:['class']});
+ new MutationObserver(()=>{if(currentGame!==C.id&&!root.hidden){root.hidden=true;restore(round);for(const id of ['critterHelp','critterSettings','critterBonusShop'])if($(id).open)$(id).close();document.body.classList.remove('critter-active');}}).observe(document.body,{attributes:true,attributeFilter:['class']});
  document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(timer);else if(currentGame===C.id)schedule();});
- restore(null);return {getHudState:()=>({round:round?{status:round.status,payout:round.payout,bonus:!!round.bonus}:null}),open,restore,resume(){if(currentGame===C.id&&!busy){ready=VaultCritterBridge.ready;render();schedule();}},getCheckpoint:()=>round?structuredClone(round):null,get isBusy(){return busy;},get betIndex(){return betIndex;},set betIndex(v){if(Number.isInteger(v)&&v>=0&&v<BETS.length)betIndex=v;render();},inspect:()=>({round:round?structuredClone(round):null,busy,ready,auto})};
+ restore(null);return {getHudState:()=>({spinCost:spinCost(),scatterBoost:!!boost,round:round?{status:round.status,payout:round.payout,bonus:!!round.bonus}:null}),open,restore,resume(){if(currentGame===C.id&&!busy){ready=VaultCritterBridge.ready;render();schedule();}},getCheckpoint:()=>round?structuredClone(round):null,get isBusy(){return busy;},get scatterBoost(){return boost;},set scatterBoost(v){boost=v===true;render();},get betIndex(){return betIndex;},set betIndex(v){if(Number.isInteger(v)&&v>=0&&v<BETS.length)betIndex=v;render();},inspect:()=>({round:round?structuredClone(round):null,busy,ready,auto})};
 })();
 
 </script>
@@ -6395,7 +6545,7 @@ const VaultCritter=window.VaultCritter=(()=>{
   const isId=x=>typeof x==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x);
   const amount=x=>Number.isFinite(Number(x))&&Number(x)>=0&&Number(x)<=1e12?Math.round(Number(x)*1e6)/1e6:null;
   const copy=x=>JSON.parse(JSON.stringify(x));
-  const defaults=()=>({balance:C.guestStartingBalance,revision:0,walletConfirmed:false,settings:{sound:true,music:false,fastGame:false,fastBonus:false,scatterBoost:false},bets:{slot:2,poker:2,bird:1,blackjack:2,baccarat:2,swamp:2,mines:2,vault_heist:2,magnet:2,critter:2,minesCount:3,baccaratType:'PLAYER'},lastGame:'lobby',settingsUpdatedAt:0,recovery:{slotBonus:null,swampBonus:null,minesRound:null,heistRound:null,magnetRound:null,critterRound:null,openRounds:{}},rounds:[],stats:{},queue:[]});
+  const defaults=()=>({balance:C.guestStartingBalance,revision:0,walletConfirmed:false,settings:{sound:true,music:false,fastGame:false,fastBonus:false,scatterBoost:false},bets:{slot:2,poker:2,bird:1,blackjack:2,baccarat:2,swamp:2,mines:2,vault_heist:2,magnet:2,critter:2,critterBoost:false,minesCount:3,baccaratType:'PLAYER'},lastGame:'lobby',settingsUpdatedAt:0,recovery:{slotBonus:null,swampBonus:null,minesRound:null,heistRound:null,magnetRound:null,critterRound:null,openRounds:{}},rounds:[],stats:{},queue:[]});
   const VaultSession=window.VaultSession={mode:'guest',user:null,profile:null,ready:false};
   let authBusy=false;
   let owner='guest',data=defaults(),client=null,clientRevision=0,suppress=false,localTimer=null,syncTimer=null,syncing=null,identityEpoch=0,connecting=null,connectionUser=null,settingsFingerprint='',conflict=false,locked=false,releaseLock=null,lockHeld=false,storageAvailable=true,profileRemote=true;
@@ -6413,7 +6563,7 @@ const VaultCritter=window.VaultCritter=(()=>{
   function read(key){try{return JSON.parse(localStorage.getItem(NS+key)||'null');}catch{return null;}}
   function write(key,value){try{localStorage.setItem(NS+key,JSON.stringify(value));return true;}catch{storageAvailable=false;status('Сохранение недоступно');return false;}}
   function validSettings(input){const out=defaults().settings;for(const key of Object.keys(out))if(typeof input?.[key]==='boolean')out[key]=input[key];return out;}
-  function validBets(input){const out={slot:2,poker:2,bird:1,blackjack:2,baccarat:2,swamp:2,mines:2,vault_heist:2,magnet:2,critter:2,minesCount:3,baccaratType:['PLAYER','BANKER','TIE'].includes(input?.baccaratType)?input.baccaratType:'PLAYER'};for(const game of games){const n=input?.[game],max=game==='bird'?BIRD_BETS.length:BETS.length;if(Number.isInteger(n)&&n>=0&&n<max)out[game]=n;}if(Number.isInteger(input?.minesCount)&&input.minesCount>=1&&input.minesCount<=24)out.minesCount=input.minesCount;return out;}
+  function validBets(input){const out={slot:2,poker:2,bird:1,blackjack:2,baccarat:2,swamp:2,mines:2,vault_heist:2,magnet:2,critter:2,critterBoost:false,minesCount:3,baccaratType:['PLAYER','BANKER','TIE'].includes(input?.baccaratType)?input.baccaratType:'PLAYER'};for(const game of games){const n=input?.[game],max=game==='bird'?BIRD_BETS.length:BETS.length;if(Number.isInteger(n)&&n>=0&&n<max)out[game]=n;}if(Number.isInteger(input?.minesCount)&&input.minesCount>=1&&input.minesCount<=24)out.minesCount=input.minesCount;if(typeof input?.critterBoost==='boolean')out.critterBoost=input.critterBoost;return out;}
   function validBonus(b){
     if(!b||!['normal','super'].includes(b.type)||!Number.isInteger(b.size)||b.size<5||b.size>8||!Number.isInteger(b.freeSpins)||b.freeSpins<0||b.freeSpins>5000)return null;
     const entries=Array.isArray(b.sticky)?b.sticky.filter(entry=>Array.isArray(entry)&&entry.length===2).filter(([k,v])=>typeof k==='string'&&/^\d,\d$/.test(k)&&SYMBOLS[v]&&v.startsWith('wild')&&k.split(',').every(n=>Number(n)<b.size)):[];
@@ -6437,7 +6587,7 @@ const VaultCritter=window.VaultCritter=(()=>{
   }
   function capturePreferences(){
     const settings={sound:state.sound,music:state.music,fastGame:state.fastGame,fastBonus:state.fastBonus,scatterBoost:state.scatterBoost};
-    const bets={slot:state.betIndex,poker:pokerState.betIndex,bird:birdState.betIndex,...VaultTables.preferences(),swamp:VaultSwamp.betIndex,...VaultMines.preferences(),vault_heist:VaultHeist.betIndex,magnet:VaultMagnet.betIndex,critter:VaultCritter.betIndex};
+    const bets={slot:state.betIndex,poker:pokerState.betIndex,bird:birdState.betIndex,...VaultTables.preferences(),swamp:VaultSwamp.betIndex,...VaultMines.preferences(),vault_heist:VaultHeist.betIndex,magnet:VaultMagnet.betIndex,critter:VaultCritter.betIndex,critterBoost:VaultCritter.scatterBoost};
     const fingerprint=JSON.stringify({settings,bets,lastGame:currentGame});
     if(fingerprint!==settingsFingerprint){settingsFingerprint=fingerprint;data.settings=settings;data.bets=bets;data.lastGame=screens.includes(currentGame)?currentGame:'lobby';data.settingsUpdatedAt=Date.now();
       if(VaultSession.mode==='authenticated')enqueue('settings',{settings:{...settings,bets,lastGame:data.lastGame},updatedAt:new Date(data.settingsUpdatedAt).toISOString()});
@@ -6509,7 +6659,7 @@ const VaultCritter=window.VaultCritter=(()=>{
     async connect(){
       if(critterSupport)return true;if(!client||owner==='guest')return false;
       if(critterConnection)return critterConnection;
-      const known=read('critter-schema'),cached=known?.version===2&&known.project===C.supabaseUrl;
+      const known=read('critter-schema'),cached=known?.version===3&&known.project===C.supabaseUrl;
       if(!navigator.onLine&&cached){critterSupport=true;return true;}
       critterConnectionError='';const expectedOwner=owner;
       critterConnection=(async()=>{
@@ -6524,8 +6674,8 @@ const VaultCritter=window.VaultCritter=(()=>{
               critterConnectionError=error.code==='PGRST202'||responseStatus===404?'schema':responseStatus===401||responseStatus===403||error.code==='42501'?'permission':'connection';
               console.error('VAULT Critter connection failed',{code:error.code,status:responseStatus,message:error.message});return false;
             }
-            critterSupport=cap?.version===2;
-            if(critterSupport)write('critter-schema',{version:2,project:C.supabaseUrl});else critterConnectionError='version';
+            critterSupport=cap?.version>=2&&cap?.featuresVersion===3;
+            if(critterSupport)write('critter-schema',{version:3,project:C.supabaseUrl});else critterConnectionError='version';
             return critterSupport;
           }catch(error){
             if(owner!==expectedOwner)return false;
@@ -6539,12 +6689,12 @@ const VaultCritter=window.VaultCritter=(()=>{
     },
     commit(candidate){
       if(!critterSupport||!VaultRoundService.canPlay('critter')||!storageAvailable||data.queue.length>=C.maxPendingEvents-2)return false;
-      const r=CRITTER_MODEL.validate(candidate);if(!r||r.bet>canonicalBalance||data.rounds.some(x=>x.roundId===r.roundId)||data.recovery.critterRound?.roundId===r.roundId)return false;
-      const balance=amount(canonicalBalance-r.bet+r.payout);if(balance===null)return false;
+      const r=CRITTER_MODEL.validate(candidate);if(!r||CRITTER_MODEL.cost(r)>canonicalBalance||data.rounds.some(x=>x.roundId===r.roundId)||data.recovery.critterRound?.roundId===r.roundId)return false;
+      const balance=amount(canonicalBalance-CRITTER_MODEL.cost(r)+r.payout);if(balance===null)return false;
       const rollback={balance:canonicalBalance,revision:clientRevision,mutation:walletMutation,queue:[...data.queue],rounds:[...data.rounds],stats:data.stats.critter?copy(data.stats.critter):null,checkpoint:data.recovery.critterRound};
       if(enqueue('critter',{p_round_id:r.roundId,p_expected_revision:clientRevision,p_checkpoint:r})===false)return false;
       clientRevision++;canonicalBalance=balance;data.balance=balance;walletMutation++;data.recovery.critterRound=copy(r);
-      const record={roundId:r.roundId,gameId:'critter',status:'settled',bet:r.bet,stake:r.bet,payout:r.payout,multiplier:r.winX,result:r.result,metadata:{seed:r.seed,bonus:!!r.bonus,cascades:r.base.steps.length+(r.bonus?.spins||[r.bonus?.plan]).filter(Boolean).reduce((n,p)=>n+p.steps.length,0),runningWilds:[r.base,...(r.bonus?.spins||(r.bonus?[r.bonus.plan]:[]))].flatMap(p=>p.steps).reduce((n,s)=>n+s.moves.length,0)},startedAt:Date.now(),settledAt:Date.now()};
+      const record={roundId:r.roundId,gameId:'critter',status:'settled',bet:CRITTER_MODEL.cost(r),stake:r.bet,payout:r.payout,multiplier:r.winX,result:r.result,metadata:{seed:r.seed,purchaseType:r.purchaseType||null,scatterBoost:!!r.scatterBoost,baseBet:r.bet,cost:CRITTER_MODEL.cost(r),bonus:!!r.bonus,cascades:r.base.steps.length+(r.bonus?.spins||[r.bonus?.plan]).filter(Boolean).reduce((n,p)=>n+p.steps.length,0),runningWilds:[r.base,...(r.bonus?.spins||(r.bonus?[r.bonus.plan]:[]))].flatMap(p=>p.steps).reduce((n,s)=>n+s.moves.length,0)},startedAt:Date.now(),settledAt:Date.now()};
       data.rounds.push(record);data.rounds=data.rounds.slice(-C.maxLocalRounds);localStats(record);
       if(!VaultStorage.saveLocalState()){
         canonicalBalance=rollback.balance;data.balance=rollback.balance;clientRevision=rollback.revision;walletMutation=rollback.mutation;data.queue=rollback.queue;data.rounds=rollback.rounds;data.recovery.critterRound=rollback.checkpoint;
@@ -6702,7 +6852,7 @@ const VaultCritter=window.VaultCritter=(()=>{
     },
     cancelInterrupted(game){const r=data.recovery.openRounds[game];if(r)VaultRoundService.finish(game,'interrupted','cancelled',{recovery:'safe-reset-no-refund'});},
   };
-  function restorePreferences(){Object.assign(state,data.settings);state.betIndex=data.bets.slot;pokerState.betIndex=data.bets.poker;birdState.betIndex=data.bets.bird;VaultTables.restore(data.bets);VaultSwamp.betIndex=data.bets.swamp;VaultMines.restorePreferences(data.bets);VaultHeist.betIndex=data.bets.vault_heist;VaultMagnet.betIndex=data.bets.magnet;VaultCritter.betIndex=data.bets.critter;settingsFingerprint=JSON.stringify({settings:data.settings,bets:data.bets,lastGame:data.lastGame});}
+  function restorePreferences(){Object.assign(state,data.settings);state.betIndex=data.bets.slot;pokerState.betIndex=data.bets.poker;birdState.betIndex=data.bets.bird;VaultTables.restore(data.bets);VaultSwamp.betIndex=data.bets.swamp;VaultMines.restorePreferences(data.bets);VaultHeist.betIndex=data.bets.vault_heist;VaultMagnet.betIndex=data.bets.magnet;VaultCritter.betIndex=data.bets.critter;VaultCritter.scatterBoost=data.bets.critterBoost;settingsFingerprint=JSON.stringify({settings:data.settings,bets:data.bets,lastGame:data.lastGame});}
   function showSavedScreen(){if(VaultSession.mode!=='authenticated'){openLobby();return;}const open={lobby:openLobby,slot:openSlotGame,poker:openPokerGame,bird:openBirdGame,blackjack:()=>VaultTables.open('blackjack'),baccarat:()=>VaultTables.open('baccarat'),swamp:()=>VaultSwamp.open(),mines:()=>VaultMines.open(),vault_heist:()=>VaultHeist.open(),magnet:()=>VaultMagnet.open(),critter:()=>VaultCritter.open()};open[data.lastGame]();updateUI();updatePokerUI();updateBirdUI();drawBirdGame();updateSettingsUI();}
   function renderIdentity(){
     const signedIn=VaultSession.mode==='authenticated';byId('vaultProfileMenu').open=false;document.body.classList.toggle('vault-signed-out',!signedIn);
@@ -6794,8 +6944,8 @@ const VaultCritter=window.VaultCritter=(()=>{
           if(event.type==='critter'){
             const candidate=CRITTER_MODEL.validate(payload.p_checkpoint);if(!candidate)continue;
             if(round&&round.status==='settled')continue;
-            if(candidate.bet>balance||window.VaultAccess?.isBlocked){rejected.add(id);continue;}
-            payload.p_expected_revision=revision;balance=amount(balance-candidate.bet+candidate.payout);revision++;critterCursor=candidate;next.push(event);continue;
+            if(CRITTER_MODEL.cost(candidate)>balance||window.VaultAccess?.isBlocked){rejected.add(id);continue;}
+            payload.p_expected_revision=revision;balance=amount(balance-CRITTER_MODEL.cost(candidate)+candidate.payout);revision++;critterCursor=candidate;next.push(event);continue;
           }
           if(event.type==='magnet'){
             const candidate=MAGNET_ROUNDS.validate(payload.p_checkpoint);if(!candidate)continue;
@@ -7071,7 +7221,7 @@ const VaultCritter=window.VaultCritter=(()=>{
   {id:'swamp',name:'Swamp Fishing',root:'#swampApp',scene:'.swamp-scene',frame:'.swamp-frame',bar:'.swamp-controls',top:'.swamp-result',minus:'swampBetMinus',plus:'swampBetPlus',bet:'swampBetValue',max:'swampMaxBet',spin:'swampSpin',auto:'swampAuto',buy:'swampBuy',shop:'swampBonusShop',win:'swampLastWin',choices:'[data-swamp-auto]',count:'swampAuto',help:'.swamp-info-body',pay:'swampPaytable'},
   {id:'vault_heist',name:'VAULT Heist',root:'#heistApp',scene:'.heist-scene',frame:'.heist-frame',bar:'.heist-controls',top:'.heist-hud',minus:'heistMinus',plus:'heistPlus',bet:'heistBet',max:'heistMax',spin:'heistSpin',auto:'heistAuto',buy:'heistBuy',shop:'heistBonusShop',win:'heistBaseWin',choices:'[data-heist-auto]',count:'heistAuto',help:'#heistHelp',pay:'heistPaytable',hide:['#heistHelpOpen']},
   {id:'magnet',name:'MAGNET',root:'#magnetApp',scene:'.magnet-scene',frame:'.magnet-apparatus',bar:'.magnet-controls',top:'.magnet-readout',minus:'magnetMinus',plus:'magnetPlus',bet:'magnetBet',max:'magnetMax',spin:'magnetSpin',auto:'magnetAuto',win:'magnetWin',choices:'[data-magnet-auto]',count:'magnetAuto',help:'#magnetHelp',pay:'magnetPaytable',hide:['.magnet-result','.magnet-v2-balance','#magnetHelpOpen']},
-  {id:'critter',name:'Critter Chaos',root:'#critterApp',scene:'.critter-scene',frame:'.critter-frame',bar:'.critter-controls',top:'.critter-readout',minus:'critterMinus',plus:'critterPlus',bet:'critterBet',max:'critterMax',spin:'critterSpin',auto:'critterAuto',win:'critterWin',choices:'[data-critter-auto]',count:'critterAuto',help:'#critterHelp',pay:'critterPaytable',hide:['.critter-wallet','#critterHelpOpen']}
+  {id:'critter',name:'Critter Chaos',root:'#critterApp',scene:'.critter-scene',frame:'.critter-frame',bar:'.critter-controls',top:'.critter-readout',minus:'critterMinus',plus:'critterPlus',bet:'critterBet',max:'critterMax',spin:'critterSpin',auto:'critterAuto',buy:'critterBuy',shop:'critterBonusShop',win:'critterWin',choices:'[data-critter-auto]',count:'critterAuto',help:'#critterHelp',pay:'critterPaytable',hide:['.critter-wallet','#critterHelpOpen']}
  ];
  const controllers={swamp:()=>window.VaultSwamp,vault_heist:()=>window.VaultHeist,magnet:()=>window.VaultMagnet,critter:()=>window.VaultCritter};
  function snapshot(c){
@@ -7084,9 +7234,9 @@ const VaultCritter=window.VaultCritter=(()=>{
   if(c.id==='swamp')featureInfo=bonus?`${bonus.remaining} FREE SPINS · ${$('swampCurrentMultiplier').textContent}`:'';
   if(c.id==='vault_heist'){statusText=round?.status==='CHOICE'?'COLLECT OR GO DEEPER':busy?'RESOLVING':feature?'HEIST ACTIVE':'BASE GAME';featureInfo=feature?`${$('heistStageLabel').textContent} · ${$('heistLoot').textContent}`:'';}
   if(c.id==='magnet'){statusText=$('magnetPhaseLabel').textContent||statusText;featureInfo=feature?`${$('magnetCounter').textContent} · ${$('magnetMultiplier').textContent}`:'';}
-  if(c.id==='critter'){const inBonus=busy&&$('critterMode').textContent.includes('BONUS SPIN');statusText=inBonus?'BONUS GAME':busy?($('critterStatus').textContent.includes('CASCADE')?'RESOLVING':'SPINNING'):'BASE GAME';featureInfo=inBonus?$('critterMode').textContent:busy?$('critterCascade').textContent:'';}
+  if(c.id==='critter'){const inBonus=busy&&$('critterMode').textContent.includes('BONUS SPIN');statusText=inBonus?'BONUS GAME':busy?($('critterStatus').textContent.includes('CASCADE')?'RESOLVING':'SPINNING'):'BASE GAME';featureInfo=inBonus?$('critterMode').textContent:busy?$('critterCascade').textContent:details?.scatterBoost?'CHANCE BOOST · SPIN '+Number(details.spinCost).toLocaleString('ru-RU'):'';}
   const canChangeBet=!$(c.minus).disabled&&!busy;
-  const insufficient=!feature&&BETS[c.id==='slot'?state.betIndex:controller?.betIndex||0]>state.balance;
+  const insufficient=c.id==='critter'?details?.spinCost>state.balance:!feature&&BETS[c.id==='slot'?state.betIndex:controller?.betIndex||0]>state.balance;
   return {balance:VaultWalletService.formatBalance(),bet:c.id==='slot'?bet():BETS[controller?.betIndex||0],betSteps:BETS,win:c.id==='vault_heist'&&round?.status==='SETTLED'?Number(round.payout).toLocaleString('ru-RU'):$(c.win).textContent,state:busy?'SPINNING':feature?'BONUS_ACTIVE':autoplayRemaining?'AUTOPLAY':insufficient?'INSUFFICIENT_BALANCE':$(c.spin).disabled?'DISABLED':'IDLE',autoplayRemaining,canSpin:!$(c.spin).disabled,canChangeBet,canBuyBonus:!!c.buy&&!$(c.buy).disabled,statusText,featureInfo,busy,feature};
  }
  const instances=[];

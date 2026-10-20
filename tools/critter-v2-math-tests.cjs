@@ -1,4 +1,4 @@
-const assert=require('node:assert/strict'),M=require('../critter/model'),C=M.config,id='11111111-1111-4111-8111-111111111111';
+const assert=require('node:assert/strict'),M=require('../critter/model-v2'),C=M.config,id='11111111-1111-4111-8111-111111111111';
 assert.deepEqual(C.symbols,M.legacy.config.symbols,'raw paytable/weights changed');for(const key of ['wildChance','scatterChance','minCluster','maxCascades','maxWinX'])assert.equal(C[key],M.legacy.config[key]);assert.equal(M.legacy.config.payScale,3.7256);const a=M.seeded(19),b=M.legacy.seeded(19);for(let i=0;i<1000;i++)assert.equal(a(),b(),'PRNG changed');
 const strip=g=>g.map(({uid,symbol})=>({uid,symbol}));
 let bonus=0,superBonus=0,moves=0,chain8=false;

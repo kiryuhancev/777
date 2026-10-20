@@ -1,7 +1,7 @@
 /* Simulation-only instrumentation: omit trace snapshots, execute the same source math. */
 const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path'),assert=require('node:assert/strict');
 function load(name,legacy){const source=fs.readFileSync(path.join(__dirname,'../critter',name),'utf8');assert(source.includes('const copy=v=>JSON.parse(JSON.stringify(v))'));const module={exports:{}};vm.runInNewContext(source.replace('const copy=v=>JSON.parse(JSON.stringify(v))','const copy=v=>v'),{module,require:p=>p==='./model-v1.js'?legacy:require(path.join(__dirname,'../critter',p))});return module.exports;}
-const legacy=load('model-v1.js'),fast=load('model.js',legacy),M=require('../critter/model'),id='11111111-1111-4111-8111-111111111111';
+const legacy=load('model-v1.js'),fast=load('model-v2.js',legacy),M=require('../critter/model-v2'),id='11111111-1111-4111-8111-111111111111';
 // Snapshot references may change; RNG, plans' wins, final grids and financial totals must not.
 for(let seed=0;seed<10000;seed++){
  const args={seed,bet:1,roundId:id},a=M.start(args),b=fast.start(args);

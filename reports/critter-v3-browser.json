@@ -1,0 +1,12 @@
+{
+  "mode": "owned actual SDK fixtures",
+  "passed": [
+    "BONUS in shared HUD; three choices; Cancel; current bet and prices update immediately",
+    "320\u20131440px: original uniform SVG transform, cat proportions, no page/dialog overflow",
+    "Real boost flag frozen in checkpoint; free toggle, one correct boosted debit; isolated game preference survives F5 without changing other slots",
+    "Purchased normal bonus: real Wild jump with multiplier badge, exact final field/payout, one debit, no residual runner",
+    "SUPER completes all20 spins without hang and pays exact model result",
+    "SUPER20 spins; F5 restores stable terminal result, no duplicated purchase/payout/statistics",
+    "Total-cost affordability; no duplicate IDs, console/page errors"
+  ]
+}
