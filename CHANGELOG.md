@@ -1,3 +1,11 @@
+# Critter Chaos — новый неоновый cluster slot
+
+- Новая самостоятельная игра5×5 из приложенного light ZIP: все8 исходных символов, оригинальные енот-WILD и мусорный SCATTER, отдельный neon-alley background и карточка SLOTS.
+- Кластеры5+, каскады и Running Wild: выигравший енот после refill последовательно перебегает в случайную обычную клетку. 3+ Scatter → полноценный короткий Dumpster Dash с cash, Wild drop и множителем.
+- Общий personal wallet, одно атомарное settle на весь paid round/бонус, safe F5, bounded offline outbox, automatic revision rebase. Дополнительный `supabase_critter.txt`, без сброса данных.
+- 100k paid cycles: sampled RTP96.4994%, bonus.84% (~1/119), hit26.524%. Проверены чистая модель, PostgreSQL/RLS, Chromium normal/FAST/F5/два устройства/мобильные размеры. Подробности: [CRITTER_CHAOS.md](CRITTER_CHAOS.md).
+- Девять существующих игр, Featured, auth, MAGNET bridge и канонические денежные методы сохранены.
+
 # MAGNET v2 — WHEEL + MAGNET CHAMBER
 
 - Новый source of truth: light ZIP с updated prompt. Обычная игра больше не запускает постоянные магнитные цепочки; отдельный WHEEL с шестью эффектами, новые оригинальные Wheel/Scatter.

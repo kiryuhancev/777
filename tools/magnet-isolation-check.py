@@ -4,9 +4,10 @@ import subprocess,re,hashlib,json
 ROOT=Path(__file__).resolve().parent.parent
 baseline='1292196'
 old=subprocess.check_output(['git','show',baseline+':index.html'],cwd=ROOT).decode();new=(ROOT/'index.html').read_text()
-for name in ['MAGNET STYLES','MAGNET SCREEN','MAGNET MODULE','VAULT RUNTIME']:
+for name in ['MAGNET STYLES','MAGNET SCREEN','MAGNET MODULE','CRITTER STYLES','CRITTER SCREEN','CRITTER MODULE','VAULT RUNTIME']:
  pattern=r'<!-- BEGIN '+name+r' -->[\s\S]*?<!-- END '+name+r' -->';old=re.sub(pattern,'',old);new=re.sub(pattern,'',new)
 new=re.sub(r'<button class="game-card playable" id="openMagnetGame"[\s\S]*?</button>','',new).replace("{id:'magnet',element:'openMagnetGame',category:'slots',isNew:true},",'')
+new=re.sub(r'<button class="game-card playable" id="openCritterGame"[\s\S]*?</button>','',new).replace("{id:'critter',element:'openCritterGame',category:'slots',isNew:true},",'')
 assert '\n'.join(l for l in old.splitlines() if l.strip())=='\n'.join(l for l in new.splitlines() if l.strip()),'Existing game/lobby HTML changed'
 oldruntime=subprocess.check_output(['git','show',baseline+':vault/runtime.js'],cwd=ROOT).decode();runtime=(ROOT/'vault/runtime.js').read_text()
 assert oldruntime[oldruntime.index('async function loadSDK()'):]==runtime[runtime.index('async function loadSDK()'):],'Auth changed'

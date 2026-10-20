@@ -1,0 +1,81 @@
+body.critter-active .app,body.critter-active #slotApp,body.critter-active #pokerApp,body.critter-active #birdApp,body.critter-active #swampApp,body.critter-active #minesApp,body.critter-active #heistApp,body.critter-active #magnetApp,body.critter-active .vault-table{display:none!important}
+#critterApp[hidden],#critterApp [hidden]{display:none!important}
+#critterApp{font:14px Arial,sans-serif;color:#fff0cf;padding:0 10px 24px;font-variant-numeric:tabular-nums}
+#critterApp *{box-sizing:border-box}
+#critterApp small{display:block;font-size:9px;letter-spacing:.12em;color:#c4cedf}
+#critterApp button{font:800 12px Arial;letter-spacing:.04em;cursor:pointer;color:#ffeabd;background:linear-gradient(#33435a,#11172c 45%,#111329);border:1px solid #7c849b;border-radius:10px;padding:12px 15px;box-shadow:inset 0 0 0 2px #0c1020,0 3px 8px #0008}
+#critterApp button:hover:enabled{border-color:#ffce60;background:#273c50}
+#critterApp button:disabled{opacity:.45;cursor:default}
+#critterApp :focus-visible{outline:3px solid #5fe7e1;outline-offset:3px}
+#critterApp .critter-scene{position:relative;isolation:isolate;max-width:1650px;min-height:800px;margin:auto;border:1px solid #7e517f;border-radius:12px;background-color:#070c1a;background-size:cover;background-position:center;display:flex;flex-direction:column;align-items:center;padding:15px 25px 25px;overflow:hidden;box-shadow:inset 0 0 120px #05051099}
+#critterApp .critter-scene:before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse,#07101a22,#08071977)}
+#critterApp .critter-heading{display:flex;justify-content:space-between;align-items:center;width:min(1000px,100%);gap:20px}
+#critterApp #critterLogo{display:block;width:min(470px,65%);height:auto;mix-blend-mode:screen}
+#critterApp .critter-heading button{font-size:10px;background:#0b1328dc}
+#critterApp .critter-readout{display:flex;justify-content:space-between;align-items:center;width:min(680px,100%);padding:12px 18px;background:#0c1325ed;border:1px solid #a68874;border-radius:12px 12px 0 0;gap:14px}
+#critterApp .critter-readout>div:last-child{text-align:right}
+#critterApp .critter-readout strong{display:block;margin-top:6px;font-size:14px;letter-spacing:.03em;color:#72efe7}
+#critterApp #critterWin{font-size:23px;color:#ffe49e}
+#critterApp .critter-frame{width:min(700px,100%);padding:13px;border:3px solid #b8843b;border-top-color:#f4cf6f;border-bottom-color:#825294;border-radius:14px;background:linear-gradient(130deg,#60473d,#172132 15%,#1b1330 85%,#63475e);box-shadow:inset 0 0 0 3px #070e19,0 0 22px #26dbef22,0 12px 40px #000b}
+#critterApp .critter-rail{display:flex;justify-content:space-between;font-size:8px;font-weight:bold;letter-spacing:.1em;padding:0 6px 10px;color:#edd9a6}
+#critterApp .critter-grid{position:relative;aspect-ratio:1;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(5,minmax(0,1fr));border:1px solid #72839c;background:#040916;overflow:hidden;isolation:isolate}
+#critterApp .critter-cell{position:relative;min-width:0;min-height:0;display:grid;place-items:center;padding:4px;background:radial-gradient(ellipse,#142432,#060b16 80%);border:1px solid #34445c77;transition:background .16s,opacity .16s}
+#critterApp .critter-cell svg,#critterApp .critter-cell img{width:98%;height:98%;display:block;object-fit:contain;overflow:hidden;mix-blend-mode:screen}
+#critterApp .critter-cell[data-symbol='wild']{border-color:#f9b84d99;background:radial-gradient(#4a3218,#060a15 80%)}
+#critterApp .critter-cell[data-symbol='scatter']{border-color:#52efe099;background:radial-gradient(#163f45,#060a15 80%)}
+#critterApp .critter-cell.winning{background:#64571f77;box-shadow:inset 0 0 0 3px #ffe7a0;z-index:2}
+#critterApp .critter-cell.active-wild:after{content:'RUN!';position:absolute;top:4px;left:4px;padding:3px 5px;color:#151b27;background:#ffda65;border-radius:4px;font:bold 9px Arial}
+#critterApp .critter-cell.removing{animation:critter-pop .2s ease forwards}
+#critterApp .critter-cell.destination{box-shadow:inset 0 0 0 3px #58fff0;background:#25696577;z-index:2}
+#critterApp .critter-cell.running-source img{opacity:.15}
+#critterApp .critter-cell.falling{animation:critter-fall .3s ease-out}
+#critterApp.critter-reeling .critter-cell{animation:critter-reel .6s ease-out;animation-delay:calc(var(--column)*45ms)}
+#critterApp.critter-fast.critter-reeling .critter-cell{animation-duration:.22s;animation-delay:calc(var(--column)*20ms)}
+#critterApp #critterPaths{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
+#critterApp #critterPaths path{stroke:#63ffe6;stroke-width:4;fill:none;stroke-dasharray:6 5;animation:critter-trail .3s linear infinite}
+#critterApp .critter-runner{position:absolute;width:20%;height:20%;object-fit:contain;z-index:8;filter:drop-shadow(0 0 7px #ffcc4f);pointer-events:none;transition:none}
+#critterApp #critterMessage{font-size:10px;line-height:1.6;min-height:30px;text-align:center;margin:12px 2px 0;color:#f1e2b5}
+#critterApp .critter-controls{display:grid;grid-template-columns:52px 190px 65px 110px 82px;align-items:center;gap:12px;margin:17px 0 0;max-width:100%;padding:13px;border:1px solid #ae955b;background:linear-gradient(#25314a,#10172be8);border-radius:15px;box-shadow:0 10px 25px #0009}
+#critterApp .critter-bet{display:grid;grid-template-columns:35px minmax(0,1fr) 35px;align-items:center;background:#090f21;border:1px solid #627991;border-radius:10px;height:49px;text-align:center;min-width:0}
+#critterApp .critter-bet button{padding:7px;background:none;border:0;box-shadow:none;font-size:21px;color:#f3d999}
+#critterApp .critter-bet strong{display:block;font-size:17px;margin-top:3px}
+#critterApp #critterSpin{font-size:17px;color:#112331;background:linear-gradient(#fff0a0,#ffc455 50%,#ee8a29);border:2px solid #ffe48a;border-radius:50%;width:102px;height:102px;box-shadow:inset 0 0 0 5px #d88d31,0 0 0 4px #122940,0 0 20px #ffc45533}
+#critterApp .critter-auto-wrap{position:relative}
+#critterApp #critterAuto{width:100%}
+#critterApp #critterAutoMenu{position:absolute;bottom:calc(100% + 15px);right:0;width:240px;padding:12px;background:#0b1429;border:1px solid #d6bd7a;border-radius:10px;z-index:12;display:flex;gap:5px;flex-wrap:wrap}
+#critterApp #critterAutoMenu small{width:100%;margin-bottom:7px}
+#critterApp #critterAutoMenu button{padding:9px 10px}
+#critterApp .critter-wallet{text-align:center;margin-top:16px}
+#critterApp .critter-wallet strong{display:block;font-size:21px;margin-top:5px}
+#critterApp .critter-wallet p{font-size:8px;letter-spacing:.12em;color:#c5bdcd;margin:10px 0 0}
+#critterApp dialog{width:min(780px,94vw);max-height:85dvh;overflow:auto;border:1px solid #edc164;border-radius:15px;padding:25px;color:#f5e1b6;background:#0c1428;box-shadow:0 15px 80px #000c}
+#critterApp dialog::backdrop{background:#02040ee6;backdrop-filter:blur(4px)}
+#critterApp dialog h2{font-size:20px;color:#ffe598}
+#critterApp dialog p{font-size:12px;line-height:1.8}
+#critterApp #critterHelpClose{float:right;margin-bottom:15px}
+#critterApp #critterSettings button{margin:6px}
+#critterApp #critterPaytable{overflow-x:auto;clear:both}
+#critterApp .critter-pay-row{display:grid;grid-template-columns:minmax(120px,2fr) repeat(7,minmax(40px,1fr));align-items:center;gap:7px;min-width:560px;border-bottom:1px solid #384561;padding:7px 0;font-size:10px}
+#critterApp .critter-pay-row span{display:flex;align-items:center;gap:8px}
+#critterApp .critter-pay-row svg,#critterApp .critter-pay-row img{width:42px;height:47px;flex-shrink:0}
+#critterApp .critter-pay-specials{display:flex;gap:10px;align-items:center}
+#critterApp .critter-pay-specials img{width:55px;height:60px;object-fit:contain;flex-shrink:0}
+#critterApp .critter-bonus-overlay{position:fixed;inset:0;z-index:1100;display:grid;place-items:center;background:#030919ef;backdrop-filter:blur(5px);padding:15px}
+#critterApp .critter-bonus-card{width:min(850px,100%);max-height:95dvh;overflow:auto;text-align:center;border:2px solid #f8c361;border-radius:24px;background:radial-gradient(ellipse at top,#2b4357,#0c142d 70%);padding:30px 18px;box-shadow:0 0 45px #a545ff44}
+#critterApp .critter-bonus-card h2{font:1000 clamp(25px,5vw,45px) Arial;margin:15px 0;color:#ffe58c;text-shadow:2px 3px #792d23}
+#critterApp .critter-bonus-card p{font-size:12px;line-height:1.7;color:#b9dbdc}
+#critterApp .critter-bonus-bins{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+#critterApp .critter-bonus-bin{border:1px solid #5d748f;background:#071224;border-radius:12px;padding:12px 5px;min-width:0;transition:background .2s,box-shadow .2s}
+#critterApp .critter-bonus-bin img{width:100%;max-height:180px;object-fit:contain;mix-blend-mode:screen}
+#critterApp .critter-bonus-bin strong{display:block;font-size:18px;margin:8px 0;color:#fff1a8;min-height:23px}
+#critterApp .critter-bonus-bin.revealed{background:#2d462c;border-color:#ffdc83;box-shadow:inset 0 0 25px #f3c87522}
+#critterApp .critter-dash-track{position:relative;height:100px;margin:20px 0}
+#critterApp .critter-dash-track i{position:absolute;bottom:4px;left:0;right:0;border-bottom:2px dashed #ffce7766}
+#critterApp #critterDashRunner{position:absolute;left:0;bottom:4px;width:95px;height:95px;object-fit:contain;mix-blend-mode:screen;transition:left .45s ease-out;z-index:1}
+#critterLobbyArt{width:100%;height:100%;object-fit:cover}
+@keyframes critter-pop{to{scale:.3;opacity:0}}
+@keyframes critter-fall{from{translate:0 -35%;opacity:.3}to{translate:0 0;opacity:1}}
+@keyframes critter-reel{from{translate:0 -40%;filter:blur(2px)}to{translate:0 0;filter:blur(0)}}
+@keyframes critter-trail{to{stroke-dashoffset:-22}}
+@media(max-width:750px){#critterApp{padding:0 5px 20px}#critterApp .critter-scene{padding:8px 8px 20px;min-height:0;background-size:auto 100%}#critterApp .critter-heading{gap:8px;margin:8px 0}#critterApp .critter-heading button{font-size:8px;padding:10px 9px}#critterApp .critter-readout{padding:10px;gap:8px}#critterApp .critter-readout small{font-size:7px}#critterApp .critter-readout strong{font-size:10px}#critterApp #critterWin{font-size:18px}#critterApp .critter-frame{padding:7px;border-width:2px}#critterApp .critter-rail{font-size:6px;padding:3px 1px 9px;letter-spacing:.04em}#critterApp .critter-cell{padding:2px}#critterApp #critterMessage{font-size:8px;min-height:37px}#critterApp .critter-cell.active-wild:after{font-size:6px;left:1px;top:1px;padding:2px}#critterApp .critter-controls{width:100%;grid-template-columns:44px minmax(0,1fr) 55px;grid-template-rows:45px 95px;padding:12px 10px;gap:10px 8px}#critterApp .critter-bet{grid-column:2;grid-row:1;grid-template-columns:30px 1fr 30px;height:45px}#critterApp #critterSettingsOpen{grid-column:1;grid-row:1}#critterApp #critterMax{grid-column:3;grid-row:1;font-size:10px;padding:10px}#critterApp #critterSpin{grid-column:2;grid-row:2;justify-self:center;width:87px;height:87px;font-size:14px}#critterApp .critter-auto-wrap{grid-column:1;grid-row:2}#critterApp #critterAuto{font-size:8px;padding:11px 4px}#critterApp #critterAutoMenu{left:0;right:auto}#critterApp .critter-wallet strong{font-size:18px}#critterApp .critter-bonus-bins{gap:5px}#critterApp .critter-bonus-bin{padding:9px 3px}#critterApp .critter-bonus-bin strong{font-size:12px}#critterApp .critter-bonus-bin small{font-size:6px}#critterApp .critter-bonus-card{padding:20px 10px}#critterApp .critter-bonus-card p{font-size:9px}#critterApp dialog{padding:17px 12px}#critterApp .critter-heading img{width:64%}}
+@media(prefers-reduced-motion:reduce){#critterApp *,#critterApp *:before,#critterApp *:after{animation:none!important;transition:none!important}}

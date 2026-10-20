@@ -1,0 +1,33 @@
+{
+  "baseline": "02113af",
+  "existingNineGamesAndLobby": "byte-identical HTML/math/art except added card/registry; Critter uses isolated styles/modules",
+  "auth": "byte-identical",
+  "canonicalWalletMonetaryMethods": "byte-identical; presentation hold extended to Critter",
+  "magnetBridge": "byte-identical",
+  "newArchiveFiles": [
+    {
+      "path": "assets/critter/references/01_main_concept.webp",
+      "sha256": "07381573ac877a8cbb6bd68b99fcc4793b3a51f63bbd14560aaf62f5219c285d"
+    },
+    {
+      "path": "assets/critter/references/02_scene_alt.webp",
+      "sha256": "df339276bc7bb99ea4d982e693696f016e50a285c6d14c008eada35effb39ff5"
+    },
+    {
+      "path": "assets/critter/references/03_wild_symbol.webp",
+      "sha256": "0641076ad521247c90d9471c217f4cad9c687d1bcf93a347c7cdd02d01104d91"
+    },
+    {
+      "path": "assets/critter/references/04_scatter_symbol.webp",
+      "sha256": "648f4b5e7100cc26330f3b375636749043d4d7705d843cbcadf3b944e1bf693d"
+    },
+    {
+      "path": "assets/critter/references/05_symbol_set.webp",
+      "sha256": "1fa8569817593b83a64def0cdb213b7bd39569c3f8a055de7d27eb4ed9c652f0"
+    },
+    {
+      "path": "assets/critter/references/CRITTER_CHAOS_prompt_for_Codex.txt",
+      "sha256": "ec5d32cfc6a67cd758727c8f057b531dba72ca12a36e7eaeb11f14ba88e6dc51"
+    }
+  ]
+}

@@ -127,3 +127,23 @@ s=s.replace('<small>Магнитное поле · Overdrive</small>','<small>WH
 art='data:image/webp;base64,'+base64.b64encode((ROOT/'assets/magnet/environment.webp').read_bytes()).decode()
 s=re.sub(r'(<img id="magnetLobbyArt")([^>]*)(>)',lambda m:m[1]+re.sub(r' src="[^"]*"','',m[2])+' src="'+art+'"'+m[3],s)
 p.write_text(s)
+
+# Critter Chaos is isolated from all existing game modules.
+s=p.read_text()
+def critter_assets(text):
+ return re.sub(r'__CRITTER_([^\s\x27"<>]+)__',lambda m:'data:image/webp;base64,'+base64.b64encode((ROOT/'assets/critter'/m[1]).read_bytes()).decode(),text)
+for name,text,tag in [('CRITTER STYLES',(ROOT/'critter/presentation.css').read_text(),'style'),('CRITTER SCREEN',(ROOT/'critter/screen.html').read_text(),None),('CRITTER MODULE',critter_assets('\n'.join((ROOT/'critter'/f).read_text() for f in ['config.js','model.js','assets.js','game.js'])),'script')]:
+ block=f'<!-- BEGIN {name} -->\n'+(f'<{tag}>\n{text}\n</{tag}>' if tag else text)+f'\n<!-- END {name} -->'
+ pattern=rf'<!-- BEGIN {name} -->[\s\S]*?<!-- END {name} -->'
+ if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
+ elif tag=='style':s=s.replace('</head>',block+'\n</head>',1)
+ else:s=s.replace('<!-- BEGIN VAULT RUNTIME -->',block+'\n<!-- BEGIN VAULT RUNTIME -->',1)
+if 'id="openCritterGame"' not in s:
+ card='<button class="game-card playable" id="openCritterGame" data-category="slots" aria-label="Играть в Critter Chaos"><div class="art"><img id="critterLobbyArt" alt="" loading="lazy"></div><span class="info"><strong>Critter Chaos</strong><small>Running Wild · Dumpster Dash</small></span><span class="lobby-play" aria-hidden="true">PLAY</span></button>'
+ s=s.replace('<button class="game-card playable" id="openMagnetGame"',card+'<button class="game-card playable" id="openMagnetGame"',1)
+ if 'id="openCritterGame"' not in s:raise RuntimeError('Critter lobby insertion point missing')
+if "id:'critter',element:'openCritterGame'" not in s:
+ s=s.replace("{id:'magnet',element:'openMagnetGame'","{id:'critter',element:'openCritterGame',category:'slots',isNew:true},{id:'magnet',element:'openMagnetGame'",1)
+art='data:image/webp;base64,'+base64.b64encode((ROOT/'assets/critter/references/02_scene_alt.webp').read_bytes()).decode()
+s=re.sub(r'(<img id="critterLobbyArt")([^>]*)(>)',lambda m:m[1]+re.sub(r' src="[^"]*"','',m[2])+' src="'+art+'"'+m[3],s)
+p.write_text(s)

@@ -1,0 +1,96 @@
+Create a new slot game called "Critter Chaos" using the attached visual references as the main art direction.
+
+GOAL
+Build a polished browser-based slot prototype that matches the same quality level and UX consistency as our other casino mini-games. The slot should be easy to read, playful, visually loud, and immediately understandable.
+
+THEME AND STYLE
+- Theme: neon urban animal chaos at night.
+- Mood: mischievous, energetic, playful, premium arcade-casino feel.
+- Visual environment: night alley / urban backstreet / neon-lit trash-zone aesthetic.
+- Style: glossy, colorful, high-contrast, with strong glow accents, crisp symbol silhouettes, and readable UI.
+- Use the attached images as style references, especially for color palette, rendering language, and symbol personality.
+
+CORE SLOT FORMAT
+- 5 reels x 5 rows.
+- Standard spin button and bet controls.
+- Keep the UI clean and readable.
+- Make symbol readability a priority over over-decoration.
+- The game should feel fast and satisfying.
+
+SYMBOL SET
+Use the attached symbol sheet as the foundation.
+
+Low symbols:
+- 10
+- J
+- K
+- A
+These should be bright, chunky, glossy, graffiti-like, and easily readable.
+
+High-value animal symbols:
+- Street cat
+- Cool pigeon
+- Possum
+- Bulldog
+These should be premium framed portrait-style symbols, matching the provided art.
+
+Special symbols:
+- WILD: use the raccoon thief symbol as the wild.
+- SCATTER: use the trash-can / garbage-bin scatter symbol.
+
+WILD MECHANIC
+This slot should use a “running wild” mechanic.
+- When a wild participates in a win, it becomes active.
+- Active wilds move / run / jump to a new random position for the next cascade or next evaluation step.
+- The movement should be visually fun and clearly readable.
+- Wild movement should feel like the raccoon is causing chaos.
+- If multiple wilds are active, each movement should resolve clearly one after another or in a well-readable sequence.
+
+RECOMMENDED GAME FLOW
+- Spin starts.
+- Reels stop.
+- Winning combinations are highlighted.
+- If a wild is involved in the win, trigger the running-wild feature.
+- Remove winning symbols if you use a cascading system.
+- Refill reels.
+- Re-evaluate wins.
+- Continue until no more wins remain.
+
+SCATTER / BONUS IDEA
+Use 3+ scatters to trigger a bonus feature.
+Recommended bonus concept:
+- “Dumpster Dash Bonus” or equivalent.
+- The raccoon runs across a bonus scene and reveals modifiers / multipliers / extra wild placements.
+- Keep it lightweight if needed for the prototype, but make the trigger and entry visually exciting.
+- If full bonus implementation is too much for the first pass, at least create the scatter trigger, bonus popup, and a stub bonus screen layout.
+
+UI / UX REQUIREMENTS
+- Make the game look like a real casino product, but in a fun neon-cartoon way.
+- Clear paytable button.
+- Clear display for balance, bet, and win.
+- Use button styling consistent with our other game interfaces: clean, premium, rounded, readable.
+- Add subtle glow and particle accents, but do not reduce readability.
+
+PAYTABLE / HELP
+- Add a paytable / info popup.
+- Show all symbols and their payouts.
+- Briefly explain the running wild mechanic.
+- Explain how scatters trigger the bonus.
+
+TECHNICAL EXPECTATIONS
+- The result should be a clean front-end prototype suitable for local running or easy integration.
+- Prefer modular code and clean asset mapping.
+- Keep references to the attached files explicit so the symbol art can be swapped easily later.
+
+ATTACHED FILES USAGE
+- 01_main_concept.png — main style direction.
+- 02_scene_alt.png — alternate theme / scene support.
+- 03_wild_symbol.png — exact wild symbol reference.
+- 04_scatter_symbol.png — exact scatter symbol reference.
+- 05_symbol_set.png — low and high symbol lineup reference.
+
+IMPORTANT
+- Do not redesign the visual style away from the references.
+- Keep silhouettes strong and readable.
+- Prioritize a fun and understandable player experience.
+- The final result should look like a polished slot concept called Critter Chaos.
