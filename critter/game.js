@@ -29,10 +29,10 @@ const VaultCritter=window.VaultCritter=(()=>{
    const visible=structuredClone(step.gravityGrid);
    for(const move of step.moves){
     $('critterStatus').textContent='RUNNING WILD';$('critterMessage').textContent='RACCOON RUN · '+(move.from+1)+' → '+(move.to+1);cells[move.from].classList.add('active-wild','running-source');cells[move.to].classList.add('destination');
-    const x=i=>i%5*100+50,y=i=>Math.floor(i/5)*100+50;$('critterPaths').innerHTML=`<path d="M${x(move.from)},${y(move.from)} Q250,${Math.min(y(move.from),y(move.to))-70} ${x(move.to)},${y(move.to)}"/>`;
+    const x=i=>i%5*100+50,y=i=>Math.floor(i/5)*100+50,bend=Math.min(Math.floor(move.from/5),Math.floor(move.to/5))===0?1:-1;$('critterPaths').innerHTML=`<path d="M${x(move.from)},${y(move.from)} Q${(x(move.from)+x(move.to))/2},${Math.max(50,Math.min(450,(y(move.from)+y(move.to))/2+bend*80))} ${x(move.to)},${y(move.to)}"/>`;
     const runner=document.createElement('img');runner.src=A.wild;runner.className='critter-runner';runner.alt='Running Wild';runner.style.left=(move.from%5*20)+'%';runner.style.top=(Math.floor(move.from/5)*20)+'%';gridEl.append(runner);
-    const dx=(move.to%5-move.from%5)*gridEl.clientWidth/5,dy=(Math.floor(move.to/5)-Math.floor(move.from/5))*gridEl.clientHeight/5,duration=reduced?50:fast?190:350;
-    if(!reduced)runner.animate([{transform:'translate(0,0) rotate(-8deg)'},{transform:`translate(${dx/2}px,${dy/2-gridEl.clientHeight*.12}px) rotate(10deg)`,offset:.5},{transform:`translate(${dx}px,${dy}px) rotate(0)`}],{duration,fill:'forwards',easing:'ease-in-out'});
+    const dx=(move.to%5-move.from%5)*gridEl.clientWidth/5,dy=(Math.floor(move.to/5)-Math.floor(move.from/5))*gridEl.clientHeight/5,startY=Math.floor(move.from/5)*gridEl.clientHeight/5,midY=Math.max(0,Math.min(gridEl.clientHeight*.8,startY+dy/2+bend*gridEl.clientHeight*.08))-startY,duration=reduced?50:fast?190:350;
+    if(!reduced)runner.animate([{transform:'translate(0,0) rotate(0)'},{transform:`translate(${dx/2}px,${midY}px) rotate(${dx<0?-8:8}deg) scale(.88)`,offset:.5},{transform:`translate(${dx}px,${dy}px) rotate(0)`}],{duration,fill:'forwards',easing:'ease-in-out'});
     await sleep(duration);if(g!==generation)return false;runner.remove();$('critterPaths').replaceChildren();[visible[move.from],visible[move.to]]=[visible[move.to],visible[move.from]];draw(visible);
    }
    draw(step.nextGrid);

@@ -46,7 +46,10 @@ with sync_playwright() as p:
  for seed in [seeds['loss'],seeds['running']]:
   if seed==seeds['running']:pg.evaluate('state.fastGame=false')
   play(pg,seed);planned=checkpoint(pg)
-  if seed==seeds['running']:pg.wait_for_function("document.querySelector('.critter-runner')");assert pg.locator('#critterPaths path').count()==1;shot(pg,'running-wild')
+  if seed==seeds['running']:
+   pg.wait_for_function("document.querySelector('.critter-runner')");pg.wait_for_timeout(50);assert pg.locator('#critterPaths path').count()==1
+   assert pg.evaluate("()=>{const a=document.querySelector('.critter-runner').getBoundingClientRect(),b=document.getElementById('critterGrid').getBoundingClientRect();return a.top>=b.top-2&&a.bottom<=b.bottom+2&&a.left>=b.left-2&&a.right<=b.right+2}")
+   shot(pg,'running-wild')
   settled(pg);pg.evaluate('state.fastGame=true');assert checkpoint(pg)==planned
   assert pg.evaluate("[...document.querySelectorAll('#critterGrid .critter-cell')].map(n=>({uid:+n.dataset.uid,symbol:n.dataset.symbol}))")==planned['base']['finalGrid']
   assert pg.locator('.critter-runner,#critterPaths path').count()==0
