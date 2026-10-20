@@ -5,7 +5,10 @@
     "390px: invalid credentials / confirmation / rate limit / service failure preserve fields, show alert, retry and F5 succeed",
     "Embedded SDK signs in with the external CDN completely blocked",
     "Initial SDK download failure recovers on next submit without page reload",
-    "Fallback blocks native form submission before runtime initialization"
+    "Fallback blocks native form submission before runtime initialization",
+    "slow: one submit signs in, bounded request count, F5 restores session",
+    "disconnect: one submit signs in, bounded request count, F5 restores session",
+    "gateway: one submit signs in, bounded request count, F5 restores session"
   ],
   "pageErrors": []
 }

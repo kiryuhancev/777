@@ -6,6 +6,7 @@ const VAULT_CONFIG = Object.freeze({
   guestStartingBalance: 1000000,
   localDebounceMs: 300,
   syncDebounceMs: 900,
+  authRequestTimeoutMs: 20000,
   maxPendingEvents: 250,
   maxLocalRounds: 100,
   sdkUrl: 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.8/dist/umd/supabase.js',

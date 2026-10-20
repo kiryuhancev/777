@@ -1030,6 +1030,7 @@ const VAULT_CONFIG = Object.freeze({
   guestStartingBalance: 1000000,
   localDebounceMs: 300,
   syncDebounceMs: 900,
+  authRequestTimeoutMs: 20000,
   maxPendingEvents: 250,
   maxLocalRounds: 100,
   sdkUrl: 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.8/dist/umd/supabase.js',
@@ -6640,13 +6641,38 @@ const VaultCritter=window.VaultCritter=(()=>{
     if(error?.status>=500||!navigator.onLine||/fetch|network|timeout|timed out|unreachable/i.test(message))return {error:'Не удалось связаться с сервером авторизации. Проверьте соединение и повторите попытку.',errorKind:'connection'};
     return {error:fallback,errorKind:'service'};
   }
+  async function supabaseFetch(url,options={}){
+    const address=String(url),isAuth=address.includes('/auth/v1/');
+    if(address.includes('/rest/v1/')){
+      const token=new Headers(options.headers).get('Authorization')?.replace(/^Bearer /,'');let subject=null;
+      try{subject=JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).sub;}catch{}
+      if(owner==='guest'||subject!==owner)throw Error('Queue identity mismatch');
+    }
+    // Retry only password sign-in transport failures, never financial RPCs,
+    // registration, refresh tokens, invalid credentials or rate limits.
+    const retryable=isAuth&&address.includes('/token?grant_type=password')&&options.method?.toUpperCase()==='POST';
+    for(let attempt=0;;attempt++){
+      const controller=new AbortController();
+      const abort=()=>controller.abort(options.signal?.reason);
+      if(options.signal?.aborted)abort();else options.signal?.addEventListener('abort',abort,{once:true});
+      const timer=setTimeout(()=>controller.abort(),isAuth?(C.authRequestTimeoutMs||20000):8000);
+      try{
+        const response=await fetch(url,{...options,signal:controller.signal});
+        if(!retryable||attempt||![502,503,504].includes(response.status))return response;
+        await response.body?.cancel();
+      }catch(error){
+        if(!retryable||attempt||options.signal?.aborted||!navigator.onLine)throw error;
+      }finally{clearTimeout(timer);options.signal?.removeEventListener('abort',abort);}
+      await new Promise(resolve=>setTimeout(resolve,500));
+    }
+  }
   const VaultAuth=window.VaultAuth={
     get client(){return client;},isConfigured:configured,
     async restoreSession(){
       if(!configured()||location.protocol==='file:')return switchIdentity(null);
       try{
         const sdk=await loadSDK();
-        client=sdk.createClient(C.supabaseUrl,C.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:NS+'auth'},global:{fetch:async(url,options={})=>{const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),8000);try{if(String(url).includes('/rest/v1/')){const token=new Headers(options.headers).get('Authorization')?.replace(/^Bearer /,'');let subject=null;try{subject=JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).sub;}catch{}if(owner==='guest'||subject!==owner)throw Error('Queue identity mismatch');}return await fetch(url,{...options,signal:controller.signal});}finally{clearTimeout(timer);}}}});
+        client=sdk.createClient(C.supabaseUrl,C.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:NS+'auth'},global:{fetch:supabaseFetch}});
         client.auth.onAuthStateChange((event,session)=>{
           // Keep asynchronous DB work outside the Supabase auth callback lock.
           setTimeout(()=>{

@@ -47,6 +47,24 @@ with sync_playwright() as p:
  page.locator('#vaultAuthEmail').fill('alice@example.test');page.locator('#vaultAuthPassword').fill('typed-password');page.locator('#vaultAuthSubmit').click()
  assert page.url=='about:blank' and 'Не удалось запустить вход' in page.locator('#vaultAuthMessage').inner_text()
  ctx.close();passed.append('Fallback blocks native form submission before runtime initialization')
+ # Slow mobile transport and a single transient failure recover without another ENTER.
+ for scenario in ['slow','disconnect','gateway']:
+  cloud=Cloud();ctx=b.new_context();attempts={'count':0}
+  ctx.route('https://**',lambda r:r.abort())
+  def resilient_route(r):
+   if '/auth/v1/token?grant_type=password' in r.request.url and r.request.method=='POST':
+    attempts['count']+=1
+    if attempts['count']==1:
+     if scenario=='slow':time.sleep(9)
+     elif scenario=='disconnect':return r.abort('connectionreset')
+     elif scenario=='gateway':return r.fulfill(status=503,headers={'Access-Control-Allow-Origin':'*','Content-Type':'application/json'},body='{"msg":"Temporarily unavailable"}')
+   return cloud.route(r)
+  ctx.route('https://vault-test.supabase.co/**',resilient_route);ctx.route('http://127.0.0.1:8777/**',lambda r:r.fulfill(content_type='text/html',body=HTML))
+  page=ctx.new_page();page.on('pageerror',lambda e:errors.append(str(e)));page.goto('http://127.0.0.1:8777/');page.wait_for_function('VaultSession.ready')
+  page.locator('#vaultAuthEmail').fill('alice@example.test');page.locator('#vaultAuthPassword').fill('typed-password');page.locator('#vaultAuthSubmit').click();page.wait_for_function("VaultSession.mode==='authenticated'&&VaultSession.ready",timeout=45000)
+  assert attempts['count']==(1 if scenario=='slow' else 2),attempts
+  page.reload();page.wait_for_function('VaultSession.ready');assert page.evaluate('VaultSession.user.id')==A
+  ctx.close();passed.append(f'{scenario}: one submit signs in, bounded request count, F5 restores session')
  b.close()
 assert not errors,errors
 report={'mode':'Chromium and actual Supabase SDK with HTTP fixtures; not live backend','passed':passed,'pageErrors':errors}
