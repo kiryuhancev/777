@@ -2,12 +2,13 @@
 (()=>{
  'use strict';
  const PRESETS=Object.freeze({
-  classic:Object.freeze({fallDuration:240,symbolStagger:20,columnStagger:55,bounceDuration:85,overshoot:.025}),
-  premium:Object.freeze({fallDuration:300,symbolStagger:24,columnStagger:65,bounceDuration:90,overshoot:0}),
-  impact:Object.freeze({fallDuration:210,symbolStagger:16,columnStagger:45,bounceDuration:95,overshoot:.045})
+  classic:Object.freeze({fallDuration:280,symbolStagger:32,columnStagger:100,bounceDuration:100,overshoot:.025}),
+  premium:Object.freeze({fallDuration:320,symbolStagger:42,columnStagger:110,bounceDuration:140,overshoot:0}),
+  impact:Object.freeze({fallDuration:235,symbolStagger:26,columnStagger:80,bounceDuration:120,overshoot:.045})
  });
  const GAMES=Object.freeze({slot:'classic',swamp:'classic',vault_heist:'premium',magnet:'premium',critter:'impact'});
- const SPEED=Object.freeze({normal:1,quick:.65,turbo:.4});
+ const SPEED=Object.freeze({normal:1,quick:.7,turbo:.4});
+ const renderers=new Map();
  const sessions=new Map(),pending=new Map(),settings=new Map(),listeners=new Map(),history=[],owners=new WeakMap();
  const hooks=['onSymbolEnter','onSymbolLand','onColumnLand','onGridSettled','onSpecialSymbolLand'];
  function emit(hook,detail){
@@ -18,10 +19,10 @@
  function config(game,options={}){
   const supplied={...options,...settings.get(game)},mode=Object.hasOwn(PRESETS,supplied.mode)?supplied.mode:GAMES[game]||'classic';
   const speedProfile=Object.hasOwn(SPEED,supplied.speedProfile)?supplied.speedProfile:'normal';
-  return {mode,...PRESETS[mode],columnMode:'STAGGERED_COLUMNS',winSettleDelay:100,noWinSettleDelay:450,featureSettleDelay:170,cascadeSpeedMultiplier:.85,anticipation:true,...supplied,mode,speedProfile,reducedMotion:!!supplied.reducedMotion||matchMedia('(prefers-reduced-motion: reduce)').matches||document.body.classList.contains('slot-reduced-motion')};
+  return {mode,...PRESETS[mode],columnMode:'STAGGERED_COLUMNS',winSettleDelay:200,noWinSettleDelay:550,featureSettleDelay:270,cascadeSpeedMultiplier:.85,anticipation:true,...supplied,mode,speedProfile,reducedMotion:!!supplied.reducedMotion||matchMedia('(prefers-reduced-motion: reduce)').matches||document.body.classList.contains('slot-reduced-motion')};
  }
  function special(symbol){return /scatter|wild|wheel|collector|magnet|super|overload|bonus/.test(symbol||'');}
- function cancel(game){const s=sessions.get(game);if(!s)return;s.cancelled=true;for(const timer of s.timers)clearTimeout(timer);for(const a of s.animations)a.cancel();}
+ function cancel(game){renderers.get(game)?.cancel();const s=sessions.get(game);if(!s)return;s.cancelled=true;for(const timer of s.timers)clearTimeout(timer);for(const a of s.animations)a.cancel();}
  async function run(game,options){
   cancel(game);
   const cfg=config(game,options),scale=SPEED[cfg.speedProfile]*(options.phase==='cascade'?cfg.cascadeSpeedMultiplier:1);
@@ -34,9 +35,9 @@
   const base={game,roundId:s.roundId,phase:options.phase||'initial',mode:cfg.mode,speedProfile:cfg.speedProfile,reducedMotion:cfg.reducedMotion};
   for(let colIndex=0;colIndex<columns.length;colIndex++){
    const column=columns[colIndex],cells=list.filter(c=>c.column===column).sort((a,b)=>b.row-a.row);
-   let start=cfg.columnMode==='SEQUENTIAL_COLUMNS'?previousEnd:colIndex*cfg.columnStagger*scale;
+   let start=cfg.columnMode==='SEQUENTIAL_COLUMNS'?previousEnd:(colIndex*cfg.columnStagger+Math.max(0,colIndex-2)*10)*scale;
    const suspense=!!cfg.anticipation&&seen>=2&&colIndex===columns.length-1&&!options.staticScatterColumns?.includes(column);
-   if(suspense)start=Math.max(start,previousEnd)+(cfg.reducedMotion?100:420)*scale;
+   if(suspense)start=Math.max(start,previousEnd)+(cfg.reducedMotion?100:720)*scale;
    let end=start;
    for(let index=0;index<cells.length;index++){
     const c=cells[index],isSpecial=special(c.symbol),fall=cfg.reducedMotion?90:Math.max(cfg.speedProfile==='turbo'?100:145,cfg.fallDuration*scale);
@@ -76,19 +77,20 @@
     return animate(node,frames,{duration:c.duration,delay:c.delay,fill:'backwards',easing:'linear'}).then(land).finally(()=>{if(owners.get(node)===s){owners.delete(node);delete node.dataset.slotLanding;delete node.dataset.slotDropActive;node.style.removeProperty('--slot-landing-delay');node.style.removeProperty('--slot-landing-duration');}});
    });
    await Promise.all(jobs);
-   if(!s.cancelled){s.settled=true;emit('onGridSettled',{...base,cells:plan.length,elapsed:performance.now()-s.started});if(options.settle!==false)await clock((options.feature?cfg.featureSettleDelay:options.hasWin?cfg.winSettleDelay:cfg.noWinSettleDelay)*scale);}
+   if(!s.cancelled){s.settled=true;emit('onGridSettled',{...base,cells:plan.length,elapsed:performance.now()-s.started});if(options.settle!==false)await clock((options.feature||plan.some(c=>c.isSpecial)?cfg.featureSettleDelay:options.hasWin?cfg.winSettleDelay:cfg.noWinSettleDelay)*scale);}
    return {cancelled:s.cancelled,gridSettled:s.settled,elapsed:performance.now()-s.started};
   }finally{for(const timer of s.timers)clearTimeout(timer);if(sessions.get(game)===s){sessions.delete(game);if(options.root?.dataset.slotDropMask===game)delete options.root.dataset.slotDropMask;}}
  }
  const api=window.VaultSymbolDrop={presets:PRESETS,games:GAMES,speeds:SPEED,
-  play(game,options){const promise=run(game,options);pending.set(game,promise);return promise;},
-  wait:game=>pending.get(game)||Promise.resolve(),cancel,isBusy:game=>sessions.has(game),
+  play(game,options){const promise=options.reels&&renderers.has(game)?renderers.get(game).play(options):run(game,options);pending.set(game,promise);return promise;},
+  wait:game=>pending.get(game)||Promise.resolve(),cancel,isBusy:game=>sessions.has(game)||!!renderers.get(game)?.isBusy(),
+  registerRenderer(game,renderer){renderers.set(game,renderer);},notify(hook,detail){if(!hooks.includes(hook))throw Error('Unknown animation hook');emit(hook,detail);},
   configure(game,value){settings.set(game,{...settings.get(game),...value});},reset:game=>settings.delete(game),getConfig:config,
   on(hook,fn){if(!hooks.includes(hook))throw Error('Unknown animation hook');if(!listeners.has(hook))listeners.set(hook,new Set());listeners.get(hook).add(fn);return ()=>listeners.get(hook).delete(fn);},
-  inspect:()=>({active:[...sessions.values()].map(s=>({game:s.game,roundId:s.roundId,elapsed:performance.now()-s.started,gridSettled:s.settled})),events:history.slice()})
+  inspect:()=>({active:[...sessions.values()].map(s=>({game:s.game,roundId:s.roundId,elapsed:performance.now()-s.started,gridSettled:s.settled})).concat([...renderers.values()].flatMap(r=>r.inspect?.().active?[r.inspect().active]:[])),events:history.slice()})
  };
- window.addEventListener('pagehide',()=>{for(const game of sessions.keys())cancel(game);});
- new MutationObserver(()=>{for(const game of sessions.keys())if(typeof currentGame!=='undefined'&&currentGame!==game)cancel(game);}).observe(document.body,{attributes:true,attributeFilter:['class']});
+ window.addEventListener('pagehide',()=>{for(const game of new Set([...sessions.keys(),...renderers.keys()]))cancel(game);});
+ new MutationObserver(()=>{for(const game of new Set([...sessions.keys(),...renderers.keys()]))if(typeof currentGame!=='undefined'&&currentGame!==game)cancel(game);}).observe(document.body,{attributes:true,attributeFilter:['class']});
  if(window.SLOT_ANIMATION_DEBUG===true){
   const panel=document.createElement('aside');panel.className='slot-animation-debug';panel.innerHTML='<b>SLOT ANIMATION DEBUG</b><label>DROP MODE<select data-key="mode"><option value="classic">Classic</option><option value="premium">Premium</option><option value="impact">Impact</option></select></label><label>SPEED<select data-key="speedProfile"><option value="normal">Normal</option><option value="quick">Quick</option><option value="turbo">Turbo</option></select></label><label>COLUMNS<select data-key="columnMode"><option>STAGGERED_COLUMNS</option><option>SEQUENTIAL_COLUMNS</option></select></label><output></output>';document.body.append(panel);
   panel.querySelectorAll('select').forEach(n=>n.onchange=()=>api.configure(currentGame,{[n.dataset.key]:n.value}));

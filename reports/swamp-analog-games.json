@@ -1,0 +1,8 @@
+{
+  "mode": "actual SDK + owned HTTP fixture, not live Supabase",
+  "passed": [
+    "Paid finalGrid/payout exact; no early win highlight; F5 mid-reel restores same grid and balance without replay or duplicate",
+    "Existing BONUS purchase + real Free Spin use analog strips; Collector/math/wallet unchanged; shared BIG WIN starts after full stop and finishes before unlock; AUTO stops safely"
+  ],
+  "pageErrors": []
+}

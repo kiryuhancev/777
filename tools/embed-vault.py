@@ -36,7 +36,7 @@ if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
 else:s=s.replace('</head>',block+'\n</head>',1)
 s=re.sub(r'(<img class="vault-mark" data-vault-mark src=")[^"]*(")',lambda m:m[1]+mark+m[2],s)
 # Symbol entry is a shared presentation engine, loaded after game handlers and HUD.
-for name,text,tag in [('SYMBOL DROP STYLES',(ROOT/'slot-animation/presentation.css').read_text(),'style'),('SYMBOL DROP MODULE',(ROOT/'slot-animation/engine.js').read_text()+'\n'+(ROOT/'slot-animation/derby.js').read_text(),'script')]:
+for name,text,tag in [('SYMBOL DROP STYLES',(ROOT/'slot-animation/presentation.css').read_text()+'\n'+(ROOT/'slot-animation/analog.css').read_text(),'style'),('SYMBOL DROP MODULE','\n'.join((ROOT/'slot-animation'/f).read_text() for f in ['engine.js','analog.js','derby.js']),'script')]:
  block=f'<!-- BEGIN {name} -->\n<{tag}>\n{text}\n</{tag}>\n<!-- END {name} -->'
  pattern=rf'<!-- BEGIN {name} -->[\s\S]*?<!-- END {name} -->'
  if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)

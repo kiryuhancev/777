@@ -1,0 +1,30 @@
+{
+  "passed": [
+    "5 physical strips move continuously downward; all phases/hooks once; ordered stops; SAME target nodes align within1px; Quick/Turbo proportional",
+    "Two Scatter anticipation starts after real landings; FS uses same strips; mobile320\u2013768 and reduced motion retain rotation; cancel cleans transient state"
+  ],
+  "stopTimesMs": {
+    "normal": [
+      1175,
+      1336,
+      1512,
+      1649,
+      1803
+    ],
+    "quick": [
+      787,
+      880,
+      991,
+      1082,
+      1190
+    ],
+    "turbo": [
+      458,
+      522,
+      586,
+      650,
+      714
+    ]
+  },
+  "pageErrors": []
+}

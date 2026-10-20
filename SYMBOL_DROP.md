@@ -13,15 +13,15 @@
 
 | Mode | Fall | Symbol stagger | Column stagger | Landing | Overshoot | Games |
 |---|---:|---:|---:|---:|---:|---|
-| classic |240ms|20ms|55ms|85ms|2.5%|Digital Derby, Swamp Fishing|
-| premium |300ms|24ms|65ms|90ms|0%|VAULT Heist, MAGNET|
-| impact |210ms|16ms|45ms|95ms|4.5%|Critter Chaos|
+| classic |280ms|32ms|100ms|100ms|2.5%|Digital Derby|
+| premium |320ms|42ms|110ms|140ms|0%|VAULT Heist, MAGNET|
+| impact |235ms|26ms|80ms|120ms|4.5%|Critter Chaos|
 
-NORMAL1.0 / QUICK0.65 / TURBO0.4. Существующий FAST переключает NORMAL↔QUICK. TURBO и смена пресета доступны через API/debug, без добавления постоянных кнопок в HUD. Скорость фиксируется для текущего play; следующая анимация получает новые настройки.
+NORMAL1.0 / QUICK0.70 / TURBO0.4. Существующий FAST переключает NORMAL↔QUICK. TURBO и смена пресета доступны через API/debug, без добавления постоянных кнопок в HUD. Скорость фиксируется для текущего play; следующая анимация получает новые настройки.
 
-Конфигурация `VaultSymbolDrop.configure(gameId, {...})`: mode, speedProfile, columnMode, fallDuration, symbolStagger, columnStagger, bounceDuration, overshoot, winSettleDelay100, noWinSettleDelay450, featureSettleDelay170, cascadeSpeedMultiplier0.85, anticipation, reducedMotion. `reset(gameId)` возвращает стандартный пресет. `getConfig(gameId)` показывает действующие параметры.
+Конфигурация `VaultSymbolDrop.configure(gameId, {...})`: mode, speedProfile, columnMode, fallDuration, symbolStagger, columnStagger, bounceDuration, overshoot, winSettleDelay200, noWinSettleDelay550, featureSettleDelay270, cascadeSpeedMultiplier0.85, anticipation, reducedMotion. `reset(gameId)` возвращает стандартный пресет. `getConfig(gameId)` показывает действующие параметры.
 
-`STAGGERED_COLUMNS` — стандарт. `SEQUENTIAL_COLUMNS` дожидается предыдущей колонки. При двух уже представленных Scatter последняя подходящая колонка получает420ms suspense; колонка с уже лежащим Scatter исключается. Итоговые символы не меняются. Reduced Motion берётся из OS media query, общей настройки HUD или config: fade/slide8px за90ms, без shake/bounce/hero glow.
+`STAGGERED_COLUMNS` — стандарт. `SEQUENTIAL_COLUMNS` дожидается предыдущей колонки. При двух уже представленных Scatter последняя подходящая колонка получает720ms suspense; колонка с уже лежащим Scatter исключается. Итоговые символы не меняются. Reduced Motion берётся из OS media query, общей настройки HUD или config: fade/slide8px за90ms, без shake/bounce/hero glow.
 
 Scatter/Wild/Collector получают один landing pulse. MAGNET specials — cyan Magnetic Lock-In; Impact использует мягкий короткий bounce без shake/squash. В Turbo эффекты уменьшены, fall длится не менее100ms (без Reduced Motion не менее145ms). Running Wild, магнитные swaps, collect, выбор Heist и bonus transitions остаются собственными последующими этапами игры.
 
@@ -65,3 +65,7 @@ Derby по-прежнему генерирует результат по кас�
 Экспорт WebM — дополнительная опция `symbol-drop-engine-check.py --record`, требующая Playwright FFmpeg. В этой среде CDN кодека отвечает403; видео не экспортированы. Интерактивный HTML и browser verification работают без кодека.
 
 GAME MATH UNCHANGED · RNG UNCHANGED · PAYOUT UNCHANGED · ANIMATION LAYER ONLY · UNIVERSAL SLOT HUD COMPATIBLE.
+
+## Swamp: analog reels
+
+Swamp использует отдельный зарегистрированный renderer `analog.js` вместо symbol drop. QUICK для лент —0.65, TURBO —0.4. Полная спецификация, измерения и артефакты: [SWAMP_ANALOG_REELS.md](SWAMP_ANALOG_REELS.md).

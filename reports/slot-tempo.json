@@ -1,0 +1,21 @@
+{
+  "baseline": "672dd07",
+  "gridSettleMs": {
+    "previous": {
+      "classic": 610.25,
+      "premium": 705.9500000029802,
+      "impact": 542.4499999880791
+    },
+    "current": {
+      "classic": 877.9499999880791,
+      "premium": 1029.25,
+      "impact": 767.1000000089407
+    }
+  },
+  "normalDurationRatios": {
+    "classic": 1.4386726751136076,
+    "premium": 1.4579644450678588,
+    "impact": 1.4141395520800046
+  },
+  "scope": "actual WAAPI timing on fixed15-cell grid, excludes settle pause; not a physical phone benchmark"
+}

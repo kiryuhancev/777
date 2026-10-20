@@ -1994,6 +1994,18 @@ body .slot-reduced-motion [data-slot-skin] *,body.slot-reduced-motion [data-slot
 @media(prefers-reduced-motion:reduce){[data-slot-landing]::after{display:none}}
 body.slot-reduced-motion [data-slot-landing]::after{display:none}
 
+/* The mask is stationary. Only the physical strip translates; no opacity swaps. */
+.swamp-reel[data-swamp-analog]{display:block!important;position:relative;overflow:hidden;isolation:isolate;perspective:700px}
+.swamp-analog-strip{position:absolute;top:0;left:0;width:100%;display:flex;flex-direction:column;gap:var(--analog-gap);will-change:transform;backface-visibility:hidden}
+.swamp-analog-strip>.swamp-cell{height:var(--analog-cell-height);flex:0 0 var(--analog-cell-height);min-height:0;aspect-ratio:auto;animation:none!important;transition:none!important}
+.swamp-analog-strip .swamp-cell img{filter:none;backface-visibility:hidden}
+.swamp-reel[data-swamp-analog]::after{content:'';position:absolute;inset:0;z-index:4;pointer-events:none;background:linear-gradient(#020a08d9,transparent 19%,#e4b56606 42%,transparent 78%,#020a08db);box-shadow:inset 0 9px 12px #0006,inset 0 -9px 12px #0006}
+.swamp-reel[data-reel-phase="FINAL_ALIGNMENT"]{box-shadow:inset 0 0 12px #d79b3b55}
+.swamp-frame.has-win .swamp-cell:not(.win){opacity:.45;transition:opacity .18s}
+.swamp-analog-debug{position:fixed;bottom:10px;left:10px;z-index:9999;max-height:60vh;overflow:auto;padding:10px;background:#0d211bec;border:1px solid #b99455;color:#f8dda4;font:11px monospace}
+.swamp-analog-debug label{display:flex;justify-content:space-between;gap:10px;margin:7px 0}.swamp-analog-debug input{width:70px}
+@media(prefers-reduced-motion:reduce){.swamp-frame.has-win .swamp-cell{transition:none}}
+
 </style>
 <!-- END SYMBOL DROP STYLES -->
 </head>
@@ -5077,6 +5089,7 @@ const VaultSwamp=window.VaultSwamp=(()=>{
  window.addEventListener('vault-symbol-drop:onColumnLand',e=>{if(e.detail.game==='swamp')tone(150+e.detail.column*13,.05,.004);});
  window.addEventListener('vault-symbol-drop:onSpecialSymbolLand',e=>{if(e.detail.game==='swamp'&&e.detail.symbol==='collector')scene.classList.add('collector-flash');});
  window.addEventListener('vault-symbol-drop:onSymbolEnter',e=>{if(e.detail.game==='swamp'&&e.detail.anticipation)scene.classList.add('anticipating');});
+ window.addEventListener('vault-analog-reels:onReelDecelerate',e=>{if(e.detail.anticipation)scene.classList.add('anticipating');});
  function preload(){if(preloaded)return;preloaded=true;const urls=new Set([...Object.values(A).filter(x=>typeof x==='string'),...A.money]);for(const url of urls){const image=new Image();image.src=url;image.decode?.().catch(()=>{});}}
  function tone(freq=180,duration=.06,gain=.009){if(!state.sound||!audio||audio.state!=='running')return;const o=audio.createOscillator(),g=audio.createGain();o.type='sine';o.frequency.setValueAtTime(freq,audio.currentTime);o.frequency.exponentialRampToValueAtTime(Math.max(30,freq*.65),audio.currentTime+duration);g.gain.setValueAtTime(gain,audio.currentTime);g.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+duration);o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+duration);}
  function startAudio(){if(!state.sound&&!state.music)return;try{audio??=new (window.AudioContext||window.webkitAudioContext)();audio.resume().catch(()=>{});}catch{}syncAmbient();}
@@ -5096,7 +5109,7 @@ const VaultSwamp=window.VaultSwamp=(()=>{
   for(const group of by('swampMeter').children)group.classList.toggle('complete',count>=Number(group.dataset.milestone));
   by('swampCurrentMultiplier').textContent=`×${C.multipliers[snapshot?.tier||0]}`;
  }
- function clearProgressFX(){for(const animation of progressAnimations)animation.cancel();progressAnimations.clear();by('swampProgressFlights').replaceChildren();by('swampMilestoneMessage').textContent='';by('swampFeatureBar').classList.remove('milestone');by('swampMeter').querySelectorAll('.arrival,.milestone-group').forEach(n=>n.classList.remove('arrival','milestone-group'));root.querySelectorAll('.collecting').forEach(n=>n.classList.remove('collecting'));}
+ function clearProgressFX(){window.VaultAnalogReels?.cancel();root.querySelector('.swamp-frame').classList.remove('has-win');for(const animation of progressAnimations)animation.cancel();progressAnimations.clear();by('swampProgressFlights').replaceChildren();by('swampMilestoneMessage').textContent='';by('swampFeatureBar').classList.remove('milestone');by('swampMeter').querySelectorAll('.arrival,.milestone-group').forEach(n=>n.classList.remove('arrival','milestone-group'));root.querySelectorAll('.collecting').forEach(n=>n.classList.remove('collecting'));}
  function milestone(count){
   const index=count/4,tier=C.multipliers[Math.min(3,index)];
   by('swampMilestoneMessage').textContent=`+10 FREE SPINS${count<=12?' · MULTIPLIER ×'+tier:' · COLLECT ×10'}`;
@@ -5145,7 +5158,7 @@ const VaultSwamp=window.VaultSwamp=(()=>{
   root.querySelectorAll('[data-setting]').forEach(n=>n.setAttribute('aria-pressed',String(!!state[n.dataset.setting])));
  }
  function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
- function markWins(outcome){by('swampLines').innerHTML=outcome.lines.map(l=>`<polyline points="${l.rows.slice(0,l.count).map((r,c)=>`${c*100+50},${r*100+50}`).join(' ')}"/>`).join('');for(const l of outcome.lines)for(let c=0;c<l.count;c++)columns[c].children[l.rows[c]].classList.add('win');}
+ function markWins(outcome){root.querySelector('.swamp-frame').classList.toggle('has-win',outcome.winX>0);by('swampLines').innerHTML=outcome.lines.map(l=>`<polyline points="${l.rows.slice(0,l.count).map((r,c)=>`${c*100+50},${r*100+50}`).join(' ')}"/>`).join('');for(const l of outcome.lines)for(let c=0;c<l.count;c++)columns[c].children[l.rows[c]].classList.add('win');if(outcome.collectedX>0)root.querySelectorAll('.swamp-cell.money,.swamp-cell.collector').forEach(n=>n.classList.add('win'));}
  function animateCollect(outcome){root.querySelectorAll('.swamp-cell.money,.swamp-cell.collector').forEach(n=>n.classList.add('collecting'));const layer=by('swampCollectLayer'),box=layer.getBoundingClientRect();let count=0;for(const target of outcome.collectors){for(const fish of outcome.fish){if(count++>=32)break;const n=document.createElement('span');n.className='swamp-flying-value';n.textContent=`${fish.valueX}×`;n.style.setProperty('--sx',`${(fish.reel+.5)/5*100}%`);n.style.setProperty('--sy',`${(fish.row+.5)/3*100}%`);n.style.setProperty('--dx',`${(target.reel-fish.reel)*box.width/5}px`);n.style.setProperty('--dy',`${(target.row-fish.row)*box.height/3}px`);layer.append(n);}}tone(220,.7,.012);}
  async function transition(text,small,g){const n=by('swampTransition');n.replaceChildren();const t=document.createElement('span');t.textContent=text;const sub=document.createElement('small');sub.textContent=small;n.append(t,sub);n.hidden=false;await sleep(state.fastBonus?250:650);if(generation===g)n.hidden=true;}
  function schedule(){clearTimeout(timer);if(!document.hidden&&currentGame==='swamp'&&(hasBonus()||autoRunning()))timer=setTimeout(()=>spin(),hasBonus()?(state.fastBonus?80:350):C.timing.pause);}
@@ -5168,14 +5181,15 @@ const VaultSwamp=window.VaultSwamp=(()=>{
    VaultRoundService.settleWithPayout('swamp',lastWin,outcome.winX>0?'win':'no-win',{mathVersion:C.version,seed,featureId:bonus?.featureId||prior?.featureId||rid,freeSpin:inBonus,scatters:outcome.scatters,collectors:outcome.collectors.length,moneyFish:outcome.fish.map(f=>f.valueX),multiplier:outcome.multiplier,lineWinX:outcome.lineWinX,collectedX:outcome.collectedX,retriggerSpins:outcome.awardedSpins,winX:outcome.winX,capped:outcome.capped});
   }catch(e){console.error('VAULT swamp round failed',e);VaultRoundService.finish('swamp','interrupted','cancelled');busy=false;VaultWalletService.releasePresentation('swamp');auto=0;message('Не удалось завершить спин. Ставка сохранена в истории.');controls();return;}
   clearProgressFX();
-  if(!inBonus&&auto>0)auto--;by('swampLines').replaceChildren();by('swampCollectLayer').replaceChildren();shown=outcome.grid;drawAll();controls();message(inBonus?'The swamp wakes…':'Casting into the dark…');
+  if(!inBonus&&auto>0)auto--;by('swampLines').replaceChildren();by('swampCollectLayer').replaceChildren();root.querySelector('.swamp-frame').classList.remove('has-win');controls();message(inBonus?'The swamp wakes…':'Casting into the dark…');
   const fast=inBonus?state.fastBonus:state.fastGame;
-  await VaultSymbolDrop.play('swamp',{root:by('swampReels'),cells:shown.flatMap((col,c)=>col.map((t,r)=>({node:columns[c].children[r],column:c,row:r,symbol:t.id}))),rows:3,roundId:rid,hasWin:outcome.winX>0,feature:inBonus,anticipation:!inBonus,speedProfile:fast?'quick':'normal'});if(g!==generation)return;
-  scene.classList.remove('anticipating');markWins(outcome);
+  await VaultSymbolDrop.play('swamp',{root:by('swampReels'),reels:columns,finalGrid:outcome.grid,renderCell:cell,decorativeSymbols:C.symbols.map(s=>({id:s.id})),rows:3,roundId:rid,hasWin:outcome.winX>0,feature:inBonus,anticipation:!inBonus,speedProfile:fast?'quick':'normal'});if(g!==generation)return;shown=outcome.grid;
+  scene.classList.remove('anticipating');markWins(outcome);if(outcome.winX>0)message(`WIN ${format(lastWin)} · ${format(outcome.winX)}×`);
   if(inBonus&&outcome.collectedX>0){animateCollect(outcome);message(`${format(outcome.fish.reduce((n,f)=>n+f.valueX,0))}× × ${outcome.multiplier} × ${outcome.collectors.length} COLLECTOR${outcome.collectors.length>1?'S':''} = ${format(outcome.collectedX)}×`);await sleep(fast?200:750);if(g!==generation)return;by('swampCollectLayer').replaceChildren();}
   if(inBonus)await animateProgress(outcome,prior,g);if(g!==generation)return;
   root.querySelectorAll('.collecting').forEach(n=>n.classList.remove('collecting'));
   viewBonus=bonus;displayedWin=lastWin;displayedFeatureWin=featureWin;VaultWalletService.releasePresentation('swamp');controls();
+  if(outcome.winX>=WIN_LEVELS.find(level=>level.label==='BIG WIN').mult){await showWinMilestones(lastWin,stake);if(g!==generation)return;}
   if(outcome.triggerSpins)await transition(`${outcome.triggerSpins} FREE SPINS`,'THE SWAMP WAKES',g);
   // Collector milestones are shown at each icon arrival; rewards were already committed above.
   if(g!==generation)return;
@@ -5191,7 +5205,14 @@ const VaultSwamp=window.VaultSwamp=(()=>{
  function shopControls(){by('swampScatterBoost').disabled=busy||hasBonus()||autoRunning()||!window.VaultRoundService?.swampBoostSupport;by('swampScatterBoost').setAttribute('aria-pressed',String(boosted()));by('swampBoostInfo').textContent=window.VaultRoundService?.swampBoostSupport?`${boosted()?'АКТИВЕН · ':''}шанс символа Scatter ×${C.scatterBoost.symbolMultiplier} · цена спина ×${C.scatterBoost.costMultiplier}`:'Scatter Boost доступен после обновления базы';by('swampSpinCost').textContent=hasBonus()?'FREE SPINS · без доплаты за Boost':`Базовая ставка ${format(wager())} · цена спина ${format(spinCost())}${boosted()?' · SCATTER BOOST':''}`;if(!by('swampShopOffers').children.length)return;by('swampShopBet').textContent=format(BETS[betIndex]);for(const b of root.querySelectorAll('[data-swamp-buy]')){const offer=C.purchases.find(x=>x.id===b.dataset.swampBuy);b.textContent=`BUY · ${format(offer.costX*BETS[betIndex])}`;b.disabled=busy||hasBonus()||autoRunning()||offer.costX*BETS[betIndex]>state.balance||!window.VaultRoundService?.swampPurchaseSupport;}by('swampShopMessage').textContent=window.VaultRoundService?.swampPurchaseSupport?'Each purchase charges the shown total once. The stake is locked throughout Free Spins.':'Для покупки бонусов требуется обновление базы.';}
  async function buyFeature(type){const offer=C.purchases.find(x=>x.id===type);if(!offer||busy||hasBonus()||autoRunning()||!VaultRoundService.swampPurchaseSupport||!VaultRoundService.canPlay('swamp'))return;const stake=BETS[betIndex],cost=money(stake*offer.costX);if(cost>state.balance)return;clearProgressFX();bonus={...M.newBonus(offer.spins===20?5:3,stake),featureId:null};const id=VaultRoundService.begin('swamp',cost,{stake,purchaseStake:stake,purchaseType:offer.id,purchaseSpins:offer.spins,purchaseCostX:offer.costX,mathVersion:C.version});if(!id){bonus=null;controls();return;}featureWin=0;lastWin=0;VaultRoundService.settleWithPayout('swamp',0,'bonus-purchased',{featureId:id,purchaseType:offer.id,purchaseSpins:offer.spins,purchaseCostX:offer.costX});by('swampBonusShop').close();toggleAuto(false);busy=true;viewBonus=bonus;controls();const g=++generation;await transition(`${offer.spins} FREE SPINS`,'FEATURE PURCHASED · COLLECT ×1',g);if(g!==generation)return;busy=false;controls();schedule();}
  function getCheckpoint(){return bonus?{...bonus}:null;}
- function restore(value){clearProgressFX();window.VaultWalletService?.releasePresentation('swamp');displayedWin=0;displayedFeatureWin=0;viewBonus=null;scene.classList.remove('anticipating','collector-flash');clearTimeout(timer);generation++;bonus=M.validateBonus(value);busy=false;auto=0;featureWin=bonus?money(bonus.totalWinX*bonus.bet):0;lastWin=0;lastOutcome=null;columns.forEach(n=>n.classList.remove('rolling','anticipation'));by('swampCollectLayer').replaceChildren();by('swampLines').replaceChildren();by('swampTransition').hidden=true;shown=Array.from({length:5},(_,c)=>Array.from({length:3},(_,r)=>({id:preview[(c*3+r)%preview.length]})));drawAll();controls();message(hasBonus()?`FREE SPINS RESTORED · ${bonus.remaining}`:'10 fixed paylines · Money Fish collect in Free Spins.');}
+ function recoveryGrid(){
+  // Reconstruct only the visual board from the last owned, already settled seed.
+  // No resolve/settle, wallet change, entitlement consumption or new RNG draw.
+  const saved=window.VaultStorage?.inspect().data.rounds;
+  const record=saved?.findLast(r=>r.gameId==='swamp'&&r.status==='settled'&&r.metadata?.mathVersion===C.version&&Number.isInteger(r.metadata?.seed)&&r.metadata.seed>=0&&r.metadata.seed<=4294967295);
+  return record?M.generate(record.metadata.freeSpin===true,M.seeded(record.metadata.seed),C,record.metadata.scatterBoost===true):Array.from({length:5},(_,c)=>Array.from({length:3},(_,r)=>({id:preview[(c*3+r)%preview.length]})));
+ }
+ function restore(value){clearProgressFX();window.VaultWalletService?.releasePresentation('swamp');displayedWin=0;displayedFeatureWin=0;viewBonus=null;scene.classList.remove('anticipating','collector-flash');clearTimeout(timer);generation++;bonus=M.validateBonus(value);busy=false;auto=0;featureWin=bonus?money(bonus.totalWinX*bonus.bet):0;lastWin=0;lastOutcome=null;columns.forEach(n=>n.classList.remove('rolling','anticipation'));by('swampCollectLayer').replaceChildren();by('swampLines').replaceChildren();by('swampTransition').hidden=true;shown=recoveryGrid();drawAll();controls();message(hasBonus()?`FREE SPINS RESTORED · ${bonus.remaining}`:'10 fixed paylines · Money Fish collect in Free Spins.');}
  async function open(){if(!VaultSession.ready||VaultSession.mode!=='authenticated')return;currentGame='swamp';document.body.classList.remove('lobby-mode','slot-active','poker-active','bird-active','table-active');document.body.classList.add('game-mode','swamp-active');root.hidden=false;VaultStorage.schedule();syncMusic();preload();startAudio();controls();
   if(!VaultRoundService.swampSupport){message('Connecting to the dock…');const ready=await VaultRoundService.checkSwampSupport();if(currentGame!=='swamp')return;message(ready?'10 fixed paylines · Money Fish collect in Free Spins.':'Слот пока недоступен: требуется обновление базы.');controls();}
   if(VaultRoundService.swampSupport)schedule();
@@ -7026,12 +7047,13 @@ const VaultCritter=window.VaultCritter=(()=>{
 (()=>{
  'use strict';
  const PRESETS=Object.freeze({
-  classic:Object.freeze({fallDuration:240,symbolStagger:20,columnStagger:55,bounceDuration:85,overshoot:.025}),
-  premium:Object.freeze({fallDuration:300,symbolStagger:24,columnStagger:65,bounceDuration:90,overshoot:0}),
-  impact:Object.freeze({fallDuration:210,symbolStagger:16,columnStagger:45,bounceDuration:95,overshoot:.045})
+  classic:Object.freeze({fallDuration:280,symbolStagger:32,columnStagger:100,bounceDuration:100,overshoot:.025}),
+  premium:Object.freeze({fallDuration:320,symbolStagger:42,columnStagger:110,bounceDuration:140,overshoot:0}),
+  impact:Object.freeze({fallDuration:235,symbolStagger:26,columnStagger:80,bounceDuration:120,overshoot:.045})
  });
  const GAMES=Object.freeze({slot:'classic',swamp:'classic',vault_heist:'premium',magnet:'premium',critter:'impact'});
- const SPEED=Object.freeze({normal:1,quick:.65,turbo:.4});
+ const SPEED=Object.freeze({normal:1,quick:.7,turbo:.4});
+ const renderers=new Map();
  const sessions=new Map(),pending=new Map(),settings=new Map(),listeners=new Map(),history=[],owners=new WeakMap();
  const hooks=['onSymbolEnter','onSymbolLand','onColumnLand','onGridSettled','onSpecialSymbolLand'];
  function emit(hook,detail){
@@ -7042,10 +7064,10 @@ const VaultCritter=window.VaultCritter=(()=>{
  function config(game,options={}){
   const supplied={...options,...settings.get(game)},mode=Object.hasOwn(PRESETS,supplied.mode)?supplied.mode:GAMES[game]||'classic';
   const speedProfile=Object.hasOwn(SPEED,supplied.speedProfile)?supplied.speedProfile:'normal';
-  return {mode,...PRESETS[mode],columnMode:'STAGGERED_COLUMNS',winSettleDelay:100,noWinSettleDelay:450,featureSettleDelay:170,cascadeSpeedMultiplier:.85,anticipation:true,...supplied,mode,speedProfile,reducedMotion:!!supplied.reducedMotion||matchMedia('(prefers-reduced-motion: reduce)').matches||document.body.classList.contains('slot-reduced-motion')};
+  return {mode,...PRESETS[mode],columnMode:'STAGGERED_COLUMNS',winSettleDelay:200,noWinSettleDelay:550,featureSettleDelay:270,cascadeSpeedMultiplier:.85,anticipation:true,...supplied,mode,speedProfile,reducedMotion:!!supplied.reducedMotion||matchMedia('(prefers-reduced-motion: reduce)').matches||document.body.classList.contains('slot-reduced-motion')};
  }
  function special(symbol){return /scatter|wild|wheel|collector|magnet|super|overload|bonus/.test(symbol||'');}
- function cancel(game){const s=sessions.get(game);if(!s)return;s.cancelled=true;for(const timer of s.timers)clearTimeout(timer);for(const a of s.animations)a.cancel();}
+ function cancel(game){renderers.get(game)?.cancel();const s=sessions.get(game);if(!s)return;s.cancelled=true;for(const timer of s.timers)clearTimeout(timer);for(const a of s.animations)a.cancel();}
  async function run(game,options){
   cancel(game);
   const cfg=config(game,options),scale=SPEED[cfg.speedProfile]*(options.phase==='cascade'?cfg.cascadeSpeedMultiplier:1);
@@ -7058,9 +7080,9 @@ const VaultCritter=window.VaultCritter=(()=>{
   const base={game,roundId:s.roundId,phase:options.phase||'initial',mode:cfg.mode,speedProfile:cfg.speedProfile,reducedMotion:cfg.reducedMotion};
   for(let colIndex=0;colIndex<columns.length;colIndex++){
    const column=columns[colIndex],cells=list.filter(c=>c.column===column).sort((a,b)=>b.row-a.row);
-   let start=cfg.columnMode==='SEQUENTIAL_COLUMNS'?previousEnd:colIndex*cfg.columnStagger*scale;
+   let start=cfg.columnMode==='SEQUENTIAL_COLUMNS'?previousEnd:(colIndex*cfg.columnStagger+Math.max(0,colIndex-2)*10)*scale;
    const suspense=!!cfg.anticipation&&seen>=2&&colIndex===columns.length-1&&!options.staticScatterColumns?.includes(column);
-   if(suspense)start=Math.max(start,previousEnd)+(cfg.reducedMotion?100:420)*scale;
+   if(suspense)start=Math.max(start,previousEnd)+(cfg.reducedMotion?100:720)*scale;
    let end=start;
    for(let index=0;index<cells.length;index++){
     const c=cells[index],isSpecial=special(c.symbol),fall=cfg.reducedMotion?90:Math.max(cfg.speedProfile==='turbo'?100:145,cfg.fallDuration*scale);
@@ -7100,23 +7122,146 @@ const VaultCritter=window.VaultCritter=(()=>{
     return animate(node,frames,{duration:c.duration,delay:c.delay,fill:'backwards',easing:'linear'}).then(land).finally(()=>{if(owners.get(node)===s){owners.delete(node);delete node.dataset.slotLanding;delete node.dataset.slotDropActive;node.style.removeProperty('--slot-landing-delay');node.style.removeProperty('--slot-landing-duration');}});
    });
    await Promise.all(jobs);
-   if(!s.cancelled){s.settled=true;emit('onGridSettled',{...base,cells:plan.length,elapsed:performance.now()-s.started});if(options.settle!==false)await clock((options.feature?cfg.featureSettleDelay:options.hasWin?cfg.winSettleDelay:cfg.noWinSettleDelay)*scale);}
+   if(!s.cancelled){s.settled=true;emit('onGridSettled',{...base,cells:plan.length,elapsed:performance.now()-s.started});if(options.settle!==false)await clock((options.feature||plan.some(c=>c.isSpecial)?cfg.featureSettleDelay:options.hasWin?cfg.winSettleDelay:cfg.noWinSettleDelay)*scale);}
    return {cancelled:s.cancelled,gridSettled:s.settled,elapsed:performance.now()-s.started};
   }finally{for(const timer of s.timers)clearTimeout(timer);if(sessions.get(game)===s){sessions.delete(game);if(options.root?.dataset.slotDropMask===game)delete options.root.dataset.slotDropMask;}}
  }
  const api=window.VaultSymbolDrop={presets:PRESETS,games:GAMES,speeds:SPEED,
-  play(game,options){const promise=run(game,options);pending.set(game,promise);return promise;},
-  wait:game=>pending.get(game)||Promise.resolve(),cancel,isBusy:game=>sessions.has(game),
+  play(game,options){const promise=options.reels&&renderers.has(game)?renderers.get(game).play(options):run(game,options);pending.set(game,promise);return promise;},
+  wait:game=>pending.get(game)||Promise.resolve(),cancel,isBusy:game=>sessions.has(game)||!!renderers.get(game)?.isBusy(),
+  registerRenderer(game,renderer){renderers.set(game,renderer);},notify(hook,detail){if(!hooks.includes(hook))throw Error('Unknown animation hook');emit(hook,detail);},
   configure(game,value){settings.set(game,{...settings.get(game),...value});},reset:game=>settings.delete(game),getConfig:config,
   on(hook,fn){if(!hooks.includes(hook))throw Error('Unknown animation hook');if(!listeners.has(hook))listeners.set(hook,new Set());listeners.get(hook).add(fn);return ()=>listeners.get(hook).delete(fn);},
-  inspect:()=>({active:[...sessions.values()].map(s=>({game:s.game,roundId:s.roundId,elapsed:performance.now()-s.started,gridSettled:s.settled})),events:history.slice()})
+  inspect:()=>({active:[...sessions.values()].map(s=>({game:s.game,roundId:s.roundId,elapsed:performance.now()-s.started,gridSettled:s.settled})).concat([...renderers.values()].flatMap(r=>r.inspect?.().active?[r.inspect().active]:[])),events:history.slice()})
  };
- window.addEventListener('pagehide',()=>{for(const game of sessions.keys())cancel(game);});
- new MutationObserver(()=>{for(const game of sessions.keys())if(typeof currentGame!=='undefined'&&currentGame!==game)cancel(game);}).observe(document.body,{attributes:true,attributeFilter:['class']});
+ window.addEventListener('pagehide',()=>{for(const game of new Set([...sessions.keys(),...renderers.keys()]))cancel(game);});
+ new MutationObserver(()=>{for(const game of new Set([...sessions.keys(),...renderers.keys()]))if(typeof currentGame!=='undefined'&&currentGame!==game)cancel(game);}).observe(document.body,{attributes:true,attributeFilter:['class']});
  if(window.SLOT_ANIMATION_DEBUG===true){
   const panel=document.createElement('aside');panel.className='slot-animation-debug';panel.innerHTML='<b>SLOT ANIMATION DEBUG</b><label>DROP MODE<select data-key="mode"><option value="classic">Classic</option><option value="premium">Premium</option><option value="impact">Impact</option></select></label><label>SPEED<select data-key="speedProfile"><option value="normal">Normal</option><option value="quick">Quick</option><option value="turbo">Turbo</option></select></label><label>COLUMNS<select data-key="columnMode"><option>STAGGERED_COLUMNS</option><option>SEQUENTIAL_COLUMNS</option></select></label><output></output>';document.body.append(panel);
   panel.querySelectorAll('select').forEach(n=>n.onchange=()=>api.configure(currentGame,{[n.dataset.key]:n.value}));
   const tick=()=>{panel.querySelector('output').textContent=JSON.stringify(api.inspect().active);requestAnimationFrame(tick);};tick();
+ }
+})();
+
+/* Deterministic visual strip. The supplied finalGrid is never generated or edited here. */
+(()=>{
+ 'use strict';
+ const DEFAULTS=Object.freeze({accelerationDuration:150,fullSpeedDuration:490,decelerationDuration:360,reelStagger:165,stopDuration:110,stopBounce:5,reelSpeed:15,blurStrength:0,perspectiveAmount:.05});
+ const overrides={},history=[],hooks=new Map();let session=null;
+ function emit(hook,detail){const event=Object.freeze({hook,...detail,time:performance.now()});history.push(event);if(history.length>250)history.shift();window.dispatchEvent(new CustomEvent('vault-analog-reels:'+hook,{detail:event}));for(const fn of hooks.get(hook)||[])try{fn(event);}catch(error){console.error('Analog reel hook failed',error);}}
+ function cancel(){if(!session)return;session.cancelled=true;for(const a of session.animations)a.cancel();}
+ function configure(values){for(const [key,value] of Object.entries(values)){if(!Object.hasOwn(DEFAULTS,key)||!Number.isFinite(Number(value)))continue;const ranges={accelerationDuration:[60,350],fullSpeedDuration:[100,2000],decelerationDuration:[150,1100],reelStagger:[70,300],stopDuration:[70,180],stopBounce:[0,8],reelSpeed:[8,28],blurStrength:[0,.5],perspectiveAmount:[0,.08]};const [lo,hi]=ranges[key];overrides[key]=Math.max(lo,Math.min(hi,Number(value)));}}
+ const ease=t=>1-(1-t)**2;
+ async function play(options){
+  cancel();
+  const cfg={...DEFAULTS,...overrides},profile=VaultSymbolDrop.getConfig('swamp',options),reduced=profile.reducedMotion;
+  const scale=({normal:1,quick:.65,turbo:.4}[profile.speedProfile]||1)*(reduced?.45:1);
+  const s={roundId:options.roundId||null,cancelled:false,animations:new Set(),reels:[],started:performance.now(),raf:0,settled:false};session=s;
+  const root=options.root,base={game:'swamp',roundId:s.roundId,phase:options.feature?'free-spin':'initial',renderer:'analog',speedProfile:profile.speedProfile,reducedMotion:reduced};
+  const notify=(hook,detail={})=>VaultSymbolDrop.notify(hook,{...base,...detail});
+  const make=value=>{const template=document.createElement('template');template.innerHTML=options.renderCell(value);const node=template.content.firstElementChild;if(!node)throw Error('Missing reel symbol');return node;};
+  // Read all viewport geometry before reparenting any cells.
+  const geometry=options.reels.map(node=>({node,height:node.getBoundingClientRect().height,gap:parseFloat(getComputedStyle(node).rowGap)||3,old:[...node.children]}));
+  const early=options.finalGrid.slice(0,-1).flatMap((col,i)=>col.some(t=>t.id==='scatter')?[i]:[]);
+  const suspense=options.anticipation!==false&&early.length>=2;
+  const accel=Math.max(40,cfg.accelerationDuration*scale),decel=Math.max(90,cfg.decelerationDuration*scale),lock=reduced?0:cfg.stopDuration*scale;
+  const firstMotion=accel+cfg.fullSpeedDuration*scale+decel;
+  try{
+   for(let c=0;c<geometry.length;c++){
+    const {node,height,gap,old}=geometry[c],cellHeight=(height-gap*2)/3,pitch=cellHeight+gap;
+    const isSuspense=suspense&&c===geometry.length-1;
+    let motion=firstMotion+cfg.reelStagger*c*scale,slow=decel;
+    if(isSuspense){slow=Math.max(180,(reduced?400:900)*scale);const secondStop=firstMotion+cfg.reelStagger*early[1]*scale+lock;motion=Math.max(motion-decel,secondStop+120*scale)+slow;}
+    const full=motion-accel-slow,bounce=reduced?0:cfg.stopBounce*Math.min(1,scale/.65);
+    const turns=Math.max(reduced?5:8,Math.round((motion-(accel+slow)/2)/1000*cfg.reelSpeed));
+    const oldStart=turns+1,yStart=-oldStart*pitch,yTarget=-pitch,distance=turns*pitch+bounce,velocity=distance/(accel/2+full+slow/2);
+    const yAccel=yStart+velocity*accel/2,yFull=yAccel+velocity*full,total=motion+lock;
+    const strip=document.createElement('div');strip.className='swamp-analog-strip';strip.style.setProperty('--analog-cell-height',cellHeight+'px');strip.style.setProperty('--analog-gap',gap+'px');
+    const target=options.finalGrid[c].map(make),sequence=[];
+    for(let i=0;i<oldStart+4;i++){
+     const child=i>=1&&i<=3?target[i-1]:i>=oldStart&&i<oldStart+3&&old[i-oldStart]?old[i-oldStart]:make(options.decorativeSymbols[(i+c*3)%options.decorativeSymbols.length]);
+     child.classList.remove('win','collecting','landed');sequence.push({node:child,img:child.querySelector('img'),index:i,scale:1});strip.append(child);
+    }
+    const reel={column:c,node,strip,target,sequence,cellHeight,pitch,height,yStart,yTarget,velocity,yAccel,yFull,accel,full,slow,motion,total,lock,bounce,isSuspense,entered:new Set(),stage:'START',stageIndex:0,animation:null};s.reels.push(reel);
+    node.dataset.swampAnalog='';node.dataset.reelPhase='START';node.replaceChildren(strip);strip.style.transform=`translate3d(0,${yStart}px,0)`;
+    const t=y=>`translate3d(0,${y}px,0)`;
+    const frames=[{offset:0,transform:t(yStart),easing:'cubic-bezier(.333333,0,.666667,.333333)'},{offset:accel/total,transform:t(yAccel),easing:'linear'},{offset:(accel+full)/total,transform:t(yFull),easing:'cubic-bezier(.333333,.666667,.666667,1)'},{offset:motion/total,transform:t(yTarget+bounce)}];
+    if(lock)frames.push({offset:(motion+lock*.4)/total,transform:t(yTarget-2*Math.min(1,scale/.65)),easing:'ease-out'},{offset:1,transform:t(yTarget)});
+    reel.animation=strip.animate(frames,{duration:total,easing:'linear',fill:'both'});s.animations.add(reel.animation);
+    emit('onReelStart',{...base,reelIndex:c,accelerationDuration:accel,fullSpeedDuration:full,decelerationDuration:slow,duration:total,anticipation:isSuspense});node.dataset.reelPhase='ACCELERATION';
+   }
+   function state(reel,time){
+    const stages=[{at:reel.accel,name:'FULL_SPEED',hook:'onReelFullSpeed'},{at:reel.accel+reel.full,name:'DECELERATION',hook:'onReelDecelerate'},{at:reel.motion,name:'FINAL_ALIGNMENT'}];
+    while(reel.stageIndex<stages.length&&time>=stages[reel.stageIndex].at){const stage=stages[reel.stageIndex++];reel.stage=stage.name;reel.node.dataset.reelPhase=stage.name;if(stage.name==='FULL_SPEED'&&cfg.blurStrength>0&&!reduced&&innerWidth>600)reel.strip.style.filter=`blur(${cfg.blurStrength}px)`;else reel.strip.style.removeProperty('filter');if(stage.name==='FINAL_ALIGNMENT'&&!reduced&&time<reel.total){reel.lockMotion=reel.node.animate([{transform:'translateX(0)'},{transform:'translateX(.4px)'},{transform:'translateX(0)'}],{duration:reel.total-time,easing:'ease-out'});s.animations.add(reel.lockMotion);}if(stage.hook)emit(stage.hook,{...base,reelIndex:reel.column,anticipation:reel.isSuspense});}
+   }
+   function position(reel,t){
+    if(t<reel.accel)return reel.yStart+reel.velocity*t*t/(2*reel.accel);
+    if(t<reel.accel+reel.full)return reel.yAccel+reel.velocity*(t-reel.accel);
+    if(t<reel.motion){const u=(t-reel.accel-reel.full)/reel.slow;return reel.yFull+reel.velocity*reel.slow*(u-u*u/2);}
+    if(!reel.lock)return reel.yTarget;
+    const u=Math.min(1,(t-reel.motion)/reel.lock),back=2*Math.min(1,scale/.65);
+    return reel.yTarget+(u<.4?reel.bounce-(reel.bounce+back)*ease(u/.4):-back*(1-ease((u-.4)/.6)));
+   }
+   function frame(){
+    if(s.cancelled)return;
+    for(const reel of s.reels){
+     if(reel.stage==='SETTLED')continue;
+     const time=Math.min(reel.total,Number(reel.animation.currentTime)||0);state(reel,time);
+     const y=position(reel,time),first=Math.max(0,Math.floor(-y/reel.pitch)-1),last=Math.min(reel.sequence.length-1,first+5);
+     for(let i=first;i<=last;i++){
+      const cell=reel.sequence[i],center=y+i*reel.pitch+reel.cellHeight/2,edge=Math.min(1,Math.abs(center-reel.height/2)/(reel.height/2));
+      const strength=reduced?0:cfg.perspectiveAmount*(time<reel.motion?1:Math.max(0,1-(time-reel.motion)/Math.max(1,reel.lock))),stretch=1-strength*edge*edge;
+      if(cell.img&&Math.abs(stretch-cell.scale)>.001){cell.img.style.transform=`scaleY(${stretch.toFixed(3)})`;cell.scale=stretch;}
+      if(i>=1&&i<=3&&!reel.entered.has(i)&&center+reel.cellHeight/2>0&&center-reel.cellHeight/2<reel.height){reel.entered.add(i);notify('onSymbolEnter',{column:reel.column,row:i-1,symbol:options.finalGrid[reel.column][i-1].id,anticipation:reel.isSuspense});}
+     }
+    }
+    s.raf=requestAnimationFrame(frame);
+   }
+   frame();
+   await Promise.all(s.reels.map(async reel=>{
+    await reel.animation.finished.catch(()=>{});if(reel.lockMotion){await reel.lockMotion.finished.catch(()=>{});reel.lockMotion.cancel();s.animations.delete(reel.lockMotion);}if(s.cancelled)return;
+    state(reel,reel.total);
+    // Commit the SAME target nodes that have physically scrolled into the viewport.
+    for(const node of reel.target)node.querySelector('img')?.style.removeProperty('transform');
+    if(reel.strip.parentNode===reel.node){reel.node.replaceChildren(...reel.target);delete reel.node.dataset.swampAnalog;}
+    reel.animation.cancel();s.animations.delete(reel.animation);reel.stage='SETTLED';reel.node.dataset.reelPhase='SETTLED';
+    for(let r=0;r<3;r++){
+     const symbol=options.finalGrid[reel.column][r].id;
+     if(!reel.entered.has(r+1))notify('onSymbolEnter',{column:reel.column,row:r,symbol,anticipation:reel.isSuspense});
+     notify('onSymbolLand',{column:reel.column,row:r,symbol});
+     if(/scatter|collector|wild/.test(symbol)){notify('onSpecialSymbolLand',{column:reel.column,row:r,symbol});reel.target[r].dataset.slotLanding=reduced?'reduced':'special';reel.target[r].style.setProperty('--slot-landing-duration','200ms');}
+    }
+    notify('onColumnLand',{column:reel.column});emit('onReelStop',{...base,reelIndex:reel.column,anticipation:reel.isSuspense});
+   }));
+   if(!s.cancelled){
+    s.settled=true;emit('onAllReelsStopped',{...base,elapsed:performance.now()-s.started});notify('onGridSettled',{cells:15,elapsed:performance.now()-s.started});
+    const special=options.finalGrid.flat().some(t=>/scatter|collector|wild/.test(t.id));
+    const pause=(options.feature||special?profile.featureSettleDelay:options.hasWin?profile.winSettleDelay:profile.noWinSettleDelay)*({normal:1,quick:.65,turbo:.4}[profile.speedProfile]||1);
+    if(pause>0){const a=root.animate([{},{}],{duration:reduced?Math.min(120,pause):pause});s.animations.add(a);await a.finished.catch(()=>{});a.cancel();s.animations.delete(a);}
+   }
+   return {cancelled:s.cancelled,gridSettled:s.settled,elapsed:performance.now()-s.started};
+  }finally{
+   cancelAnimationFrame(s.raf);
+   for(const a of s.animations)a.cancel();
+   for(const reel of s.reels){
+    for(const cell of reel.sequence)cell.img?.style.removeProperty('transform');
+    if(reel.strip.parentNode===reel.node){reel.node.replaceChildren(...reel.target);delete reel.node.dataset.swampAnalog;}
+    for(const node of reel.target){delete node.dataset.slotLanding;node.style.removeProperty('--slot-landing-duration');}
+    delete reel.node.dataset.reelPhase;
+   }
+   if(session===s)session=null;
+  }
+ }
+ const api=window.VaultAnalogReels={play,cancel,configure,reset:()=>Object.keys(overrides).forEach(k=>delete overrides[k]),defaults:DEFAULTS,
+  isBusy:()=>!!session,
+  getConfig:()=>({...DEFAULTS,...overrides}),
+  inspect:()=>({active:session?{game:'swamp',roundId:session.roundId,elapsed:performance.now()-session.started,gridSettled:session.settled,reels:session.reels.map(r=>({column:r.column,stage:r.stage,position:Number(r.animation?.currentTime)||0,duration:r.total,acceleration:r.accel,fullSpeed:r.full,deceleration:r.slow}))}:null,events:history.slice()}),
+  on(hook,fn){if(!hooks.has(hook))hooks.set(hook,new Set());hooks.get(hook).add(fn);return ()=>hooks.get(hook).delete(fn);}
+ };
+ VaultSymbolDrop.registerRenderer('swamp',api);
+ if(window.SLOT_ANIMATION_DEBUG===true){
+  const panel=document.createElement('details');panel.className='swamp-analog-debug';const title=document.createElement('summary');title.textContent='SWAMP REEL DEBUG';panel.append(title);
+  for(const [key,value] of Object.entries(DEFAULTS)){const label=document.createElement('label');label.textContent=key;const input=document.createElement('input');input.type='number';input.step=key.includes('Amount')||key.includes('Strength')?'.01':'1';input.value=value;input.onchange=()=>configure({[key]:input.value});label.append(input);panel.append(label);}document.body.append(panel);
  }
 })();
 
