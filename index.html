@@ -1979,6 +1979,22 @@ body .slot-reduced-motion [data-slot-skin] *,body.slot-reduced-motion [data-slot
 
 </style>
 <!-- END SLOT HUD STYLES -->
+<!-- BEGIN SYMBOL DROP STYLES -->
+<style>
+/* Local contact glow only; never shake a frame or page. */
+[data-slot-drop-mask]{overflow:hidden!important}
+[data-slot-landing]::after{content:'';position:absolute;inset:3%;border:2px solid #ffe3a2;border-radius:12px;background:radial-gradient(ellipse,#f6c96940,transparent 70%);pointer-events:none;opacity:0;animation:slot-contact-glow var(--slot-landing-duration,120ms) ease-out var(--slot-landing-delay,0ms);z-index:8}
+[data-slot-landing="classic"]::after,[data-slot-landing="reduced"]::after{display:none}
+[data-slot-landing="magnetic"]::after{border-color:#6df8ff;background:radial-gradient(ellipse,#53e5ff66,transparent 70%)}
+[data-slot-landing="hop"]::after{border-color:#ffba6a}
+@keyframes slot-contact-glow{0%{opacity:0}35%{opacity:.8}100%{opacity:0}}
+.slot-animation-debug{position:fixed;right:10px;bottom:10px;z-index:9999;background:#0b1329ed;color:#f4dfa6;padding:12px;border:1px solid #dbb35e;border-radius:10px;font:11px monospace;max-width:300px;display:grid;gap:8px}
+.slot-animation-debug label{display:flex;justify-content:space-between;gap:10px}.slot-animation-debug output{overflow-wrap:anywhere}
+@media(prefers-reduced-motion:reduce){[data-slot-landing]::after{display:none}}
+body.slot-reduced-motion [data-slot-landing]::after{display:none}
+
+</style>
+<!-- END SYMBOL DROP STYLES -->
 </head>
 <body class="lobby-mode vault-booting vault-signed-out">
 
@@ -2716,7 +2732,7 @@ async function absorbBonusScatters(){
 async function levelUp(){
   el('levelTitle').textContent=`${state.size} × ${state.size}`;el('levelFlash').classList.remove('show');
   void el('levelFlash').offsetWidth;el('levelFlash').classList.add('show');sound(250,.45,'sawtooth',.025);
-  setTimeout(()=>sound(520,.4,'triangle',.025),120);render({enter:true});await sleep(Math.max(1450,reelAnimationTime()));
+  setTimeout(()=>sound(520,.4,'triangle',.025),120);render({enter:true});await VaultSymbolDrop.wait('slot');
 }
 function updateSlotDebug(){
   if(!DEBUG)return;
@@ -3485,7 +3501,7 @@ async function buyBonusFeature(type){
   render({enter:true});
   sound(180,.08,'square',.018);
 
-  await sleep(reelAnimationTime());
+  await VaultSymbolDrop.wait('slot');
   await waitAfterFullDrop();
 
   const spinWin=await settleSpin();
@@ -3658,7 +3674,7 @@ function postDropPauseMs(){
   return 120;
 }
 async function waitAfterFullDrop(){
-  await sleep(postDropPauseMs());
+  await VaultSymbolDrop.wait('slot');
 }
 function allPositionsOf(types){const s=new Set(types),out=[];for(let r=0;r<state.size;r++)for(let c=0;c<state.size;c++)if(s.has(state.grid[r][c]))out.push([r,c]);return out}
 async function settleSpin(){
@@ -3752,12 +3768,12 @@ async function settleSpin(){
 
     const fallMap=applyGravity();
     render({fallMap});
-    await sleep(620);
+    await VaultSymbolDrop.wait('slot');
 
     const addedCells=refill();
     render({enterCells:addedCells});
     // Same symbol-entry speed and timing as the initial spin.
-    await sleep(reelAnimationTime());
+    await VaultSymbolDrop.wait('slot');
     await waitAfterFullDrop();
   }
 
@@ -3792,7 +3808,7 @@ async function spin({fromAuto=false}={}){
       state.size=5;state.sticky.clear();state.slotProfile='base';if(!VaultRoundService.begin('slot',spinCost(),{stake:bet(),scatterBoost:state.scatterBoost}))return;
       msg.textContent=state.scatterBoost?'Scatter Boost ×1.5 · Kick-off!':(fromAuto?'Автоигра · Kick-off!':'Kick-off!');fillGrid();
     }
-    sound(180,.08,'square',.018);render({enter:true});await sleep(reelAnimationTime());await waitAfterFullDrop();
+    sound(180,.08,'square',.018);render({enter:true});await VaultSymbolDrop.wait('slot');await waitAfterFullDrop();
     const spinWin=await settleSpin();VaultRecovery.checkpointSlot();VaultRoundService.finish('slot',spinWin>0?'win':'no-win','settled',{bonusType:spinWasBonus?state.bonusType:null,cascades:state.cascade,freeSpins:state.freeSpins,scatters:allPositionsOf(['scatter']).length});updateUI();await showWinMilestones(spinWin,bet());
     state.activeSpinFast=null;state.busy=false;updateUI();
     if(spinWasBonus&&state.bonus&&state.freeSpins<=0){await sleep(450);await endBonus();return;}
@@ -5057,6 +5073,9 @@ const VaultSwamp=window.VaultSwamp=(()=>{
  function cell(s){return `<div class="swamp-cell ${s.id}" data-symbol="${s.id}" ${s.valueX?`data-value="${s.valueX}"`:''}><img src="${asset(s)}" alt="${s.id==='money'?'Money Fish '+s.valueX+'x':s.id==='collector'?'Collector Wild':s.id.replaceAll('_',' ')}" draggable="false">${s.id==='money'?`<strong class="swamp-value">${s.valueX}×</strong>`:''}</div>`;}
  function drawColumn(i,landed=false){columns[i].innerHTML=shown[i].map(cell).join('');if(landed)columns[i].querySelectorAll('.scatter,.collector').forEach(n=>n.classList.add('landed'));}
  function drawAll(){for(let i=0;i<5;i++)drawColumn(i);}
+ window.addEventListener('vault-symbol-drop:onColumnLand',e=>{if(e.detail.game==='swamp')tone(150+e.detail.column*13,.05,.004);});
+ window.addEventListener('vault-symbol-drop:onSpecialSymbolLand',e=>{if(e.detail.game==='swamp'&&e.detail.symbol==='collector')scene.classList.add('collector-flash');});
+ window.addEventListener('vault-symbol-drop:onSymbolEnter',e=>{if(e.detail.game==='swamp'&&e.detail.anticipation)scene.classList.add('anticipating');});
  function preload(){if(preloaded)return;preloaded=true;const urls=new Set([...Object.values(A).filter(x=>typeof x==='string'),...A.money]);for(const url of urls){const image=new Image();image.src=url;image.decode?.().catch(()=>{});}}
  function tone(freq=180,duration=.06,gain=.009){if(!state.sound||!audio||audio.state!=='running')return;const o=audio.createOscillator(),g=audio.createGain();o.type='sine';o.frequency.setValueAtTime(freq,audio.currentTime);o.frequency.exponentialRampToValueAtTime(Math.max(30,freq*.65),audio.currentTime+duration);g.gain.setValueAtTime(gain,audio.currentTime);g.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+duration);o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+duration);}
  function startAudio(){if(!state.sound&&!state.music)return;try{audio??=new (window.AudioContext||window.webkitAudioContext)();audio.resume().catch(()=>{});}catch{}syncAmbient();}
@@ -5148,13 +5167,9 @@ const VaultSwamp=window.VaultSwamp=(()=>{
    VaultRoundService.settleWithPayout('swamp',lastWin,outcome.winX>0?'win':'no-win',{mathVersion:C.version,seed,featureId:bonus?.featureId||prior?.featureId||rid,freeSpin:inBonus,scatters:outcome.scatters,collectors:outcome.collectors.length,moneyFish:outcome.fish.map(f=>f.valueX),multiplier:outcome.multiplier,lineWinX:outcome.lineWinX,collectedX:outcome.collectedX,retriggerSpins:outcome.awardedSpins,winX:outcome.winX,capped:outcome.capped});
   }catch(e){console.error('VAULT swamp round failed',e);VaultRoundService.finish('swamp','interrupted','cancelled');busy=false;VaultWalletService.releasePresentation('swamp');auto=0;message('Не удалось завершить спин. Ставка сохранена в истории.');controls();return;}
   clearProgressFX();
-  if(!inBonus&&auto>0)auto--;by('swampLines').replaceChildren();by('swampCollectLayer').replaceChildren();columns.forEach((n,i)=>{const strip=document.createElement('div');strip.className='swamp-strip';strip.innerHTML=[...shown[i],...shown[i]].map(cell).join('');n.replaceChildren(strip);n.classList.add('rolling');});controls();message(inBonus?'The swamp wakes…':'Casting into the dark…');
-  const fast=inBonus?state.fastBonus:state.fastGame;await sleep(fast?C.timing.fastInitial:C.timing.initial);if(g!==generation)return;
-  let scatters=0;
-  for(let c=0;c<5;c++){
-   if(scatters>=2&&!inBonus){scene.classList.add('anticipating');for(let x=c;x<5;x++)columns[x].classList.add('anticipation');await sleep(fast?70:C.timing.anticipation);if(g!==generation)return;}
-   await sleep(fast?C.timing.fastReel:C.timing.reel);if(g!==generation)return;shown[c]=outcome.grid[c];columns[c].classList.remove('rolling','anticipation');drawColumn(c,true);if(shown[c].some(s=>s.id==='collector'))scene.classList.add('collector-flash');scatters+=shown[c].filter(s=>s.id==='scatter').length;tone(150+c*13,.05,.004);
-  }
+  if(!inBonus&&auto>0)auto--;by('swampLines').replaceChildren();by('swampCollectLayer').replaceChildren();shown=outcome.grid;drawAll();controls();message(inBonus?'The swamp wakes…':'Casting into the dark…');
+  const fast=inBonus?state.fastBonus:state.fastGame;
+  await VaultSymbolDrop.play('swamp',{root:by('swampReels'),cells:shown.flatMap((col,c)=>col.map((t,r)=>({node:columns[c].children[r],column:c,row:r,symbol:t.id}))),rows:3,roundId:rid,hasWin:outcome.winX>0,feature:inBonus,anticipation:!inBonus,speedProfile:fast?'quick':'normal'});if(g!==generation)return;
   scene.classList.remove('anticipating');markWins(outcome);
   if(inBonus&&outcome.collectedX>0){animateCollect(outcome);message(`${format(outcome.fish.reduce((n,f)=>n+f.valueX,0))}× × ${outcome.multiplier} × ${outcome.collectors.length} COLLECTOR${outcome.collectors.length>1?'S':''} = ${format(outcome.collectedX)}×`);await sleep(fast?200:750);if(g!==generation)return;by('swampCollectLayer').replaceChildren();}
   if(inBonus)await animateProgress(outcome,prior,g);if(g!==generation)return;
@@ -5557,8 +5572,8 @@ const VaultHeist=window.VaultHeist=(()=>{
  function resultMessage(){if(round?.status==='CHOICE')return 'Choose your exit. Nothing happens until you decide.';if(round?.status==='SETTLED')return `${round.result==='alarm'?'ALARM · BONUS LOOT LOST · BASE WIN KEPT':round.result==='base'?'ROUND COMPLETE':round.result==='grand-take'?'GRAND TAKE COMPLETE':'HEIST COMPLETE'} · PAID ${money(round.payout)}`;return round?.outcome.alarm?'SECURITY BEACON · NEXT ALARM RISK +2%':round?.outcome.disabled?'OVERRIDE ACTIVE · NEXT ALARM RISK −3%':'Inside the vault. Build your loot.';}
  async function reveal(previous,action){const g=++generation;busy=true;resetWinFX();render();const out=round.outcome,fast=previous?state.fastBonus:state.fastGame;
   if(action==='spin'){
-   event('spin');cols.forEach(n=>{const strip=document.createElement('div');strip.className='heist-strip';strip.innerHTML=n.innerHTML.repeat(3);n.replaceChildren(strip);n.classList.add('rolling');});await sleep(fast?C.timing.fastInitial:C.timing.initial);if(g!==generation)return;
-   for(let c=0;c<5;c++){await sleep(fast?C.timing.fastReel:C.timing.reel);if(g!==generation)return;cols[c].classList.remove('rolling');draw(out,c);}
+   event('spin');for(let c=0;c<5;c++)draw(out,c);
+   await VaultSymbolDrop.play(C.id,{root:$('heistReels'),cells:out.grid.flatMap((col,c)=>col.map((symbol,r)=>({node:cols[c].children[r],column:c,row:r,symbol}))),rows:4,roundId:round.roundId,hasWin:out.winX>0,feature:active(),speedProfile:fast?'quick':'normal'});if(g!==generation)return;
    markWins(out);await showWin(out,previous,g,fast);if(g!==generation)return;if(out.scatters)event('scatter');if(out.winX)event('win');if(out.alarm)event('alarm_rise');if(out.tokens)event('loot_add');
   }
   if(action==='deeper'){event('security_scan');await notice(round.result==='alarm'?'ALARM TRIGGERED · LOOT LOST':'ACCESS GRANTED',round.result==='alarm'?'alarm':'access',g);if(g!==generation)return;event(round.result==='alarm'?'alarm_triggered':'access_granted');}
@@ -5949,7 +5964,7 @@ const VaultMagnet=window.VaultMagnet=(()=>{
   draw(phase.finalGrid);delete field.dataset.playback;
  }
  function tone(){if(!state.sound)return;try{const a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(140,a.currentTime);o.frequency.exponentialRampToValueAtTime(380,a.currentTime+.15);g.gain.setValueAtTime(.012,a.currentTime);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.2);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.2);o.onended=()=>a.close();}catch{}}
- async function reveal(previous){const g=++generation,p=round.magneticPlan,fast=state.fastGame;busy=true;render();clearFX();root.classList.add('reeling');draw(p.initialGrid);$('magnetPhaseLabel').textContent='REELS STOPPING';$('magnetMessage').textContent='SOURCE → TARGET → MOVE → FINAL GRID';await sleep(fast?250:650);if(g!==generation)return;root.classList.remove('reeling');await sleep(C.timing.pause);if(g!==generation)return;
+ async function reveal(previous){const g=++generation,p=round.magneticPlan,fast=state.fastGame;busy=true;render();clearFX();draw(p.initialGrid);$('magnetPhaseLabel').textContent='REELS STOPPING';$('magnetMessage').textContent='SOURCE → TARGET → MOVE → FINAL GRID';await VaultSymbolDrop.play(C.id,{root:field,cells:p.initialGrid.map((t,i)=>({node:nodes[t.uid],column:i%5,row:Math.floor(i/5),symbol:t.symbol})),rows:5,roundId:round.roundId,hasWin:p.winX>0,speedProfile:fast?'quick':'normal'});if(g!==generation)return;
   for(const phase of p.phases){
    root.classList.add('field-active');$('magnetPhaseLabel').textContent=phase.index?'CHAIN PHASE · '+(phase.index+1):'FIELD ACTIVE · MAGNETIC PHASE';
    if(phase.index){root.classList.add('chain-active');$('magnetPhaseLabel').textContent='CHAIN PHASE '+(phase.index+1);await sleep(fast?80:140);if(g!==generation)return;root.classList.remove('chain-active');}
@@ -5964,14 +5979,14 @@ const VaultMagnet=window.VaultMagnet=(()=>{
   busy=false;render();if(VaultStorage.inspect().conflict)VaultSync.flush();schedule();
  }
  async function revealModern(previous){
-  const g=++generation,p=round.magneticPlan,fast=state.fastGame;busy=true;render();clearFX();root.classList.add('reeling');draw(p.initialGrid);$('magnetPhaseLabel').textContent=p.bonus?'CHAMBER SPIN':'REELS STOPPING';$('magnetMessage').textContent=p.bonus?'COLLECT VALUES · BUILD REACTOR CHARGE':'WHEEL = FEATURE · 3 SCATTERS = CHAMBER';
-  await sleep(fast?350:850);if(g!==generation)return;root.classList.remove('reeling');
+  const g=++generation,p=round.magneticPlan,fast=state.fastGame;busy=true;render();clearFX();draw(p.initialGrid);$('magnetPhaseLabel').textContent=p.bonus?'CHAMBER SPIN':'REELS STOPPING';$('magnetMessage').textContent=p.bonus?'COLLECT VALUES · BUILD REACTOR CHARGE':'WHEEL = FEATURE · 3 SCATTERS = CHAMBER';
+  await VaultSymbolDrop.play(C.id,{root:field,cells:p.initialGrid.map((t,i)=>({node:nodes[t.uid],column:i%5,row:Math.floor(i/5),symbol:t.symbol})),rows:5,roundId:round.roundId,hasWin:p.winX>0,feature:!!p.bonus||!!p.wheel,speedProfile:fast?'quick':'normal'});if(g!==generation)return;
   if(p.wheel){
    for(const n of nodes.filter(n=>n.dataset.symbol==='wheel'))n.classList.add('feature-landing');await sleep(fast?120:320);if(g!==generation)return;
    const overlay=$('magnetFeatureOverlay');overlay.hidden=false;overlay.dataset.mode='wheel';$('magnetFeatureTitle').textContent='MAGNET WHEEL';$('magnetFeatureResult').textContent='ONE SECTOR · ONE EFFECT';
    const disc=$('magnetWheelDisc');disc.style.transition='none';disc.style.transform='rotate(0deg)';void disc.offsetWidth;disc.style.transition=`transform ${fast?.7:1.6}s cubic-bezier(.12,.65,.14,1)`;disc.style.transform=`rotate(${2160-p.wheel.sector*60}deg)`;
    await sleep(fast?750:1650);if(g!==generation)return;$('magnetFeatureTitle').textContent=p.wheel.title;$('magnetFeatureResult').textContent=p.wheel.description;await sleep(fast?450:850);if(g!==generation)return;overlay.hidden=true;
-   if(p.wheel.id==='respin')root.classList.add('reeling');draw(p.finalGrid);for(const c of p.wheel.changes)nodes[p.finalGrid[c.cell].uid].classList.add('feature-target');for(const s of p.wheel.swaps||[])nodes[p.finalGrid[s.to].uid].classList.add('feature-target');
+   draw(p.finalGrid);if(p.wheel.id==='respin'){await VaultSymbolDrop.play(C.id,{root:field,cells:p.finalGrid.map((t,i)=>({node:nodes[t.uid],column:i%5,row:Math.floor(i/5),symbol:t.symbol})),rows:5,roundId:round.roundId,phase:'respin',hasWin:p.winX>0,speedProfile:fast?'quick':'normal'});if(g!==generation)return;}for(const c of p.wheel.changes)nodes[p.finalGrid[c.cell].uid].classList.add('feature-target');for(const s of p.wheel.swaps||[])nodes[p.finalGrid[s.to].uid].classList.add('feature-target');
    $('magnetMessage').textContent=p.wheel.title+' · '+p.wheel.description;await sleep(fast?250:600);if(g!==generation)return;root.classList.remove('reeling');
   }
   if(p.bonus){const visual=structuredClone(p.initialGrid);
@@ -6147,12 +6162,12 @@ const VaultCritter=window.VaultCritter=(()=>{
  function tone(){if(!state.sound)return;try{const a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.frequency.setValueAtTime(330,a.currentTime);o.frequency.exponentialRampToValueAtTime(660,a.currentTime+.12);g.gain.setValueAtTime(.012,a.currentTime);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.16);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.16);o.onended=()=>a.close();}catch{}}
  async function showPlan(plan,g,{bonus=false,multiplier=1}={}){
   const fast=state.fastGame,reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  root.classList.add('critter-reeling');draw(plan.initialGrid);$('critterStatus').textContent=bonus?'BONUS DROP · EXTRA WILDS':'REELS STOPPING';await sleep(fast?350:850);if(g!==generation)return false;root.classList.remove('critter-reeling');
+  draw(plan.initialGrid);$('critterStatus').textContent=bonus?'BONUS DROP · EXTRA WILDS':'REELS STOPPING';await VaultSymbolDrop.play(C.id,{root:gridEl,cells:plan.initialGrid.map((t,i)=>({node:cells[i],column:i%5,row:Math.floor(i/5),symbol:t.symbol})),rows:5,roundId:round.roundId,hasWin:!!plan.steps.length,feature:bonus,speedProfile:fast?'quick':'normal'});if(g!==generation)return false;
   for(const step of plan.steps){
    draw(step.grid,{wins:step.wins,activeWilds:step.activeWilds});$('critterCascade').textContent='CASCADE '+(step.index+1);$('critterStatus').textContent='CLUSTER WIN · '+fmt(step.winX*multiplier)+'×';$('critterMessage').textContent=step.wins.map(w=>name(w.symbol)+' · '+w.size+' CONNECTED').join(' / ');shownX=M.round(Math.min(C.maxWinX,shownX+step.winX*multiplier));render();tone();await sleep(fast?230:550);if(g!==generation)return false;
    if(!step.gravityGrid)break;
    const removed=new Set(step.removed);cells.forEach(n=>{if(removed.has(Number(n.dataset.uid)))n.classList.add('removing');});await sleep(fast?100:200);if(g!==generation)return false;
-   draw(step.gravityGrid);cells.forEach(n=>{if(!step.grid.some(t=>t.uid===Number(n.dataset.uid)))n.classList.add('falling');});$('critterStatus').textContent='REFILL';await sleep(fast?130:280);if(g!==generation)return false;
+   draw(step.gravityGrid);$('critterStatus').textContent='REFILL';const refill=step.gravityGrid.flatMap((t,i)=>{const previous=step.grid.findIndex(x=>x.uid===t.uid);return previous===i?[]:[{node:cells[i],column:i%5,row:Math.floor(i/5),symbol:t.symbol,fromRows:previous<0?undefined:Math.max(1,Math.floor(i/5)-Math.floor(previous/5))}];});await VaultSymbolDrop.play(C.id,{root:gridEl,cells:refill,rows:5,roundId:round.roundId,phase:'cascade',settle:false,speedProfile:fast?'quick':'normal'});if(g!==generation)return false;
    const visible=structuredClone(step.gravityGrid);
    for(const move of step.moves){
     $('critterStatus').textContent='RUNNING WILD';$('critterMessage').textContent='RACCOON RUN · '+(move.from+1)+' → '+(move.to+1);cells[move.from].classList.add('active-wild','running-source');cells[move.to].classList.add('destination');
@@ -7004,5 +7019,125 @@ const VaultCritter=window.VaultCritter=(()=>{
 
 </script>
 <!-- END SLOT HUD MODULE -->
+<!-- BEGIN SYMBOL DROP MODULE -->
+<script>
+/* Symbols enter already resolved cells. No RNG, wallet, outcomes or persistence. */
+(()=>{
+ 'use strict';
+ const PRESETS=Object.freeze({
+  classic:Object.freeze({fallDuration:120,symbolStagger:18,columnStagger:45,bounceDuration:60,overshoot:.04}),
+  premium:Object.freeze({fallDuration:185,symbolStagger:25,columnStagger:60,bounceDuration:100,overshoot:.01}),
+  impact:Object.freeze({fallDuration:95,symbolStagger:12,columnStagger:35,bounceDuration:85,overshoot:.08})
+ });
+ const GAMES=Object.freeze({slot:'classic',swamp:'classic',vault_heist:'premium',magnet:'premium',critter:'impact'});
+ const SPEED=Object.freeze({normal:1,quick:.65,turbo:.4});
+ const sessions=new Map(),pending=new Map(),settings=new Map(),listeners=new Map(),history=[],owners=new WeakMap();
+ const hooks=['onSymbolEnter','onSymbolLand','onColumnLand','onGridSettled','onSpecialSymbolLand'];
+ function emit(hook,detail){
+  const event=Object.freeze({hook,...detail,time:performance.now()});history.push(event);if(history.length>500)history.shift();
+  window.dispatchEvent(new CustomEvent('vault-symbol-drop:'+hook,{detail:event}));
+  for(const fn of listeners.get(hook)||[])try{fn(event);}catch(error){console.error('Slot animation hook failed',error);}
+ }
+ function config(game,options={}){
+  const supplied={...options,...settings.get(game)},mode=Object.hasOwn(PRESETS,supplied.mode)?supplied.mode:GAMES[game]||'classic';
+  const speedProfile=Object.hasOwn(SPEED,supplied.speedProfile)?supplied.speedProfile:'normal';
+  return {mode,...PRESETS[mode],columnMode:'STAGGERED_COLUMNS',winSettleDelay:100,noWinSettleDelay:450,featureSettleDelay:170,cascadeSpeedMultiplier:.85,anticipation:true,...supplied,mode,speedProfile,reducedMotion:!!supplied.reducedMotion||matchMedia('(prefers-reduced-motion: reduce)').matches||document.body.classList.contains('slot-reduced-motion')};
+ }
+ function special(symbol){return /scatter|wild|wheel|collector|magnet|super|overload|bonus/.test(symbol||'');}
+ function cancel(game){const s=sessions.get(game);if(!s)return;s.cancelled=true;for(const timer of s.timers)clearTimeout(timer);for(const a of s.animations)a.cancel();}
+ async function run(game,options){
+  cancel(game);
+  const cfg=config(game,options),scale=SPEED[cfg.speedProfile]*(options.phase==='cascade'?cfg.cascadeSpeedMultiplier:1);
+  const s={game,roundId:options.roundId||null,cancelled:false,animations:new Set(),timers:new Set(),started:performance.now(),settled:false};sessions.set(game,s);
+  const list=(options.cells||[]).filter(c=>c.node?.isConnected).map(c=>({...c,symbol:String(c.symbol||''),height:c.node.getBoundingClientRect().height,base:getComputedStyle(c.node).transform}));
+  const columns=[...new Set(list.map(c=>c.column))].sort((a,b)=>a-b),plan=[];
+  let previousEnd=0,seen=options.staticScatters||0;
+  const base={game,roundId:s.roundId,phase:options.phase||'initial',mode:cfg.mode,speedProfile:cfg.speedProfile,reducedMotion:cfg.reducedMotion};
+  for(let colIndex=0;colIndex<columns.length;colIndex++){
+   const column=columns[colIndex],cells=list.filter(c=>c.column===column).sort((a,b)=>b.row-a.row);
+   let start=cfg.columnMode==='SEQUENTIAL_COLUMNS'?previousEnd:colIndex*cfg.columnStagger*scale;
+   const suspense=!!cfg.anticipation&&seen>=2&&colIndex===columns.length-1&&!options.staticScatterColumns?.includes(column);
+   if(suspense)start=Math.max(start,previousEnd)+(cfg.reducedMotion?100:420)*scale;
+   let end=start;
+   for(let index=0;index<cells.length;index++){
+    const c=cells[index],isSpecial=special(c.symbol),fall=cfg.reducedMotion?90:cfg.fallDuration*scale;
+    const landing=cfg.reducedMotion?0:(isSpecial?160:cfg.bounceDuration)*scale;
+    const delay=start+index*(cfg.reducedMotion?4:cfg.symbolStagger*scale),duration=fall+landing;
+    plan.push({...c,delay,duration,fall,isSpecial,suspense});end=Math.max(end,delay+duration);
+   }
+   previousEnd=Math.max(previousEnd,end);seen+=cells.filter(c=>c.symbol==='scatter').length;
+  }
+  // All geometry is read above before the first animation/write.
+  if(options.root)options.root.dataset.slotDropMask=game;
+  function animate(node,frames,timing){
+   if(!node.animate)return Promise.resolve();
+   const a=node.animate(frames,timing);s.animations.add(a);
+   return a.finished.catch(()=>{}).finally(()=>{s.animations.delete(a);a.cancel();});
+  }
+  function clock(ms){const node=options.root||list[0]?.node;return node&&ms>0?animate(node,[{},{}],{duration:ms}):Promise.resolve();}
+  const columnPromises=new Map();
+  try{
+   const jobs=plan.map(c=>{
+    const node=c.node,identity={...base,column:c.column,row:c.row,symbol:c.symbol,anticipation:c.suspense,delay:c.delay,duration:c.duration};owners.set(node,s);
+    const baseTransform=c.base==='none'?'':c.base,offset=cfg.reducedMotion?8:Math.max(c.height,1)*(c.fromRows||((options.rows||3)+1));
+    const transform=(dy,sx=1,sy=1,dx=0)=>`${baseTransform} translate(${dx}px,${dy}px) scale(${sx},${sy})`;
+    const ratio=c.fall/c.duration,overshoot=c.height*cfg.overshoot*(cfg.speedProfile==='turbo'?.45:1);
+    let frames;
+    if(cfg.reducedMotion)frames=[{opacity:0,transform:transform(-offset)},{opacity:1,transform:transform(0)}];
+    else if(cfg.mode==='premium')frames=[{offset:0,opacity:0,transform:transform(-offset)},{offset:ratio*.75,opacity:1,transform:transform(-offset*.08)},{offset:ratio,opacity:1,transform:transform(0)},{offset:Math.min(1,ratio+.1),transform:transform(overshoot)},{offset:1,transform:transform(0)}];
+    else frames=[{offset:0,opacity:0,transform:transform(-offset)},{offset:ratio*.75,opacity:1,transform:transform(-offset*.1)},{offset:ratio,opacity:1,transform:transform(overshoot,c.isSpecial?1.04:1, cfg.mode==='impact'?.94:1)},{offset:ratio+(1-ratio)*.4,transform:transform(-overshoot*.45,1,1,cfg.mode==='impact'&&cfg.speedProfile!=='turbo'?1.5:0)},{offset:1,transform:transform(0)}];
+    if(!cfg.reducedMotion&&cfg.mode==='premium'&&c.isSpecial&&game==='magnet')frames.splice(frames.length-1,0,{offset:ratio+(1-ratio)*.55,transform:transform(0,1.025,1.025,cfg.speedProfile==='turbo'?0:1)});
+    if(!cfg.reducedMotion&&game==='critter'&&c.symbol.includes('wild')&&cfg.mode==='impact')frames[3].transform=transform(-c.height*.06,.96,1.06);
+    for(const frame of frames)frame.easing=cfg.mode==='premium'?'cubic-bezier(.16,.6,.2,1)':'cubic-bezier(.3,.65,.5,1)';
+    node.dataset.slotLanding=cfg.reducedMotion?'reduced':c.isSpecial?(c.symbol==='wheel'||game==='magnet'?'magnetic':game==='critter'&&c.symbol.includes('wild')?'hop':'special'):cfg.mode;
+    node.style.setProperty('--slot-landing-delay',(c.delay+c.fall)+'ms');node.style.setProperty('--slot-landing-duration',(cfg.speedProfile==='turbo'?65:120)+'ms');
+    const timer=setTimeout(()=>{s.timers.delete(timer);if(!s.cancelled)emit('onSymbolEnter',identity);},c.delay);s.timers.add(timer);
+    const contact=clock(c.delay+c.fall).then(()=>{if(!s.cancelled){emit('onSymbolLand',identity);if(c.isSpecial)emit('onSpecialSymbolLand',identity);}});
+    const job=Promise.all([animate(node,frames,{duration:c.duration,delay:c.delay,fill:'backwards',easing:'linear'}),contact]).finally(()=>{if(owners.get(node)===s){owners.delete(node);delete node.dataset.slotLanding;node.style.removeProperty('--slot-landing-delay');node.style.removeProperty('--slot-landing-duration');}});
+    if(!columnPromises.has(c.column))columnPromises.set(c.column,[]);columnPromises.get(c.column).push(contact);return job;
+   });
+   await Promise.all([...columnPromises].map(async([column,jobs])=>{await Promise.all(jobs);if(!s.cancelled)emit('onColumnLand',{...base,column});}));
+   await Promise.all(jobs);
+   if(!s.cancelled){s.settled=true;emit('onGridSettled',{...base,cells:plan.length,elapsed:performance.now()-s.started});if(options.settle!==false)await clock((options.feature?cfg.featureSettleDelay:options.hasWin?cfg.winSettleDelay:cfg.noWinSettleDelay)*scale);}
+   return {cancelled:s.cancelled,gridSettled:s.settled,elapsed:performance.now()-s.started};
+  }finally{for(const timer of s.timers)clearTimeout(timer);if(sessions.get(game)===s){sessions.delete(game);if(options.root?.dataset.slotDropMask===game)delete options.root.dataset.slotDropMask;}}
+ }
+ const api=window.VaultSymbolDrop={presets:PRESETS,games:GAMES,speeds:SPEED,
+  play(game,options){const promise=run(game,options);pending.set(game,promise);return promise;},
+  wait:game=>pending.get(game)||Promise.resolve(),cancel,isBusy:game=>sessions.has(game),
+  configure(game,value){settings.set(game,{...settings.get(game),...value});},reset:game=>settings.delete(game),getConfig:config,
+  on(hook,fn){if(!hooks.includes(hook))throw Error('Unknown animation hook');if(!listeners.has(hook))listeners.set(hook,new Set());listeners.get(hook).add(fn);return ()=>listeners.get(hook).delete(fn);},
+  inspect:()=>({active:[...sessions.values()].map(s=>({game:s.game,roundId:s.roundId,elapsed:performance.now()-s.started,gridSettled:s.settled})),events:history.slice()})
+ };
+ window.addEventListener('pagehide',()=>{for(const game of sessions.keys())cancel(game);});
+ new MutationObserver(()=>{for(const game of sessions.keys())if(typeof currentGame!=='undefined'&&currentGame!==game)cancel(game);}).observe(document.body,{attributes:true,attributeFilter:['class']});
+ if(window.SLOT_ANIMATION_DEBUG===true){
+  const panel=document.createElement('aside');panel.className='slot-animation-debug';panel.innerHTML='<b>SLOT ANIMATION DEBUG</b><label>DROP MODE<select data-key="mode"><option value="classic">Classic</option><option value="premium">Premium</option><option value="impact">Impact</option></select></label><label>SPEED<select data-key="speedProfile"><option value="normal">Normal</option><option value="quick">Quick</option><option value="turbo">Turbo</option></select></label><label>COLUMNS<select data-key="columnMode"><option>STAGGERED_COLUMNS</option><option>SEQUENTIAL_COLUMNS</option></select></label><output></output>';document.body.append(panel);
+  panel.querySelectorAll('select').forEach(n=>n.onchange=()=>api.configure(currentGame,{[n.dataset.key]:n.value}));
+  const tick=()=>{panel.querySelector('output').textContent=JSON.stringify(api.inspect().active);requestAnimationFrame(tick);};tick();
+ }
+})();
+
+/* Legacy Derby presentation adapter. Model generation/settlement remain untouched. */
+(()=>{
+ const originalRender=render;
+ render=function(options={}){
+  originalRender(options);
+  if(currentGame!=='slot')return;
+  if(!options.enter&&!options.enterCells?.size&&!options.fallMap?.size)return;
+  const cells=[],staticScatterColumns=[],all=[...gridEl.children];let staticScatters=0;
+  for(let r=0;r<state.size;r++)for(let c=0;c<state.size;c++){
+   const position=key(r,c),node=all[r*state.size+c],symbol=state.grid[r][c];
+   const enters=!state.sticky.has(position)&&(options.enter||options.enterCells?.has(position)),falls=options.fallMap?.get(position);
+   if(symbol==='scatter'&&!enters){staticScatters++;staticScatterColumns.push(c);}
+   if(!symbol||!enters&&!falls)continue;
+   node.classList.remove('enter','falling');cells.push({node,column:c,row:r,symbol,fromRows:falls||undefined});
+  }
+  VaultSymbolDrop.play('slot',{root:gridEl,cells,rows:state.size,phase:options.enterCells?.size?'cascade':options.fallMap?.size?'gravity':'initial',staticScatters,staticScatterColumns,hasWin:findWins().length>0,settle:!options.fallMap?.size,speedProfile:currentFastMode()?'quick':'normal',roundId:window.VaultRoundService?.get('slot')?.roundId});
+ };
+})();
+
+</script>
+<!-- END SYMBOL DROP MODULE -->
 </body>
 </html>

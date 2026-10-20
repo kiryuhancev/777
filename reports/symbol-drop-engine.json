@@ -1,0 +1,24 @@
+{
+  "passed": [
+    "Classic/Premium/Impact \u00d7 Normal/Quick/Turbo: fixed art/cells unchanged, no RNG, all hooks exactly once, finished promises and zero residual animations",
+    "Two Scatter hero pulses once, suspense on final column, sequential/staggered, reduced motion, clean cancellation, mobile390px"
+  ],
+  "durationsMs": {
+    "classic": {
+      "normal": 407,
+      "quick": 266.7999999821186,
+      "turbo": 169.30000001192093
+    },
+    "premium": {
+      "normal": 587.5,
+      "quick": 387.69999998807907,
+      "turbo": 237.40000000596046
+    },
+    "impact": {
+      "normal": 350.80000001192093,
+      "quick": 244,
+      "turbo": 151.40000000596046
+    }
+  },
+  "pageErrors": []
+}

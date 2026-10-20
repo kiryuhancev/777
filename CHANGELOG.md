@@ -1,3 +1,9 @@
+# Symbol Drop Animation System
+
+- Общий promise-based animation engine: Classic, Premium Smooth, Impact, NORMAL/QUICK/TURBO, sequential/staggered, reduced motion, landing overrides, Scatter suspense и audio hooks без SFX в core.
+- Пять слотов подключены к рассчитанным полям; gravity/refill Derby, refill Critter и Respin MAGNET ожидают animation.finished. Финансовые операции, RNG и модели сохранены.
+- Проверены фиксированные результаты/баланс всех5 игр, hooks, double click, F5, AUTO/STOP, бонус Critter и Respin MAGNET. Отдельная ветка, резервный HTML и интерактивный предпросмотр. Подробнее: `SYMBOL_DROP.md`.
+
 # Universal Slot HUD
 
 - Единый модуль для Digital Derby, Swamp Fishing, VAULT Heist, MAGNET и Critter Chaos: одинаковый control order, верхняя панель, settings/auto/bet/info окна и mobile layout. Пять скинов на CSS variables.

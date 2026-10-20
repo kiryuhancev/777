@@ -35,6 +35,12 @@ pattern=r'<!-- BEGIN BIRD PRESENTATION -->[\s\S]*?<!-- END BIRD PRESENTATION -->
 if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
 else:s=s.replace('</head>',block+'\n</head>',1)
 s=re.sub(r'(<img class="vault-mark" data-vault-mark src=")[^"]*(")',lambda m:m[1]+mark+m[2],s)
+# Symbol entry is a shared presentation engine, loaded after game handlers and HUD.
+for name,text,tag in [('SYMBOL DROP STYLES',(ROOT/'slot-animation/presentation.css').read_text(),'style'),('SYMBOL DROP MODULE',(ROOT/'slot-animation/engine.js').read_text()+'\n'+(ROOT/'slot-animation/derby.js').read_text(),'script')]:
+ block=f'<!-- BEGIN {name} -->\n<{tag}>\n{text}\n</{tag}>\n<!-- END {name} -->'
+ pattern=rf'<!-- BEGIN {name} -->[\s\S]*?<!-- END {name} -->'
+ if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
+ else:s=s.replace('</head>' if tag=='style' else '</body>',block+('\n</head>' if tag=='style' else '\n</body>'),1)
 p.write_text(s)
 print('Embedded VAULT configuration, UI and data layer')
 # Adjacent tables inherit the approved Poker materials and card components.

@@ -99,7 +99,7 @@ const VaultMagnet=window.VaultMagnet=(()=>{
   draw(phase.finalGrid);delete field.dataset.playback;
  }
  function tone(){if(!state.sound)return;try{const a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(140,a.currentTime);o.frequency.exponentialRampToValueAtTime(380,a.currentTime+.15);g.gain.setValueAtTime(.012,a.currentTime);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.2);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.2);o.onended=()=>a.close();}catch{}}
- async function reveal(previous){const g=++generation,p=round.magneticPlan,fast=state.fastGame;busy=true;render();clearFX();root.classList.add('reeling');draw(p.initialGrid);$('magnetPhaseLabel').textContent='REELS STOPPING';$('magnetMessage').textContent='SOURCE → TARGET → MOVE → FINAL GRID';await sleep(fast?250:650);if(g!==generation)return;root.classList.remove('reeling');await sleep(C.timing.pause);if(g!==generation)return;
+ async function reveal(previous){const g=++generation,p=round.magneticPlan,fast=state.fastGame;busy=true;render();clearFX();draw(p.initialGrid);$('magnetPhaseLabel').textContent='REELS STOPPING';$('magnetMessage').textContent='SOURCE → TARGET → MOVE → FINAL GRID';await VaultSymbolDrop.play(C.id,{root:field,cells:p.initialGrid.map((t,i)=>({node:nodes[t.uid],column:i%5,row:Math.floor(i/5),symbol:t.symbol})),rows:5,roundId:round.roundId,hasWin:p.winX>0,speedProfile:fast?'quick':'normal'});if(g!==generation)return;
   for(const phase of p.phases){
    root.classList.add('field-active');$('magnetPhaseLabel').textContent=phase.index?'CHAIN PHASE · '+(phase.index+1):'FIELD ACTIVE · MAGNETIC PHASE';
    if(phase.index){root.classList.add('chain-active');$('magnetPhaseLabel').textContent='CHAIN PHASE '+(phase.index+1);await sleep(fast?80:140);if(g!==generation)return;root.classList.remove('chain-active');}
@@ -114,14 +114,14 @@ const VaultMagnet=window.VaultMagnet=(()=>{
   busy=false;render();if(VaultStorage.inspect().conflict)VaultSync.flush();schedule();
  }
  async function revealModern(previous){
-  const g=++generation,p=round.magneticPlan,fast=state.fastGame;busy=true;render();clearFX();root.classList.add('reeling');draw(p.initialGrid);$('magnetPhaseLabel').textContent=p.bonus?'CHAMBER SPIN':'REELS STOPPING';$('magnetMessage').textContent=p.bonus?'COLLECT VALUES · BUILD REACTOR CHARGE':'WHEEL = FEATURE · 3 SCATTERS = CHAMBER';
-  await sleep(fast?350:850);if(g!==generation)return;root.classList.remove('reeling');
+  const g=++generation,p=round.magneticPlan,fast=state.fastGame;busy=true;render();clearFX();draw(p.initialGrid);$('magnetPhaseLabel').textContent=p.bonus?'CHAMBER SPIN':'REELS STOPPING';$('magnetMessage').textContent=p.bonus?'COLLECT VALUES · BUILD REACTOR CHARGE':'WHEEL = FEATURE · 3 SCATTERS = CHAMBER';
+  await VaultSymbolDrop.play(C.id,{root:field,cells:p.initialGrid.map((t,i)=>({node:nodes[t.uid],column:i%5,row:Math.floor(i/5),symbol:t.symbol})),rows:5,roundId:round.roundId,hasWin:p.winX>0,feature:!!p.bonus||!!p.wheel,speedProfile:fast?'quick':'normal'});if(g!==generation)return;
   if(p.wheel){
    for(const n of nodes.filter(n=>n.dataset.symbol==='wheel'))n.classList.add('feature-landing');await sleep(fast?120:320);if(g!==generation)return;
    const overlay=$('magnetFeatureOverlay');overlay.hidden=false;overlay.dataset.mode='wheel';$('magnetFeatureTitle').textContent='MAGNET WHEEL';$('magnetFeatureResult').textContent='ONE SECTOR · ONE EFFECT';
    const disc=$('magnetWheelDisc');disc.style.transition='none';disc.style.transform='rotate(0deg)';void disc.offsetWidth;disc.style.transition=`transform ${fast?.7:1.6}s cubic-bezier(.12,.65,.14,1)`;disc.style.transform=`rotate(${2160-p.wheel.sector*60}deg)`;
    await sleep(fast?750:1650);if(g!==generation)return;$('magnetFeatureTitle').textContent=p.wheel.title;$('magnetFeatureResult').textContent=p.wheel.description;await sleep(fast?450:850);if(g!==generation)return;overlay.hidden=true;
-   if(p.wheel.id==='respin')root.classList.add('reeling');draw(p.finalGrid);for(const c of p.wheel.changes)nodes[p.finalGrid[c.cell].uid].classList.add('feature-target');for(const s of p.wheel.swaps||[])nodes[p.finalGrid[s.to].uid].classList.add('feature-target');
+   draw(p.finalGrid);if(p.wheel.id==='respin'){await VaultSymbolDrop.play(C.id,{root:field,cells:p.finalGrid.map((t,i)=>({node:nodes[t.uid],column:i%5,row:Math.floor(i/5),symbol:t.symbol})),rows:5,roundId:round.roundId,phase:'respin',hasWin:p.winX>0,speedProfile:fast?'quick':'normal'});if(g!==generation)return;}for(const c of p.wheel.changes)nodes[p.finalGrid[c.cell].uid].classList.add('feature-target');for(const s of p.wheel.swaps||[])nodes[p.finalGrid[s.to].uid].classList.add('feature-target');
    $('magnetMessage').textContent=p.wheel.title+' · '+p.wheel.description;await sleep(fast?250:600);if(g!==generation)return;root.classList.remove('reeling');
   }
   if(p.bonus){const visual=structuredClone(p.initialGrid);

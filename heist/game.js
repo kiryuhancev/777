@@ -41,8 +41,8 @@ const VaultHeist=window.VaultHeist=(()=>{
  function resultMessage(){if(round?.status==='CHOICE')return 'Choose your exit. Nothing happens until you decide.';if(round?.status==='SETTLED')return `${round.result==='alarm'?'ALARM · BONUS LOOT LOST · BASE WIN KEPT':round.result==='base'?'ROUND COMPLETE':round.result==='grand-take'?'GRAND TAKE COMPLETE':'HEIST COMPLETE'} · PAID ${money(round.payout)}`;return round?.outcome.alarm?'SECURITY BEACON · NEXT ALARM RISK +2%':round?.outcome.disabled?'OVERRIDE ACTIVE · NEXT ALARM RISK −3%':'Inside the vault. Build your loot.';}
  async function reveal(previous,action){const g=++generation;busy=true;resetWinFX();render();const out=round.outcome,fast=previous?state.fastBonus:state.fastGame;
   if(action==='spin'){
-   event('spin');cols.forEach(n=>{const strip=document.createElement('div');strip.className='heist-strip';strip.innerHTML=n.innerHTML.repeat(3);n.replaceChildren(strip);n.classList.add('rolling');});await sleep(fast?C.timing.fastInitial:C.timing.initial);if(g!==generation)return;
-   for(let c=0;c<5;c++){await sleep(fast?C.timing.fastReel:C.timing.reel);if(g!==generation)return;cols[c].classList.remove('rolling');draw(out,c);}
+   event('spin');for(let c=0;c<5;c++)draw(out,c);
+   await VaultSymbolDrop.play(C.id,{root:$('heistReels'),cells:out.grid.flatMap((col,c)=>col.map((symbol,r)=>({node:cols[c].children[r],column:c,row:r,symbol}))),rows:4,roundId:round.roundId,hasWin:out.winX>0,feature:active(),speedProfile:fast?'quick':'normal'});if(g!==generation)return;
    markWins(out);await showWin(out,previous,g,fast);if(g!==generation)return;if(out.scatters)event('scatter');if(out.winX)event('win');if(out.alarm)event('alarm_rise');if(out.tokens)event('loot_add');
   }
   if(action==='deeper'){event('security_scan');await notice(round.result==='alarm'?'ALARM TRIGGERED · LOOT LOST':'ACCESS GRANTED',round.result==='alarm'?'alarm':'access',g);if(g!==generation)return;event(round.result==='alarm'?'alarm_triggered':'access_granted');}

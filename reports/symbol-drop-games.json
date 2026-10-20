@@ -1,0 +1,14 @@
+{
+  "mode": "real SDK + HTTP fixtures, not live backend",
+  "passed": [
+    "slot: seeded payout and shared wallet exact, double spin blocked, real grid-settled hooks, clean completion before next action",
+    "swamp: seeded payout and shared wallet exact, double spin blocked, real grid-settled hooks, clean completion before next action",
+    "vault_heist: seeded payout and shared wallet exact, double spin blocked, real grid-settled hooks, clean completion before next action",
+    "magnet: seeded payout and shared wallet exact, double spin blocked, real grid-settled hooks, clean completion before next action",
+    "critter: seeded payout and shared wallet exact, double spin blocked, real grid-settled hooks, clean completion before next action",
+    "magnet respin: complete feature animations finish before unlock, exact precomputed payout once",
+    "critter bonus: complete feature animations finish before unlock, exact precomputed payout once",
+    "F5 during drop restores exact stable result without replay/duplicate payout; STOP during animation completes only the current round"
+  ],
+  "pageErrors": []
+}

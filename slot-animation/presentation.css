@@ -1,0 +1,11 @@
+/* Local contact glow only; never shake a frame or page. */
+[data-slot-drop-mask]{overflow:hidden!important}
+[data-slot-landing]::after{content:'';position:absolute;inset:3%;border:2px solid #ffe3a2;border-radius:12px;background:radial-gradient(ellipse,#f6c96940,transparent 70%);pointer-events:none;opacity:0;animation:slot-contact-glow var(--slot-landing-duration,120ms) ease-out var(--slot-landing-delay,0ms);z-index:8}
+[data-slot-landing="classic"]::after,[data-slot-landing="reduced"]::after{display:none}
+[data-slot-landing="magnetic"]::after{border-color:#6df8ff;background:radial-gradient(ellipse,#53e5ff66,transparent 70%)}
+[data-slot-landing="hop"]::after{border-color:#ffba6a}
+@keyframes slot-contact-glow{0%{opacity:0}35%{opacity:.8}100%{opacity:0}}
+.slot-animation-debug{position:fixed;right:10px;bottom:10px;z-index:9999;background:#0b1329ed;color:#f4dfa6;padding:12px;border:1px solid #dbb35e;border-radius:10px;font:11px monospace;max-width:300px;display:grid;gap:8px}
+.slot-animation-debug label{display:flex;justify-content:space-between;gap:10px}.slot-animation-debug output{overflow-wrap:anywhere}
+@media(prefers-reduced-motion:reduce){[data-slot-landing]::after{display:none}}
+body.slot-reduced-motion [data-slot-landing]::after{display:none}

@@ -14,6 +14,9 @@ const VaultSwamp=window.VaultSwamp=(()=>{
  function cell(s){return `<div class="swamp-cell ${s.id}" data-symbol="${s.id}" ${s.valueX?`data-value="${s.valueX}"`:''}><img src="${asset(s)}" alt="${s.id==='money'?'Money Fish '+s.valueX+'x':s.id==='collector'?'Collector Wild':s.id.replaceAll('_',' ')}" draggable="false">${s.id==='money'?`<strong class="swamp-value">${s.valueX}×</strong>`:''}</div>`;}
  function drawColumn(i,landed=false){columns[i].innerHTML=shown[i].map(cell).join('');if(landed)columns[i].querySelectorAll('.scatter,.collector').forEach(n=>n.classList.add('landed'));}
  function drawAll(){for(let i=0;i<5;i++)drawColumn(i);}
+ window.addEventListener('vault-symbol-drop:onColumnLand',e=>{if(e.detail.game==='swamp')tone(150+e.detail.column*13,.05,.004);});
+ window.addEventListener('vault-symbol-drop:onSpecialSymbolLand',e=>{if(e.detail.game==='swamp'&&e.detail.symbol==='collector')scene.classList.add('collector-flash');});
+ window.addEventListener('vault-symbol-drop:onSymbolEnter',e=>{if(e.detail.game==='swamp'&&e.detail.anticipation)scene.classList.add('anticipating');});
  function preload(){if(preloaded)return;preloaded=true;const urls=new Set([...Object.values(A).filter(x=>typeof x==='string'),...A.money]);for(const url of urls){const image=new Image();image.src=url;image.decode?.().catch(()=>{});}}
  function tone(freq=180,duration=.06,gain=.009){if(!state.sound||!audio||audio.state!=='running')return;const o=audio.createOscillator(),g=audio.createGain();o.type='sine';o.frequency.setValueAtTime(freq,audio.currentTime);o.frequency.exponentialRampToValueAtTime(Math.max(30,freq*.65),audio.currentTime+duration);g.gain.setValueAtTime(gain,audio.currentTime);g.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+duration);o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+duration);}
  function startAudio(){if(!state.sound&&!state.music)return;try{audio??=new (window.AudioContext||window.webkitAudioContext)();audio.resume().catch(()=>{});}catch{}syncAmbient();}
@@ -105,13 +108,9 @@ const VaultSwamp=window.VaultSwamp=(()=>{
    VaultRoundService.settleWithPayout('swamp',lastWin,outcome.winX>0?'win':'no-win',{mathVersion:C.version,seed,featureId:bonus?.featureId||prior?.featureId||rid,freeSpin:inBonus,scatters:outcome.scatters,collectors:outcome.collectors.length,moneyFish:outcome.fish.map(f=>f.valueX),multiplier:outcome.multiplier,lineWinX:outcome.lineWinX,collectedX:outcome.collectedX,retriggerSpins:outcome.awardedSpins,winX:outcome.winX,capped:outcome.capped});
   }catch(e){console.error('VAULT swamp round failed',e);VaultRoundService.finish('swamp','interrupted','cancelled');busy=false;VaultWalletService.releasePresentation('swamp');auto=0;message('Не удалось завершить спин. Ставка сохранена в истории.');controls();return;}
   clearProgressFX();
-  if(!inBonus&&auto>0)auto--;by('swampLines').replaceChildren();by('swampCollectLayer').replaceChildren();columns.forEach((n,i)=>{const strip=document.createElement('div');strip.className='swamp-strip';strip.innerHTML=[...shown[i],...shown[i]].map(cell).join('');n.replaceChildren(strip);n.classList.add('rolling');});controls();message(inBonus?'The swamp wakes…':'Casting into the dark…');
-  const fast=inBonus?state.fastBonus:state.fastGame;await sleep(fast?C.timing.fastInitial:C.timing.initial);if(g!==generation)return;
-  let scatters=0;
-  for(let c=0;c<5;c++){
-   if(scatters>=2&&!inBonus){scene.classList.add('anticipating');for(let x=c;x<5;x++)columns[x].classList.add('anticipation');await sleep(fast?70:C.timing.anticipation);if(g!==generation)return;}
-   await sleep(fast?C.timing.fastReel:C.timing.reel);if(g!==generation)return;shown[c]=outcome.grid[c];columns[c].classList.remove('rolling','anticipation');drawColumn(c,true);if(shown[c].some(s=>s.id==='collector'))scene.classList.add('collector-flash');scatters+=shown[c].filter(s=>s.id==='scatter').length;tone(150+c*13,.05,.004);
-  }
+  if(!inBonus&&auto>0)auto--;by('swampLines').replaceChildren();by('swampCollectLayer').replaceChildren();shown=outcome.grid;drawAll();controls();message(inBonus?'The swamp wakes…':'Casting into the dark…');
+  const fast=inBonus?state.fastBonus:state.fastGame;
+  await VaultSymbolDrop.play('swamp',{root:by('swampReels'),cells:shown.flatMap((col,c)=>col.map((t,r)=>({node:columns[c].children[r],column:c,row:r,symbol:t.id}))),rows:3,roundId:rid,hasWin:outcome.winX>0,feature:inBonus,anticipation:!inBonus,speedProfile:fast?'quick':'normal'});if(g!==generation)return;
   scene.classList.remove('anticipating');markWins(outcome);
   if(inBonus&&outcome.collectedX>0){animateCollect(outcome);message(`${format(outcome.fish.reduce((n,f)=>n+f.valueX,0))}× × ${outcome.multiplier} × ${outcome.collectors.length} COLLECTOR${outcome.collectors.length>1?'S':''} = ${format(outcome.collectedX)}×`);await sleep(fast?200:750);if(g!==generation)return;by('swampCollectLayer').replaceChildren();}
   if(inBonus)await animateProgress(outcome,prior,g);if(g!==generation)return;
