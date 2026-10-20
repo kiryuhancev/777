@@ -7,8 +7,8 @@ p=ROOT/'index.html';s=p.read_text()
 # A small independent guard precedes every game/SDK script.
 boot='<!-- BEGIN VAULT BOOT GUARD -->\n<script>\n'+(ROOT/'vault/boot.js').read_text()+'\n</script>\n<!-- END VAULT BOOT GUARD -->'
 pattern=r'<!-- BEGIN VAULT BOOT GUARD -->[\s\S]*?<!-- END VAULT BOOT GUARD -->'
-if re.search(pattern,s):s=re.sub(pattern,lambda _:boot,s)
-else:s=s.replace('<head>','<head>\n'+boot,1)
+s=re.sub(pattern+r'\n?', '',s)
+s=s.replace('<meta charset="utf-8" />','<meta charset="utf-8" />\n'+boot,1)
 p.write_text(s)
 
 for name,path,tag in [('VAULT STYLES','auth.css','style'),('VAULT CONFIG','config.js','script'),('VAULT AUTH UI','auth.html',None),('VAULT RUNTIME','runtime.js','script')]:

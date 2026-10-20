@@ -3,6 +3,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 import json
 root=Path(__file__).resolve().parent.parent;guard=(root/'vault/boot.js').read_text();css=(root/'vault/auth.css').read_text();checks=[]
+html=(root/'index.html').read_text();assert html.index('<meta charset=')<1024;assert html.index('BEGIN VAULT BOOT GUARD')<html.index('BEGIN VAULT RUNTIME');
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
  for mode in ['healthy','hung','crash']:
