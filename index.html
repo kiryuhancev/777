@@ -1321,6 +1321,23 @@ body.table-active .vault-table:not([hidden]){display:block}
 @media(prefers-reduced-motion:reduce){.swamp-flying-collector{display:none}.swamp-progress-icon.arrival{animation:none}.swamp-progress-icon img{transition:opacity .08s}.swamp-cell.scatter.landed::after{display:none}}
 #swampApp .swamp-boost{display:flex;flex-direction:column;gap:8px;width:100%;padding:18px;border:1px solid #537052;border-radius:12px;background:#17271c;color:#eadab6;text-align:left;font:700 14px Arial;cursor:pointer}#swampApp .swamp-boost small{font-size:11px;font-weight:400;line-height:1.6}#swampApp .swamp-boost[aria-pressed='true']{border-color:#dfaf45;background:#3b3219}#swampApp .swamp-boost:disabled{opacity:.5;cursor:default}#swampApp .swamp-spin-cost{text-align:center;color:#dbc899;font-size:11px;line-height:1.5;margin:12px 0}
 
+/* Sequential15-spin bonus gates and milestone rewards. */
+#swampApp .swamp-progress-group{grid-template-rows:52px}
+#swampApp .swamp-progress-target{display:none}
+#swampApp .swamp-milestone-icon{display:grid;place-items:center;align-content:center;gap:1px;border:1px solid #a8874f;border-radius:8px;background:radial-gradient(#4c4a20,#172017);opacity:.35}
+#swampApp .swamp-milestone-icon span{font-size:17px;color:#dbad52}
+#swampApp .swamp-milestone-icon b{font-size:15px;color:#ffe39b}
+#swampApp .swamp-milestone-icon.active{opacity:1;box-shadow:0 0 12px #c9df5a66;border-color:#ebc36a}
+#swampApp .swamp-bonus-gate{position:fixed;inset:0;width:100vw;max-width:none;height:100dvh;max-height:none;margin:0;border:0;padding:max(18px,env(safe-area-inset-top)) 15px;background:radial-gradient(ellipse,#293c22f7,#07120dfc);color:#f3d9a4;cursor:pointer;touch-action:manipulation;z-index:1600}
+#swampApp .swamp-bonus-gate[open]{display:grid;place-items:center}
+#swampApp .swamp-bonus-gate>div{width:min(610px,100%);max-height:90dvh;overflow:auto;text-align:center;padding:30px 16px;border:3px double #b88a4a;border-radius:16px;background:linear-gradient(140deg,#443320aa,#11251c);box-shadow:0 0 75px #c2b34b22,inset 0 0 50px #0007}
+#swampApp .swamp-bonus-gate h2{font:900 clamp(24px,6vw,42px) Arial;letter-spacing:.06em;color:#ffe6aa}
+#swampApp .swamp-bonus-gate strong{display:block;font:900 clamp(42px,12vw,110px) Arial;color:#f3b55a;text-shadow:0 0 22px #daa53e88;overflow-wrap:anywhere}
+#swampApp .swamp-bonus-gate p{font-size:clamp(13px,3vw,20px);line-height:1.7}
+#swampApp .swamp-bonus-gate small{display:block;letter-spacing:.13em;font-size:11px;margin-top:28px;color:#9acb8b}
+
+@media(max-width:600px){#swampApp .swamp-progress-group{grid-template-columns:repeat(4,var(--collector-size));grid-template-rows:38px}#swampApp .swamp-milestone-icon span{font-size:12px}#swampApp .swamp-milestone-icon b{font-size:13px}}
+
 </style>
 <!-- END SWAMP STYLES -->
 <!-- BEGIN MINES STYLES -->
@@ -2069,6 +2086,8 @@ body .slot-bottom-controls .slot-balance{min-width:0;cursor:pointer}
 body .slot-bottom-controls .slot-balance strong{display:block;max-width:100%;white-space:nowrap}
 body .slot-full-balance{font-variant-numeric:tabular-nums;overflow-wrap:anywhere;font-size:24px}
 @media(max-width:760px){body.game-mode .lobby-balance{min-width:0;max-width:45vw}body.game-mode .lobby-balance strong{display:block;max-width:100%;font-size:clamp(12px,4vw,18px);white-space:nowrap}}
+body .slot-purchase-confirmation{width:min(430px,calc(100vw - 24px))!important}
+body .slot-purchase-confirmation header [data-dismiss]{width:44px!important;flex:0 0 44px;font-size:22px!important}
 
 </style>
 <!-- END SLOT HUD STYLES -->
@@ -5071,7 +5090,7 @@ const VaultTables=window.VaultTables=(()=>{
   <div class="swamp-environment" aria-hidden="true"></div><div class="swamp-mist" aria-hidden="true"></div><div class="swamp-fireflies" aria-hidden="true"></div>
   <header class="swamp-heading"><div><small>VAULT · WORKING TITLE</small><h1 id="swampTitle">SWAMP FISHING</h1><img id="swampLogo" alt="Game logo" hidden></div><span class="swamp-format">5 × 3 <b>10 FIXED LINES</b></span></header>
   <div class="swamp-feature-bar" id="swampFeatureBar" hidden aria-label="Free Spins collector progression">
-   <div class="swamp-fs"><small>FREE SPINS</small><strong id="swampSpins">—</strong></div>
+   <div class="swamp-fs"><small>FREE SPINS</small><strong id="swampSpins">—</strong><small id="swampCollectorTotal">0 FISHERMEN</small></div>
    <div class="swamp-progression" id="swampMeter" role="img" aria-label="0 of 12 collectors gathered"></div>
    <div class="swamp-current-collect"><small>COLLECT</small><strong id="swampCurrentMultiplier">×1</strong></div>
    <div class="swamp-milestone-message" id="swampMilestoneMessage" role="status" aria-live="polite"></div>
@@ -5086,15 +5105,16 @@ const VaultTables=window.VaultTables=(()=>{
    <div class="betbox"><button id="swampBetMinus" aria-label="Decrease bet">−</button><div><small>BET</small><strong id="swampBetValue">20</strong></div><button id="swampBetPlus" aria-label="Increase bet">+</button></div>
    <div class="swamp-auto-wrap"><button class="btn secondary" id="swampAuto" aria-expanded="false" aria-controls="swampAutoMenu">AUTO</button><div id="swampAutoMenu" class="swamp-auto-menu" hidden><small>AUTO SPINS</small><div><button data-swamp-auto="10">10</button><button data-swamp-auto="25">25</button><button data-swamp-auto="50">50</button><button data-swamp-auto="100">100</button><button data-swamp-auto="-1" aria-label="Unlimited auto spins">∞</button></div></div></div><button class="btn secondary" id="swampMaxBet">MAX</button><button class="btn swamp-spin" id="swampSpin">SPIN</button><button class="btn swamp-buy" id="swampBuy">BONUS</button>
   </div>
-  <p id="swampSpinCost" class="swamp-spin-cost" role="status"></p><details class="swamp-info"><summary>PAYTABLE &amp; HOW TO PLAY</summary><div class="swamp-info-body"><p>10 fixed paylines pay left to right, starting on reel 1. All values below are multiples of the TOTAL BET. Only the longest match per line pays; winning lines add together.</p><div id="swampPaytable"></div><div class="swamp-line-guide" id="swampLineGuide"></div><p>3 / 4 / 5 Scatters award 10 / 15 / 20 Free Spins. At most one Scatter per reel; Scatter does not pay cash. Money Fish have no independent payout.</p><p>In Free Spins, Collector Wild can land on reels 2–4. Each Collector substitutes regular symbols and collects ALL Money Fish. Multiple Collectors collect the same fish independently. Every four accumulated Collectors award +10 FS. Multipliers: x1 → x2 → x3 → x10; a new tier applies on the NEXT free spin. Marks also count on spins with no Money Fish. Retriggers continue at x10.</p><p>Scatter Boost: шанс символа Scatter ×1.28, цена платного спина ×1.5. Выплаты считаются от базовой ставки. В Free Spins и при покупке бонуса доплаты нет. Настройка общая для слотов VAULT.</p><p id="swampCapInfo"></p><p>Free Spins use the triggering bet. Unfinished visual animations are discarded after reload; committed payouts and remaining Free Spins are restored safely. Working title; final logo pending approval.</p></div></details>
- <dialog id="swampBonusShop" class="swamp-shop" aria-labelledby="swampShopTitle"><button id="swampShopClose" class="swamp-shop-close" aria-label="Close bonus shop">×</button><small>THE SWAMP WAKES</small><h2 id="swampShopTitle">BONUS FEATURES</h2><p>Buy entry to Free Spins. No guaranteed return. Each feature uses the same independent bonus reels and collector progression.</p><div class="swamp-shop-bet"><button id="swampShopBetMinus" aria-label="Decrease bonus bet">−</button><div><small>BET</small><strong id="swampShopBet">20</strong></div><button id="swampShopBetPlus" aria-label="Increase bonus bet">+</button></div><button id="swampScatterBoost" class="swamp-boost" aria-pressed="false"><b>SCATTER BOOST</b><small id="swampBoostInfo">Повышенный шанс Scatter · спин ×1.5</small></button><div id="swampShopOffers" class="swamp-shop-offers"></div><p id="swampShopMessage" role="status"></p></dialog>
+  <p id="swampSpinCost" class="swamp-spin-cost" role="status"></p><details class="swamp-info"><summary>PAYTABLE &amp; HOW TO PLAY</summary><div class="swamp-info-body"><p>10 fixed paylines pay left to right, starting on reel 1. All values below are multiples of the TOTAL BET. Only the longest match per line pays; winning lines add together.</p><div id="swampPaytable"></div><div class="swamp-line-guide" id="swampLineGuide"></div><p>3+ Scatters award15 Free Spins in the single bonus. At most one Scatter per reel; Scatter does not pay cash. Money Fish have no independent payout.</p><p>In Free Spins, Collector Wild can land on reels 2–4. Each Collector substitutes regular symbols and collects ALL Money Fish. Multiple Collectors collect the same fish independently. Collect4 /8 /12 cumulative Fishermen to qualify for the next level. Finish all15 spins of the current level before the Level Up popup. Confirm to play15 new spins at x2 /x3 /x10. Levels are played sequentially, even if several thresholds are already reached. Counters do not reset; marks count without Money Fish. Level4 ends the bonus. Intro, Level Up and Complete wait for Space or tap.</p><p>Scatter Boost: шанс символа Scatter ×1.28, цена платного спина ×1.5. Выплаты считаются от базовой ставки. В Free Spins и при покупке бонуса доплаты нет. Настройка общая для слотов VAULT.</p><p id="swampCapInfo"></p><p>Free Spins use the triggering bet. Unfinished visual animations are discarded after reload; committed payouts, level, cumulative Fishermen, remaining Free Spins and pending confirmation are restored safely. Working title; final logo pending approval.</p></div></details>
+ <dialog id="swampBonusShop" class="swamp-shop" aria-labelledby="swampShopTitle"><button id="swampShopClose" class="swamp-shop-close" aria-label="Close bonus shop">×</button><small>THE SWAMP WAKES</small><h2 id="swampShopTitle">BONUS FEATURES</h2><p>Buy entry to Free Spins. No guaranteed return. One bonus:15 Free Spins per qualified level. Collector multipliers change only between levels.</p><div class="swamp-shop-bet"><button id="swampShopBetMinus" aria-label="Decrease bonus bet">−</button><div><small>BET</small><strong id="swampShopBet">20</strong></div><button id="swampShopBetPlus" aria-label="Increase bonus bet">+</button></div><button id="swampScatterBoost" class="swamp-boost" aria-pressed="false"><b>SCATTER BOOST</b><small id="swampBoostInfo">Повышенный шанс Scatter · спин ×1.5</small></button><div id="swampShopOffers" class="swamp-shop-offers"></div><p id="swampShopMessage" role="status"></p></dialog>
  </div>
+<dialog id="swampBonusGate" class="swamp-bonus-gate" aria-labelledby="swampGateTitle"><div><h2 id="swampGateTitle"></h2><p id="swampGateKicker"></p><strong id="swampGateValue"></strong><p id="swampGateDetail"></p><small>SPACE / TAP ANYWHERE TO CONTINUE</small></div></dialog>
 </section>
 
 <!-- END SWAMP SCREEN -->
 <!-- BEGIN SWAMP MODULE -->
 <script>
-const SWAMP_CONFIG=Object.freeze({
+const SWAMP_CONFIG_V2=Object.freeze({
  version:2,gameId:'swamp',displayName:'SWAMP FISHING',nameIsPlaceholder:true,GAME_LOGO_SRC:'',
  rows:3,reels:5,targetRtp:.96,maxWinX:50000,
  // Scatter is selected once per reel, at most one per reel. No conditioned redraws.
@@ -5115,8 +5135,8 @@ const SWAMP_CONFIG=Object.freeze({
 });
 
 /* Pure collect-slot model. Visual timing cannot draw or replace any symbol. */
-const SWAMP_MODEL=(()=>{
- const C=SWAMP_CONFIG,money=n=>Math.round(n*1e6)/1e6;
+const SWAMP_MODEL_V1=(()=>{
+ const C=SWAMP_CONFIG_V2,money=n=>Math.round(n*1e6)/1e6;
  function seeded(seed){let a=seed>>>0;return()=>{a+=0x6D2B79F5;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
  function pick(entries,rng){const sum=entries.reduce((n,e)=>n+e.weight,0);let t=rng()*sum;for(const e of entries){t-=e.weight;if(t<0)return e;}return entries[entries.length-1];}
  function generate(bonus=false,rng=Math.random,config=C,boost=false){
@@ -5153,6 +5173,85 @@ const SWAMP_MODEL=(()=>{
  }
  function validateBonus(b){if(!b||b.version!==1||b.remaining>0&&(typeof b.featureId!=='string'||!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(b.featureId))||!Number.isFinite(b.bet)||b.bet<=0||b.bet>1e9||!Number.isInteger(b.remaining)||b.remaining<0||b.remaining>100000||!Number.isInteger(b.collectors)||b.collectors<0||b.collectors>100000||!Number.isInteger(b.tier)||b.tier<0||b.tier>3||!Number.isInteger(b.spinsPlayed)||b.spinsPlayed<0||b.spinsPlayed>100000||!Number.isFinite(b.totalWinX)||b.totalWinX<0||b.totalWinX>C.maxWinX||b.tier!==Math.min(3,Math.floor(b.collectors/4)))return null;return {version:1,featureId:typeof b.featureId==='string'&&/^[0-9a-f-]{36}$/i.test(b.featureId)?b.featureId:null,bet:b.bet,remaining:b.remaining,collectors:b.collectors,tier:b.tier,totalWinX:b.totalWinX,spinsPlayed:b.spinsPlayed};}
  return {seeded,pick,generate,evaluate,resolve,newBonus,validateBonus};
+})();
+if(typeof module!=='undefined'&&module.exports)module.exports={SWAMP_CONFIG:SWAMP_CONFIG_V2,SWAMP_MODEL:SWAMP_MODEL_V1};
+
+const SWAMP_CONFIG=Object.freeze({
+ version:3,gameId:'swamp',displayName:'SWAMP FISHING',nameIsPlaceholder:true,GAME_LOGO_SRC:'',
+ rows:3,reels:5,targetRtp:.96,maxWinX:50000,
+ // Scatter is selected once per reel, at most one per reel. No conditioned redraws.
+ scatterPerReel:.09,scatterBoost:{symbolMultiplier:1.28,costMultiplier:1.5},moneyChanceBase:.075,moneyChanceBonus:.15,collectorChance:.028,
+ collectorReels:[1,2,3],collectorsPerUpgrade:4,retriggerSpins:15,multipliers:[1,2,3,10],
+ freeSpins:{3:15,4:15,5:15},
+ autoChoices:[10,25,50,100,-1],timing:{initial:240,reel:180,anticipation:260,fastInitial:70,fastReel:75,pause:600},
+ purchases:[{id:"bonus",spins:15,costX:77,label:"BONUS"}],
+ symbols:[
+  {id:'bobber',weight:23,pays:[1,3,12]}, {id:'hook',weight:20,pays:[1.2,4,16]},
+  {id:'insect',weight:17,pays:[1.5,5,20]}, {id:'bait_jar',weight:14,pays:[2,7,28]},
+  {id:'lantern',weight:11,pays:[2.5,10,40]}, {id:'tackle_box',weight:8,pays:[3,14,60]},
+  {id:'fish_01',weight:5,pays:[5,22,100]}, {id:'catfish',weight:2,pays:[8,40,200]}
+ ],
+ lineScale:.97,
+ money:[{x:2,weight:60000},{x:5,weight:27000},{x:10,weight:9000},{x:15,weight:2500},{x:20,weight:1000},{x:25,weight:400},{x:50,weight:99},{x:2000,weight:1}],
+ paylines:[[1,1,1,1,1],[0,0,0,0,0],[2,2,2,2,2],[0,1,2,1,0],[2,1,0,1,2],[0,0,1,2,2],[2,2,1,0,0],[1,0,0,0,1],[1,2,2,2,1],[0,1,1,1,0]]
+});
+
+/* Pure collect-slot model. Visual timing cannot draw or replace any symbol. */
+const SWAMP_MODEL=(()=>{
+ const C=SWAMP_CONFIG,money=n=>Math.round(n*1e6)/1e6;
+ function seeded(seed){let a=seed>>>0;return()=>{a+=0x6D2B79F5;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
+ function pick(entries,rng){const sum=entries.reduce((n,e)=>n+e.weight,0);let t=rng()*sum;for(const e of entries){t-=e.weight;if(t<0)return e;}return entries[entries.length-1];}
+ function generate(bonus=false,rng=Math.random,config=C,boost=false){
+  const grid=Array.from({length:5},()=>[]);
+  for(let reel=0;reel<5;reel++){
+   const scatterRow=!bonus&&rng()<config.scatterPerReel*(boost?config.scatterBoost.symbolMultiplier:1)?Math.floor(rng()*3):-1;
+   for(let row=0;row<3;row++){
+    if(row===scatterRow){grid[reel].push({id:'scatter'});continue;}
+    if(bonus&&config.collectorReels.includes(reel)&&rng()<config.collectorChance){grid[reel].push({id:'collector'});continue;}
+    if(rng()<(bonus?config.moneyChanceBonus:config.moneyChanceBase)){const m=pick(config.money,rng);grid[reel].push({id:'money',valueX:m.x,skin:m.x>=50?1:m.x>=20?2:m.x>=10?3:0});continue;}
+    grid[reel].push({id:pick(config.symbols,rng).id});
+   }
+  }return grid;
+ }
+ function evaluate(grid,config=C){
+  let lineWinX=0;const lines=[];
+  config.paylines.forEach((rows,index)=>{const symbol=config.symbols.find(s=>s.id===grid[0][rows[0]].id);if(!symbol)return;let count=1;while(count<5&&[symbol.id,'collector'].includes(grid[count][rows[count]].id))count++;if(count>=3){const payoutX=money(symbol.pays[count-3]*config.lineScale);lineWinX+=payoutX;lines.push({line:index,rows,count,symbol:symbol.id,payoutX});}});
+  const collectors=[],fish=[];let scatters=0;
+  grid.forEach((column,reel)=>column.forEach((s,row)=>{if(s.id==='collector')collectors.push({reel,row});if(s.id==='money')fish.push({reel,row,valueX:s.valueX});if(s.id==='scatter')scatters++;}));
+  return {lineWinX:money(lineWinX),lines,collectors,fish,scatters};
+ }
+ function newBonus(scatterCount,bet,config=C,initialWinX=0){return {version:2,bet,remaining:initialWinX>=config.maxWinX?0:15,collectors:0,tier:0,totalWinX:initialWinX,spinsPlayed:0,phase:initialWinX>=config.maxWinX?'complete':'intro'};}
+ function resolve(grid,bonus=null,config=C){
+  if(bonus?.version===1)return SWAMP_MODEL_V1.resolve(grid,bonus,SWAMP_CONFIG_V2);
+  const e=evaluate(grid,config),inBonus=!!bonus,multiplier=inBonus?config.multipliers[bonus.tier]:1;
+  const collectedX=inBonus?money(e.fish.reduce((sum,f)=>sum+f.valueX,0)*e.collectors.length*multiplier):0;
+  const uncappedX=money(e.lineWinX+collectedX),availableX=Math.max(0,config.maxWinX-(bonus?.totalWinX||0)),winX=money(Math.min(uncappedX,availableX));
+  let nextBonus=null;
+  if(inBonus){
+   const count=bonus.collectors+e.collectors.length;
+   nextBonus={...bonus,remaining:bonus.remaining-1,collectors:count,totalWinX:money(bonus.totalWinX+winX),spinsPlayed:bonus.spinsPlayed+1,phase:'playing'};
+   delete nextBonus.previousTier;
+   if(nextBonus.totalWinX>=config.maxWinX){nextBonus.remaining=0;nextBonus.phase='complete';}
+   else if(nextBonus.remaining===0){
+    if(bonus.tier<3&&count>=(bonus.tier+1)*4){nextBonus={...nextBonus,remaining:15,tier:bonus.tier+1,previousTier:bonus.tier,phase:'level-up'};}
+    else nextBonus.phase='complete';
+   }
+  }
+  return {...e,grid,multiplier,collectedX,uncappedX,winX,awardedSpins:0,nextBonus,triggerSpins:!inBonus&&e.scatters>=3&&winX<config.maxWinX?15:0,capped:winX<uncappedX};
+ }
+ function acknowledge(b){if(!b||b.version!==2)return b;const next={...b,phase:b.phase==='complete'?'complete':'playing'};delete next.previousTier;return next;}
+ function purchaseTrigger(seed){const grid=generate(false,seeded(seed));for(const col of grid)for(let i=0;i<3;i++)if(col[i].id==='scatter')col[i]={id:C.symbols[(i+seed)%C.symbols.length].id};for(let i=0;i<3;i++)grid[i][(seed+i)%3]={id:'scatter'};return grid;}
+ function validateBonus(b){
+  if(b?.version===1)return SWAMP_MODEL_V1.validateBonus(b);
+  if(!b||b.version!==2||typeof b.featureId!=='string'||!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(b.featureId)||!Number.isFinite(b.bet)||b.bet<=0||b.bet>1e9||!Number.isInteger(b.remaining)||b.remaining<0||b.remaining>15||!Number.isInteger(b.collectors)||b.collectors<0||b.collectors>540||!Number.isInteger(b.tier)||b.tier<0||b.tier>3||b.collectors<b.tier*4||!Number.isInteger(b.spinsPlayed)||b.spinsPlayed<0||b.spinsPlayed>60||!Number.isFinite(b.totalWinX)||b.totalWinX<0||b.totalWinX>C.maxWinX||!['intro','playing','level-up','complete'].includes(b.phase))return null;
+  if(b.phase==='intro'&&(b.tier!==0||b.remaining!==15||b.spinsPlayed!==0)||b.phase==='level-up'&&(b.tier<1||b.remaining!==15||b.spinsPlayed!==b.tier*15||b.previousTier!==b.tier-1)||b.phase==='complete'&&b.remaining!==0)return null;
+  const out={version:2,featureId:b.featureId,bet:b.bet,remaining:b.remaining,collectors:b.collectors,tier:b.tier,totalWinX:b.totalWinX,spinsPlayed:b.spinsPlayed,phase:b.phase};
+  if(b.phase==='level-up')out.previousTier=b.previousTier;
+  if(Number.isInteger(b.triggerSeed)&&b.triggerSeed>=0&&b.triggerSeed<=4294967295)out.triggerSeed=b.triggerSeed;
+  return out;
+ }
+
+ return {seeded,pick,generate,evaluate,resolve,newBonus,validateBonus,acknowledge,purchaseTrigger};
 })();
 if(typeof module!=='undefined'&&module.exports)module.exports={SWAMP_CONFIG,SWAMP_MODEL};
 
@@ -5191,21 +5290,22 @@ const VaultSwamp=window.VaultSwamp=(()=>{
  const reducedMotion=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  const progressAnimations=new Set();
  const progressSlots=Array.from({length:12},(_,i)=>{
-  if(i%4===0){const group=document.createElement('div');group.className='swamp-progress-group';group.dataset.milestone=String(i+4);const label=document.createElement('span');label.className='swamp-progress-target';label.textContent=`×${C.multipliers[i/4+1]}`;group.append(label);by('swampMeter').append(group);}
-  const n=document.createElement('span');n.className='swamp-progress-icon';n.dataset.index=i+1;n.setAttribute('aria-hidden','true');const img=document.createElement('img');img.src=A.collectorProgress;img.alt='';img.draggable=false;n.append(img);by('swampMeter').lastElementChild.append(n);return n;
+  if(i%4===0){const group=document.createElement('div');group.className='swamp-progress-group';group.dataset.milestone=String(i+4);by('swampMeter').append(group);}
+  const n=document.createElement('span');n.className='swamp-progress-icon';n.dataset.index=i+1;n.setAttribute('aria-hidden','true');const img=document.createElement('img');img.src=A.collectorProgress;img.alt='';img.draggable=false;if(i%4===3){n.classList.add('swamp-milestone-icon');n.innerHTML='<span aria-hidden="true">⚓</span><b>×'+C.multipliers[Math.floor(i/4)+1]+'</b>';}else n.append(img);by('swampMeter').lastElementChild.append(n);return n;
  });
  function paintProgress(snapshot,visible){
   const bar=by('swampFeatureBar');bar.hidden=!visible;
   const count=Math.min(12,snapshot?.collectors||0);
-  by('swampMeter').setAttribute('aria-label',`${count} of 12 collectors gathered${(snapshot?.collectors||0)>=12?' · progression complete':''}`);
+  by('swampCollectorTotal').textContent=String(snapshot?.collectors||0)+' FISHERMEN';
+  by('swampMeter').setAttribute('aria-label',`${snapshot?.collectors||0} collectors gathered${(snapshot?.collectors||0)>=12?' · progression complete':''}`);
   for(let i=0;i<12;i++)progressSlots[i].classList.toggle('active',i<count);
   for(const group of by('swampMeter').children)group.classList.toggle('complete',count>=Number(group.dataset.milestone));
-  by('swampCurrentMultiplier').textContent=`×${C.multipliers[snapshot?.tier||0]}`;
+  by('swampCurrentMultiplier').textContent=`×${C.multipliers[snapshot?.phase==='level-up'?snapshot.previousTier:snapshot?.tier||0]}`;
  }
  function clearProgressFX(){window.VaultAnalogReels?.cancel();root.querySelector('.swamp-frame').classList.remove('has-win');for(const animation of progressAnimations)animation.cancel();progressAnimations.clear();by('swampProgressFlights').replaceChildren();by('swampMilestoneMessage').textContent='';by('swampFeatureBar').classList.remove('milestone');by('swampMeter').querySelectorAll('.arrival,.milestone-group').forEach(n=>n.classList.remove('arrival','milestone-group'));root.querySelectorAll('.collecting').forEach(n=>n.classList.remove('collecting'));}
  function milestone(count){
   const index=count/4,tier=C.multipliers[Math.min(3,index)];
-  by('swampMilestoneMessage').textContent=`+10 FREE SPINS${count<=12?' · MULTIPLIER ×'+tier:' · COLLECT ×10'}`;
+  by('swampMilestoneMessage').textContent=count<=12?`×${tier} QUALIFIED · FINISH CURRENT LEVEL`:`${count} COLLECTORS · CURRENT LEVEL CONTINUES`;
   const target=count<=12?by('swampMeter').children[index-1]:by('swampFeatureBar');
   target.classList.remove(count<=12?'milestone-group':'milestone');void target.offsetWidth;target.classList.add(count<=12?'milestone-group':'milestone');
  }
@@ -5232,7 +5332,7 @@ const VaultSwamp=window.VaultSwamp=(()=>{
    }else await sleep(70+f.index*80);
    if(g!==generation)return;
    // Derived from the committed prior/current checkpoints, never a second game-state counter.
-   viewBonus={...bonus,collectors:f.n,tier:Math.min(bonus.tier,Math.floor(f.n/4)),remaining:Math.min(bonus.remaining,prior.remaining-1+(Math.floor(f.n/4)-Math.floor(prior.collectors/4))*C.retriggerSpins)};
+   viewBonus=prior.version===1?{...bonus,collectors:f.n,tier:Math.min(bonus.tier,Math.floor(f.n/4)),remaining:Math.min(bonus.remaining,prior.remaining-1+(Math.floor(f.n/4)-Math.floor(prior.collectors/4))*10)}:{...bonus,collectors:f.n,tier:prior.tier,phase:'playing',remaining:Math.max(0,prior.remaining-1)};
    controls();f.target.classList.add('arrival');
    if(f.n%4===0)milestone(f.n);
   });
@@ -5240,23 +5340,56 @@ const VaultSwamp=window.VaultSwamp=(()=>{
   if(outcome.awardedSpins)await sleep(small?80:220);
  }
 
+ // Stable popup boundaries are checkpoints, never animation frames.
+ const popup=by('swampBonusGate');let pendingGate=false,gateArmedAt=0;
+ function presentationKey(){return 'vault:v1:user:'+VaultSession.user?.id+':swamp-presentation';}
+ function gateToken(b){return b?[b.featureId,b.phase,b.spinsPlayed].join(':'):'';}
+ function acknowledged(b){try{return JSON.parse(localStorage.getItem(presentationKey()))?.token===gateToken(b);}catch{return false;}}
+ function markAcknowledged(b){try{localStorage.setItem(presentationKey(),JSON.stringify({version:1,token:gateToken(b),updatedAt:Date.now()}));}catch{}}
+ function closeGate(){pendingGate=false;if(popup.open)popup.close();}
+ function showGate(){
+  if(!bonus||bonus.version!==2||bonus.phase==='playing')return false;
+  if(acknowledged(bonus)){if(bonus.phase==='complete'){bonus=null;controls();return false;}bonus=M.acknowledge(bonus);VaultRecovery.checkpointSwamp();controls();return false;}
+  pendingGate=true;gateArmedAt=performance.now()+180;clearTimeout(timer);toggleAuto(false);
+  const phase=bonus.phase,level=bonus.tier+1;
+  by('swampGateTitle').textContent=phase==='intro'?'ПОЗДРАВЛЯЕМ!':phase==='level-up'?'НОВЫЙ УРОВЕНЬ!':'BONUS COMPLETE';
+  by('swampGateKicker').textContent=phase==='intro'?'ВЫ ВЫИГРАЛИ':phase==='level-up'?'COLLECTOR MULTIPLIER':'TOTAL WIN';
+  by('swampGateValue').textContent=phase==='complete'?format(money(bonus.totalWinX*bonus.bet)):phase==='intro'?'15':'×'+C.multipliers[bonus.tier];
+  by('swampGateDetail').textContent=phase==='complete'?format(bonus.totalWinX)+'× TOTAL':phase==='intro'?'БЕСПЛАТНЫХ ВРАЩЕНИЙ · LEVEL 1 · ×1':'+15 FREE SPINS · LEVEL '+level;
+  if(!popup.open)popup.showModal();controls();
+  if(phase==='complete'&&!reducedMotion()){
+   const target=money(bonus.totalWinX*bonus.bet),start=performance.now(),g=generation;
+   function frame(now){if(!pendingGate||g!==generation)return;const t=Math.min(1,(now-start)/650);by('swampGateValue').textContent=format(target*(1-(1-t)**3));if(t<1)requestAnimationFrame(frame);}
+   requestAnimationFrame(frame);
+  }
+  return true;
+ }
+ function continueGate(e){
+  if(!pendingGate||performance.now()<gateArmedAt)return;e?.preventDefault();e?.stopImmediatePropagation();
+  const b=bonus;markAcknowledged(b);closeGate();
+  if(b.phase==='complete'){bonus=null;viewBonus=null;VaultRecovery.checkpointSwamp();busy=false;controls();schedule();return;}
+  bonus=M.acknowledge(b);viewBonus=bonus;VaultRecovery.checkpointSwamp();busy=false;controls();spin();
+ }
+ popup.addEventListener('click',continueGate);popup.addEventListener('cancel',e=>e.preventDefault());
+ document.addEventListener('keydown',e=>{if(pendingGate){if(e.code==='Space'&&!e.repeat)continueGate(e);else{e.preventDefault();e.stopImmediatePropagation();}}},true);
  function controls(){
   const view=busy?viewBonus:bonus;
   by('swampBetValue').textContent=format(busy&&view?view.bet:wager());by('swampLastWin').textContent=format(busy?displayedWin:lastWin);by('swampFeatureWin').textContent=format(busy?displayedFeatureWin:featureWin);
-  by('swampSpins').textContent=view?String(view.remaining):'—';paintProgress(view,busy?!!view:hasBonus());
+  by('swampSpins').textContent=view?String(view.phase==='level-up'?0:view.remaining):'—';paintProgress(view,busy?!!view:hasBonus());
   scene.classList.toggle('in-bonus',busy?!!view:hasBonus());
-  const locked=busy||hasBonus()||autoRunning();for(const id of ['swampBetMinus','swampBetPlus','swampMaxBet'])by(id).disabled=locked;
-  by('swampSpin').disabled=busy||autoRunning()||!window.VaultRoundService?.swampSupport||!hasBonus()&&spinCost()>state.balance;by('swampSpin').textContent=busy?'SPINNING':hasBonus()?'FREE SPIN':'SPIN';
-  by('swampAuto').disabled=!window.VaultRoundService?.swampSupport||!autoRunning()&&(hasBonus()||busy);by('swampAuto').textContent=autoRunning()?`STOP ${auto===-1?'∞':auto}`:'AUTO';by('swampAuto').setAttribute('aria-pressed',String(autoRunning()));by('swampBuy').disabled=locked;shopControls();
+  const locked=busy||pendingGate||hasBonus()||autoRunning();for(const id of ['swampBetMinus','swampBetPlus','swampMaxBet'])by(id).disabled=locked;
+  by('swampSpin').disabled=busy||pendingGate||autoRunning()||!window.VaultRoundService?.swampSupport||!hasBonus()&&spinCost()>state.balance;by('swampSpin').textContent=busy?'SPINNING':hasBonus()?'FREE SPIN':'SPIN';
+  by('swampAuto').disabled=pendingGate||!window.VaultRoundService?.swampSupport||!autoRunning()&&(hasBonus()||busy);by('swampAuto').textContent=autoRunning()?`STOP ${auto===-1?'∞':auto}`:'AUTO';by('swampAuto').setAttribute('aria-pressed',String(autoRunning()));by('swampBuy').disabled=locked;shopControls();
   root.querySelectorAll('[data-setting]').forEach(n=>n.setAttribute('aria-pressed',String(!!state[n.dataset.setting])));
  }
  function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
  function markWins(outcome){root.querySelector('.swamp-frame').classList.toggle('has-win',outcome.winX>0);by('swampLines').innerHTML=outcome.lines.map(l=>`<polyline points="${l.rows.slice(0,l.count).map((r,c)=>`${c*100+50},${r*100+50}`).join(' ')}"/>`).join('');for(const l of outcome.lines)for(let c=0;c<l.count;c++)columns[c].children[l.rows[c]].classList.add('win');if(outcome.collectedX>0)root.querySelectorAll('.swamp-cell.money,.swamp-cell.collector').forEach(n=>n.classList.add('win'));}
  function animateCollect(outcome){root.querySelectorAll('.swamp-cell.money,.swamp-cell.collector').forEach(n=>n.classList.add('collecting'));const layer=by('swampCollectLayer'),box=layer.getBoundingClientRect();let count=0;for(const target of outcome.collectors){for(const fish of outcome.fish){if(count++>=32)break;const n=document.createElement('span');n.className='swamp-flying-value';n.textContent=`${fish.valueX}×`;n.style.setProperty('--sx',`${(fish.reel+.5)/5*100}%`);n.style.setProperty('--sy',`${(fish.row+.5)/3*100}%`);n.style.setProperty('--dx',`${(target.reel-fish.reel)*box.width/5}px`);n.style.setProperty('--dy',`${(target.row-fish.row)*box.height/3}px`);layer.append(n);}}tone(220,.7,.012);}
  async function transition(text,small,g){const n=by('swampTransition');n.replaceChildren();const t=document.createElement('span');t.textContent=text;const sub=document.createElement('small');sub.textContent=small;n.append(t,sub);n.hidden=false;await sleep(state.fastBonus?250:650);if(generation===g)n.hidden=true;}
- function schedule(){clearTimeout(timer);if(!document.hidden&&currentGame==='swamp'&&(hasBonus()||autoRunning()))timer=setTimeout(()=>spin(),hasBonus()?(state.fastBonus?80:350):C.timing.pause);}
+ function schedule(){clearTimeout(timer);if(!pendingGate&&!document.hidden&&currentGame==='swamp'&&(hasBonus()||autoRunning()))timer=setTimeout(()=>spin(),hasBonus()?(state.fastBonus?80:350):C.timing.pause);}
  async function spin(){
-  if(busy||currentGame!=='swamp'||!VaultRoundService.canPlay('swamp'))return;
+  if(busy||pendingGate||currentGame!=='swamp'||!VaultRoundService.canPlay('swamp'))return;
+  if(showGate())return;
   const inBonus=hasBonus(),stake=wager(),boost=!inBonus&&boosted(),cost=money(stake*(boost?C.scatterBoost.costMultiplier:1));if(!inBonus&&cost>state.balance){auto=0;message('Недостаточно средств');controls();return;}
   const prior=bonus?{...bonus}:null;
   // Begin checkpoints the consumed free spin before any await; the model receives its prior count.
@@ -5283,7 +5416,7 @@ const VaultSwamp=window.VaultSwamp=(()=>{
   root.querySelectorAll('.collecting').forEach(n=>n.classList.remove('collecting'));
   viewBonus=bonus;displayedWin=lastWin;displayedFeatureWin=featureWin;VaultWalletService.releasePresentation('swamp');controls();
   if(outcome.winX>=WIN_LEVELS.find(level=>level.label==='BIG WIN').mult){await showWinMilestones(lastWin,stake);if(g!==generation)return;}
-  if(outcome.triggerSpins)await transition(`${outcome.triggerSpins} FREE SPINS`,'THE SWAMP WAKES',g);
+  if(outcome.triggerSpins&&bonus?.version===1)await transition(`${outcome.triggerSpins} FREE SPINS`,'THE SWAMP WAKES',g);
   // Collector milestones are shown at each icon arrival; rewards were already committed above.
   if(g!==generation)return;
   if(outcome.capped)message(`MAX WIN · ${format(C.maxWinX)}×`);
@@ -5291,32 +5424,44 @@ const VaultSwamp=window.VaultSwamp=(()=>{
   else if(outcome.winX>0)message(`WIN ${format(lastWin)} · ${format(outcome.winX)}×`);
   else if(outcome.collectors.length)message('Collector mark earned · no Money Fish this spin');
   else message(inBonus?'Quiet water… next free spin.':'No catch. Money Fish collect only in Free Spins.');
-  if(bonus?.remaining===0)bonus=null;scene.classList.remove('collector-flash');busy=false;controls();schedule();
+  if(bonus?.version===1&&bonus.remaining===0)bonus=null;scene.classList.remove('collector-flash');busy=false;controls();if(!showGate())schedule();
  }
  function message(text){by('swampMessage').textContent=text;}
  function toggleAuto(show){by('swampAutoMenu').hidden=!show;by('swampAuto').setAttribute('aria-expanded',String(show));}
  function shopControls(){by('swampScatterBoost').disabled=busy||hasBonus()||autoRunning()||!window.VaultRoundService?.swampBoostSupport;by('swampScatterBoost').setAttribute('aria-pressed',String(boosted()));by('swampBoostInfo').textContent=window.VaultRoundService?.swampBoostSupport?`${boosted()?'АКТИВЕН · ':''}шанс символа Scatter ×${C.scatterBoost.symbolMultiplier} · цена спина ×${C.scatterBoost.costMultiplier}`:'Scatter Boost доступен после обновления базы';by('swampSpinCost').textContent=hasBonus()?'FREE SPINS · без доплаты за Boost':`Базовая ставка ${format(wager())} · цена спина ${format(spinCost())}${boosted()?' · SCATTER BOOST':''}`;if(!by('swampShopOffers').children.length)return;by('swampShopBet').textContent=format(BETS[betIndex]);for(const b of root.querySelectorAll('[data-swamp-buy]')){const offer=C.purchases.find(x=>x.id===b.dataset.swampBuy);b.textContent=`BUY · ${format(offer.costX*BETS[betIndex])}`;b.disabled=busy||hasBonus()||autoRunning()||offer.costX*BETS[betIndex]>state.balance||!window.VaultRoundService?.swampPurchaseSupport;}by('swampShopMessage').textContent=window.VaultRoundService?.swampPurchaseSupport?'Each purchase charges the shown total once. The stake is locked throughout Free Spins.':'Для покупки бонусов требуется обновление базы.';}
- async function buyFeature(type){const offer=C.purchases.find(x=>x.id===type);if(!offer||busy||hasBonus()||autoRunning()||!VaultRoundService.swampPurchaseSupport||!VaultRoundService.canPlay('swamp'))return;const stake=BETS[betIndex],cost=money(stake*offer.costX);if(cost>state.balance)return;clearProgressFX();bonus={...M.newBonus(offer.spins===20?5:3,stake),featureId:null};const id=VaultRoundService.begin('swamp',cost,{stake,purchaseStake:stake,purchaseType:offer.id,purchaseSpins:offer.spins,purchaseCostX:offer.costX,mathVersion:C.version});if(!id){bonus=null;controls();return;}featureWin=0;lastWin=0;VaultRoundService.settleWithPayout('swamp',0,'bonus-purchased',{featureId:id,purchaseType:offer.id,purchaseSpins:offer.spins,purchaseCostX:offer.costX});by('swampBonusShop').close();toggleAuto(false);busy=true;viewBonus=bonus;controls();const g=++generation;await transition(`${offer.spins} FREE SPINS`,'FEATURE PURCHASED · COLLECT ×1',g);if(g!==generation)return;busy=false;controls();schedule();}
+ async function buyFeature(type){
+  const offer=C.purchases.find(x=>x.id===type);if(!offer||busy||pendingGate||hasBonus()||autoRunning()||!VaultRoundService.swampPurchaseSupport||!VaultRoundService.canPlay('swamp'))return;
+  const stake=BETS[betIndex],cost=money(stake*offer.costX);if(cost>state.balance)return;
+  const seed=crypto.getRandomValues(new Uint32Array(1))[0];clearProgressFX();bonus={...M.newBonus(3,stake),featureId:null,triggerSeed:seed};
+  const id=VaultRoundService.begin('swamp',cost,{stake,purchaseStake:stake,purchaseType:offer.id,purchaseSpins:15,purchaseCostX:offer.costX,seed,mathVersion:C.version});
+  if(!id){bonus=null;controls();return;}featureWin=0;lastWin=0;
+  VaultRoundService.settleWithPayout('swamp',0,'bonus-purchased',{featureId:id,purchaseType:offer.id,purchaseSpins:15,purchaseCostX:offer.costX,seed,mathVersion:C.version,presentationTrigger:true});
+  by('swampBonusShop').close();toggleAuto(false);busy=true;viewBonus=bonus;controls();const g=++generation,grid=M.purchaseTrigger(seed);
+  message('PURCHASED ENTRY · 3 SCATTER TRIGGER');
+  await VaultSymbolDrop.play('swamp',{root:by('swampReels'),reels:columns,finalGrid:grid,renderCell:cell,decorativeSymbols:C.symbols.map(s=>({id:s.id})),rows:3,roundId:id,hasWin:false,feature:false,anticipation:true,speedProfile:state.fastGame?'quick':'normal'});
+  if(g!==generation)return;shown=grid;root.querySelectorAll('.swamp-cell.scatter').forEach(n=>n.classList.add('win'));busy=false;controls();showGate();
+ }
+
  function getCheckpoint(){return bonus?{...bonus}:null;}
  function recoveryGrid(){
   // Reconstruct only the visual board from the last owned, already settled seed.
   // No resolve/settle, wallet change, entitlement consumption or new RNG draw.
   const saved=window.VaultStorage?.inspect().data.rounds;
   const record=saved?.findLast(r=>r.gameId==='swamp'&&r.status==='settled'&&r.metadata?.mathVersion===C.version&&Number.isInteger(r.metadata?.seed)&&r.metadata.seed>=0&&r.metadata.seed<=4294967295);
-  return record?M.generate(record.metadata.freeSpin===true,M.seeded(record.metadata.seed),C,record.metadata.scatterBoost===true):Array.from({length:5},(_,c)=>Array.from({length:3},(_,r)=>({id:preview[(c*3+r)%preview.length]})));
+  return record?(record.metadata.presentationTrigger===true?M.purchaseTrigger(record.metadata.seed):M.generate(record.metadata.freeSpin===true,M.seeded(record.metadata.seed),C,record.metadata.scatterBoost===true)):Array.from({length:5},(_,c)=>Array.from({length:3},(_,r)=>({id:preview[(c*3+r)%preview.length]})));
  }
- function restore(value){clearProgressFX();window.VaultWalletService?.releasePresentation('swamp');displayedWin=0;displayedFeatureWin=0;viewBonus=null;scene.classList.remove('anticipating','collector-flash');clearTimeout(timer);generation++;bonus=M.validateBonus(value);busy=false;auto=0;featureWin=bonus?money(bonus.totalWinX*bonus.bet):0;lastWin=0;lastOutcome=null;columns.forEach(n=>n.classList.remove('rolling','anticipation'));by('swampCollectLayer').replaceChildren();by('swampLines').replaceChildren();by('swampTransition').hidden=true;shown=recoveryGrid();drawAll();controls();message(hasBonus()?`FREE SPINS RESTORED · ${bonus.remaining}`:'10 fixed paylines · Money Fish collect in Free Spins.');}
+ function restore(value){closeGate();clearProgressFX();window.VaultWalletService?.releasePresentation('swamp');displayedWin=0;displayedFeatureWin=0;viewBonus=null;scene.classList.remove('anticipating','collector-flash');clearTimeout(timer);generation++;bonus=M.validateBonus(value);busy=false;auto=0;featureWin=bonus?money(bonus.totalWinX*bonus.bet):0;lastWin=0;lastOutcome=null;columns.forEach(n=>n.classList.remove('rolling','anticipation'));by('swampCollectLayer').replaceChildren();by('swampLines').replaceChildren();by('swampTransition').hidden=true;shown=recoveryGrid();drawAll();controls();message(hasBonus()?`FREE SPINS RESTORED · ${bonus.remaining}`:'10 fixed paylines · Money Fish collect in Free Spins.');}
  async function open(){if(!VaultSession.ready||VaultSession.mode!=='authenticated')return;currentGame='swamp';document.body.classList.remove('lobby-mode','slot-active','poker-active','bird-active','table-active');document.body.classList.add('game-mode','swamp-active');root.hidden=false;VaultStorage.schedule();syncMusic();preload();startAudio();controls();
   if(!VaultRoundService.swampSupport){message('Connecting to the dock…');const ready=await VaultRoundService.checkSwampSupport();if(currentGame!=='swamp')return;message(ready?'10 fixed paylines · Money Fish collect in Free Spins.':'Слот пока недоступен: требуется обновление базы.');controls();}
-  if(VaultRoundService.swampSupport)schedule();
+  if(VaultRoundService.swampSupport&&!showGate())schedule();
  }
- function leave(){if(root.hidden)return;clearProgressFX();toggleAuto(false);if(by('swampBonusShop').open)by('swampBonusShop').close();VaultWalletService.releasePresentation('swamp');scene.classList.remove('anticipating','collector-flash');root.hidden=true;clearTimeout(timer);generation++;busy=false;auto=0;by('swampTransition').hidden=true;by('swampCollectLayer').replaceChildren();columns.forEach(n=>n.classList.remove('rolling','anticipation'));if(document.body.classList.contains('swamp-active'))document.body.classList.remove('swamp-active');clearInterval(ambient);ambient=null;}
+ function leave(){if(root.hidden)return;closeGate();clearProgressFX();toggleAuto(false);if(by('swampBonusShop').open)by('swampBonusShop').close();VaultWalletService.releasePresentation('swamp');scene.classList.remove('anticipating','collector-flash');root.hidden=true;clearTimeout(timer);generation++;busy=false;auto=0;by('swampTransition').hidden=true;by('swampCollectLayer').replaceChildren();columns.forEach(n=>n.classList.remove('rolling','anticipation'));if(document.body.classList.contains('swamp-active'))document.body.classList.remove('swamp-active');clearInterval(ambient);ambient=null;}
  by('openSwampGame').onclick=open;by('swampSpin').onclick=()=>{startAudio();spin();};by('swampAuto').onclick=()=>{if(autoRunning()){auto=0;clearTimeout(timer);toggleAuto(false);controls();if(hasBonus()&&!busy)schedule();return;}if(busy||hasBonus())return;toggleAuto(by('swampAutoMenu').hidden);};
  for(const [id,delta] of [['swampBetMinus',-1],['swampBetPlus',1],['swampMaxBet',999]])by(id).onclick=()=>{if(busy||hasBonus()||autoRunning())return;betIndex=Math.max(0,Math.min(BETS.length-1,delta===999?BETS.length-1:betIndex+delta));controls();VaultStorage.schedule();};
  root.querySelectorAll('[data-setting]').forEach(n=>n.onclick=()=>{toggleSetting(n.dataset.setting);startAudio();controls();syncAmbient();});
  by('swampScatterBoost').onclick=()=>{if(busy||hasBonus()||autoRunning()||!window.VaultRoundService?.swampBoostSupport)return;toggleSetting('scatterBoost');controls();VaultStorage.saveLocalState();};
  by('swampBuy').onclick=()=>{if(busy||hasBonus()||autoRunning())return;toggleAuto(false);shopControls();by('swampBonusShop').showModal();};by('swampShopClose').onclick=()=>by('swampBonusShop').close();
- by('swampShopOffers').innerHTML=C.purchases.map(o=>`<article class="swamp-offer"><h3>${o.label}</h3><strong>${o.spins} FREE SPINS</strong><small>START ×1 · PROGRESS TO ×10</small><p>Cost ${o.costX}× bet · collector retriggers included</p><button data-swamp-buy="${o.id}">BUY</button></article>`).join('');root.querySelectorAll('[data-swamp-buy]').forEach(b=>b.onclick=()=>{startAudio();buyFeature(b.dataset.swampBuy);});
+ by('swampShopOffers').innerHTML=C.purchases.map(o=>`<article class="swamp-offer"><h3>${o.label}</h3><strong>${o.spins} FREE SPINS</strong><small>START ×1 · PROGRESS TO ×10</small><p>Cost ${o.costX}× bet · 15 SPINS PER QUALIFIED LEVEL</p><button data-swamp-buy="${o.id}">BUY</button></article>`).join('');root.querySelectorAll('[data-swamp-buy]').forEach(b=>b.onclick=()=>{startAudio();buyFeature(b.dataset.swampBuy);});
  for(const [id,d] of [['swampShopBetMinus',-1],['swampShopBetPlus',1]])by(id).onclick=()=>{if(busy||hasBonus()||autoRunning())return;betIndex=Math.max(0,Math.min(BETS.length-1,betIndex+d));controls();VaultStorage.schedule();};
  root.querySelectorAll('[data-swamp-auto]').forEach(b=>b.onclick=()=>{const count=Number(b.dataset.swampAuto);if(busy||hasBonus()||!C.autoChoices.includes(count))return;auto=count;toggleAuto(false);startAudio();controls();spin();});document.addEventListener('click',e=>{if(!e.target.closest('.swamp-auto-wrap'))toggleAuto(false);});
  by('swampTitle').textContent=C.displayName;if(C.GAME_LOGO_SRC){by('swampLogo').onerror=()=>{by('swampLogo').hidden=true;by('swampTitle').hidden=false;};by('swampLogo').src=C.GAME_LOGO_SRC;by('swampLogo').hidden=false;by('swampTitle').hidden=true;}
@@ -5329,7 +5474,7 @@ const VaultSwamp=window.VaultSwamp=(()=>{
  new MutationObserver(()=>{if(currentGame!=='swamp')leave();}).observe(document.body,{attributes:true,attributeFilter:['class']});
  document.addEventListener('visibilitychange',()=>{if(document.hidden){clearTimeout(timer);clearInterval(ambient);ambient=null;}else if(currentGame==='swamp'){syncAmbient();if(!busy)schedule();}});
  drawAll();controls();
- return {getHudState:()=>({bonus:bonus?{remaining:bonus.remaining}:null}),open,restore,getCheckpoint,attachPurchaseRound:id=>{if(bonus)bonus.featureId=id;},resume:schedule,get isBusy(){return busy;},get betIndex(){return betIndex;},set betIndex(value){betIndex=Number.isInteger(value)&&value>=0&&value<BETS.length?value:2;controls();},inspect:()=>({betIndex,bonus:getCheckpoint(),busy,auto,lastWin,featureWin,lastOutcome,shown})};
+ return {getHudState:()=>({bonus:bonus?{remaining:bonus.phase==='level-up'?0:bonus.remaining,freeSpinsRemaining:bonus.phase==='level-up'?0:bonus.remaining,active:bonus.phase!=='complete',level:(bonus.phase==='level-up'?bonus.previousTier:bonus.tier)+1,activeMultiplier:C.multipliers[bonus.phase==='level-up'?bonus.previousTier:bonus.tier],fishermenCollected:bonus.collectors,nextThreshold:(bonus.phase==='level-up'?bonus.previousTier:bonus.tier)<3?((bonus.phase==='level-up'?bonus.previousTier:bonus.tier)+1)*4:null,bonusTotal:money(bonus.totalWinX*bonus.bet),phase:bonus.phase}:null}),open,restore,getCheckpoint,attachPurchaseRound:id=>{if(bonus)bonus.featureId=id;},resume:()=>{if(currentGame==='swamp'&&!busy&&!showGate())schedule();},get isBusy(){return busy;},get betIndex(){return betIndex;},set betIndex(value){betIndex=Number.isInteger(value)&&value>=0&&value<BETS.length?value:2;controls();},inspect:()=>({pendingGate,betIndex,bonus:getCheckpoint(),busy,auto,lastWin,featureWin,lastOutcome,shown})};
 })();
 
 </script>
@@ -6951,8 +7096,8 @@ const VaultCritter=window.VaultCritter=(()=>{
     async checkSwampSupport(){
       if(swampSupport)return true;if(swampSupportPromise)return swampSupportPromise;if(!client||VaultSession.mode!=='authenticated')return false;
       const cached=read('swamp-schema');
-      if(!navigator.onLine&&cached?.version>=1&&cached.project===C.supabaseUrl){swampSupport=true;swampPurchaseSupport=cached.purchaseVersion===1;swampBoostSupport=cached.boostVersion===1;return true;}
-      swampSupportPromise=(async()=>{try{const {data:result,error}=await client.rpc('swamp_slot_capabilities');if(error)throw error;swampSupport=result?.version>=1;swampPurchaseSupport=result?.purchaseVersion===1;swampBoostSupport=result?.boostVersion===1;if(swampSupport){write('swamp-schema',{version:result.version,purchaseVersion:result.purchaseVersion||0,boostVersion:result.boostVersion||0,project:C.supabaseUrl});settingsFingerprint='';VaultStorage.schedule();}return swampSupport;}catch(e){if(cached?.version>=1&&cached.project===C.supabaseUrl&&/fetch|network|offline/i.test(e.message||'')){swampSupport=true;swampPurchaseSupport=cached.purchaseVersion===1;swampBoostSupport=cached.boostVersion===1;return true;}console.error('VAULT swamp schema unavailable',e);return false;}finally{swampSupportPromise=null;}})();return swampSupportPromise;
+      if(!navigator.onLine&&cached?.version>=1&&cached.bonusVersion===2&&cached.project===C.supabaseUrl){swampSupport=true;swampPurchaseSupport=cached.purchaseVersion===1;swampBoostSupport=cached.boostVersion===1;return true;}
+      swampSupportPromise=(async()=>{try{const {data:result,error}=await client.rpc('swamp_slot_capabilities');if(error)throw error;swampSupport=result?.version>=1&&result?.bonusVersion===2;swampPurchaseSupport=result?.purchaseVersion===1;swampBoostSupport=result?.boostVersion===1;if(swampSupport){write('swamp-schema',{version:result.version,purchaseVersion:result.purchaseVersion||0,boostVersion:result.boostVersion||0,bonusVersion:result.bonusVersion||0,project:C.supabaseUrl});settingsFingerprint='';VaultStorage.schedule();}return swampSupport;}catch(e){if(cached?.version>=1&&cached.bonusVersion===2&&cached.project===C.supabaseUrl&&/fetch|network|offline/i.test(e.message||'')){swampSupport=true;swampPurchaseSupport=cached.purchaseVersion===1;swampBoostSupport=cached.boostVersion===1;return true;}console.error('VAULT swamp schema unavailable',e);return false;}finally{swampSupportPromise=null;}})();return swampSupportPromise;
     },
     get swampSupport(){return swampSupport;},get swampPurchaseSupport(){return swampPurchaseSupport;},get swampBoostSupport(){return swampBoostSupport;},
     async checkTableSupport(){
@@ -7165,7 +7310,7 @@ const VaultCritter=window.VaultCritter=(()=>{
             if(payload.p_game_id==='swamp'&&!accepted.has(id)){
               const m=payload.p_metadata||{},isFree=m.freeSpin===true,feature=m.featureId;
               if(isFree&&(swampForks.has(feature)||rejected.has(feature)||!swampCursor||swampCursor.featureId!==feature||swampCursor.remaining<1||m.freeSpinIndex!==swampCursor.spinsPlayed+1)||!isFree&&swampCursor?.remaining>0){rejected.add(id);if(feature)swampForks.add(feature);continue;}
-              if(isFree)swampCursor={...swampCursor,remaining:swampCursor.remaining-1,spinsPlayed:swampCursor.spinsPlayed+1};else swampCursor=m.purchaseType?SWAMP_MODEL.validateBonus(payload.p_recovery?.swampBonus):null;
+              if(isFree){swampCursor=SWAMP_MODEL.acknowledge(swampCursor);swampCursor={...swampCursor,remaining:swampCursor.remaining-1,spinsPlayed:swampCursor.spinsPlayed+1};}else swampCursor=m.purchaseType?SWAMP_MODEL.validateBonus(payload.p_recovery?.swampBonus):null;
               payload.p_recovery={...payload.p_recovery,swampBonus:swampCursor};
             }
             if(!accepted.has(id)){

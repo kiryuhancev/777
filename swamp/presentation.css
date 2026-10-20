@@ -53,3 +53,20 @@
 @media(max-width:600px){.swamp-feature-bar{--collector-size:clamp(26px,8vw,34px);grid-template-columns:46px minmax(0,1fr) 45px;gap:6px;padding:7px 8px;margin-bottom:12px}.swamp-progression{display:flex;flex-direction:column;align-items:center;gap:4px}.swamp-progress-group{grid-template-columns:repeat(4,var(--collector-size)) 28px;grid-template-rows:34px;gap:3px;align-items:center}.swamp-progress-group+.swamp-progress-group{padding-left:0;border-left:0}.swamp-progress-target{grid-row:1;grid-column:5;text-align:right;font-size:10px;line-height:1}.swamp-progress-icon{height:34px}.swamp-fs small,.swamp-current-collect small{font-size:7px;letter-spacing:0}.swamp-fs strong{font-size:23px}.swamp-current-collect strong{font-size:23px}.swamp-milestone-message{font-size:8px;bottom:calc(100% + 2px);letter-spacing:0}}
 @media(prefers-reduced-motion:reduce){.swamp-flying-collector{display:none}.swamp-progress-icon.arrival{animation:none}.swamp-progress-icon img{transition:opacity .08s}.swamp-cell.scatter.landed::after{display:none}}
 #swampApp .swamp-boost{display:flex;flex-direction:column;gap:8px;width:100%;padding:18px;border:1px solid #537052;border-radius:12px;background:#17271c;color:#eadab6;text-align:left;font:700 14px Arial;cursor:pointer}#swampApp .swamp-boost small{font-size:11px;font-weight:400;line-height:1.6}#swampApp .swamp-boost[aria-pressed='true']{border-color:#dfaf45;background:#3b3219}#swampApp .swamp-boost:disabled{opacity:.5;cursor:default}#swampApp .swamp-spin-cost{text-align:center;color:#dbc899;font-size:11px;line-height:1.5;margin:12px 0}
+
+/* Sequential15-spin bonus gates and milestone rewards. */
+#swampApp .swamp-progress-group{grid-template-rows:52px}
+#swampApp .swamp-progress-target{display:none}
+#swampApp .swamp-milestone-icon{display:grid;place-items:center;align-content:center;gap:1px;border:1px solid #a8874f;border-radius:8px;background:radial-gradient(#4c4a20,#172017);opacity:.35}
+#swampApp .swamp-milestone-icon span{font-size:17px;color:#dbad52}
+#swampApp .swamp-milestone-icon b{font-size:15px;color:#ffe39b}
+#swampApp .swamp-milestone-icon.active{opacity:1;box-shadow:0 0 12px #c9df5a66;border-color:#ebc36a}
+#swampApp .swamp-bonus-gate{position:fixed;inset:0;width:100vw;max-width:none;height:100dvh;max-height:none;margin:0;border:0;padding:max(18px,env(safe-area-inset-top)) 15px;background:radial-gradient(ellipse,#293c22f7,#07120dfc);color:#f3d9a4;cursor:pointer;touch-action:manipulation;z-index:1600}
+#swampApp .swamp-bonus-gate[open]{display:grid;place-items:center}
+#swampApp .swamp-bonus-gate>div{width:min(610px,100%);max-height:90dvh;overflow:auto;text-align:center;padding:30px 16px;border:3px double #b88a4a;border-radius:16px;background:linear-gradient(140deg,#443320aa,#11251c);box-shadow:0 0 75px #c2b34b22,inset 0 0 50px #0007}
+#swampApp .swamp-bonus-gate h2{font:900 clamp(24px,6vw,42px) Arial;letter-spacing:.06em;color:#ffe6aa}
+#swampApp .swamp-bonus-gate strong{display:block;font:900 clamp(42px,12vw,110px) Arial;color:#f3b55a;text-shadow:0 0 22px #daa53e88;overflow-wrap:anywhere}
+#swampApp .swamp-bonus-gate p{font-size:clamp(13px,3vw,20px);line-height:1.7}
+#swampApp .swamp-bonus-gate small{display:block;letter-spacing:.13em;font-size:11px;margin-top:28px;color:#9acb8b}
+
+@media(max-width:600px){#swampApp .swamp-progress-group{grid-template-columns:repeat(4,var(--collector-size));grid-template-rows:38px}#swampApp .swamp-milestone-icon span{font-size:12px}#swampApp .swamp-milestone-icon b{font-size:13px}}

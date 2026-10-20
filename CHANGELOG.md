@@ -1,3 +1,10 @@
+# Swamp Fishing —15-spins sequential levels
+
+- One bonus from3+ Scatter; Intro/Level Up/Complete wait for Space/tap. Purchased entry uses shared confirmation and non-paying3Scatter analog presentation, with one77× debit.
+- Levels play15 spins each at×1/×2/×3/×10; cumulative4/8/12 Collectors qualify future levels without immediate upgrade. Milestone icons and active multiplier separated.
+- Stable phase checkpoints, old bonus compatibility, full TXT migration with narrow Swamp-only SQL guards. Model, four-level browser/F5 and duplicate-settlement SQL checks passed.
+- **Not deployed:** new rules with existing coefficients estimate204.35% RTP (base) and287.26% (buy). Separate calibration required. Details:`SWAMP_LEVELS.md`.
+
 # Shared BONUS / balance and Critter tiles
 
 - Shared themed YES/NO gate, one-shot purchase dispatch, boost popup close/toast. Existing costs and financial handlers retained.

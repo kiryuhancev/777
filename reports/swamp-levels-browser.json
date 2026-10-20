@@ -1,0 +1,10 @@
+{
+  "mode": "Chromium actual SDK/owned HTTP fixtures",
+  "passed": [
+    "Natural3Scatter\u219215-spin intro; no auto start, all gameplay controls locked; mobile popup and F5 pending intro retained without payout replay",
+    "All four levels played sequentially at x1/x2/x3/x10; thresholds never change current multiplier; each pending Level Up survives F5; stale remote wallet revision at Level Up rebases; one15-spin grant per level",
+    "Milestone icons4/8/12; cumulative overflow;60-spin maximum; Complete confirms back to base and stays dismissed after F5",
+    "One77x BONUS offer; shared confirmation; actual analog trigger with exactly3Scatter, zero second debit/payout; F5 preserves exact purchased trigger and pending intro",
+    "320\u20131440px popup bounds, no overflow/duplicate flow or JS errors"
+  ]
+}

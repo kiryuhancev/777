@@ -51,7 +51,7 @@ class Cloud:
   if path.startswith('/rest/v1/rpc/'):
    name=path.split('/')[-1];self.calls.append((uid,name,payload));wallet=self.rows[uid]['wallets']
    if name=='mines_capabilities':return response({'version':1}) if self.mines_schema_ready else response({'message':'Function not found','code':'PGRST202'},404)
-   if name=='swamp_slot_capabilities':return response({'version':2,'purchaseVersion':1,'siteAdminVersion':1}) if self.swamp_schema_ready else response({'message':'Function not found','code':'PGRST202'},404)
+   if name=='swamp_slot_capabilities':return response({'version':2,'purchaseVersion':1,'siteAdminVersion':1,'boostVersion':1,'bonusVersion':2}) if self.swamp_schema_ready else response({'message':'Function not found','code':'PGRST202'},404)
    if name=='table_games_capabilities':return response({'version':1}) if self.table_schema_ready else response({'message':'Function not found','code':'PGRST202'},404)
    is_admin=lambda id:self.users[id]['email']=='al.kiryuhancev@yandex.ru' and self.users[id].get('email_confirmed_at') is not None
    if name=='vault_admin_context':return response({'isAdmin':is_admin(uid)})

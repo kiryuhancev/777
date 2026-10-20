@@ -6,7 +6,7 @@ exec(compile(source.read_text().split('\nwith sync_playwright() as p:')[0],str(s
 globals().update({k:v for k,v in ns.items() if not k.startswith('__')})
 errors=[];checks=[]
 def shared_route(r):
- if r.request.url.split('/')[-1] in ['heist_capabilities','swamp_slot_capabilities']:return r.fulfill(content_type='application/json',body=json.dumps({'version':2,'purchaseVersion':1,'boostVersion':1,'siteAdminVersion':1}),headers={'Access-Control-Allow-Origin':'*'})
+ if r.request.url.split('/')[-1] in ['heist_capabilities','swamp_slot_capabilities']:return r.fulfill(content_type='application/json',body=json.dumps({'version':2,'purchaseVersion':1,'boostVersion':1,'siteAdminVersion':1,'bonusVersion':2}),headers={'Access-Control-Allow-Origin':'*'})
  return critter_route(r)
 
 with sync_playwright() as p:
@@ -32,6 +32,14 @@ with sync_playwright() as p:
   assert page.evaluate("()=>[...document.querySelectorAll('#critterGrid .critter-tile-art')].every(n=>{const r=n.getBoundingClientRect(),c=n.parentElement.getBoundingClientRect(),m=n.getScreenCTM();return r.width>=c.width-2&&r.height>=c.height-2&&Math.abs(m.a-m.d)<.001})")
   if width==390:page.screenshot(path=str(ROOT.parent/'output/critter-full-tiles-mobile.png'),full_page=True)
  checks.append('Pure 9-digit/mobile carry formatter, compact overflow, desktop; real balance unchanged; premium tiles full-cell and uniformly scaled320–1440')
+ # All cancellation paths and fresh balance/price checks are presentation-safe.
+ page.locator('#critterBuy').click();page.locator('[name="critter-feature"][value="super"]').check();page.locator('#critterShopConfirm').click();assert 'SUPER' in page.locator('#critterApp .slot-purchase-confirmation h2').inner_text();page.locator('#critterApp .slot-purchase-confirmation [data-dismiss]').click()
+ page.locator('#critterBuy').click();page.locator('#critterShopConfirm').click();page.mouse.click(1,1);assert not page.locator('.slot-purchase-confirmation[open]').count()
+ page.locator('#critterBuy').click();page.locator('#critterShopConfirm').click();saved=page.evaluate('state.balance');result=page.evaluate("()=>{VaultWalletService.setLocalBalance(0);document.querySelector('#critterApp .slot-purchase-confirmation [data-yes]').click();return {message:document.querySelector('#critterApp .slot-purchase-confirmation [data-message]').textContent,balance:state.balance};}");assert 'INSUFFICIENT' in result['message'],result;assert result['balance']==0;page.locator('#critterApp .slot-purchase-confirmation [data-no]').click();page.evaluate('n=>VaultWalletService.setLocalBalance(n)',saved)
+ checks.append('SUPER uses same gate; X/backdrop cancel; balance rechecked after opening confirmation, insufficient funds never purchase')
  page.evaluate('state.fastGame=true');page.locator('#critterBuy').click();page.locator('[name="critter-feature"][value="bonus"]').check();page.locator('#critterShopConfirm').click();before=page.evaluate('state.balance');page.evaluate("()=>{const n=document.querySelector('#critterApp .slot-purchase-confirmation [data-yes]');n.click();n.click();}");page.wait_for_function('!VaultCritter.isBusy',timeout=120000);r=page.evaluate('VaultCritter.getCheckpoint()');assert page.evaluate('state.balance')==round(before-r['cost']+r['payout'],6);assert r['purchaseType']=='bonus'
+ # Final preview uses an actual paid seeded result with all premium symbol types.
+ seed=page.evaluate("()=>{for(let s=0;s<10000;s++){const r=CRITTER_MODEL.start({seed:s,bet:20,roundId:crypto.randomUUID(),scatterBoost:VaultCritter.scatterBoost});if(!r.bonus&&['cat','pigeon','possum','bulldog','wild','scatter'].every(id=>r.base.finalGrid.some(t=>t.symbol===id)))return s}}")
+ page.evaluate("s=>{const old=crypto.getRandomValues.bind(crypto);crypto.getRandomValues=a=>{a[0]=s;return a};document.getElementById('critterSpin').click();crypto.getRandomValues=old}",seed);page.wait_for_function('!VaultCritter.isBusy',timeout=120000);page.set_viewport_size({'width':390,'height':844});page.evaluate("VaultSlotHud.refresh();document.querySelectorAll('.slot-feature-toast').forEach(n=>n.hidden=true)");page.screenshot(path=str(ROOT.parent/'output/critter-full-tiles-mobile.png'),full_page=True)
  assert not errors,errors;checks.append('Double YES starts one real Critter bonus and debits once; no JS errors');b.close()
 (ROOT/'reports/shared-bonus.json').write_text(json.dumps({'mode':'owned actual SDK fixtures','passed':checks},indent=2)+'\n');print('\n'.join('PASS '+x for x in checks))

@@ -1,0 +1,37 @@
+{
+  "seed": 20261020,
+  "configVersion": 3,
+  "results": {
+    "normal": {
+      "cycles": 200000,
+      "rtpPct": 204.35450149993702,
+      "approx95Pct": [
+        179.89629677694683,
+        228.81270622292723
+      ],
+      "bonusPct": 0.6365,
+      "meanFreeSpins": 33.14611154752553
+    },
+    "boost": {
+      "cycles": 200000,
+      "rtpPct": 211.86481233335198,
+      "approx95Pct": [
+        199.23188322660786,
+        224.49774144009606
+      ],
+      "bonusPct": 1.2335,
+      "meanFreeSpins": 32.705715443858935
+    },
+    "buy": {
+      "cycles": 20000,
+      "rtpPct": 287.2571467532493,
+      "approx95Pct": [
+        282.0269091828211,
+        292.4873843236775
+      ],
+      "bonusPct": 100,
+      "meanFreeSpins": 33.141
+    }
+  },
+  "notes": "Real model Monte Carlo; not exact/certified RTP. Existing random generation/weights/paytable/cost77 retained; only authorized bonus progression changed; no payout targeting."
+}

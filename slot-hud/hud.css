@@ -87,3 +87,5 @@ body .slot-bottom-controls .slot-balance{min-width:0;cursor:pointer}
 body .slot-bottom-controls .slot-balance strong{display:block;max-width:100%;white-space:nowrap}
 body .slot-full-balance{font-variant-numeric:tabular-nums;overflow-wrap:anywhere;font-size:24px}
 @media(max-width:760px){body.game-mode .lobby-balance{min-width:0;max-width:45vw}body.game-mode .lobby-balance strong{display:block;max-width:100%;font-size:clamp(12px,4vw,18px);white-space:nowrap}}
+body .slot-purchase-confirmation{width:min(430px,calc(100vw - 24px))!important}
+body .slot-purchase-confirmation header [data-dismiss]{width:44px!important;flex:0 0 44px;font-size:22px!important}

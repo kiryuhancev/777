@@ -1,0 +1,9 @@
+{
+  "mode": "isolated PostgreSQL",
+  "passed": [
+    "Repeat-safe migration; no production database touched",
+    "One77x purchase +60 Free Spins across sequential levels; exact JS/SQL recovery checkpoints",
+    "Every begin/settle sent twice: wallet revision122,61 rounds, no duplicate +15, debit or payout",
+    "Premature tier/multiplier/extra-spin transition rejected; natural3Scatter entitlement15; bonusVersion2 capability"
+  ]
+}

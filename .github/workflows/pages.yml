@@ -30,6 +30,7 @@ jobs:
           node tools/heist-math-tests.cjs
           node tools/mines-math-tests.cjs
           node tools/swamp-math-tests.cjs
+          node tools/swamp-levels-tests.cjs
           node tools/table-rules-tests.cjs
           node tools/math-tests.cjs
           node tools/bird-physics-tests.cjs

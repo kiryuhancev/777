@@ -1,3 +1,5 @@
+> Current review update: [SWAMP_LEVELS.md](SWAMP_LEVELS.md). The rules below describe the previous bonus and remain relevant only to legacy sessions.
+
 # VAULT swamp collect-slot
 
 Working descriptor: **SWAMP FISHING**. This is not an approved final title. `swamp/config.js` exposes `GAME_LOGO_SRC: ''`; no invented logo/title is baked into artwork. A future local logo can use `GAME_LOGO_SRC: '__SWAMP_game_logo.webp__'` after placing the file in `assets/swamp/` and rebuilding.
