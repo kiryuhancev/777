@@ -15,7 +15,9 @@ with sync_playwright() as p:
  def buy(kind,seed=2):
   page.locator('#critterBuy').click();page.locator(f'[name="critter-feature"][value="{kind}"]').check()
   page.evaluate('s=>{window.oldRandom=crypto.getRandomValues.bind(crypto);crypto.getRandomValues=a=>{a[0]=s;return a}}',seed)
-  page.locator('#critterShopConfirm').click();page.evaluate('()=>{crypto.getRandomValues=window.oldRandom;}')
+  page.locator('#critterShopConfirm').click();
+  if kind!='boost':page.locator('#critterApp .slot-purchase-confirmation [data-yes]').click()
+  page.evaluate('()=>{crypto.getRandomValues=window.oldRandom;}')
  sync();page.locator('#critterBuy').click();assert page.locator('[name="critter-feature"]').count()==3
  price=page.locator('#critterPricebonus').inner_text();page.locator('#critterShopPlus').click();assert page.locator('#critterPricebonus').inner_text()!=price;page.locator('#critterShopMinus').click();page.locator('#critterShopCancel').click()
  for width in [320,390,430,768,1440]:

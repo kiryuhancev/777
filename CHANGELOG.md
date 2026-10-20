@@ -1,3 +1,9 @@
+# Shared BONUS / balance and Critter tiles
+
+- Shared themed YES/NO gate, one-shot purchase dispatch, boost popup close/toast. Existing costs and financial handlers retained.
+- Read-only9-digit mobile balance and compact fallback; native square Critter premium tiles with proportional art.
+- Four-slot shop checks and Critter F5/browser checks passed. Details:`SHARED_BONUS_UI.md`.
+
 # Critter Chaos v4 — одна сыгровка за спин
 
 - Каскады полностью удалены из новой механики; base Wild стандартныйx1, без движения и сохранения.

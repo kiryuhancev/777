@@ -3,6 +3,21 @@
  'use strict';
  const $=id=>document.getElementById(id),q=(root,s)=>root.querySelector(s);
  const text=(node,value)=>{value=String(value??'');if(node.textContent!==value)node.textContent=value;};
+ // Read-only display formatting: never feeds a number back into the wallet.
+ function parseBalance(value){if(typeof value==='number')return Number.isFinite(value)?value:null;const s=String(value).replace(/[\s\u00a0\u202f]/g,'').replace(',','.');return /^\d+(\.\d+)?$/.test(s)?Number(s):null;}
+ function formatBalanceForDisplay(value,{mobile=matchMedia('(max-width:760px)').matches,compact=false}={}){
+  const n=parseBalance(value);if(n===null)return String(value??'—');
+  if(compact){const d=n>=1e12?1e12:n>=1e9?1e9:n>=1e6?1e6:1e3,u=d===1e12?'T':d===1e9?'B':d===1e6?'M':'K';return new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(n/d)+u;}
+  let decimals=mobile?Math.max(0,9-Math.max(1,Math.trunc(n).toString().length)):4,result='';
+  for(let i=0;i<3;i++){result=new Intl.NumberFormat('ru-RU',{maximumFractionDigits:decimals}).format(n);const integer=result.split(',')[0].replace(/\D/g,'').length,next=mobile?Math.max(0,9-integer):4;if(next===decimals)break;decimals=next;}
+  return result;
+ }
+ window.formatBalanceForDisplay=formatBalanceForDisplay;
+ function balanceDisplay(node,value){
+  text(node,formatBalanceForDisplay(value));node.title=String(value);node.dataset.fullBalance=String(value);node.style.fontSize='';
+  if(matchMedia('(max-width:760px)').matches&&node.scrollWidth>node.clientWidth+1){node.style.setProperty('font-size','10px','important');if(node.scrollWidth>node.clientWidth+1)text(node,formatBalanceForDisplay(value,{mobile:true,compact:true}));}
+ }
+ window.BalanceDisplay={format:formatBalanceForDisplay,render:balanceDisplay};
  const configs=[
   {id:'slot',name:'Digital Derby',root:'.app',scene:'.arena-inner',frame:'.derby-stage',fallback:'.field-wrap',bar:'.controls',top:'.hud',minus:'betMinus',plus:'betPlus',bet:'betValue',max:'maxBetBtn',spin:'spinBtn',auto:'autoBtn',buy:'buyBtn',shop:'bonusShopModal',win:'lastWin',choices:'#autoPopover [data-auto-count]',count:'autoCount',hide:['.bonus-total-hud'],pay:null},
   {id:'swamp',name:'Swamp Fishing',root:'#swampApp',scene:'.swamp-scene',frame:'.swamp-frame',bar:'.swamp-controls',top:'.swamp-result',minus:'swampBetMinus',plus:'swampBetPlus',bet:'swampBetValue',max:'swampMaxBet',spin:'swampSpin',auto:'swampAuto',buy:'swampBuy',shop:'swampBonusShop',win:'swampLastWin',choices:'[data-swamp-auto]',count:'swampAuto',help:'.swamp-info-body',pay:'swampPaytable'},
@@ -96,11 +111,48 @@
    if(shop.tagName==='DIALOG'){shop.addEventListener('click',e=>{if(e.target===shop){const r=shop.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)shop.close();}});}
    else{shop.setAttribute('role','dialog');shop.setAttribute('aria-modal','true');shop.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();closeBonusShop();$(c.buy).focus();}if(e.key==='Tab'){const all=[...shop.querySelectorAll('button:not(:disabled)')];if(e.shiftKey&&document.activeElement===all[0]){e.preventDefault();all.at(-1).focus();}else if(!e.shiftKey&&document.activeElement===all.at(-1)){e.preventDefault();all[0].focus();}}});$(c.buy).addEventListener('click',()=>{if(shop.classList.contains('show'))$('bonusShopClose').focus();});}
   }
+  const closeFeature=()=>{if(!c.shop)return;const shop=$(c.shop);if(shop.tagName==='DIALOG')shop.close();else closeBonusShop();};
+  const offers=()=>{
+   const stake=snapshot(c).bet;
+   if(c.id==='slot')return [{selector:'#buyNormalBonusBtn',type:'normal',label:'BONUS',price:stake*BONUS_BUY_MULT_NORMAL},{selector:'#buySuperBonusBtn',type:'super',label:'SUPER BONUS',price:stake*BONUS_BUY_MULT_SUPER}];
+   if(c.id==='swamp')return SWAMP_CONFIG.purchases.map(o=>({selector:`[data-swamp-buy="${o.id}"]`,type:o.id,label:o.label,price:stake*o.costX}));
+   if(c.id==='vault_heist')return VAULT_HEIST_CONFIG.purchases.map(o=>({selector:`[data-heist-buy="${o.id}"]`,type:o.id,label:o.label,price:stake*o.costX}));
+   if(c.id==='critter'){const mode=q(root,'[name="critter-feature"]:checked')?.value;return mode&&mode!=='boost'?[{selector:'#critterShopConfirm',type:mode,label:mode==='super'?'SUPER BONUS':'BONUS',price:stake*CRITTER_CONFIG.features[mode+'Cost']}]:[];}
+   return [];
+  };
+  const confirm=document.createElement('dialog');confirm.className='slot-shared-modal slot-purchase-confirmation';confirm.dataset.slotSkin=c.id;confirm.setAttribute('aria-label','Confirm bonus purchase');
+  confirm.innerHTML='<header><h2>BUY BONUS?</h2><button data-dismiss aria-label="Close">×</button></header><small>PRICE</small><strong data-price></strong><small>CURRENT BET</small><strong data-stake></strong><p data-message role="status"></p><div class="slot-confirm-actions"><button data-no>NO</button><button data-yes>YES</button></div>';
+  root.append(confirm);let quote=null,purchaseLocked=false,bypass=false;
+  function cancelPurchase(){quote=null;purchaseLocked=false;if(confirm.open)confirm.close();}
+  q(confirm,'[data-dismiss]').onclick=cancelPurchase;q(confirm,'[data-no]').onclick=cancelPurchase;
+  confirm.addEventListener('cancel',()=>{quote=null;purchaseLocked=false;});
+  confirm.addEventListener('click',e=>{e.stopPropagation();if(e.target===confirm){const b=confirm.getBoundingClientRect();if(e.clientX<b.left||e.clientX>b.right||e.clientY<b.top||e.clientY>b.bottom){e.preventDefault();cancelPurchase();}}});
+  q(confirm,'[data-yes]').onclick=()=>{
+   if(purchaseLocked||!quote)return;purchaseLocked=true;q(confirm,'[data-yes]').disabled=true;
+   const now=offers().find(o=>o.type===quote.type),s=snapshot(c);
+   if(currentGame!==c.id||!s.canBuyBonus||s.busy||s.bet!==quote.bet||!now||now.price!==quote.price){text(q(confirm,'[data-message]'),'OFFER CHANGED — REOPEN BONUS MENU');return;}
+   if(state.balance<quote.price){text(q(confirm,'[data-message]'),'INSUFFICIENT BALANCE');return;}
+   const target=quote.target;quote=null;confirm.close();bypass=true;try{target.click();}finally{bypass=false;}
+  };
+  if(c.shop){const shop=$(c.shop);shop.addEventListener('click',e=>{
+   if(bypass)return;const offer=offers().find(o=>e.target.closest(o.selector));
+   if(offer){e.preventDefault();e.stopImmediatePropagation();if(!snapshot(c).canBuyBonus||e.target.closest(offer.selector).disabled)return;
+    quote={...offer,bet:snapshot(c).bet,target:e.target.closest(offer.selector)};purchaseLocked=false;closeFeature();text(q(confirm,'h2'),'BUY '+offer.label+'?');text(q(confirm,'[data-price]'),formatBalanceForDisplay(offer.price,{mobile:false}));text(q(confirm,'[data-stake]'),formatBalanceForDisplay(quote.bet,{mobile:false}));text(q(confirm,'[data-message]'),'');q(confirm,'[data-yes]').disabled=false;confirm.showModal();return;
+   }
+   const boostSelector={slot:'#scatterBoostBtn',swamp:'#swampScatterBoost',vault_heist:'#heistScatterBoost',critter:'#critterShopConfirm'}[c.id];
+   const target=boostSelector&&e.target.closest(boostSelector);if(!target||target.disabled||c.id==='critter'&&q(root,'[name="critter-feature"]:checked')?.value!=='boost')return;
+   const before=c.id==='critter'?VaultCritter.scatterBoost:state.scatterBoost;
+   setTimeout(()=>{const active=c.id==='critter'?VaultCritter.scatterBoost:state.scatterBoost;if(active===before)return;closeFeature();text(toast,active?'SCATTER BOOST ACTIVE':'SCATTER BOOST OFF');toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{toast.hidden=true;},2400);},0);
+  },true);}
+  const toast=document.createElement('div');toast.className='slot-feature-toast';toast.setAttribute('role','status');toast.hidden=true;root.append(toast);let toastTimer;
+  q(hud,'.slot-balance').setAttribute('role','button');q(hud,'.slot-balance').tabIndex=0;
+  const showBalance=()=>{show('balance','BALANCE');const n=document.createElement('p');n.className='slot-full-balance';n.textContent=VaultWalletService.formatBalance();body.append(n);};
+  q(hud,'.slot-balance').onclick=showBalance;q(hud,'.slot-balance').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showBalance();}};
   let lastWin='0';
   function render(){
-   if(currentGame!==c.id){if(modal.open)close();return;}
+   if(currentGame!==c.id){if(modal.open)close();cancelPurchase();return;}
    const s=snapshot(c);hud.dataset.state=s.state;
-   text(q(hud,'.slot-balance strong'),s.balance);text(betDisplay,Number(s.bet).toLocaleString('ru-RU'));q(hud,'[data-action="bet"]').disabled=!s.canChangeBet;
+   balanceDisplay(q(hud,'.slot-balance strong'),s.balance);const headerBalance=document.querySelector('.lobby-balance strong');if(headerBalance)balanceDisplay(headerBalance,s.balance);text(betDisplay,Number(s.bet).toLocaleString('ru-RU'));q(hud,'[data-action="bet"]').disabled=!s.canChangeBet;
    const autoButton=q(hud,'[data-action="auto"]');text(autoButton,s.autoplayRemaining?'STOP · '+s.autoplayRemaining:'AUTO');autoButton.disabled=$(c.auto).disabled;autoButton.setAttribute('aria-pressed',String(!!s.autoplayRemaining));autoButton.setAttribute('aria-expanded',String(modal.open&&popup==='auto'));
    if(!s.busy)lastWin=s.win;text(q(upper,'.slot-status-win strong'),lastWin);
    text(q(upper,'.slot-status-mode strong'),s.statusText);text(q(upper,'.slot-status-mode small'),s.state==='INSUFFICIENT_BALANCE'?'INSUFFICIENT BALANCE':s.autoplayRemaining?'AUTOPLAY · '+s.autoplayRemaining:c.name.toUpperCase());
@@ -113,6 +165,7 @@
  function init(){
   try{const pref=JSON.parse(localStorage.getItem('vault:v1:hud'));if(pref?.version===1&&pref.reducedMotion===true)document.body.classList.add('slot-reduced-motion');}catch{}
   configs.forEach(create);
+  window.BonusFeatureModal={open:id=>{const c=configs.find(c=>c.id===id);if(c?.buy)$(c.buy).click();},close:()=>{document.querySelectorAll('.slot-bonus-dialog').forEach(n=>{if(n.tagName==='DIALOG')n.close();else if(n.classList.contains('show'))closeBonusShop();});}};window.BonusPurchaseConfirmation={cancel:()=>document.querySelectorAll('.slot-purchase-confirmation[open]').forEach(n=>n.querySelector('[data-no]').click())};
   window.VaultSlotHud={states:Object.freeze(['IDLE','SPINNING','RESOLVING','FEATURE','BONUS_INTRO','BONUS_ACTIVE','BIG_WIN','AUTOPLAY','INSUFFICIENT_BALANCE','DISABLED']),instances,getState:id=>instances.find(n=>n.id===id)?.getState(),refresh:()=>instances.forEach(n=>n.render())};
   VaultSlotHud.refresh();setInterval(()=>{if(!document.hidden)VaultSlotHud.refresh();},150);
  }

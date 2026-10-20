@@ -1,0 +1,11 @@
+{
+  "mode": "owned actual SDK fixtures",
+  "passed": [
+    "slot: shared themed confirmation, no charge before YES/NO/ESC, boost closes shop with toast",
+    "swamp: shared themed confirmation, no charge before YES/NO/ESC, boost closes shop with toast",
+    "vault_heist: shared themed confirmation, no charge before YES/NO/ESC, boost closes shop with toast",
+    "critter: shared themed confirmation, no charge before YES/NO/ESC, boost closes shop with toast",
+    "Pure 9-digit/mobile carry formatter, compact overflow, desktop; real balance unchanged; premium tiles full-cell and uniformly scaled320\u20131440",
+    "Double YES starts one real Critter bonus and debits once; no JS errors"
+  ]
+}

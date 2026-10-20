@@ -119,3 +119,8 @@ body.critter-active .app,body.critter-active #slotApp,body.critter-active #poker
 #critterApp .critter-wild-multiplier.upgraded{animation:critter-upgrade .24s ease-out}
 @keyframes critter-upgrade{50%{scale:1.12;background:#ffe29a;color:#102335;box-shadow:0 0 12px #74ffe5}}
 @media(prefers-reduced-motion:reduce){#critterApp .critter-wild-multiplier.upgraded{animation:none}}
+
+/* Native square premium art: full bleed, no portrait stretching/cropping. */
+#critterApp .critter-cell>.critter-tile-art{width:100%;height:100%;mix-blend-mode:normal}
+#critterApp .critter-runner>.critter-tile-art{width:100%;height:100%;display:block;overflow:hidden}
+#critterApp .critter-cell.running-source>.critter-tile-art{opacity:.15}
