@@ -1,5 +1,7 @@
 # MAGNET
 
+**Текущая версия — [MAGNET v2: WHEEL + MAGNET CHAMBER](MAGNET_V2.md).** Нижеследующий документ описывает v1 и её визуальный проход; v1 сохранена для завершения уже заработанного Overdrive.
+
 Новая самостоятельная игра `magnet` в SLOTS. Источник требований и художественного направления: приложенный `MAGNET_COMPLETE_FOR_CODEX.zip`, включая полный `03_docs/MAGNET_CODEX_PROMPT.txt`. Исходный frontend сохранён в `/workspace/output/VAULT_before_MAGNET.html`; новая автономная версия — `/workspace/output/VAULT_with_MAGNET.html`.
 
 ## Второй визуальный проход: читаемость

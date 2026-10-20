@@ -1,0 +1,15 @@
+{
+  "mode": "Chromium and real SDK with HTTP fixture; PostgreSQL separately; no live database writes",
+  "passed": [
+    "Normal spin has no force phase; all six Wheel outcomes replay precomputed grid/result; payout hidden until reveal; shared balance exact",
+    "Chamber intro; 6\u201312 earned spins; F5 and cross-device idempotency; held values/charge exact; one final payout/statistics",
+    "F5 during Wheel resumes final stable outcome without replay or duplicate money",
+    "Simultaneous Wheel and 3 Scatters resolve serially: Wheel first, Chamber second, one parent stake",
+    "Offline outbox and reconnect remain functional",
+    "Existing earned v1 Overdrive retains old rules, continues through old RPC, and restores after F5",
+    "Five responsive widths; no duplicate IDs; HELP, Poker/lobby transitions, shared wallet and signout isolation",
+    "Missing v2 schema cannot charge; shows exact TXT migration; Poker remains accessible"
+  ],
+  "pageErrors": [],
+  "expectedOfflineConsoleErrors": []
+}

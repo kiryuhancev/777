@@ -1,4 +1,6 @@
 const MAGNET_ASSETS={
+ wheel:'__MAGNET_v2/неоновый_магнитный_механизм_wheel.webp__',
+ scatterV2:'__MAGNET_v2/неоновый_магнитный_реактор_scatter.webp__',
  copper:'__MAGNET_01_regular_symbols/copper_coil_module.webp__',
  steel:'__MAGNET_01_regular_symbols/steel_battery_cell.webp__',
  energy:'__MAGNET_01_regular_symbols/neon_energy_cell.webp__',

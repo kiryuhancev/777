@@ -1,0 +1,30 @@
+{
+  "source": "MAGNET_complete_package_for_Codex_light.zip",
+  "files": [
+    {
+      "path": "assets/magnet/v2/MAGNET_updated_prompt_for_Codex.txt",
+      "sha256": "41d2b7ee0e4176b2d38cbcfe4dc190fe4c7acee4ff3ef5e0ba8d4f947e40985c"
+    },
+    {
+      "path": "assets/magnet/v2/магнитная_камера_бонусный_реактор.webp",
+      "sha256": "9fcfa94fee5e3aae08f3179b9a91ced8552fa34b4f8d01be48ff3a73d2babddd"
+    },
+    {
+      "path": "assets/magnet/v2/неоновый_магнитный_механизм_wheel.webp",
+      "sha256": "88024a448f0c0cb4119542a288a991d13463eb8ae74d21a82c07b27109b7aee1"
+    },
+    {
+      "path": "assets/magnet/v2/неоновый_магнитный_реактор_scatter.webp",
+      "sha256": "e431c07e2ee7573524a7e22bcaa8bc8cc89711429f5e8b61271784de4379fb21"
+    },
+    {
+      "path": "assets/magnet/v2/неоновый_магнитный_реактор_казино.webp",
+      "sha256": "304cdfe72c7c86ccce02bb31cded749203c299688a175b088b3eacc9675e1244"
+    },
+    {
+      "path": "assets/magnet/v2/футуристическая_магнитная_лаборатория.webp",
+      "sha256": "57f739e5999ed3c4e0c16b05f703835040bbde3fb271184d9da39309a3c8cab8"
+    }
+  ],
+  "legacyModelAndConfig": "byte-identical"
+}

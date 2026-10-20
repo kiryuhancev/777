@@ -13,7 +13,7 @@ assert oldruntime[oldruntime.index('async function loadSDK()'):]==runtime[runtim
 assert oldruntime[oldruntime.index('    setLocalBalance(value)'):oldruntime.index('  function enqueue(')]==runtime[runtime.index('    setLocalBalance(value)'):runtime.index('  function enqueue(')],'Canonical wallet monetary methods changed'
 paths=sorted((ROOT/'assets/magnet').rglob('*'));manifest=[]
 for path in paths:
- if path.is_file() and path.name!='environment.webp':manifest.append({'path':str(path.relative_to(ROOT)),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
+ if path.is_file() and path.name!='environment.webp' and 'v2' not in path.parts:manifest.append({'path':str(path.relative_to(ROOT)),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
 assert len(manifest)==16
 report={'baseline':baseline,'otherEightGamesAndLobby':'HTML/math/art unchanged; new card only','auth':'byte-identical','canonicalWalletService':'Monetary methods byte-identical; presentation hold extended to MAGNET; isolated owned bridge extends outbox/recovery','archiveFiles':manifest}
 (ROOT/'reports/magnet-isolation.json').write_text(json.dumps(report,indent=2)+'\n')

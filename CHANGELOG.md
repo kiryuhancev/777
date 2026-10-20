@@ -1,3 +1,11 @@
+# MAGNET v2 — WHEEL + MAGNET CHAMBER
+
+- Новый source of truth: light ZIP с updated prompt. Обычная игра больше не запускает постоянные магнитные цепочки; отдельный WHEEL с шестью эффектами, новые оригинальные Wheel/Scatter.
+- 3+ Scatter → отдельная камера: 6 спинов, held values, локальный/глобальный collect, Flip, charge ladder ×1/×2/×5/×10, до12 спинов и final sweep.
+- Version2 checkpoints/новый owned RPC, один bet/payout/statistics; прежний earned Overdrive и его RPC сохранены. Обновление БД одним `supabase_magnet_v2.txt`, без сброса аккаунтов/балансов.
+- 100k paid cycles: sampled RTP96.5357%, WHEEL10.986%, Chamber.695% (~1/144). Проверены математика, PostgreSQL/RLS, Chromium/F5/две сессии/мобильные размеры. Подробности: [MAGNET_V2.md](MAGNET_V2.md).
+- Остальные восемь игр, auth и канонические денежные методы WalletService сохранены.
+
 # MAGNET — понятное магнитное поле
 
 - Только presentation: спокойная матрица, крупные +/−, рамки источника/цели, направленные стрелки, след обмена и короткая фиксация.

@@ -1,0 +1,9 @@
+{
+  "mode": "isolated PostgreSQL only",
+  "passed": [
+    "base: one wager/payout/statistics; every request duplicated; exact cross-device checkpoint; own-row RLS",
+    "wheel: one wager/payout/statistics; every request duplicated; exact cross-device checkpoint; own-row RLS",
+    "chamber: one wager/payout/statistics; every request duplicated; exact cross-device checkpoint; own-row RLS",
+    "Altered payout rejected; blocked user finishes earned bonus; repeat-safe migration; legacy MAGNET/Heist/common begin RPC unchanged"
+  ]
+}

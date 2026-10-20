@@ -38,12 +38,12 @@
     const x=raw.data;out.walletConfirmed=x.walletConfirmed===true;out.balance=amount(x.balance);out.revision=Number.isSafeInteger(x.revision)&&x.revision>=0?x.revision:0;
     out.settings=validSettings(x.settings);out.bets=validBets(x.bets);out.lastGame=screens.includes(x.lastGame)?x.lastGame:'lobby';out.settingsUpdatedAt=Number.isFinite(x.settingsUpdatedAt)?x.settingsUpdatedAt:0;
     out.recovery.slotBonus=validBonus(x.recovery?.slotBonus);out.recovery.swampBonus=SWAMP_MODEL.validateBonus(x.recovery?.swampBonus);out.recovery.minesRound=MINES_MODEL.validate(x.recovery?.minesRound);out.recovery.heistRound=VAULT_HEIST_MODEL.validate(x.recovery?.heistRound);
-    out.recovery.magnetRound=MAGNET_MODEL.validate(x.recovery?.magnetRound);
+    out.recovery.magnetRound=MAGNET_ROUNDS.validate(x.recovery?.magnetRound);
     for(const game of games){const r=x.recovery?.openRounds?.[game];if(validRound(r)&&r.gameId===game&&r.status==='started'&&(game!=='mines'||out.recovery.minesRound?.status==='PLAYING'&&out.recovery.minesRound.roundId===r.roundId))out.recovery.openRounds[game]=copy(r);}
     out.rounds=Array.isArray(x.rounds)?x.rounds.filter(validRound).slice(-C.maxLocalRounds):[];
     out.stats=x.stats&&typeof x.stats==='object'?x.stats:{};
     // Versioned, owner-bound queue; reject unknown RPCs and corrupt envelope data.
-    out.queue=Array.isArray(x.queue)?x.queue.filter(e=>e&&e.userId===id&&isId(e.id)&&['begin','settle','settings','mines','heist','magnet'].includes(e.type)&&e.payload&&typeof e.payload==='object'&&(e.type!=='heist'||VAULT_HEIST_MODEL.validate(e.payload.p_checkpoint)&&e.payload.p_round_id===e.payload.p_checkpoint.roundId&&Number.isSafeInteger(e.payload.p_expected_revision)&&e.payload.p_expected_revision>=0&&Number.isInteger(e.payload.p_previous_step)&&e.payload.p_previous_step>=-1&&e.payload.p_previous_step<24&&e.payload.p_checkpoint.step===e.payload.p_previous_step+1)&&(e.type!=='magnet'||MAGNET_MODEL.validate(e.payload.p_checkpoint)&&e.payload.p_round_id===e.payload.p_checkpoint.roundId&&Number.isSafeInteger(e.payload.p_expected_revision)&&e.payload.p_expected_revision>=0&&Number.isInteger(e.payload.p_previous_step)&&e.payload.p_previous_step>=-1&&e.payload.p_previous_step<5&&e.payload.p_checkpoint.step===e.payload.p_previous_step+1)).slice(0,C.maxPendingEvents):[];
+    out.queue=Array.isArray(x.queue)?x.queue.filter(e=>e&&e.userId===id&&isId(e.id)&&['begin','settle','settings','mines','heist','magnet'].includes(e.type)&&e.payload&&typeof e.payload==='object'&&(e.type!=='heist'||VAULT_HEIST_MODEL.validate(e.payload.p_checkpoint)&&e.payload.p_round_id===e.payload.p_checkpoint.roundId&&Number.isSafeInteger(e.payload.p_expected_revision)&&e.payload.p_expected_revision>=0&&Number.isInteger(e.payload.p_previous_step)&&e.payload.p_previous_step>=-1&&e.payload.p_previous_step<24&&e.payload.p_checkpoint.step===e.payload.p_previous_step+1)&&(e.type!=='magnet'||MAGNET_ROUNDS.validate(e.payload.p_checkpoint)&&e.payload.p_round_id===e.payload.p_checkpoint.roundId&&Number.isSafeInteger(e.payload.p_expected_revision)&&e.payload.p_expected_revision>=0&&Number.isInteger(e.payload.p_previous_step)&&e.payload.p_previous_step>=-1&&e.payload.p_previous_step<12&&e.payload.p_checkpoint.step===e.payload.p_previous_step+1)).slice(0,C.maxPendingEvents):[];
     return out;
   }
   function capturePreferences(){
@@ -113,26 +113,27 @@
     }
   };
   // MAGNET owns only its checkpoint; the existing canonical wallet and outbox own money.
-  let magnetSupport=false;
+  let magnetSupport=false,magnetFeatures=false;
   window.VaultMagnetBridge={
     get ready(){return magnetSupport;},
+    get featuresReady(){return magnetFeatures;},
     async connect(){
       if(magnetSupport)return true;if(!client||owner==='guest')return false;
       const known=read('magnet-schema'),cached=known?.version===1&&known.project===C.supabaseUrl;
-      if(!navigator.onLine&&cached){magnetSupport=true;return true;}
-      try{const {data:cap,error}=await client.rpc('magnet_capabilities');if(error){if(cached&&/fetch|network|offline/i.test(error.message||'')){magnetSupport=true;return true;}return false;}magnetSupport=cap?.version===1;if(magnetSupport)write('magnet-schema',{version:1,project:C.supabaseUrl});return magnetSupport;}catch{return false;}
+      if(!navigator.onLine&&cached){magnetSupport=true;magnetFeatures=known.featuresVersion===2;return true;}
+      try{const {data:cap,error}=await client.rpc('magnet_capabilities');if(error){if(cached&&/fetch|network|offline/i.test(error.message||'')){magnetSupport=true;magnetFeatures=known.featuresVersion===2;return true;}return false;}magnetSupport=cap?.version===1;magnetFeatures=cap?.featuresVersion===2;if(magnetSupport)write('magnet-schema',{version:1,featuresVersion:magnetFeatures?2:0,project:C.supabaseUrl});return magnetSupport;}catch{return false;}
     },
     commit(candidate){
       if(!magnetSupport||!VaultRoundService.canPlay('magnet')||!storageAvailable||data.queue.length>=C.maxPendingEvents-2)return false;
-      const r=MAGNET_MODEL.validate(candidate),previous=data.recovery.magnetRound;if(!r)return false;
+      const r=MAGNET_ROUNDS.validate(candidate),previous=data.recovery.magnetRound;if(!r||r.version===2&&!magnetFeatures)return false;
       const start=r.step===0&&r.roundId!==previous?.roundId;
-      if(start&&(MAGNET_MODEL.active(previous)||r.bet>canonicalBalance)||!start&&(previous?.roundId!==r.roundId||!MAGNET_MODEL.active(previous)||r.step!==previous.step+1))return false;
+      if(start&&(MAGNET_ROUNDS.active(previous)||r.bet>canonicalBalance)||!start&&(previous?.roundId!==r.roundId||!MAGNET_ROUNDS.active(previous)||r.step!==previous.step+1))return false;
       const nextBalance=amount(canonicalBalance-(start?r.bet:0)+(r.status==='SETTLED'?r.payout:0));if(nextBalance===null)return false;
       const rollback={balance:canonicalBalance,revision:clientRevision,mutation:walletMutation,queue:[...data.queue],rounds:[...data.rounds],stats:data.stats.magnet?copy(data.stats.magnet):null};
       if(enqueue('magnet',{p_round_id:r.roundId,p_previous_step:start?-1:previous.step,p_expected_revision:clientRevision,p_checkpoint:r})===false)return false;
       clientRevision++;data.recovery.magnetRound=copy(r);canonicalBalance=nextBalance;data.balance=nextBalance;walletMutation++;
       if(r.status==='SETTLED'&&!data.rounds.some(x=>x.roundId===r.roundId)){
-        const record={roundId:r.roundId,gameId:'magnet',status:'settled',bet:r.bet,stake:r.bet,payout:r.payout,multiplier:r.payout/r.bet,result:r.result,metadata:{seed:r.seed,overdrive:r.bonus.triggered,bonusSpins:r.step,magneticPhases:r.spins.reduce((n,p)=>n+p.phaseCount,0),movements:r.spins.reduce((n,p)=>n+p.orderedEffects.filter(e=>e.from!==undefined).length,0)},startedAt:Date.now(),settledAt:Date.now()};
+        const record={roundId:r.roundId,gameId:'magnet',status:'settled',bet:r.bet,stake:r.bet,payout:r.payout,multiplier:r.payout/r.bet,result:r.result,metadata:{seed:r.seed,version:r.version,chamber:r.version===2&&r.bonus.triggered,overdrive:r.version===1&&r.bonus.triggered,wheel:r.spins[0].wheel?.id||null,bonusSpins:r.step,magneticPhases:r.spins.reduce((n,p)=>n+p.phaseCount,0),movements:r.spins.reduce((n,p)=>n+p.orderedEffects.filter(e=>e.from!==undefined).length,0)},startedAt:Date.now(),settledAt:Date.now()};
         data.rounds.push(record);data.rounds=data.rounds.slice(-C.maxLocalRounds);localStats(record);
       }
       if(!VaultStorage.saveLocalState()){
@@ -178,7 +179,7 @@
     },
     get tableSupport(){return tableSupport;},
     canPlay(game){
-      if(window.VaultAccess?.isBlocked&&!data.recovery.openRounds[game]&&!(game==='slot'&&state.bonus&&state.freeSpins>0)&&!(game==='swamp'&&data.recovery.swampBonus?.remaining>0)&&!(game==='vault_heist'&&VAULT_HEIST_MODEL.active(data.recovery.heistRound))&&!(game==='magnet'&&MAGNET_MODEL.active(data.recovery.magnetRound))){toast('Новые ставки приостановлены администратором');return false;}
+      if(window.VaultAccess?.isBlocked&&!data.recovery.openRounds[game]&&!(game==='slot'&&state.bonus&&state.freeSpins>0)&&!(game==='swamp'&&data.recovery.swampBonus?.remaining>0)&&!(game==='vault_heist'&&VAULT_HEIST_MODEL.active(data.recovery.heistRound))&&!(game==='magnet'&&MAGNET_ROUNDS.active(data.recovery.magnetRound))){toast('Новые ставки приостановлены администратором');return false;}
       if(game==='magnet'&&!magnetSupport)return false;
       if(game==='vault_heist'&&!heistSupport)return false;
       if(game==='mines'&&!minesSupport)return false;
@@ -312,7 +313,7 @@
     VaultSession.profile=remote.profile;profileRemote=true;
     if(wallet&&remote.rounds.some(r=>!['mines','vault_heist','magnet'].includes(r.game_id))){conflict=true;status('Восстанавливаем раздачу…');}
     if(wallet){canonicalBalance=amount(remote.wallet.balance);data.balance=canonicalBalance;data.walletConfirmed=true;data.revision=Number(remote.wallet.revision)||0;clientRevision=data.revision;data.recovery.slotBonus=validBonus(remote.wallet.recovery?.slotBonus);data.recovery.swampBonus=SWAMP_MODEL.validateBonus(remote.wallet.recovery?.swampBonus);data.recovery.minesRound=MINES_MODEL.validate(remote.wallet.recovery?.minesRound);data.recovery.heistRound=VAULT_HEIST_MODEL.validate(remote.wallet.recovery?.heistRound);}
-    if(wallet)data.recovery.magnetRound=MAGNET_MODEL.validate(remote.wallet.recovery?.magnetRound);
+    if(wallet)data.recovery.magnetRound=MAGNET_ROUNDS.validate(remote.wallet.recovery?.magnetRound);
     const s=remote.settings,ts=Date.parse(s.updated_at)||0;
     if(ts>=data.settingsUpdatedAt){data.settings={sound:s.sound_enabled,music:s.music_enabled,fastGame:s.fast_mode,fastBonus:s.fast_bonus,scatterBoost:s.scatter_boost};data.bets=validBets(s.selected_bets);data.lastGame=screens.includes(s.last_game_id)?s.last_game_id:'lobby';data.settingsUpdatedAt=ts;}
     if(wallet)data.stats=Object.fromEntries(remote.stats.map(s=>[s.game_id,s]));rememberSession();
@@ -342,16 +343,16 @@
         }
         let balance=amount(wallet.balance),revision=Number(wallet.revision);if(balance===null||!Number.isSafeInteger(revision))throw Error('Invalid remote wallet');
         const rejected=new Set(),accepted=new Set([...known].filter(([,r])=>r.status==='started').map(([id])=>id));
-        const next=[];let magnetCursor=MAGNET_MODEL.validate(wallet.recovery?.magnetRound);let heistCursor=VAULT_HEIST_MODEL.validate(wallet.recovery?.heistRound);let minesCursor=MINES_MODEL.validate(wallet.recovery?.minesRound);const mineRewinds=new Set();let swampCursor=SWAMP_MODEL.validateBonus(wallet.recovery?.swampBonus);const swampForks=new Set();
+        const next=[];let magnetCursor=MAGNET_ROUNDS.validate(wallet.recovery?.magnetRound);let heistCursor=VAULT_HEIST_MODEL.validate(wallet.recovery?.heistRound);let minesCursor=MINES_MODEL.validate(wallet.recovery?.minesRound);const mineRewinds=new Set();let swampCursor=SWAMP_MODEL.validateBonus(wallet.recovery?.swampBonus);const swampForks=new Set();
         for(const event of data.queue){
           if(event.userId!==uid)throw Error('Queue identity mismatch');
           if(event.type==='settings'){next.push(event);continue;}
           const payload=event.payload,id=payload.p_round_id,round=known.get(id);
           if(event.type==='magnet'){
-            const candidate=MAGNET_MODEL.validate(payload.p_checkpoint);if(!candidate)continue;
+            const candidate=MAGNET_ROUNDS.validate(payload.p_checkpoint);if(!candidate)continue;
             if(round&&round.status!=='started')continue;
             if(magnetCursor?.roundId===id&&magnetCursor.step>=candidate.step)continue;
-            if(payload.p_previous_step===-1){if(MAGNET_MODEL.active(magnetCursor)||candidate.bet>balance||window.VaultAccess?.isBlocked)continue;}
+            if(payload.p_previous_step===-1){if(MAGNET_ROUNDS.active(magnetCursor)||candidate.bet>balance||window.VaultAccess?.isBlocked)continue;}
             else if(magnetCursor?.roundId!==id||magnetCursor.step!==payload.p_previous_step)continue;
             payload.p_expected_revision=revision;balance=amount(balance-(payload.p_previous_step===-1?candidate.bet:0)+(candidate.status==='SETTLED'?candidate.payout:0));revision++;magnetCursor=candidate;next.push(event);continue;
           }
@@ -420,7 +421,7 @@
             else if(event.type==='settle'){method='record_game_round';args=event.payload;}
             else if(event.type==='mines'){method='save_mines_checkpoint';args=event.payload;}
             else if(event.type==='heist'){method='apply_heist_checkpoint';args=event.payload;}
-            else if(event.type==='magnet'){method='apply_magnet_checkpoint';args=event.payload;}
+            else if(event.type==='magnet'){method=event.payload.p_checkpoint.version===2?'apply_magnet_v2_checkpoint':'apply_magnet_checkpoint';args=event.payload;}
             else{method='save_vault_settings';args={p_settings:event.payload.settings,p_updated_at:event.payload.updatedAt};}
             const {data:result,error}=await client.rpc(method,args);if(owner!==uid||identityEpoch!==epoch)return;
             if(error)throw error;

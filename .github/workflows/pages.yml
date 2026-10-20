@@ -21,6 +21,7 @@ jobs:
       - name: Check game mathematics
         run: |
           node tools/magnet-math-tests.cjs
+          node tools/magnet-v2-tests.cjs
           node tools/slot-features-tests.cjs --modes-only
           node tools/heist-math-tests.cjs
           node tools/mines-math-tests.cjs

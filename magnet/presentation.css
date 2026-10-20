@@ -152,3 +152,59 @@ body.magnet-active .app,body.magnet-active #slotApp,body.magnet-active #pokerApp
 @keyframes magnet-settle{50%{filter:brightness(1.25)}}
 @media(max-width:700px){#magnetApp .magnet-sign{width:19px;height:19px;font-size:16px;border-width:1px}#magnetApp .magnet-effect-label{right:20px;font-size:5px;padding:2px 0}#magnetApp .magnet-legend{gap:8px;font-size:7px}#magnetApp .magnet-diagrams{gap:4px}#magnetApp .magnet-diagram{font-size:8px;padding:8px 3px}#magnetApp .magnet-diagram strong{font-size:19px}#magnetApp .magnet-special-help{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){#magnetApp *,#magnetApp *:before,#magnetApp *:after{animation:none!important;transition:none!important}#magnetApp .magnet-energy{display:none}}
+/* v2: quiet ordinary spins, isolated Wheel, separate value-collection chamber. */
+#magnetApp:not(.magnet-v2) #magnetModernManual,#magnetApp:not(.magnet-v2) .magnet-v2-balance,#magnetApp.magnet-v2 #magnetLegacyManual{display:none}
+#magnetApp.magnet-v2 .magnet-heading p{font-size:0}
+#magnetApp.magnet-v2 .magnet-heading p:after{content:'WHEEL · SCATTER · MAGNET CHAMBER';font-size:8px}
+#magnetApp.magnet-v2 .magnet-legend{display:none}
+#magnetApp.magnet-v2:not(.chamber-mode) .magnet-readout{grid-template-columns:2fr 1fr}
+#magnetApp.magnet-v2:not(.chamber-mode) .magnet-readout>div:nth-child(2){display:none}
+#magnetApp.magnet-v2 .magnet-sign{display:none}
+#magnetApp.magnet-v2 .magnet-token{border:1px solid #7c9bad35;background:#07111b;box-shadow:inset 0 0 12px #0008;padding:7px}
+#magnetApp.magnet-v2 .magnet-token.buffer{opacity:.6}
+#magnetApp.magnet-v2 .magnet-token[data-symbol='wheel'],#magnetApp.magnet-v2 .magnet-token[data-symbol='scatter']{background:#010309;opacity:1;border-color:#d6b96a99}
+#magnetApp.magnet-v2 .magnet-token[data-symbol='wheel']{box-shadow:inset 0 0 16px #f3ac3744}
+#magnetApp.magnet-v2 .magnet-token[data-symbol='crystal'],#magnetApp.magnet-v2 .magnet-token[data-symbol='reactor']{background:radial-gradient(#183544,#07111b)}
+#magnetApp .magnet-new-special{width:100%;height:100%;mix-blend-mode:screen;object-fit:contain}
+#magnetApp.magnet-v2 .magnet-token[data-symbol='wheel'] small,#magnetApp.magnet-v2 .magnet-token[data-symbol='scatter'] small{display:none}
+#magnetApp.magnet-v2 .magnet-token.winning,#magnetApp .feature-target{border:2px solid #ffdc87;background:#98703833!important;box-shadow:inset 0 0 20px #ffd87544!important}
+#magnetApp .magnet-chamber-hud{width:min(680px,68%);display:grid;grid-template-columns:1fr 1fr 1fr;background:linear-gradient(90deg,#102c3c,#301e11,#102c3c);padding:15px;border:1px solid #ca9b46;text-align:center;gap:8px}
+#magnetApp .magnet-chamber-hud strong{display:block;margin-top:8px;font-size:24px;color:#ffdb94}
+#magnetApp.chamber-mode .magnet-scene:before{background:radial-gradient(ellipse at center,#b36c181a,#030912cc)}
+#magnetApp.chamber-mode .magnet-token.buffer{opacity:1}
+#magnetApp.chamber-mode .magnet-pay-zone{display:none}
+#magnetApp.chamber-mode .magnet-buffer-label{font-size:0}
+#magnetApp.chamber-mode .magnet-buffer-label:after{content:'MAGNET CHAMBER · VALUE COLLECTION';font-size:7px}
+#magnetApp .magnet-chamber-symbol{font-size:clamp(20px,4vw,48px);color:#53daff;text-shadow:0 0 15px #25bde877}
+#magnetApp .magnet-chamber-symbol.value,#magnetApp .magnet-chamber-symbol.charge,#magnetApp .magnet-chamber-symbol.overload{color:#f5b654}
+#magnetApp .magnet-chamber-symbol.super{color:#fff4c0;text-shadow:0 0 18px #ffc357}
+#magnetApp .magnet-empty{font-size:18px;color:#4c697d}
+#magnetApp.magnet-v2 .magnet-token[data-symbol='value'] .magnet-sign{display:block;top:auto;right:auto;bottom:10%;width:auto;height:auto;border:0;border-radius:3px;padding:2px 7px;color:#fff1cb;background:#071018;font-size:clamp(13px,2vw,25px)}
+#magnetApp .magnet-v2-balance{text-align:center;margin-top:12px;font-size:20px;color:#eee2c5}
+#magnetApp .magnet-v2-balance strong{display:block;margin-top:4px}
+#magnetApp .magnet-feature-overlay{position:fixed;inset:0;z-index:1100;display:grid;place-items:center;padding:15px;background:#01070eea;backdrop-filter:blur(6px)}
+#magnetApp .magnet-feature-card{width:min(570px,100%);max-height:95dvh;overflow:auto;text-align:center;padding:30px 18px;background:radial-gradient(#1a3944,#071018 70%);border:2px solid #c1a467;box-shadow:0 0 80px #36cfff33,inset 0 0 60px #000;border-radius:20px}
+#magnetApp .magnet-feature-card h2{font-size:clamp(20px,4vw,30px);color:#ffe0a3;letter-spacing:.05em}
+#magnetApp .magnet-feature-card p{font-size:15px;line-height:1.7;min-height:52px}
+#magnetApp .magnet-wheel-stage{position:relative;width:min(360px,75vw);aspect-ratio:1;margin:30px auto}
+#magnetApp .magnet-wheel-disc{position:absolute;inset:0;border-radius:50%;border:10px ridge #e2b965;background:conic-gradient(from -30deg,#0a5569 0 60deg,#653d15 60deg 120deg,#133a68 120deg 180deg,#5b261b 180deg 240deg,#144758 240deg 300deg,#4a3269 300deg);box-shadow:0 0 0 5px #153349,0 0 30px #35d4ff55}
+#magnetApp .magnet-wheel-disc span{position:absolute;inset:0;display:flex;justify-content:center;padding-top:10%;font:bold clamp(9px,2.4vw,13px) Arial;color:#fff1cc;transform:rotate(calc(var(--sector)*60deg))}
+#magnetApp .magnet-wheel-pointer{position:absolute;top:-25px;left:calc(50% - 12px);font-size:26px;color:#ffe3a8;z-index:3}
+#magnetApp .magnet-wheel-hub{position:absolute;inset:35%;border:4px ridge #bfa269;border-radius:50%;background:radial-gradient(#2e7086,#060f18);display:grid;place-items:center;font-size:50px;color:#ffce76}
+#magnetApp .magnet-bonus-core{display:none;color:#ffc46b;font-size:100px;margin:25px;text-shadow:0 0 30px #ffb93b}
+#magnetApp .magnet-feature-overlay:not([data-mode='wheel']) .magnet-wheel-stage{display:none}
+#magnetApp .magnet-feature-overlay:not([data-mode='wheel']) .magnet-bonus-core{display:block}
+#magnetApp .magnet-chamber-hud.charged{box-shadow:inset 0 0 35px #ffc26577}
+#magnetApp .magnet-chamber-hud svg{width:36px;height:36px;display:inline-block;vertical-align:middle;margin-right:8px}
+#magnetApp #magnetCharge{display:inline-block}
+#magnetApp .magnet-wheel-hub img{width:95%;height:95%;object-fit:contain;border-radius:50%;mix-blend-mode:screen}
+#magnetApp .magnet-bonus-core svg{width:140px;height:150px;margin:auto}
+#magnetApp .magnet-value-flight{position:absolute;z-index:10;color:#ffe3a5;font:bold 22px Arial;text-shadow:0 0 10px #e8a943;background:#03101bc9;padding:3px 7px;pointer-events:none;animation:magnet-value-flight .3s ease-in forwards}
+#magnetApp.magnet-v2 .magnet-token[data-symbol='super'],#magnetApp.magnet-v2 .magnet-token[data-symbol='overload']{background:#392a1488;border-color:#efc773;box-shadow:inset 0 0 20px #efc77333}
+@keyframes magnet-value-flight{to{transform:translate(var(--fly-x),var(--fly-y)) scale(.7);opacity:.25}}
+#magnetApp .feature-landing .magnet-symbol-art{animation:magnet-feature-land .35s ease-out}
+#magnetApp.magnet-v2:not(.reeling) .magnet-token[data-symbol='scatter'] .magnet-new-special{animation:magnet-scatter-glow 2.4s ease-in-out infinite}
+@keyframes magnet-feature-land{50%{transform:scale(1.2);filter:brightness(1.3)}}
+@keyframes magnet-scatter-glow{50%{filter:brightness(1.12)}}
+@media(max-width:1050px){#magnetApp .magnet-chamber-hud{width:calc(100% - 186px)}}
+@media(max-width:700px){#magnetApp .magnet-chamber-hud{width:100%;padding:10px 5px}#magnetApp .magnet-chamber-hud small{font-size:6px}#magnetApp .magnet-chamber-hud strong{font-size:18px}#magnetApp.magnet-v2 .magnet-token{padding:3px}#magnetApp.magnet-v2 .magnet-heading p:after{font-size:6px}#magnetApp .magnet-feature-card{padding:20px 12px}#magnetApp .magnet-feature-card p{font-size:12px}#magnetApp .magnet-token[data-symbol='value'] small{display:none}}

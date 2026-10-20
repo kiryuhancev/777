@@ -1,0 +1,117 @@
+{
+  "config": {
+    "version": 2,
+    "wheelChance": 0.11,
+    "scatterChance": 0.016,
+    "wildChance": 0.008,
+    "waysPayScale": 0.202,
+    "maxWinX": 10000,
+    "bonusSpins": 6,
+    "maxBonusSpins": 12,
+    "chargeLadder": [
+      1,
+      2,
+      5,
+      10
+    ],
+    "chargeThresholds": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "bonusChances": {
+      "value": 0.055,
+      "charge": 0.004,
+      "magnet": 0.025,
+      "super": 0.003,
+      "flip": 0.002,
+      "overload": 0.001
+    },
+    "values": [
+      {
+        "x": 2,
+        "w": 60
+      },
+      {
+        "x": 5,
+        "w": 25
+      },
+      {
+        "x": 10,
+        "w": 10
+      },
+      {
+        "x": 15,
+        "w": 3
+      },
+      {
+        "x": 25,
+        "w": 1.5
+      },
+      {
+        "x": 50,
+        "w": 0.5
+      }
+    ],
+    "wheel": [
+      {
+        "id": "boost",
+        "title": "MULTIPLIER BOOST",
+        "w": 30
+      },
+      {
+        "id": "upgrade",
+        "title": "SYMBOL UPGRADE",
+        "w": 20
+      },
+      {
+        "id": "wilds",
+        "title": "EXTRA WILDS",
+        "w": 15
+      },
+      {
+        "id": "pull",
+        "title": "MAGNET PULL",
+        "w": 15
+      },
+      {
+        "id": "respin",
+        "title": "RESPIN",
+        "w": 10
+      },
+      {
+        "id": "mystery",
+        "title": "MYSTERY TRANSFORM",
+        "w": 10
+      }
+    ]
+  },
+  "result": {
+    "paidCycles": 100000,
+    "seed": 87431,
+    "rtpPct": 96.53568779999647,
+    "approx95Pct": [
+      92.86324491625265,
+      100.20813068374028
+    ],
+    "hitPct": 52.493,
+    "wheelPct": 10.986,
+    "bonusPct": 0.695,
+    "bonusMeanInterval": 143.88489208633092,
+    "averageBonusX": 52.88201438848921,
+    "baseRtpPct": 59.78268780000009,
+    "bonusRtpPct": 36.753,
+    "averageBonusSpins": 6.6676258992805755,
+    "extensions": 464,
+    "maxObservedX": 345,
+    "outcomes": {
+      "boost": 3298,
+      "mystery": 1105,
+      "upgrade": 2180,
+      "wilds": 1688,
+      "pull": 1575,
+      "respin": 1140
+    }
+  }
+}

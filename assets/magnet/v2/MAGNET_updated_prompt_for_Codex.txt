@@ -1,0 +1,267 @@
+PROJECT: MAGNET — updated slot redesign and gameplay update
+
+GOAL
+Update the existing MAGNET slot game implementation. The current version already exists, but it is too hard to read visually and the mechanic feels overloaded. We need to simplify the player perception, improve visual readability, and add 2 major features:
+1) a distinct WHEEL special symbol with a Wheel of Fortune feature;
+2) a SCATTER-triggered bonus game with its own clear logic and visuals.
+
+IMPORTANT GENERAL DIRECTION
+- Keep the game as a readable, commercially styled premium slot.
+- The player must instantly understand what is happening on the reels.
+- Visual clarity is more important than complexity.
+- The slot should feel dynamic and exciting, but not visually chaotic.
+- If no special feature triggers, the game should behave like a regular slot.
+- Every base spin should feel self-contained and easy to read.
+- Prefer fewer but stronger effects instead of many overlapping mechanics.
+
+VISUAL REFERENCES INCLUDED
+Use the attached images as style and content references:
+- футуристическая_магнитная_лаборатория.png → main visual mood / environment / general slot aesthetic.
+- неоновый_магнитный_реактор_казино.png → key premium magnetic/reactor symbol styling.
+- неоновый_магнитный_механизм_wheel.png → WHEEL special symbol styling.
+- неоновый_магнитный_реактор_scatter.png → SCATTER symbol styling.
+- магнитная_камера_бонусный_реактор.png → bonus game concept / magnetic chamber vibe.
+
+TECHNICAL GOAL
+Update only the MAGNET game logic, visuals, and UX presentation. Use plain HTML/CSS/JS compatible with the existing project structure. Reuse the current architecture if possible. Do not rebuild the whole casino site. Focus on the MAGNET slot.
+
+==================================================
+1. CORE DESIGN PROBLEM TO SOLVE
+==================================================
+The current slot is too complex for perception. The player has trouble understanding what is happening on the reels.
+
+We need to simplify the base flow:
+- A normal spin should look and feel like a regular slot spin.
+- Symbols should be easy to distinguish.
+- The special mechanics should trigger only in clearly readable moments.
+- When no feature is triggered, the player should simply see a normal spin → result → next opportunity.
+
+That means:
+- reduce simultaneous visual noise;
+- make important symbols much more recognizable;
+- introduce clear hierarchy of symbols by rarity and function;
+- ensure the player can immediately identify: normal symbol / premium symbol / special symbol / bonus trigger.
+
+==================================================
+2. REEL / SYMBOL READABILITY IMPROVEMENTS
+==================================================
+Improve the whole reel presentation so the symbols are easier to read.
+
+Required improvements:
+- Increase contrast between reel background and symbol tiles.
+- Add clearer tile frames or subtle panel borders so each reel cell reads as a separate slot position.
+- Normalize symbol sizing and visual balance so no symbol feels lost or too dark.
+- Make premium/special symbols brighter and more saturated than regular symbols.
+- Keep the magnetic / sci-fi theme, but avoid too much clutter inside each symbol.
+- The player should be able to recognize the function of a symbol in less than a second.
+
+Visual priority:
+1) WHEEL symbol → should instantly look like “something special happened”.
+2) SCATTER symbol → should instantly look like a bonus trigger.
+3) key premium symbols → clearly valuable.
+4) regular symbols → calmer and more neutral.
+
+==================================================
+3. WHEEL SYMBOL FEATURE
+==================================================
+Add a separate WHEEL symbol feature.
+
+WHEEL SYMBOL REQUIREMENTS
+- Use the attached WHEEL symbol as a visual basis.
+- It must stand out strongly from all other symbols.
+- If it lands, the player should immediately understand this is a major event.
+- Use glow, expansion, or pulse effects, but keep them clean and premium.
+
+TRIGGER BEHAVIOR
+- When the WHEEL symbol lands according to the trigger rules you implement, it should expand and transition into a Wheel of Fortune style feature.
+- If the WHEEL symbol does NOT land, the slot plays as a normal slot.
+- This must be a clear separate event, not mixed with too many overlapping on-reel effects.
+
+WHEEL FEATURE UX
+When triggered:
+1) the WHEEL symbol expands or lifts out of the reel;
+2) a large wheel / roulette overlay appears;
+3) the wheel spins;
+4) the game randomly chooses one effect;
+5) after the effect resolves, control returns to the slot.
+
+SUGGESTED WHEEL OUTCOMES
+Use a curated list of readable outcomes. Keep the list understandable and fun.
+Possible sectors:
+- MULTIPLIER BOOST → apply a win multiplier for the spin.
+- SYMBOL UPGRADE → transform selected low symbols into better symbols.
+- MAGNET PULL → pull matching or valuable symbols into winning positions.
+- EXTRA WILDS → add wilds on the reels.
+- RESPIN → grant a respin with a special modifier.
+- COLLECT VALUES → collect visible value-bearing symbols instantly.
+- CHARGE BOOST → useful if connected to the bonus theme.
+- MYSTERY TRANSFORM → several symbols morph into a single symbol type.
+
+IMPORTANT WHEEL DESIGN PRINCIPLES
+- The wheel should feel premium, mechanical, sci-fi, and magnetic.
+- The result should be displayed very clearly, both visually and with text.
+- After the wheel resolves, the player must understand exactly what changed.
+- Avoid overly complex chained mini-events.
+
+==================================================
+4. BASE GAME FLOW
+==================================================
+Base game should be straightforward:
+- Player spins.
+- Symbols land.
+- If no feature triggers, regular evaluation happens.
+- If WHEEL triggers, resolve the WHEEL feature.
+- If SCATTER triggers the bonus, launch the bonus sequence.
+
+The base game must NOT constantly feel like a bonus.
+Make it readable, clean, and cyclical.
+
+==================================================
+5. SCATTER SYMBOL + BONUS GAME
+==================================================
+Add a proper SCATTER symbol and a separate bonus game concept.
+Use the attached SCATTER symbol as the visual reference.
+
+SCATTER REQUIREMENTS
+- SCATTER must be visually distinct from all base symbols.
+- It should look premium and clearly connected to the magnetic reactor / chamber theme.
+- Add a subtle animated glow/pulse to show it is a bonus trigger.
+
+BONUS TRIGGER
+- Trigger bonus on 3+ SCATTER symbols.
+- Show a clear transition animation from base game to bonus game.
+- Make the bonus feel like the player entered a separate magnetic chamber.
+
+==================================================
+6. BONUS GAME CONCEPT — MAGNET CHAMBER BONUS
+==================================================
+Implement the bonus as a special mode called MAGNET CHAMBER BONUS.
+
+CORE BONUS IDEA
+The player enters a powerful magnetic chamber and charges a central reactor while collecting values.
+The bonus should be easier to understand than the base feature set.
+
+BONUS OBJECTIVE
+Collect values into a central magnetic reactor and increase its charge level and/or multiplier.
+At the end, the accumulated values are multiplied by the achieved charge multiplier.
+
+BONUS SETUP
+- Start with a fixed number of bonus spins, for example 6.
+- Show the number of remaining bonus spins clearly.
+- Show the current total collected value clearly.
+- Show the current reactor charge / multiplier clearly.
+
+BONUS SYMBOL TYPES
+Implement some or all of these clearly:
+- VALUE symbols: 2x, 5x, 10x, 15x, 25x, 50x.
+- CHARGE symbol: increases reactor charge level.
+- MAGNET symbol: pulls nearby value symbols into the reactor.
+- SUPER MAGNET symbol: collects all value symbols on the screen.
+- POLARITY FLIP symbol: doubles currently visible values.
+- OVERLOAD symbol: instantly increases charge level or grants extra spins.
+
+BONUS CHARGE SYSTEM
+Recommended charge ladder:
+- Level 1 → x1
+- Level 2 → x2
+- Level 3 → x5
+- Level 4 → x10
+
+You may tune numbers for balance, but keep the idea the same:
+- the reactor becomes stronger over time;
+- the bonus is about building up and then cashing out.
+
+BONUS SPIN EXTENSION
+- Any CHARGE symbol can award +1 extra bonus spin.
+- SUPER MAGNET or OVERLOAD may also award extra spins if needed.
+
+BONUS END
+At the end of the bonus:
+- perform a FINAL MAGNET SWEEP animation;
+- collect any remaining collectable values;
+- apply the final reactor multiplier;
+- show a clear TOTAL BONUS WIN summary.
+
+EXAMPLE FINAL FORMULA
+(total collected values) × (final reactor charge multiplier)
+
+The final result presentation should feel satisfying and premium.
+
+==================================================
+7. UI / UX REQUIREMENTS
+==================================================
+We need a better interface clarity.
+
+Required UI elements:
+- clear balance;
+- clear bet display;
+- clear spin button;
+- optional autoplay button if already exists;
+- readable win display;
+- clear notification / result text for wheel outcomes;
+- clear bonus intro overlay;
+- clear bonus progress display: remaining spins, current total, charge level.
+
+For wheel and bonus overlays:
+- keep the same MAGNET visual identity;
+- avoid clutter;
+- use concise readable text;
+- use strong but controlled animations.
+
+==================================================
+8. VISUAL STYLE DIRECTION
+==================================================
+Use a premium futuristic magnetic lab aesthetic:
+- dark metallic environment;
+- neon cyan / electric blue accents;
+- warm gold/orange reactor energy highlights;
+- polished sci-fi slot framing;
+- readable glow effects;
+- premium casino presentation.
+
+Avoid:
+- muddy reel readability;
+- overcomplicated HUD;
+- too many simultaneous animations;
+- tiny unreadable text;
+- feature logic that is hard to follow.
+
+==================================================
+9. IMPLEMENTATION PRIORITIES
+==================================================
+Please implement in this order:
+
+PHASE 1 — readability update
+- improve reel readability;
+- improve symbol hierarchy;
+- integrate updated WHEEL and SCATTER visuals.
+
+PHASE 2 — WHEEL feature
+- implement WHEEL trigger;
+- create wheel overlay;
+- implement the list of wheel outcomes;
+- ensure clear result presentation.
+
+PHASE 3 — bonus game
+- implement 3+ scatter trigger;
+- add bonus intro transition;
+- implement MAGNET CHAMBER BONUS;
+- add charge system, value collection, and final payout summary.
+
+PHASE 4 — polish and balancing
+- tune pacing;
+- polish transitions;
+- make feature frequency and clarity feel good;
+- ensure the game is understandable after only a few spins.
+
+==================================================
+10. OUTPUT EXPECTATION
+==================================================
+Return the updated MAGNET slot integrated into the current project.
+Use the attached visual references directly as guidance for style and identity.
+Preserve the idea of a premium casino slot, but redesign the interaction flow to be more readable and satisfying.
+
+The final result should feel like:
+- a normal readable slot in the base game;
+- a premium WHEEL feature when the special symbol lands;
+- a separate satisfying reactor-based bonus game when scatters trigger the MAGNET CHAMBER BONUS.

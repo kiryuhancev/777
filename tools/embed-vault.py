@@ -111,7 +111,7 @@ p.write_text(s)
 s=p.read_text()
 def magnet_assets(text):
  return re.sub(r'__MAGNET_([^\s\x27"<>]+)__',lambda m:'data:image/webp;base64,'+base64.b64encode((ROOT/'assets/magnet'/m[1]).read_bytes()).decode(),text)
-for name,text,tag in [('MAGNET STYLES',(ROOT/'magnet/presentation.css').read_text(),'style'),('MAGNET SCREEN',(ROOT/'magnet/screen.html').read_text(),None),('MAGNET MODULE',magnet_assets('\n'.join((ROOT/'magnet'/f).read_text() for f in ['config.js','model.js','assets.js','game.js'])),'script')]:
+for name,text,tag in [('MAGNET STYLES',(ROOT/'magnet/presentation.css').read_text(),'style'),('MAGNET SCREEN',(ROOT/'magnet/screen.html').read_text(),None),('MAGNET MODULE',magnet_assets('\n'.join((ROOT/'magnet'/f).read_text() for f in ['config.js','model.js','features-model.js','assets.js','game.js'])),'script')]:
  block=f'<!-- BEGIN {name} -->\n'+(f'<{tag}>\n{text}\n</{tag}>' if tag else text)+f'\n<!-- END {name} -->'
  pattern=rf'<!-- BEGIN {name} -->[\s\S]*?<!-- END {name} -->'
  if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
@@ -123,6 +123,7 @@ if 'id="openMagnetGame"' not in s:
  if 'id="openMagnetGame"' not in s:raise RuntimeError('MAGNET lobby insertion point missing')
 if "id:'magnet',element:'openMagnetGame'" not in s:
  s=s.replace("{id:'mines',element:'openMinesGame'","{id:'magnet',element:'openMagnetGame',category:'slots',isNew:true},{id:'mines',element:'openMinesGame'",1)
+s=s.replace('<small>Магнитное поле · Overdrive</small>','<small>WHEEL · Magnet Chamber</small>')
 art='data:image/webp;base64,'+base64.b64encode((ROOT/'assets/magnet/environment.webp').read_bytes()).decode()
 s=re.sub(r'(<img id="magnetLobbyArt")([^>]*)(>)',lambda m:m[1]+re.sub(r' src="[^"]*"','',m[2])+' src="'+art+'"'+m[3],s)
 p.write_text(s)
