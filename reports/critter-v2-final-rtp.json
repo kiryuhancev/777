@@ -1,0 +1,18 @@
+{
+  "paidCycles": 2000000,
+  "seed": 20261021,
+  "payScale": 0.000699792925918,
+  "rtpPct": 96.05334384886619,
+  "approx95Pct": [
+    93.14708499422782,
+    98.95960270350456
+  ],
+  "hitPct": 26.4627,
+  "bonuses": 17521,
+  "superBonuses": 1693,
+  "bonusInterval": 114.14873580275099,
+  "baseRtpPct": 0.06045221925001301,
+  "bonusRtpPct": 95.99289162985018,
+  "maxObservedX": 1391.615048,
+  "method": "Independent seeds; actual source model with JSON trace snapshots disabled ONLY in this simulator. Verified exact payouts and final grids against unmodified model on10000 seeds. Estimate, not an exact theoretical RTP."
+}

@@ -1,0 +1,39 @@
+{
+  "paidCycles": 2000000,
+  "seed": 92571,
+  "baseline": {
+    "rtpPct": 98.49699356984709,
+    "approx95Pct": [
+      97.13803087024641,
+      99.85595626944776
+    ],
+    "hitPct": 26.420450000000002,
+    "bonuses": 17737,
+    "superBonuses": 0,
+    "bonusInterval": 112.75864013080002,
+    "maxWinRounds": 0,
+    "maxObservedX": 1546.00576,
+    "uncappedBaseMeanX": 0.551978841899365,
+    "uncappedBonusMeanX": 0.43299109380000667
+  },
+  "persistentWilds": {
+    "rtpPct": 102.13590139364311,
+    "approx95Pct": [
+      99.06554478886905,
+      105.20625799841716
+    ],
+    "hitPct": 26.417,
+    "bonuses": 17737,
+    "superBonuses": 1660,
+    "bonusInterval": 112.75864013080002,
+    "maxWinRounds": 0,
+    "maxObservedX": 1359.741136,
+    "uncappedBaseMeanX": 0.0006705119510008029,
+    "uncappedBonusMeanX": 1.020688501984502
+  },
+  "notes": [
+    "Independent validation seeds; same PRNG, symbol weights, raw paytable and max win. Mechanics and payScale changed by explicit approval.",
+    "Confidence interval is a Monte Carlo estimate, not an exact theoretical RTP.",
+    "payScale is calibrated separately on seed42917, 200000 cycles. Validation uses different seeds. Uncapped components cannot be summed to recover capped round RTP."
+  ]
+}

@@ -1,3 +1,5 @@
+> Актуальная v2: [CRITTER_UPDATE.md](CRITTER_UPDATE.md). Ниже — историческая спецификация v1; её бонус и RTP не описывают новую версию.
+
 # Critter Chaos
 
 Новая отдельная игра `critter` в VAULT / SLOTS. Source of truth: `Critter_Chaos_for_Codex_light.zip`, полный `CRITTER_CHAOS_prompt_for_Codex.txt` и пять оригинальных WebP. Остальные девять игр, Featured, auth и канонические денежные методы WalletService не меняются.

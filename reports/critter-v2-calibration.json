@@ -1,0 +1,8 @@
+{
+  "paidCycles": 200000,
+  "seed": 42917,
+  "targetRtpPct": 96,
+  "payScale": 0.000754754351411,
+  "estimatedRtpPct": 95.999999999981,
+  "method": "Binary search of E[min(10000, weighted cluster total × payScale)] on fixed seeded paths. Independent simulation validates rounded actual model."
+}

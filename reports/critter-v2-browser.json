@@ -1,0 +1,19 @@
+{
+  "mode": "owned SDK HTTP fixtures, no live DB",
+  "seeds": {
+    "loss": 2,
+    "chain": 209,
+    "normal": 417,
+    "super": 709
+  },
+  "passed": [
+    "loss: exact full plan/payout/shared wallet, one paid round; badge tracks model",
+    "chain: exact full plan/payout/shared wallet, one paid round; badge tracks model",
+    "normal: exact full plan/payout/shared wallet, one paid round; badge tracks model",
+    "super: exact full plan/payout/shared wallet, one paid round; badge tracks model",
+    "F5 inside bonus restores terminal checkpoint once; no debit, bonus replay or duplicate statistics",
+    "320/390/430/768/1440px: artwork90%+ of cell, readable multiplier without overlap, no page overflow or duplicate IDs",
+    "Legacy v1 terminal checkpoint restores through original model",
+    "No browser page errors"
+  ]
+}

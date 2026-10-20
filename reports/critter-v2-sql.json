@@ -1,0 +1,15 @@
+{
+  "mode": "isolated PostgreSQL only",
+  "passed": [
+    "running: bet+all cascades+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "loss: bet+all cascades+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "win: bet+all cascades+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "bonus: bet+all cascades+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "super: bet+all cascades+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "legacy: bet+all cascades+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "Altered payout and blocked new bet rejected; migration repeat-safe; existing MAGNET/Heist/begin RPC byte-identical",
+    "initial-multiplier: malformed v2 checkpoint rejected",
+    "lost-persistent: malformed v2 checkpoint rejected",
+    "invalid-version: malformed v2 checkpoint rejected"
+  ]
+}

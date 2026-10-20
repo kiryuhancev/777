@@ -1,0 +1,8 @@
+const M=require('../critter/model'),fs=require('node:fs');
+const n=Number(process.argv[2]||200000),seed=Number(process.argv[3]||92571),rng=M.seeded(seed),id='11111111-1111-4111-8111-111111111111';
+const acc=()=>({sum:0,sq:0,hits:0,bonuses:0,superBonuses:0,caps:0,max:0,baseSum:0,bonusSum:0});const old=acc(),next=acc();
+function add(a,r){a.sum+=r.payout;a.sq+=r.payout*r.payout;a.hits+=r.payout>0;a.bonuses+=!!r.bonus;a.superBonuses+=r.bonus?.kind==='super';a.caps+=r.winX===10000;a.max=Math.max(a.max,r.winX);a.baseSum+=r.base.winX;a.bonusSum+=r.bonus?.winX||0;}
+for(let i=0;i<n;i++){const args={seed:Math.floor(rng()*4294967296),bet:1,roundId:id};add(old,M.legacy.start(args));add(next,M.start(args));}
+function result(a){const avg=a.sum/n,se=Math.sqrt(Math.max(0,a.sq/n-avg*avg)/n);return {rtpPct:avg*100,approx95Pct:[(avg-1.96*se)*100,(avg+1.96*se)*100],hitPct:a.hits/n*100,bonuses:a.bonuses,superBonuses:a.superBonuses,bonusInterval:a.bonuses?n/a.bonuses:null,maxWinRounds:a.caps,maxObservedX:a.max,uncappedBaseMeanX:a.baseSum/n,uncappedBonusMeanX:a.bonusSum/n};}
+const report={paidCycles:n,seed,baseline:result(old),persistentWilds:result(next),notes:['Independent validation seeds; same PRNG, symbol weights, raw paytable and max win. Mechanics and payScale changed by explicit approval.','Confidence interval is a Monte Carlo estimate, not an exact theoretical RTP.','payScale is calibrated separately on seed42917, 200000 cycles. Validation uses different seeds. Uncapped components cannot be summed to recover capped round RTP.']};
+fs.writeFileSync('reports/critter-v2-rtp.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report,null,2));

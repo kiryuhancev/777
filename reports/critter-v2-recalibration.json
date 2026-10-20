@@ -1,0 +1,12 @@
+{
+  "paidCycles": 4000000,
+  "seeds": [
+    92571,
+    20261020
+  ],
+  "targetRtpPct": 96,
+  "payScale": 0.000699792925918,
+  "previousPayScale": 0.000709411839978,
+  "pooledRtpAtPreviousScalePct": 97.31955570789178,
+  "method": "Pooled4M expanded calibration. Linear rescale; no round reaches cap at these coefficients. Rounded actual source model checked on fresh seed20261021."
+}

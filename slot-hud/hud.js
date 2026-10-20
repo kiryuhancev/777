@@ -21,7 +21,7 @@
   if(c.id==='swamp')featureInfo=bonus?`${bonus.remaining} FREE SPINS · ${$('swampCurrentMultiplier').textContent}`:'';
   if(c.id==='vault_heist'){statusText=round?.status==='CHOICE'?'COLLECT OR GO DEEPER':busy?'RESOLVING':feature?'HEIST ACTIVE':'BASE GAME';featureInfo=feature?`${$('heistStageLabel').textContent} · ${$('heistLoot').textContent}`:'';}
   if(c.id==='magnet'){statusText=$('magnetPhaseLabel').textContent||statusText;featureInfo=feature?`${$('magnetCounter').textContent} · ${$('magnetMultiplier').textContent}`:'';}
-  if(c.id==='critter'){statusText=busy?($('critterStatus').textContent.includes('CASCADE')?'RESOLVING':'SPINNING'):'BASE GAME';featureInfo=busy&&round?.bonus?'DUMPSTER DASH':busy?$('critterCascade').textContent:'';}
+  if(c.id==='critter'){const inBonus=busy&&$('critterMode').textContent.includes('BONUS SPIN');statusText=inBonus?'BONUS GAME':busy?($('critterStatus').textContent.includes('CASCADE')?'RESOLVING':'SPINNING'):'BASE GAME';featureInfo=inBonus?$('critterMode').textContent:busy?$('critterCascade').textContent:'';}
   const canChangeBet=!$(c.minus).disabled&&!busy;
   const insufficient=!feature&&BETS[c.id==='slot'?state.betIndex:controller?.betIndex||0]>state.balance;
   return {balance:VaultWalletService.formatBalance(),bet:c.id==='slot'?bet():BETS[controller?.betIndex||0],betSteps:BETS,win:c.id==='vault_heist'&&round?.status==='SETTLED'?Number(round.payout).toLocaleString('ru-RU'):$(c.win).textContent,state:busy?'SPINNING':feature?'BONUS_ACTIVE':autoplayRemaining?'AUTOPLAY':insufficient?'INSUFFICIENT_BALANCE':$(c.spin).disabled?'DISABLED':'IDLE',autoplayRemaining,canSpin:!$(c.spin).disabled,canChangeBet,canBuyBonus:!!c.buy&&!$(c.buy).disabled,statusText,featureInfo,busy,feature};

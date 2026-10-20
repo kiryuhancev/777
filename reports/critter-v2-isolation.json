@@ -1,0 +1,11 @@
+{
+  "baseline": "50e3f77",
+  "protectedFiles": 190,
+  "checks": [
+    "Other game source/assets/models, auth/config and unrelated schema byte-identical",
+    "Shared HUD changes only Critter status text",
+    "Whole embedded site outside Critter/runtime/HUD blocks byte-identical",
+    "Original debit/credit/outbox/revision/rollback unchanged",
+    "SQL wallet/statistics/access/grants tail unchanged; only Critter validation/capability extended"
+  ]
+}

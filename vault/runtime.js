@@ -121,7 +121,7 @@
     async connect(){
       if(critterSupport)return true;if(!client||owner==='guest')return false;
       if(critterConnection)return critterConnection;
-      const known=read('critter-schema'),cached=known?.version===1&&known.project===C.supabaseUrl;
+      const known=read('critter-schema'),cached=known?.version===2&&known.project===C.supabaseUrl;
       if(!navigator.onLine&&cached){critterSupport=true;return true;}
       critterConnectionError='';const expectedOwner=owner;
       critterConnection=(async()=>{
@@ -136,8 +136,8 @@
               critterConnectionError=error.code==='PGRST202'||responseStatus===404?'schema':responseStatus===401||responseStatus===403||error.code==='42501'?'permission':'connection';
               console.error('VAULT Critter connection failed',{code:error.code,status:responseStatus,message:error.message});return false;
             }
-            critterSupport=cap?.version===1;
-            if(critterSupport)write('critter-schema',{version:1,project:C.supabaseUrl});else critterConnectionError='version';
+            critterSupport=cap?.version===2;
+            if(critterSupport)write('critter-schema',{version:2,project:C.supabaseUrl});else critterConnectionError='version';
             return critterSupport;
           }catch(error){
             if(owner!==expectedOwner)return false;
@@ -156,7 +156,7 @@
       const rollback={balance:canonicalBalance,revision:clientRevision,mutation:walletMutation,queue:[...data.queue],rounds:[...data.rounds],stats:data.stats.critter?copy(data.stats.critter):null,checkpoint:data.recovery.critterRound};
       if(enqueue('critter',{p_round_id:r.roundId,p_expected_revision:clientRevision,p_checkpoint:r})===false)return false;
       clientRevision++;canonicalBalance=balance;data.balance=balance;walletMutation++;data.recovery.critterRound=copy(r);
-      const record={roundId:r.roundId,gameId:'critter',status:'settled',bet:r.bet,stake:r.bet,payout:r.payout,multiplier:r.winX,result:r.result,metadata:{seed:r.seed,bonus:!!r.bonus,cascades:r.base.steps.length+(r.bonus?.plan.steps.length||0),runningWilds:[r.base,...(r.bonus?[r.bonus.plan]:[])].flatMap(p=>p.steps).reduce((n,s)=>n+s.moves.length,0)},startedAt:Date.now(),settledAt:Date.now()};
+      const record={roundId:r.roundId,gameId:'critter',status:'settled',bet:r.bet,stake:r.bet,payout:r.payout,multiplier:r.winX,result:r.result,metadata:{seed:r.seed,bonus:!!r.bonus,cascades:r.base.steps.length+(r.bonus?.spins||[r.bonus?.plan]).filter(Boolean).reduce((n,p)=>n+p.steps.length,0),runningWilds:[r.base,...(r.bonus?.spins||(r.bonus?[r.bonus.plan]:[]))].flatMap(p=>p.steps).reduce((n,s)=>n+s.moves.length,0)},startedAt:Date.now(),settledAt:Date.now()};
       data.rounds.push(record);data.rounds=data.rounds.slice(-C.maxLocalRounds);localStats(record);
       if(!VaultStorage.saveLocalState()){
         canonicalBalance=rollback.balance;data.balance=rollback.balance;clientRevision=rollback.revision;walletMutation=rollback.mutation;data.queue=rollback.queue;data.rounds=rollback.rounds;data.recovery.critterRound=rollback.checkpoint;

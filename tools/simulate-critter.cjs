@@ -1,4 +1,5 @@
-const M=require('../critter/model.js');
+// Historical v1 RTP. Current game: simulate-critter-v2.cjs.
+const M=require('../critter/model-v1.js');
 function simulate(n,seed=42917){const rng=M.seeded(seed);let sum=0,sq=0,hits=0,bonus=0,wildRuns=0,cascades=0,limit=0,max=0,clusterRaw=0,fixedBonus=0,bonusSum=0;
  for(let i=0;i<n;i++){
   const r=M.start({seed:Math.floor(rng()*4294967296),bet:1,roundId:'11111111-1111-4111-8111-111111111111'}),plans=[r.base,...(r.bonus?[r.bonus.plan]:[])];

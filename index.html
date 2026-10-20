@@ -1836,11 +1836,11 @@ body.critter-active .app,body.critter-active #slotApp,body.critter-active #poker
 #critterApp .critter-frame{width:min(700px,100%);padding:13px;border:3px solid #b8843b;border-top-color:#f4cf6f;border-bottom-color:#825294;border-radius:14px;background:linear-gradient(130deg,#60473d,#172132 15%,#1b1330 85%,#63475e);box-shadow:inset 0 0 0 3px #070e19,0 0 22px #26dbef22,0 12px 40px #000b}
 #critterApp .critter-rail{display:flex;justify-content:space-between;font-size:8px;font-weight:bold;letter-spacing:.1em;padding:0 6px 10px;color:#edd9a6}
 #critterApp .critter-grid{position:relative;aspect-ratio:1;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(5,minmax(0,1fr));border:1px solid #72839c;background:#040916;overflow:hidden;isolation:isolate}
-#critterApp .critter-cell{position:relative;min-width:0;min-height:0;display:grid;place-items:center;padding:4px;background:radial-gradient(ellipse,#142432,#060b16 80%);border:1px solid #34445c77;transition:background .16s,opacity .16s}
+#critterApp .critter-cell{position:relative;min-width:0;min-height:0;display:grid;place-items:center;padding:0;background:#091321;border:.5px solid #34445c55;transition:background .16s,opacity .16s}
 #critterApp .critter-cell svg,#critterApp .critter-cell img{width:98%;height:98%;display:block;object-fit:contain;overflow:hidden;mix-blend-mode:screen}
 #critterApp .critter-cell[data-symbol='wild']{border-color:#f9b84d99;background:radial-gradient(#4a3218,#060a15 80%)}
 #critterApp .critter-cell[data-symbol='scatter']{border-color:#52efe099;background:radial-gradient(#163f45,#060a15 80%)}
-#critterApp .critter-cell.winning{background:#64571f77;box-shadow:inset 0 0 0 3px #ffe7a0;z-index:2}
+#critterApp .critter-cell.winning{background:#152333;box-shadow:none;z-index:2}
 #critterApp .critter-cell.active-wild:after{content:'RUN!';position:absolute;top:4px;left:4px;padding:3px 5px;color:#151b27;background:#ffda65;border-radius:4px;font:bold 9px Arial}
 #critterApp .critter-cell.removing{animation:critter-pop .2s ease forwards}
 #critterApp .critter-cell.destination{box-shadow:inset 0 0 0 3px #58fff0;background:#25696577;z-index:2}
@@ -1894,8 +1894,21 @@ body.critter-active .app,body.critter-active #slotApp,body.critter-active #poker
 @keyframes critter-fall{from{translate:0 -35%;opacity:.3}to{translate:0 0;opacity:1}}
 @keyframes critter-reel{from{translate:0 -40%;filter:blur(2px)}to{translate:0 0;filter:blur(0)}}
 @keyframes critter-trail{to{stroke-dashoffset:-22}}
-@media(max-width:750px){#critterApp{padding:0 5px 20px}#critterApp .critter-scene{padding:8px 8px 20px;min-height:0;background-size:auto 100%}#critterApp .critter-heading{gap:8px;margin:8px 0}#critterApp .critter-heading button{font-size:8px;padding:10px 9px}#critterApp .critter-readout{padding:10px;gap:8px}#critterApp .critter-readout small{font-size:7px}#critterApp .critter-readout strong{font-size:10px}#critterApp #critterWin{font-size:18px}#critterApp .critter-frame{padding:7px;border-width:2px}#critterApp .critter-rail{font-size:6px;padding:3px 1px 9px;letter-spacing:.04em}#critterApp .critter-cell{padding:2px}#critterApp #critterMessage{font-size:8px;min-height:37px}#critterApp .critter-cell.active-wild:after{font-size:6px;left:1px;top:1px;padding:2px}#critterApp .critter-controls{width:100%;grid-template-columns:44px minmax(0,1fr) 55px;grid-template-rows:45px 95px;padding:12px 10px;gap:10px 8px}#critterApp .critter-bet{grid-column:2;grid-row:1;grid-template-columns:30px 1fr 30px;height:45px}#critterApp #critterSettingsOpen{grid-column:1;grid-row:1}#critterApp #critterMax{grid-column:3;grid-row:1;font-size:10px;padding:10px}#critterApp #critterSpin{grid-column:2;grid-row:2;justify-self:center;width:87px;height:87px;font-size:14px}#critterApp .critter-auto-wrap{grid-column:1;grid-row:2}#critterApp #critterAuto{font-size:8px;padding:11px 4px}#critterApp #critterAutoMenu{left:0;right:auto}#critterApp .critter-wallet strong{font-size:18px}#critterApp .critter-bonus-bins{gap:5px}#critterApp .critter-bonus-bin{padding:9px 3px}#critterApp .critter-bonus-bin strong{font-size:12px}#critterApp .critter-bonus-bin small{font-size:6px}#critterApp .critter-bonus-card{padding:20px 10px}#critterApp .critter-bonus-card p{font-size:9px}#critterApp dialog{padding:17px 12px}#critterApp .critter-heading img{width:64%}}
+@media(max-width:750px){#critterApp{padding:0 5px 20px}#critterApp .critter-scene{padding:8px 8px 20px;min-height:0;background-size:auto 100%}#critterApp .critter-heading{gap:8px;margin:8px 0}#critterApp .critter-heading button{font-size:8px;padding:10px 9px}#critterApp .critter-readout{padding:10px;gap:8px}#critterApp .critter-readout small{font-size:7px}#critterApp .critter-readout strong{font-size:10px}#critterApp #critterWin{font-size:18px}#critterApp .critter-frame{padding:7px;border-width:2px}#critterApp .critter-rail{font-size:6px;padding:3px 1px 9px;letter-spacing:.04em}#critterApp .critter-cell{padding:0}#critterApp #critterMessage{font-size:8px;min-height:37px}#critterApp .critter-cell.active-wild:after{font-size:6px;left:1px;top:1px;padding:2px}#critterApp .critter-controls{width:100%;grid-template-columns:44px minmax(0,1fr) 55px;grid-template-rows:45px 95px;padding:12px 10px;gap:10px 8px}#critterApp .critter-bet{grid-column:2;grid-row:1;grid-template-columns:30px 1fr 30px;height:45px}#critterApp #critterSettingsOpen{grid-column:1;grid-row:1}#critterApp #critterMax{grid-column:3;grid-row:1;font-size:10px;padding:10px}#critterApp #critterSpin{grid-column:2;grid-row:2;justify-self:center;width:87px;height:87px;font-size:14px}#critterApp .critter-auto-wrap{grid-column:1;grid-row:2}#critterApp #critterAuto{font-size:8px;padding:11px 4px}#critterApp #critterAutoMenu{left:0;right:auto}#critterApp .critter-wallet strong{font-size:18px}#critterApp .critter-bonus-bins{gap:5px}#critterApp .critter-bonus-bin{padding:9px 3px}#critterApp .critter-bonus-bin strong{font-size:12px}#critterApp .critter-bonus-bin small{font-size:6px}#critterApp .critter-bonus-card{padding:20px 10px}#critterApp .critter-bonus-card p{font-size:9px}#critterApp dialog{padding:17px 12px}#critterApp .critter-heading img{width:64%}}
 @media(prefers-reduced-motion:reduce){#critterApp *,#critterApp *:before,#critterApp *:after{animation:none!important;transition:none!important}}
+
+/* Full-cell artwork; win effects follow the silhouette rather than an inset card. */
+#critterApp .critter-cell svg,#critterApp .critter-cell img{width:98%;height:98%}
+#critterApp .critter-grid.has-wins .critter-cell:not(.winning)>svg,
+#critterApp .critter-grid.has-wins .critter-cell:not(.winning)>img{opacity:.7}
+#critterApp .critter-cell.winning>svg,#critterApp .critter-cell.winning>img{opacity:1;filter:drop-shadow(0 0 3px #fff2b9) drop-shadow(0 0 7px #65f8e2);animation:critter-symbol-win .38s ease-out}
+@keyframes critter-symbol-win{0%,100%{scale:1}45%{scale:1.025}}
+@media(prefers-reduced-motion:reduce){#critterApp .critter-cell.winning>svg,#critterApp .critter-cell.winning>img{animation:none}}
+
+#critterApp .critter-wild-multiplier{position:absolute;right:3%;bottom:3%;z-index:3;padding:2px 5px;border:1px solid #fff0ad;border-radius:5px;background:#102335ed;color:#ffef9f;font:900 clamp(11px,2vw,23px) Arial;line-height:1.1;text-shadow:0 1px 2px #000;pointer-events:none}
+#critterApp .critter-cell.active-wild:after{content:'WILD'}
+
+#critterApp .persistent-bonus .critter-dash-track{display:none}
 
 </style>
 <!-- END CRITTER STYLES -->
@@ -6069,16 +6082,16 @@ const VaultMagnet=window.VaultMagnet=(()=>{
   <button id="critterReconnect" hidden>ПОВТОРИТЬ ПОДКЛЮЧЕНИЕ</button>
   <footer class="critter-controls"><button id="critterSettingsOpen" aria-label="Настройки">⚙</button><div class="critter-bet"><button id="critterMinus" aria-label="Уменьшить ставку">−</button><div><small>BET</small><strong id="critterBet">20</strong></div><button id="critterPlus" aria-label="Увеличить ставку">+</button></div><button id="critterMax">MAX</button><button id="critterSpin">SPIN</button><div class="critter-auto-wrap"><button id="critterAuto" aria-expanded="false" aria-controls="critterAutoMenu">AUTO</button><div id="critterAutoMenu" hidden><small>AUTO ROUNDS</small><button data-critter-auto="10">10</button><button data-critter-auto="25">25</button><button data-critter-auto="50">50</button><button data-critter-auto="100">100</button><button data-critter-auto="-1">∞</button></div></div></footer>
   <div class="critter-wallet"><small>PERSONAL BALANCE</small><strong id="critterBalance">—</strong><p>ONE BET · ALL CASCADES + EARNED BONUS</p></div>
-  <div id="critterBonusOverlay" class="critter-bonus-overlay" role="dialog" aria-modal="true" aria-label="Dumpster Dash Bonus" hidden><div class="critter-bonus-card"><small>3+ SCATTER · BONUS TRIGGERED</small><h2>DUMPSTER DASH</h2><p id="critterBonusMessage">THE RACCOON IS RAIDING THREE DUMPSTERS</p><div class="critter-dash-track"><img id="critterDashRunner" alt="Running raccoon"><i></i></div><div id="critterBonusBins" class="critter-bonus-bins"></div><p>ALL THREE REWARDS · ONE BONUS DROP</p></div></div>
+  <div id="critterBonusOverlay" class="critter-bonus-overlay" role="dialog" aria-modal="true" aria-label="Dumpster Dash Bonus" hidden><div class="critter-bonus-card"><small>3+ SCATTER · BONUS TRIGGERED</small><h2>DUMPSTER DASH</h2><p id="critterBonusMessage">PERSISTENT WILDS · EVERY SPIN STARTS AT x1</p><div class="critter-dash-track"><img id="critterDashRunner" alt="Running raccoon"><i></i></div><div id="critterBonusBins" class="critter-bonus-bins"></div><p>NO LEVELS · WILDS STAY UNTIL BONUS ENDS</p></div></div>
   <dialog id="critterSettings"><h2>CHAOS SETTINGS</h2><button id="critterSound">SOUND</button><button id="critterFast">FAST</button><button id="critterSettingsClose">CLOSE</button></dialog>
-  <dialog id="critterHelp"><button id="critterHelpClose">CLOSE ×</button><h2>CRITTER CHAOS · PAYTABLE</h2><p>Поле 5×5. Выигрывают группы из 5+ одинаковых символов, соприкасающихся сторонами; диагонали не считаются. Платит размер кластера, а не линия или количество ways.</p><div id="critterPaytable"></div><p><b>RUNNING WILD:</b> енот заменяет обычные символы. Если он участвовал в выигрыше, обычные выигравшие фишки удаляются, поле пополняется, затем енот перебегает в случайную клетку с обычным символом и меняется с ним местами. Несколько активных енотов бегут по очереди. Неактивный Wild остаётся на месте до конца раунда. Цель выбирается RNG, выигрыш после прыжка не гарантирован.</p><p>Wild может участвовать в разных оплачиваемых типах кластеров. Изолированная группа из 5+ Wild платит как Bulldog один раз; если она вошла в обычный выигрышный кластер, отдельной выплаты за неё нет. Wild остаются закреплёнными во время падения обычных фишек. Максимум12 оплачиваемых каскадов на поле; последняя комбинация оплачивается, после неё поле не пополняется.</p><p><b>3+ SCATTER:</b> мусорные баки сохраняются при каскадах и учитываются один раз на окончательном поле. Dumpster Dash автоматически раскрывает все три награды: +2/5/10/25× наличными, +3/4/5 дополнительных Wild и множитель ×2/×3/×5. Затем играет одно бонусное поле с каскадами без новой ставки и без повторных Scatter.</p><p><b>Bonus win = (cash award + bonus field wins) × bonus multiplier × bet.</b> Основной выигрыш прибавляется отдельно. Общий максимум10 000× ставки. Все результаты рассчитываются до анимации; ни бонус, ни прыжки не подгоняются под желаемую выплату.</p><p>Один round ID и одна ставка за всё. Выплата и статистика учитываются один раз. F5 пропускает незавершённую анимацию и показывает окончательный результат уже рассчитанного раунда, без повторного списания/прыжка/бонуса. Демонстрационные кредиты с client-authoritative RNG.</p></dialog>
+  <dialog id="critterHelp"><button id="critterHelpClose">CLOSE ×</button><h2>CRITTER CHAOS · PAYTABLE</h2><p>Поле 5×5. Выигрывают группы из 5+ одинаковых символов, соприкасающихся сторонами; диагонали не считаются. Платит размер кластера, а не линия или количество ways.</p><div id="critterPaytable"></div><p><b>RUNNING WILD:</b> енот заменяет обычные символы. В основной игре, если он участвовал в выигрыше, обычные выигравшие фишки удаляются, поле пополняется, затем енот перебегает в случайную клетку с обычным символом и меняется с ним местами. Несколько активных енотов бегут по очереди. Неактивный Wild остаётся на месте до конца раунда. Цель выбирается RNG, выигрыш после прыжка не гарантирован.</p><p>Wild может участвовать в разных оплачиваемых типах кластеров. Изолированная группа из 5+ Wild платит как Bulldog один раз; если она вошла в обычный выигрышный кластер, отдельной выплаты за неё нет. Wild остаются закреплёнными во время падения обычных фишек. Максимум12 оплачиваемых каскадов на поле; последняя комбинация оплачивается, после неё поле не пополняется.</p><p><b>WILD MULTIPLIER:</b> каждый новый Wild — x1. Выигрыш оплачивается с текущим множителем; затем участвующий Wild удваивается: x1 → x2 → x4 → x8. За каскад Wild повышается один раз, даже если участвует в нескольких кластерах. Несколько Wild в кластере используют самый высокий множитель, без сложения или перемножения. Следующий спин снова начинается с x1.</p><p><b>3+ SCATTER:</b> учитываются один раз после базовых каскадов и дают10 бонусных спинов при3 Scatter; 4+ Scatter дают SUPER —20 спинов. Внутренних уровней нет. Все выпавшие Wild остаются на своих позициях до конца бонуса; новые добавляются. В бонусе Wild не бегают. Каждый новый спин обнуляет только множитель до x1. Дополнительной ставки, cash-приза и общего случайного множителя нет.</p><p>Выигрыш — сумма базовых и бонусных каскадов. Общий максимум10 000× ставки сохранён. Бонусные поля рассчитываются до анимации; цель по выплате не задаётся. Новые правила меняют RTP; текущую оценку см. в отчёте симуляции.</p><p>Один round ID и одна ставка за всё. Выплата и статистика учитываются один раз. F5 пропускает незавершённую анимацию и показывает окончательный результат уже рассчитанного раунда, без повторного списания/прыжка/бонуса. Демонстрационные кредиты с client-authoritative RNG.</p></dialog>
  </div>
 </section>
 
 <!-- END CRITTER SCREEN -->
 <!-- BEGIN CRITTER MODULE -->
 <script>
-const CRITTER_CONFIG=Object.freeze({version:1,id:'critter',columns:5,rows:5,minCluster:5,maxCascades:12,maxWinX:10000,
+const CRITTER_CONFIG_V1=Object.freeze({version:1,id:'critter',columns:5,rows:5,minCluster:5,maxCascades:12,maxWinX:10000,
  wildChance:.018,scatterChance:.016,payScale:3.7256,
  sizes:[5,6,7,8,9,10,15],
  symbols:[
@@ -6093,11 +6106,11 @@ const CRITTER_CONFIG=Object.freeze({version:1,id:'critter',columns:5,rows:5,minC
  ],
  bonus:{cash:[{x:2,w:60},{x:5,w:30},{x:10,w:9},{x:25,w:1}],wilds:[{x:3,w:70},{x:4,w:25},{x:5,w:5}],multiplier:[{x:2,w:80},{x:3,w:18},{x:5,w:2}]}
 });
-if(typeof module!=='undefined')module.exports=CRITTER_CONFIG;
+if(typeof module!=='undefined')module.exports=CRITTER_CONFIG_V1;
 
 /* Pure seeded cluster cascade plan. No DOM, wallet, account inputs or animation RNG. */
-const CRITTER_MODEL=(()=>{
- const C=typeof module!=='undefined'&&module.exports?require('./config.js'):CRITTER_CONFIG;
+const CRITTER_MODEL_V1=(()=>{
+ const C=typeof module!=='undefined'&&module.exports?require('./config-v1.js'):CRITTER_CONFIG_V1;
  const copy=v=>JSON.parse(JSON.stringify(v)),round=n=>Math.round(n*1e6)/1e6;
  const regular=id=>C.symbols.some(s=>s.id===id);
  function seeded(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=Math.imul(a^a>>>15,a|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
@@ -6149,6 +6162,89 @@ const CRITTER_MODEL=(()=>{
  function validate(v){try{if(v?.version!==1||v.gameId!=='critter'||v.status!=='SETTLED')return null;const r=start(v);return JSON.stringify(canonical(r))===JSON.stringify(canonical(v))?r:null;}catch{return null;}}
  return {config:C,seeded,channel,evaluate,cascade,start,validate,canonical,validGrid,round};
 })();
+if(typeof module!=='undefined')module.exports=CRITTER_MODEL_V1;
+
+const CRITTER_CONFIG=Object.freeze({version:2,id:'critter',columns:5,rows:5,minCluster:5,maxCascades:12,maxWinX:10000,
+ wildChance:.018,scatterChance:.016,payScale:0.000699792925918,
+ sizes:[5,6,7,8,9,10,15],
+ symbols:[
+  {id:'ten',name:'10',weight:24,pays:[.2,.3,.45,.65,.9,1.4,3]},
+  {id:'jack',name:'J',weight:20,pays:[.25,.4,.55,.8,1.2,1.8,4]},
+  {id:'king',name:'K',weight:16,pays:[.3,.45,.7,1,1.5,2.2,5]},
+  {id:'ace',name:'A',weight:12,pays:[.4,.6,.9,1.3,1.8,2.8,6]},
+  {id:'cat',name:'Street Cat',weight:10,pays:[.6,.9,1.3,1.8,2.5,4,8]},
+  {id:'pigeon',name:'Cool Pigeon',weight:8,pays:[.8,1.2,1.7,2.5,3.5,5,10]},
+  {id:'possum',name:'Possum',weight:6,pays:[1,1.5,2.2,3,4.5,7,15]},
+  {id:'bulldog',name:'Bulldog',weight:4,pays:[1.5,2.2,3,4.5,6,10,25]}
+ ],
+ bonus:{spins:10,superSpins:20}
+});
+if(typeof module!=='undefined')module.exports=CRITTER_CONFIG;
+
+/* Pure seeded cluster cascade plan. No DOM, wallet, account inputs or animation RNG. */
+const CRITTER_MODEL=(()=>{
+ const legacy=typeof module!=='undefined'&&module.exports?require('./model-v1.js'):CRITTER_MODEL_V1;
+ const C=typeof module!=='undefined'&&module.exports?require('./config.js'):CRITTER_CONFIG;
+ const copy=v=>JSON.parse(JSON.stringify(v)),round=n=>Math.round(n*1e6)/1e6;
+ const regular=id=>C.symbols.some(s=>s.id===id);
+ function seeded(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=Math.imul(a^a>>>15,a|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
+ const channel=(seed,n)=>(seed^Math.imul(n+1,0x9e3779b9))>>>0;
+ function pick(a,rng){let n=rng()*a.reduce((s,t)=>s+t.w,0);return a.find(t=>(n-=t.w)<0)||a.at(-1);}
+ function shuffle(a,rng){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+ const neighbours=i=>[i%5?i-1:null,i%5<4?i+1:null,i>=5?i-5:null,i<20?i+5:null].filter(n=>n!==null);
+ function validGrid(g){return Array.isArray(g)&&g.length===25&&new Set(g.map(t=>t?.uid)).size===25&&g.every(t=>Number.isInteger(t.uid)&&t.uid>=0&&t.uid<10000&&(regular(t.symbol)||['wild','scatter'].includes(t.symbol)));}
+ function components(grid,allowed){const seen=new Set(),out=[];for(let i=0;i<25;i++)if(!seen.has(i)&&allowed(grid[i])){const q=[i],group=[];seen.add(i);while(q.length){const j=q.pop();group.push(j);for(const k of neighbours(j))if(!seen.has(k)&&allowed(grid[k])){seen.add(k);q.push(k);}}out.push(group.sort((a,b)=>a-b));}return out;}
+ function evaluate(grid){
+  if(!validGrid(grid))throw Error('Invalid Critter grid');const wins=[];
+  const payout=(s,n)=>s.pays[C.sizes.reduce((v,size,i)=>n>=size?i:v,0)];
+  for(const s of C.symbols)for(const positions of components(grid,t=>t.symbol===s.id||t.symbol==='wild'))if(positions.length>=C.minCluster&&positions.some(i=>grid[i].symbol===s.id))wins.push({symbol:s.id,size:positions.length,positions,rawWinX:payout(s,positions.length),winX:round(payout(s,positions.length)*C.payScale)});
+  for(const positions of components(grid,t=>t.symbol==='wild'))if(positions.length>=C.minCluster&&!wins.some(w=>positions.some(i=>w.positions.includes(i))))wins.push({symbol:'wild',size:positions.length,positions,rawWinX:payout(C.symbols.at(-1),positions.length),winX:round(payout(C.symbols.at(-1),positions.length)*C.payScale)});
+  for(const w of wins){w.multiplier=Math.max(1,...w.positions.filter(i=>grid[i].symbol==='wild').map(i=>grid[i].multiplier||1));w.winX=round(w.winX*w.multiplier);}
+  const positions=[...new Set(wins.flatMap(w=>w.positions))];return {wins,winX:round(wins.reduce((n,w)=>n+w.winX,0)),rawWinX:round(wins.reduce((n,w)=>n+w.rawWinX,0)),activeWilds:positions.filter(i=>grid[i].symbol==='wild').map(i=>grid[i].uid)};
+ }
+ function cascade(seed,{bonus=false,persistentWilds=[]}={}){
+  const rng=seeded(seed);let uid=0;
+  const draw=()=>{const n=rng(),symbol=n<(!bonus?C.scatterChance:0)?'scatter':n<(!bonus?C.scatterChance:0)+C.wildChance?'wild':pick(C.symbols.map(s=>({id:s.id,w:s.weight})),rng).id;return {uid:uid++,symbol,...(symbol==='wild'?{multiplier:1}:{})};};
+  let grid=Array.from({length:25},draw);shuffle(grid.flatMap((t,i)=>regular(t.symbol)?[i]:[]),rng);for(const i of persistentWilds)grid[i].symbol='wild';for(const t of grid)if(t.symbol==='wild')t.multiplier=1;const drops=[];
+  const initialGrid=copy(grid),steps=[];let rawWinX=0,winX=0,limitReached=false;
+  for(let index=0;index<C.maxCascades;index++){
+   const result=evaluate(grid);if(!result.wins.length)break;rawWinX=round(rawWinX+result.rawWinX);winX=round(winX+result.winX);
+   const step={index,grid:copy(grid),...result,removed:[],gravityGrid:null,moves:[],nextGrid:null};
+   if(index===C.maxCascades-1){limitReached=true;steps.push(step);break;}
+   const remove=new Set(result.wins.flatMap(w=>w.positions).filter(i=>regular(grid[i].symbol)).map(i=>grid[i].uid));step.removed=[...remove];
+   const next=copy(grid).map(t=>remove.has(t.uid)?null:t);
+   for(const t of next)if(t&&result.activeWilds.includes(t.uid))t.multiplier=(t.multiplier||1)*2;
+   // Wilds remain anchors during gravity. Scatter identities survive and may fall.
+   for(let col=0;col<5;col++){
+    let bottom=4;while(bottom>=0){if(next[bottom*5+col]?.symbol==='wild'){bottom--;continue;}let top=bottom;while(top>=0&&next[top*5+col]?.symbol!=='wild')top--;const cells=[];for(let row=top+1;row<=bottom;row++)cells.push(row*5+col);const pieces=cells.map(i=>next[i]).filter(Boolean);const missing=cells.length-pieces.length;const filled=[...Array.from({length:missing},draw),...pieces];cells.forEach((i,n)=>next[i]=filled[n]);bottom=top;}
+   }
+   step.gravityGrid=copy(next);const destinations=new Set();
+   for(const wild of (bonus?[]:result.activeWilds).sort((a,b)=>a-b)){
+    const from=next.findIndex(t=>t.uid===wild),eligible=next.flatMap((t,i)=>regular(t.symbol)&&!destinations.has(i)?[i]:[]);
+    if(!eligible.length)continue;const to=eligible[Math.floor(rng()*eligible.length)];[next[from],next[to]]=[next[to],next[from]];destinations.add(to);step.moves.push({uid:wild,from,to});
+   }
+   step.nextGrid=copy(next);steps.push(step);grid=next;
+  }
+  return {initialGrid,steps,finalGrid:copy(grid),rawWinX,winX,scatters:grid.filter(t=>t.symbol==='scatter').length,limitReached,drops};
+ }
+ function start({seed,bet,roundId}){
+  if(!Number.isInteger(seed)||seed<0||seed>4294967295||!Number.isFinite(bet)||bet<=0||bet>1e9||typeof roundId!=='string'||!/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(roundId))throw Error('Invalid Critter round');
+  const base=cascade(channel(seed,0)),triggered=base.scatters>=3;let bonus=null;
+  if(triggered){
+   const spins=[],kind=base.scatters>=4?'super':'normal',spinCount=kind==='super'?C.bonus.superSpins:C.bonus.spins;let persistentWilds=[],bonusWin=0;
+   for(let i=0;i<spinCount;i++){
+    const plan=cascade(channel(seed,i+2),{bonus:true,persistentWilds});spins.push(plan);bonusWin=round(bonusWin+plan.winX);
+    persistentWilds=plan.finalGrid.flatMap((t,pos)=>t.symbol==='wild'?[pos]:[]);
+   }
+   bonus={kind,spins,spinCount,persistentWilds,winX:bonusWin};
+  }
+  const winX=round(Math.min(C.maxWinX,base.winX+(bonus?.winX||0)));
+  return {version:2,roundId,gameId:'critter',seed,bet,status:'SETTLED',base,bonus,winX,payout:round(winX*bet),result:bonus?'persistent-wilds':'base'};
+ }
+ function canonical(v){return v&&typeof v==='object'?Array.isArray(v)?v.map(canonical):Object.fromEntries(Object.keys(v).sort().map(k=>[k,canonical(v[k])])):v;}
+ function validate(v){try{if(v?.version===1)return legacy.validate(v);if(v?.version!==2||v.gameId!=='critter'||v.status!=='SETTLED')return null;const r=start(v);return JSON.stringify(canonical(r))===JSON.stringify(canonical(v))?r:null;}catch{return null;}}
+ return {legacy,config:C,seeded,channel,evaluate,cascade,start,validate,canonical,validGrid,round};
+})();
 if(typeof module!=='undefined')module.exports=CRITTER_MODEL;
 
 const CRITTER_ASSETS={
@@ -6166,12 +6262,13 @@ const VaultCritter=window.VaultCritter=(()=>{
  const C=CRITTER_CONFIG,M=CRITTER_MODEL,A=CRITTER_ASSETS,$=id=>document.getElementById(id),root=$('critterApp'),gridEl=$('critterGrid');
  let round=null,betIndex=2,busy=false,ready=false,auto=0,timer=null,generation=0,shownX=0;
  const sleep=ms=>new Promise(r=>setTimeout(r,ms)),fmt=n=>Number(n).toLocaleString('ru-RU',{maximumFractionDigits:6});
+ const finalGrid=r=>r.bonus?.spins?.at(-1)?.finalGrid||r.bonus?.plan?.finalGrid||r.base.finalGrid;
  const name=id=>C.symbols.find(s=>s.id===id)?.name||{wild:'Running Wild',scatter:'Scatter'}[id];
  const atlas=document.createElementNS('http://www.w3.org/2000/svg','svg');atlas.setAttribute('width','0');atlas.setAttribute('height','0');atlas.style.position='absolute';atlas.setAttribute('aria-hidden','true');atlas.innerHTML=`<defs><image id="critterAtlasImage" href="${A.sheet}" width="1200" height="900"/>${Object.entries(CRITTER_SPRITES).map(([id,[x,y,w,h]])=>`<clipPath id="critterClip${id}" clipPathUnits="userSpaceOnUse"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>`).join('')}</defs>`;root.prepend(atlas);
  const cells=Array.from({length:25},(_,i)=>{const n=document.createElement('div');n.className='critter-cell';n.style.setProperty('--column',i%5);gridEl.append(n);return n;});
- function art(id){return ['wild','scatter'].includes(id)?`<img src="${A[id]}" alt="">`:`<svg viewBox="${CRITTER_SPRITES[id].join(' ')}" aria-hidden="true"><use href="#critterAtlasImage" clip-path="url(#critterClip${id})"/></svg>`;}
- function draw(grid,{wins=[],activeWilds=[]}={}){const winning=new Set(wins.flatMap(w=>w.positions)),active=new Set(activeWilds);for(let i=0;i<25;i++){const t=grid[i],n=cells[i];n.className='critter-cell'+(winning.has(i)?' winning':'')+(active.has(t.uid)?' active-wild':'');n.dataset.uid=t.uid;n.setAttribute('aria-label',`${name(t.symbol)}, row ${Math.floor(i/5)+1}, column ${i%5+1}`);if(n.dataset.symbol!==t.symbol){n.innerHTML=art(t.symbol);n.dataset.symbol=t.symbol;}}}
- function clearFX(){root.classList.remove('critter-reeling');$('critterPaths').replaceChildren();$('critterBonusOverlay').hidden=true;gridEl.querySelectorAll('.critter-runner').forEach(n=>n.remove());cells.forEach(n=>n.classList.remove('winning','active-wild','removing','falling','destination'));}
+ function art(id){return ['wild','scatter'].includes(id)?`<img src="${A[id]}" alt="">`:`<svg preserveAspectRatio="none" viewBox="${CRITTER_SPRITES[id].join(' ')}" aria-hidden="true"><use href="#critterAtlasImage" clip-path="url(#critterClip${id})"/></svg>`;}
+ function draw(grid,{wins=[],activeWilds=[]}={}){gridEl.classList.toggle('has-wins',wins.length>0);const winning=new Set(wins.flatMap(w=>w.positions)),active=new Set(activeWilds);for(let i=0;i<25;i++){const t=grid[i],n=cells[i];n.className='critter-cell'+(winning.has(i)?' winning':'')+(active.has(t.uid)?' active-wild':'');n.dataset.uid=t.uid;n.setAttribute('aria-label',`${name(t.symbol)}, row ${Math.floor(i/5)+1}, column ${i%5+1}`);if(n.dataset.symbol!==t.symbol){n.innerHTML=art(t.symbol);n.dataset.symbol=t.symbol;}n.querySelector('.critter-wild-multiplier')?.remove();if(t.symbol==='wild'){const badge=document.createElement('span');badge.className='critter-wild-multiplier';badge.textContent='x'+(t.multiplier||1);badge.setAttribute('aria-label','Wild multiplier '+(t.multiplier||1));n.append(badge);}}}
+ function clearFX(){$('critterBonusOverlay').classList.remove('persistent-bonus');gridEl.classList.remove('has-wins');root.classList.remove('critter-reeling');$('critterPaths').replaceChildren();$('critterBonusOverlay').hidden=true;gridEl.querySelectorAll('.critter-runner').forEach(n=>n.remove());cells.forEach(n=>n.classList.remove('winning','active-wild','removing','falling','destination'));}
  function render(){
   root.classList.toggle('critter-fast',state.fastGame);
   $('critterBet').textContent=fmt(BETS[betIndex]);$('critterWin').textContent=fmt(Math.min(C.maxWinX,shownX)*(round?.bet||BETS[betIndex]));$('critterBalance').textContent=window.VaultWalletService?VaultWalletService.formatBalance():'—';
@@ -6184,7 +6281,7 @@ const VaultCritter=window.VaultCritter=(()=>{
  function tone(){if(!state.sound)return;try{const a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.frequency.setValueAtTime(330,a.currentTime);o.frequency.exponentialRampToValueAtTime(660,a.currentTime+.12);g.gain.setValueAtTime(.012,a.currentTime);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.16);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.16);o.onended=()=>a.close();}catch{}}
  async function showPlan(plan,g,{bonus=false,multiplier=1}={}){
   const fast=state.fastGame,reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  draw(plan.initialGrid);$('critterStatus').textContent=bonus?'BONUS DROP · EXTRA WILDS':'REELS STOPPING';await VaultSymbolDrop.play(C.id,{root:gridEl,cells:plan.initialGrid.map((t,i)=>({node:cells[i],column:i%5,row:Math.floor(i/5),symbol:t.symbol})),rows:5,roundId:round.roundId,hasWin:!!plan.steps.length,feature:bonus,speedProfile:fast?'quick':'normal'});if(g!==generation)return false;
+  draw(plan.initialGrid);$('critterStatus').textContent=bonus?'BONUS SPIN · PERSISTENT WILDS':'REELS STOPPING';await VaultSymbolDrop.play(C.id,{root:gridEl,cells:plan.initialGrid.map((t,i)=>({node:cells[i],column:i%5,row:Math.floor(i/5),symbol:t.symbol})),rows:5,roundId:round.roundId,hasWin:!!plan.steps.length,feature:bonus,speedProfile:fast?'quick':'normal'});if(g!==generation)return false;
   for(const step of plan.steps){
    draw(step.grid,{wins:step.wins,activeWilds:step.activeWilds});$('critterCascade').textContent='CASCADE '+(step.index+1);$('critterStatus').textContent='CLUSTER WIN · '+fmt(step.winX*multiplier)+'×';$('critterMessage').textContent=step.wins.map(w=>name(w.symbol)+' · '+w.size+' CONNECTED').join(' / ');shownX=M.round(Math.min(C.maxWinX,shownX+step.winX*multiplier));render();tone();await sleep(fast?230:550);if(g!==generation)return false;
    if(!step.gravityGrid)break;
@@ -6204,22 +6301,34 @@ const VaultCritter=window.VaultCritter=(()=>{
   draw(plan.finalGrid);$('critterStatus').textContent=plan.limitReached?'CASCADE LIMIT · LAST WIN PAID':'FIELD SETTLED';return true;
  }
  async function reveal(){const g=++generation;busy=true;shownX=0;clearFX();render();$('critterMode').textContent='NEON BACKSTREET · 5×5';$('critterCascade').textContent='CASCADE 0';if(!await showPlan(round.base,g))return;
-  if(round.bonus){
+  if(round.bonus&&!round.bonus.spins){
    const b=round.bonus,fast=state.fastGame,awards=[{label:'CASH',text:'+'+b.cashX+'×'},{label:'WILD DROP',text:'+'+b.extraWilds+' WILDS'},{label:'MULTIPLIER',text:'×'+b.multiplier}];
    $('critterBonusOverlay').hidden=false;$('critterBonusMessage').textContent='ALL THREE DUMPSTERS · ALL THREE REWARDS';$('critterBonusBins').innerHTML=awards.map(a=>`<div class="critter-bonus-bin"><img src="${A.scatter}" alt="Dumpster"><small>${a.label}</small><strong>?</strong></div>`).join('');$('critterDashRunner').style.left='0';await sleep(fast?350:700);if(g!==generation)return;
    for(let i=0;i<3;i++){$('critterDashRunner').style.left=`calc(${i*40}% - ${i*10}px)`;await sleep(fast?250:500);if(g!==generation)return;const bin=$('critterBonusBins').children[i];bin.classList.add('revealed');bin.querySelector('strong').textContent=awards[i].text;tone();}
    $('critterBonusMessage').textContent=`(+${b.cashX}× + BONUS FIELD WINS) ×${b.multiplier}`;await sleep(fast?450:800);if(g!==generation)return;$('critterBonusOverlay').hidden=true;
    shownX=M.round(shownX+b.cashX*b.multiplier);render();$('critterMode').textContent='DUMPSTER DASH · ×'+b.multiplier;$('critterCascade').textContent='BONUS CASCADE 0';if(!await showPlan(b.plan,g,{bonus:true,multiplier:b.multiplier}))return;
   }
-  if(g!==generation)return;clearFX();shownX=round.winX;VaultWalletService.releasePresentation('critter');busy=false;render();$('critterStatus').textContent=round.payout?'ROUND WIN · '+fmt(round.winX)+'×':'NO WIN THIS ROUND';$('critterMessage').textContent=round.bonus?`DUMPSTER DASH: (${fmt(round.bonus.cashX)}× + ${fmt(round.bonus.plan.winX)}×) ×${round.bonus.multiplier} · ${fmt(round.payout)} TOTAL BANKED`:`ROUND SETTLED · ${fmt(round.payout)} BANKED`;if(VaultStorage.inspect().conflict)VaultSync.flush();schedule();
+  if(round.bonus?.spins){
+   const b=round.bonus;
+   $('critterBonusOverlay').classList.add('persistent-bonus');$('critterBonusOverlay').querySelector('h2').textContent=b.kind==='super'?'DUMPSTER DASH · SUPER':'DUMPSTER DASH';
+   $('critterBonusOverlay').hidden=false;$('critterBonusMessage').textContent=(b.kind==='super'?'SUPER · ':'')+b.spinCount+' BONUS SPINS · ALL WILDS STAY UNTIL THE BONUS ENDS';$('critterBonusBins').replaceChildren();await sleep(state.fastGame?450:900);if(g!==generation)return;$('critterBonusOverlay').hidden=true;
+   for(let i=0;i<b.spins.length;i++){
+    $('critterMode').textContent=(b.kind==='super'?'SUPER · ':'')+'BONUS SPIN '+(i+1)+' / '+b.spinCount;
+    $('critterCascade').textContent='CASCADE 0';
+    if(!await showPlan(b.spins[i],g,{bonus:true}))return;
+    $('critterMessage').textContent=b.spins[i].finalGrid.filter(t=>t.symbol==='wild').length+' PERSISTENT WILDS · NEXT SPIN STARTS AT x1';
+    await sleep(state.fastGame?220:450);if(g!==generation)return;
+   }
+  }
+  if(g!==generation)return;clearFX();shownX=round.winX;VaultWalletService.releasePresentation('critter');busy=false;render();$('critterStatus').textContent=round.payout?'ROUND WIN · '+fmt(round.winX)+'×':'NO WIN THIS ROUND';$('critterMessage').textContent=round.bonus?`BONUS COMPLETE · ${fmt(round.payout)} TOTAL BANKED`:`ROUND SETTLED · ${fmt(round.payout)} BANKED`;if(VaultStorage.inspect().conflict)VaultSync.flush();schedule();
  }
  function spin(){if(!ready||busy||!VaultRoundService.canPlay(C.id))return;clearTimeout(timer);const next=M.start({seed:crypto.getRandomValues(new Uint32Array(1))[0],bet:BETS[betIndex],roundId:crypto.randomUUID()});VaultWalletService.holdPresentation(C.id,{stake:next.bet});if(!VaultCritterBridge.commit(next)){VaultWalletService.releasePresentation(C.id);auto=0;render();$('critterMessage').textContent='Progress is being restored. Try again shortly.';return;}round=next;if(auto>0)auto--;reveal();}
- function restore(value){generation++;busy=false;auto=0;shownX=0;clearTimeout(timer);clearFX();if(window.VaultWalletService)VaultWalletService.releasePresentation(C.id);round=M.validate(value);shownX=round?.winX||0;draw(round?(round.bonus?.plan.finalGrid||round.base.finalGrid):M.cascade(1977).initialGrid);$('critterAutoMenu').hidden=true;$('critterAuto').setAttribute('aria-expanded','false');$('critterMode').textContent=round?.bonus?'DUMPSTER DASH · FINAL RESULT':'NEON BACKSTREET · 5×5';$('critterStatus').textContent=round?'STABLE RESULT RESTORED':'READY FOR CHAOS';$('critterMessage').textContent=round?`ROUND SETTLED · ${fmt(round.payout)} BANKED`:'MATCH CLUSTERS · WATCH THE RACCOONS RUN';render();}
+ function restore(value){generation++;busy=false;auto=0;shownX=0;clearTimeout(timer);clearFX();if(window.VaultWalletService)VaultWalletService.releasePresentation(C.id);round=M.validate(value);shownX=round?.winX||0;draw(round?(finalGrid(round)):M.cascade(1977).initialGrid);$('critterAutoMenu').hidden=true;$('critterAuto').setAttribute('aria-expanded','false');$('critterMode').textContent=round?.bonus?'DUMPSTER DASH · FINAL RESULT':'NEON BACKSTREET · 5×5';$('critterStatus').textContent=round?'STABLE RESULT RESTORED':'READY FOR CHAOS';$('critterMessage').textContent=round?`ROUND SETTLED · ${fmt(round.payout)} BANKED`:'MATCH CLUSTERS · WATCH THE RACCOONS RUN';render();}
  async function connect(){
   $('critterReconnect').hidden=true;$('critterMessage').textContent='Подключаем Critter Chaos…';
   ready=await VaultCritterBridge.connect();if(currentGame!==C.id)return;
   render();$('critterReconnect').hidden=ready;
-  const messages={schema:'БД не видит функции Critter Chaos. Проверьте выполнение полного supabase_critter.txt в подключённом проекте.',permission:'Нет доступа к функциям Critter Chaos. Проверьте права authenticated из supabase_critter.txt.',version:'Версия функций Critter Chaos несовместима. Выполните актуальный supabase_critter.txt.',connection:'Не удалось проверить Critter Chaos: сервер временно недоступен. Повторим подключение при восстановлении сети.'};
+  const messages={schema:'БД не видит функции Critter Chaos. Проверьте выполнение полного supabase_critter_v2.txt в подключённом проекте.',permission:'Нет доступа к функциям Critter Chaos. Проверьте права authenticated из supabase_critter_v2.txt.',version:'Версия функций Critter Chaos несовместима. Выполните актуальный supabase_critter_v2.txt.',connection:'Не удалось проверить Critter Chaos: сервер временно недоступен. Повторим подключение при восстановлении сети.'};
   $('critterMessage').textContent=ready?'MATCH CLUSTERS · WATCH THE RACCOONS RUN':messages[VaultCritterBridge.connectionError]||messages.connection;schedule();
  }
  async function open(){if(!VaultSession.ready||VaultSession.mode!=='authenticated')return;currentGame=C.id;document.body.classList.remove('lobby-mode','slot-active','poker-active','bird-active','table-active','swamp-active','mines-active','heist-active','magnet-active');document.body.classList.add('game-mode','critter-active');root.hidden=false;VaultStorage.schedule();syncMusic();ready=VaultCritterBridge.ready;render();if(!ready)await connect();else schedule();}
@@ -6231,7 +6340,7 @@ const VaultCritter=window.VaultCritter=(()=>{
  document.addEventListener('click',e=>{if(!e.target.closest('.critter-auto-wrap')){$('critterAutoMenu').hidden=true;$('critterAuto').setAttribute('aria-expanded','false');}});
  for(const [openId,id,closeId] of [['critterSettingsOpen','critterSettings','critterSettingsClose'],['critterHelpOpen','critterHelp','critterHelpClose']]){$(openId).onclick=()=>$(id).showModal();$(closeId).onclick=()=>$(id).close();}
  $('critterSound').onclick=()=>{toggleSetting('sound');render();};$('critterFast').onclick=()=>{toggleSetting('fastGame');render();};
- $('critterPaytable').innerHTML='<div class="critter-pay-row"><b>SYMBOL · × BET</b>'+C.sizes.map(n=>'<b>'+n+'+</b>').join('')+'</div>'+C.symbols.map(s=>'<div class="critter-pay-row"><span>'+art(s.id)+s.name+'</span>'+s.pays.map(p=>'<b>'+fmt(M.round(p*C.payScale))+'×</b>').join('')+'</div>').join('')+'<p class="critter-pay-specials">'+art('wild')+' Wild заменяет обычные символы и бегает только после выигрыша. '+art('scatter')+' 3+ Scatter → Dumpster Dash.</p>';
+ $('critterPaytable').innerHTML='<div class="critter-pay-row"><b>SYMBOL · × BET</b>'+C.sizes.map(n=>'<b>'+n+'+</b>').join('')+'</div>'+C.symbols.map(s=>'<div class="critter-pay-row"><span>'+art(s.id)+s.name+'</span>'+s.pays.map(p=>'<b>'+fmt(M.round(p*C.payScale))+'×</b>').join('')+'</div>').join('')+'<p class="critter-pay-specials">'+art('wild')+' Wild начинает с x1; после участия в выигрыше удваивается для следующего каскада. В base game перебегает после выигрыша; в бонусе остаётся закреплённым. '+art('scatter')+' 3+ Scatter → Dumpster Dash.</p>';
  $('critterLogo').src=A.logo;$('critterDashRunner').src=A.wild;root.querySelector('.critter-scene').style.backgroundImage=`linear-gradient(#060b1833,#09091a55),url('${A.background}')`;
  for(const src of Object.values(A)){const img=new Image();img.src=src;img.decode?.().catch(()=>{});}
  new MutationObserver(()=>{if(currentGame!==C.id&&!root.hidden){root.hidden=true;restore(round);for(const id of ['critterHelp','critterSettings'])if($(id).open)$(id).close();document.body.classList.remove('critter-active');}}).observe(document.body,{attributes:true,attributeFilter:['class']});
@@ -6366,7 +6475,7 @@ const VaultCritter=window.VaultCritter=(()=>{
     async connect(){
       if(critterSupport)return true;if(!client||owner==='guest')return false;
       if(critterConnection)return critterConnection;
-      const known=read('critter-schema'),cached=known?.version===1&&known.project===C.supabaseUrl;
+      const known=read('critter-schema'),cached=known?.version===2&&known.project===C.supabaseUrl;
       if(!navigator.onLine&&cached){critterSupport=true;return true;}
       critterConnectionError='';const expectedOwner=owner;
       critterConnection=(async()=>{
@@ -6381,8 +6490,8 @@ const VaultCritter=window.VaultCritter=(()=>{
               critterConnectionError=error.code==='PGRST202'||responseStatus===404?'schema':responseStatus===401||responseStatus===403||error.code==='42501'?'permission':'connection';
               console.error('VAULT Critter connection failed',{code:error.code,status:responseStatus,message:error.message});return false;
             }
-            critterSupport=cap?.version===1;
-            if(critterSupport)write('critter-schema',{version:1,project:C.supabaseUrl});else critterConnectionError='version';
+            critterSupport=cap?.version===2;
+            if(critterSupport)write('critter-schema',{version:2,project:C.supabaseUrl});else critterConnectionError='version';
             return critterSupport;
           }catch(error){
             if(owner!==expectedOwner)return false;
@@ -6401,7 +6510,7 @@ const VaultCritter=window.VaultCritter=(()=>{
       const rollback={balance:canonicalBalance,revision:clientRevision,mutation:walletMutation,queue:[...data.queue],rounds:[...data.rounds],stats:data.stats.critter?copy(data.stats.critter):null,checkpoint:data.recovery.critterRound};
       if(enqueue('critter',{p_round_id:r.roundId,p_expected_revision:clientRevision,p_checkpoint:r})===false)return false;
       clientRevision++;canonicalBalance=balance;data.balance=balance;walletMutation++;data.recovery.critterRound=copy(r);
-      const record={roundId:r.roundId,gameId:'critter',status:'settled',bet:r.bet,stake:r.bet,payout:r.payout,multiplier:r.winX,result:r.result,metadata:{seed:r.seed,bonus:!!r.bonus,cascades:r.base.steps.length+(r.bonus?.plan.steps.length||0),runningWilds:[r.base,...(r.bonus?[r.bonus.plan]:[])].flatMap(p=>p.steps).reduce((n,s)=>n+s.moves.length,0)},startedAt:Date.now(),settledAt:Date.now()};
+      const record={roundId:r.roundId,gameId:'critter',status:'settled',bet:r.bet,stake:r.bet,payout:r.payout,multiplier:r.winX,result:r.result,metadata:{seed:r.seed,bonus:!!r.bonus,cascades:r.base.steps.length+(r.bonus?.spins||[r.bonus?.plan]).filter(Boolean).reduce((n,p)=>n+p.steps.length,0),runningWilds:[r.base,...(r.bonus?.spins||(r.bonus?[r.bonus.plan]:[]))].flatMap(p=>p.steps).reduce((n,s)=>n+s.moves.length,0)},startedAt:Date.now(),settledAt:Date.now()};
       data.rounds.push(record);data.rounds=data.rounds.slice(-C.maxLocalRounds);localStats(record);
       if(!VaultStorage.saveLocalState()){
         canonicalBalance=rollback.balance;data.balance=rollback.balance;clientRevision=rollback.revision;walletMutation=rollback.mutation;data.queue=rollback.queue;data.rounds=rollback.rounds;data.recovery.critterRound=rollback.checkpoint;
@@ -6941,7 +7050,7 @@ const VaultCritter=window.VaultCritter=(()=>{
   if(c.id==='swamp')featureInfo=bonus?`${bonus.remaining} FREE SPINS · ${$('swampCurrentMultiplier').textContent}`:'';
   if(c.id==='vault_heist'){statusText=round?.status==='CHOICE'?'COLLECT OR GO DEEPER':busy?'RESOLVING':feature?'HEIST ACTIVE':'BASE GAME';featureInfo=feature?`${$('heistStageLabel').textContent} · ${$('heistLoot').textContent}`:'';}
   if(c.id==='magnet'){statusText=$('magnetPhaseLabel').textContent||statusText;featureInfo=feature?`${$('magnetCounter').textContent} · ${$('magnetMultiplier').textContent}`:'';}
-  if(c.id==='critter'){statusText=busy?($('critterStatus').textContent.includes('CASCADE')?'RESOLVING':'SPINNING'):'BASE GAME';featureInfo=busy&&round?.bonus?'DUMPSTER DASH':busy?$('critterCascade').textContent:'';}
+  if(c.id==='critter'){const inBonus=busy&&$('critterMode').textContent.includes('BONUS SPIN');statusText=inBonus?'BONUS GAME':busy?($('critterStatus').textContent.includes('CASCADE')?'RESOLVING':'SPINNING'):'BASE GAME';featureInfo=inBonus?$('critterMode').textContent:busy?$('critterCascade').textContent:'';}
   const canChangeBet=!$(c.minus).disabled&&!busy;
   const insufficient=!feature&&BETS[c.id==='slot'?state.betIndex:controller?.betIndex||0]>state.balance;
   return {balance:VaultWalletService.formatBalance(),bet:c.id==='slot'?bet():BETS[controller?.betIndex||0],betSteps:BETS,win:c.id==='vault_heist'&&round?.status==='SETTLED'?Number(round.payout).toLocaleString('ru-RU'):$(c.win).textContent,state:busy?'SPINNING':feature?'BONUS_ACTIVE':autoplayRemaining?'AUTOPLAY':insufficient?'INSUFFICIENT_BALANCE':$(c.spin).disabled?'DISABLED':'IDLE',autoplayRemaining,canSpin:!$(c.spin).disabled,canChangeBet,canBuyBonus:!!c.buy&&!$(c.buy).disabled,statusText,featureInfo,busy,feature};

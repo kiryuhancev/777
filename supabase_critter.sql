@@ -1,4 +1,4 @@
--- Critter Chaos additive setup. Run this WHOLE file on the existing VAULT database.
+-- Critter Chaos v2 persistent Wild update. Run this WHOLE file on the existing VAULT database.
 -- No existing account, wallet, game outcome or auth setting is reset.
 begin;
 alter table public.game_stats drop constraint if exists game_stats_game_id_check;
@@ -7,23 +7,40 @@ alter table public.game_rounds drop constraint if exists game_rounds_game_id_che
 alter table public.game_rounds add constraint game_rounds_game_id_check check(game_id in ('slot','poker','bird','blackjack','baccarat','swamp','mines','vault_heist','magnet','critter'));
 alter table public.user_settings drop constraint if exists user_settings_last_game_id_check;
 alter table public.user_settings add constraint user_settings_last_game_id_check check(last_game_id in ('lobby','slot','poker','bird','blackjack','baccarat','swamp','mines','vault_heist','magnet','critter'));
-create or replace function public.critter_capabilities() returns jsonb language sql stable security invoker set search_path='' as $$select jsonb_build_object('version',1);$$;
+create or replace function public.critter_capabilities() returns jsonb language sql stable security invoker set search_path='' as $$select jsonb_build_object('version',2);$$;
 revoke all on function public.critter_capabilities() from public,anon;
 grant execute on function public.critter_capabilities() to authenticated;
 create or replace function public.settle_critter_round(p_round_id uuid,p_expected_revision bigint,p_checkpoint jsonb)
 returns jsonb language plpgsql security definer set search_path='' as $$
 declare u uuid:=auth.uid();w public.wallets;r public.game_rounds;c jsonb:=p_checkpoint;p jsonb;g jsonb;cell jsonb;s jsonb;win jsonb;idx integer;
- stake numeric;pay numeric;total numeric;computed numeric;base_win numeric;bonus_win numeric:=0;triggered boolean;sc integer;sum_win numeric;sum_raw numeric;step_win numeric;win_value numeric;bonus jsonb;
+ stake numeric;pay numeric;total numeric;computed numeric;base_win numeric;bonus_win numeric:=0;triggered boolean;sc integer;sum_win numeric;sum_raw numeric;step_win numeric;win_value numeric;bonus jsonb;plans jsonb[];v2 boolean;spin_plan jsonb;previous_grid jsonb;expected_multiplier numeric;pos integer;wild_cell jsonb;counts jsonb;expected_count integer;pay_rows jsonb;raw_expected numeric;size_index integer;
 begin
  if u is null then raise exception 'Authentication required';end if;
- if c is null or jsonb_typeof(c)<>'object' or octet_length(c::text)>524288 or not c ?& array['version','roundId','gameId','seed','bet','status','base','bonus','winX','payout','result'] then raise exception 'Invalid Critter checkpoint';end if;
+ if c is null or jsonb_typeof(c)<>'object' or octet_length(c::text)>2097152 or not c ?& array['version','roundId','gameId','seed','bet','status','base','bonus','winX','payout','result'] then raise exception 'Invalid Critter checkpoint';end if;
  stake:=(c->>'bet')::numeric;pay:=(c->>'payout')::numeric;total:=(c->>'winX')::numeric;bonus:=c->'bonus';triggered:=bonus<>'null'::jsonb;
- if c->>'version' is distinct from '1' or c->>'gameId' is distinct from 'critter' or c->>'status' is distinct from 'SETTLED' or (c->>'roundId')::uuid is distinct from p_round_id
+ if coalesce(c->>'version','') not in ('1','2') or c->>'gameId' is distinct from 'critter' or c->>'status' is distinct from 'SETTLED' or (c->>'roundId')::uuid is distinct from p_round_id
   or (c->>'seed')::bigint is null or (c->>'seed')::bigint not between 0 and 4294967295
   or stake is null or stake<=0 or stake>1000000000 or stake::text in ('NaN','Infinity','-Infinity')
   or pay is null or pay<0 or pay>10000*stake or pay::text in ('NaN','Infinity','-Infinity')
   or total is null or total<0 or total>10000 or total::text in ('NaN','Infinity','-Infinity') then raise exception 'Invalid Critter values';end if;
- foreach p in array (case when triggered then array[c->'base',bonus->'plan'] else array[c->'base'] end) loop
+ v2:=c->>'version'='2';plans:=array[c->'base'];
+ if triggered then
+  if v2 then
+   if jsonb_typeof(bonus->'spins') is distinct from 'array' or jsonb_array_length(bonus->'spins')<>(case when (c->'base'->>'scatters')::integer>=4 then 20 else 10 end) or (bonus->>'spinCount')::integer is distinct from (case when (c->'base'->>'scatters')::integer>=4 then 20 else 10 end) or bonus->>'kind' is distinct from (case when (c->'base'->>'scatters')::integer>=4 then 'super' else 'normal' end) then raise exception 'Invalid persistent Wild bonus';end if;
+   previous_grid:=null;
+   for spin_plan in select value from jsonb_array_elements(bonus->'spins') loop
+    if jsonb_typeof(spin_plan->'initialGrid') is distinct from 'array' or jsonb_array_length(spin_plan->'initialGrid')<>25 then raise exception 'Invalid bonus grid';end if;
+    if previous_grid is not null then
+     for pos in 0..24 loop
+      if previous_grid->pos->>'symbol'='wild' and spin_plan->'initialGrid'->pos->>'symbol' is distinct from 'wild' then raise exception 'Lost persistent Wild';end if;
+     end loop;
+    end if;
+    previous_grid:=spin_plan->'finalGrid';plans:=array_append(plans,spin_plan);
+   end loop;
+   if bonus->'persistentWilds' is distinct from (select coalesce(jsonb_agg(n-1 order by n),'[]'::jsonb) from jsonb_array_elements(previous_grid) with ordinality as t(v,n) where v->>'symbol'='wild') then raise exception 'Invalid persistent Wild positions';end if;
+  else plans:=array_append(plans,bonus->'plan');end if;
+ end if;
+ foreach p in array plans loop
   if jsonb_typeof(p) is distinct from 'object' or jsonb_typeof(p->'steps') is distinct from 'array' or jsonb_array_length(p->'steps')>12 then raise exception 'Invalid Critter plan';end if;
   foreach g in array array[p->'initialGrid',p->'finalGrid'] loop
    if jsonb_typeof(g) is distinct from 'array' or jsonb_array_length(g)<>25 or (select count(distinct (v->>'uid')::integer) from jsonb_array_elements(g) v)<>25 then raise exception 'Invalid Critter grid';end if;
@@ -31,7 +48,12 @@ begin
     if not cell ?& array['uid','symbol'] or (cell->>'uid')::integer is null or (cell->>'uid')::integer not between 0 and 9999 or cell->>'symbol' is null or cell->>'symbol' not in ('ten','jack','king','ace','cat','pigeon','possum','bulldog','wild','scatter') then raise exception 'Invalid Critter symbol';end if;
    end loop;
   end loop;
-  sum_win:=0;sum_raw:=0;
+  sum_win:=0;sum_raw:=0;counts:='{}'::jsonb;
+  if v2 then
+   for cell in select value from jsonb_array_elements(p->'initialGrid') where value->>'symbol'='wild' loop
+    if (cell->>'multiplier')::integer is distinct from 1 then raise exception 'Wild must start at x1';end if;
+   end loop;
+  end if;
   for s,idx in select value,(ordinality-1)::integer from jsonb_array_elements(p->'steps') with ordinality loop
    if (s->>'index')::integer is distinct from idx or jsonb_typeof(s->'wins') is distinct from 'array' or jsonb_array_length(s->'wins') not between 1 and 40 or jsonb_typeof(s->'grid') is distinct from 'array' or jsonb_array_length(s->'grid')<>25 then raise exception 'Invalid Critter cascade';end if;
    if idx=0 and s->'grid' is distinct from p->'initialGrid' then raise exception 'Invalid Critter initial cascade';end if;
@@ -39,13 +61,49 @@ begin
    if jsonb_typeof(s->'moves') is distinct from 'array' or jsonb_array_length(s->'moves')>25 then raise exception 'Invalid Critter running wilds';end if;
    if (select count(distinct v->>'uid') from jsonb_array_elements(s->'moves') v)<>jsonb_array_length(s->'moves') then raise exception 'Duplicate Critter Wild movement';end if;
    step_win:=0;
+   if v2 then
+    for cell in select value from jsonb_array_elements(s->'grid') where value->>'symbol'='wild' loop
+     if (cell->>'multiplier')::numeric is distinct from coalesce((counts->>(cell->>'uid'))::numeric,1) then raise exception 'Invalid Wild multiplier progression';end if;
+    end loop;
+   end if;
    for win in select value from jsonb_array_elements(s->'wins') loop
-    win_value:=(win->>'winX')::numeric;
+    win_value:=(win->>'winX')::numeric;expected_multiplier:=1;
+    if v2 then
+     if jsonb_typeof(win->'positions') is distinct from 'array' then raise exception 'Invalid cluster positions';end if;
+     if (select count(distinct value::integer) from jsonb_array_elements_text(win->'positions'))<>jsonb_array_length(win->'positions') then raise exception 'Duplicate cluster position';end if;
+     for pos in select value::integer from jsonb_array_elements_text(win->'positions') loop
+      if pos not between 0 and 24 then raise exception 'Invalid cluster position';end if;
+      wild_cell:=s->'grid'->pos;
+      if wild_cell->>'symbol'='wild' then expected_multiplier:=greatest(expected_multiplier,(wild_cell->>'multiplier')::numeric);
+      elsif wild_cell->>'symbol' is distinct from win->>'symbol' then raise exception 'Wrong cluster symbol';end if;
+     end loop;
+     if (win->>'multiplier')::numeric is distinct from expected_multiplier then raise exception 'Invalid cluster multiplier';end if;
+     pay_rows:='{"ten":[0.2,0.3,0.45,0.65,0.9,1.4,3],"jack":[0.25,0.4,0.55,0.8,1.2,1.8,4],"king":[0.3,0.45,0.7,1,1.5,2.2,5],"ace":[0.4,0.6,0.9,1.3,1.8,2.8,6],"cat":[0.6,0.9,1.3,1.8,2.5,4,8],"pigeon":[0.8,1.2,1.7,2.5,3.5,5,10],"possum":[1,1.5,2.2,3,4.5,7,15],"bulldog":[1.5,2.2,3,4.5,6,10,25],"wild":[1.5,2.2,3,4.5,6,10,25]}'::jsonb;
+     size_index:=case when (win->>'size')::integer>=15 then 6 when (win->>'size')::integer>=10 then 5 else (win->>'size')::integer-5 end;
+     raw_expected:=(pay_rows->(win->>'symbol')->>size_index)::numeric;
+     if raw_expected is null or (win->>'rawWinX')::numeric is distinct from raw_expected then raise exception 'Invalid Critter paytable';end if;
+    end if;
     if (win->>'size')::integer is null or (win->>'size')::integer not between 5 and 25 or jsonb_typeof(win->'positions') is distinct from 'array' or jsonb_array_length(win->'positions')<>(win->>'size')::integer
-     or win_value is null or win_value<0 or win_value>100000 or win_value::text in ('NaN','Infinity','-Infinity') or win_value is distinct from round((win->>'rawWinX')::numeric*3.7256,6) then raise exception 'Invalid Critter cluster';end if;
+     or win_value is null or win_value<0 or win_value>1000000 or win_value::text in ('NaN','Infinity','-Infinity') or win_value is distinct from round(round((win->>'rawWinX')::numeric*(case when v2 then 0.000699792925918 else 3.7256 end),6)*expected_multiplier,6) then raise exception 'Invalid Critter cluster';end if;
     step_win:=step_win+win_value;
    end loop;
    if (s->>'winX')::numeric is distinct from round(step_win,6) or (s->>'rawWinX')::numeric is null or (s->>'rawWinX')::numeric<0 then raise exception 'Invalid Critter cascade payout';end if;
+   if v2 then
+    for cell in select distinct s->'grid'->(v.value::integer) from jsonb_array_elements(s->'wins') as award(value) cross join lateral jsonb_array_elements_text(award.value->'positions') v where s->'grid'->(v.value::integer)->>'symbol'='wild' loop
+     counts:=jsonb_set(counts,array[cell->>'uid'],to_jsonb((cell->>'multiplier')::numeric*2));
+    end loop;
+    if p is distinct from c->'base' and jsonb_array_length(s->'moves')<>0 then raise exception 'Bonus Wild cannot run';end if;
+    if s->'nextGrid'<>'null'::jsonb then
+     for cell in select value from jsonb_array_elements(s->'nextGrid') where value->>'symbol'='wild' loop
+      if (cell->>'multiplier')::numeric is distinct from coalesce((counts->>(cell->>'uid'))::numeric,1) then raise exception 'Invalid next Wild multiplier';end if;
+     end loop;
+     if p is distinct from c->'base' then
+      for pos in 0..24 loop
+       if s->'grid'->pos->>'symbol'='wild' and s->'nextGrid'->pos->>'symbol' is distinct from 'wild' then raise exception 'Bonus Wild moved';end if;
+      end loop;
+     end if;
+    end if;
+   end if;
    sum_win:=sum_win+step_win;sum_raw:=sum_raw+(s->>'rawWinX')::numeric;
   end loop;
   if (p->>'winX')::numeric is distinct from round(sum_win,6) or (p->>'rawWinX')::numeric is distinct from round(sum_raw,6) then raise exception 'Invalid Critter plan payout';end if;
@@ -58,11 +116,15 @@ begin
  end loop;
  select count(*) into sc from jsonb_array_elements(c->'base'->'finalGrid') v where v->>'symbol'='scatter';
  if (c->'base'->>'scatters')::integer is distinct from sc or triggered is distinct from (sc>=3) then raise exception 'Invalid Critter bonus trigger';end if;
- if triggered then
+ if triggered and not v2 then
   if (bonus->>'cashX')::numeric is null or (bonus->>'cashX')::numeric not in (2,5,10,25) or (bonus->>'extraWilds')::integer is null or (bonus->>'extraWilds')::integer not in (3,4,5)
    or (bonus->>'multiplier')::integer is null or (bonus->>'multiplier')::integer not in (2,3,5) or (bonus->'plan'->>'scatters')::integer is distinct from 0 then raise exception 'Invalid Dumpster Dash';end if;
   bonus_win:=round(((bonus->>'cashX')::numeric+(bonus->'plan'->>'winX')::numeric)*(bonus->>'multiplier')::numeric,6);
   if (bonus->>'winX')::numeric is distinct from bonus_win then raise exception 'Invalid Dumpster payout';end if;
+ end if;
+ if triggered and v2 then
+  select round(sum((value->>'winX')::numeric),6) into bonus_win from jsonb_array_elements(bonus->'spins');
+  if (bonus->>'winX')::numeric is distinct from bonus_win or exists(select 1 from jsonb_array_elements(bonus->'spins') v where (v->>'scatters')::integer is distinct from 0) then raise exception 'Invalid persistent bonus payout';end if;
  end if;
  computed:=round(least(10000,(c->'base'->>'winX')::numeric+bonus_win),6);
  if total is distinct from computed or pay is distinct from round(total*stake,6) then raise exception 'Invalid Critter settlement';end if;

@@ -9,7 +9,7 @@ def critter_route(r):
  name=r.request.url.split('/')[-1]
  if name not in ['critter_capabilities','settle_critter_round']:return magnet_route(r)
  def reply(v,status=200):return r.fulfill(status=status,content_type='application/json',body=json.dumps(v),headers={'Access-Control-Allow-Origin':'*'})
- if name=='critter_capabilities':return reply({'version':1}) if not missing_critter else reply({'message':'Not installed'},404)
+ if name=='critter_capabilities':return reply({'version':2}) if not missing_critter else reply({'message':'Not installed'},404)
  if cloud.offline:return r.abort('internetdisconnected')
  payload=r.request.post_data_json;uid=json.loads(base64.urlsafe_b64decode(r.request.headers['authorization'].split('.')[1]+'==='))['sub'];w=cloud.rows[uid]['wallets'];c=payload['p_checkpoint'];rid=c['roundId'];old=cloud.rounds.get(rid)
  if old:return reply({'balance':w['balance'],'revision':w['revision'],'duplicate':True}) if old['user_id']==uid and old.get('checkpoint')==c else reply({'message':'VAULT_WALLET_CONFLICT'},400)

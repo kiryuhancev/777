@@ -1,4 +1,5 @@
-const assert=require('node:assert/strict'),M=require('../critter/model.js'),C=M.config,id='11111111-1111-4111-8111-111111111111';
+// Legacy v1 checkpoint/model regression; v2 has its own additional suite.
+const assert=require('node:assert/strict'),M=require('../critter/model-v1.js'),C=M.config,id='11111111-1111-4111-8111-111111111111';
 const grid=()=>Array.from({length:25},(_,uid)=>({uid,symbol:'scatter'}));
 let g=grid();[0,1,2,3].forEach(i=>g[i].symbol='ten');assert.equal(M.evaluate(g).winX,0);
 g=grid();[0,6,12,18,24].forEach(i=>g[i].symbol='ten');assert.equal(M.evaluate(g).winX,0,'diagonal is not a cluster');

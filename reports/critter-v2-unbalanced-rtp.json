@@ -1,0 +1,39 @@
+{
+  "paidCycles": 200000,
+  "seed": 42917,
+  "baseline": {
+    "rtpPct": 96.43958540001684,
+    "approx95Pct": [
+      92.11565080816582,
+      100.76351999186784
+    ],
+    "hitPct": 26.468999999999998,
+    "bonuses": 1702,
+    "superBonuses": 0,
+    "bonusInterval": 117.50881316098707,
+    "maxWinRounds": 0,
+    "maxObservedX": 1362.4904,
+    "uncappedBaseMeanX": 0.55478468440006,
+    "uncappedBonusMeanX": 0.4096111696000005
+  },
+  "persistentWilds": {
+    "rtpPct": 4651.889542781602,
+    "approx95Pct": [
+      4358.2445999038555,
+      4945.53448565935
+    ],
+    "hitPct": 26.467000000000002,
+    "bonuses": 1702,
+    "superBonuses": 145,
+    "bonusInterval": 117.50881316098707,
+    "maxWinRounds": 892,
+    "maxObservedX": 10000,
+    "uncappedBaseMeanX": 4.855554920599858,
+    "uncappedBonusMeanX": 4733.873003997194
+  },
+  "notes": [
+    "Same seeds; same PRNG, symbol weights, paytable, payScale and max win. Mechanics and resulting payouts/RTP changed by explicit approval.",
+    "Confidence interval is a Monte Carlo estimate, not an exact theoretical RTP.",
+    "No rebalance was applied. Uncapped components cannot be summed to recover capped round RTP."
+  ]
+}
