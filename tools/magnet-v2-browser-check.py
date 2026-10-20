@@ -54,7 +54,10 @@ with sync_playwright() as p:
  # Actual legacy checkpoint, same old model and old RPC path; no conversion of earned spins.
  pg.evaluate('''()=>{let r;for(let seed=0;seed<10000;seed++){r=MAGNET_MODEL.start({seed,bet:20,roundId:crypto.randomUUID()});if(MAGNET_MODEL.active(r))break;}if(!VaultMagnetBridge.commit(r))throw Error('legacy commit');VaultMagnet.restore(r);}''');sync(pg);assert checkpoint(pg)['version']==1;play(pg);settle(pg);assert checkpoint(pg)['step']==1
  reload(pg);assert checkpoint(pg)['version']==1;assert 'OVERDRIVE' in pg.locator('#magnetMode').inner_text()
- for i in range(4):play(pg);settle(pg)
+ for i in range(4):
+  play(pg)
+  if checkpoint(pg)['status']=='SETTLED':assert 'magnet-v2' not in pg.locator('#magnetApp').get_attribute('class')
+  settle(pg)
  passed.append('Existing earned v1 Overdrive retains old rules, continues through old RPC, and restores after F5')
  play(pg,seeds['base']);settle(pg);pg.locator('#magnetHelpOpen').click();assert pg.locator('#magnetModernManual').is_visible();assert 'MAGNET CHAMBER' in pg.locator('#magnetHelp').inner_text();pg.locator('#magnetHelpClose').click()
  for width in [1440,1024,768,390,320]:

@@ -16,7 +16,7 @@ const VaultMagnet=window.VaultMagnet=(()=>{
   }
  }
  function renderModern(){
-  const chamber=!!round?.bonus.triggered&&(active()||busy&&round.step>0),b=!revealed&&previousBonus?previousBonus:round?.bonus,p=round?.magneticPlan;
+  const chamber=round?.version===2&&!!round?.bonus.triggered&&(active()||busy&&round.step>0),b=!revealed&&previousBonus?previousBonus:round?.bonus,p=round?.magneticPlan;
   root.classList.remove('overdrive');$('magnetMode').textContent=chamber?'MAGNET CHAMBER BONUS':'MAGNET · 243 WAYS';$('magnetPower').textContent=chamber?'×'+b.power:'—';
   $('magnetCounterLabel').textContent=chamber?'BONUS SPINS':'GRID';$('magnetCounter').textContent=chamber?b.remaining+' REMAIN':'5 × 5';$('magnetPowerTrack').hidden=true;
   $('magnetChamberHud').hidden=!chamber;$('magnetCollected').textContent=fmt(b?.collectedX||0)+'×';$('magnetCharge').textContent=(b?.charge||0)+' / 9';$('magnetMultiplier').textContent='×'+(b?.power||1);
@@ -31,7 +31,7 @@ const VaultMagnet=window.VaultMagnet=(()=>{
   $('magnetDebug').hidden=!MAGNET_DEBUG;if(MAGNET_DEBUG)$('magnetDebug').textContent=JSON.stringify(round,null,2);
  }
  function render(){
-  const modern=round?.version!==1||!active();root.classList.toggle('magnet-v2',modern);root.classList.toggle('chamber-mode',round?.version===2&&(active()||busy&&round.step>0));
+  const modern=round?.version!==1||!active()&&!busy;root.classList.toggle('magnet-v2',modern);root.classList.toggle('chamber-mode',round?.version===2&&(active()||busy&&round.step>0));
   if(modern){renderModern();return;}
   const p=round?.magneticPlan,over=active()&&(revealed||round.step>0)||busy&&!revealed&&p?.bonus,power=over?C.overdrive.fieldPower[round.step]||p?.fieldPower||1:p?.fieldPower||1;
   root.classList.toggle('overdrive',over);root.dataset.status=round?.status||'IDLE';
