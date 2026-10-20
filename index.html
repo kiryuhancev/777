@@ -5949,6 +5949,7 @@ const VaultMagnet=window.VaultMagnet=(()=>{
   <header class="critter-heading"><img id="critterLogo" alt="Critter Chaos"><button id="critterHelpOpen" aria-haspopup="dialog">PAYTABLE ⓘ</button></header>
   <div class="critter-readout"><div><small id="critterMode">NEON BACKSTREET · 5×5</small><strong id="critterStatus" role="status">READY FOR CHAOS</strong></div><div><small>ROUND WIN</small><strong id="critterWin">0</strong></div></div>
   <div class="critter-frame"><div class="critter-rail"><span>5+ CONNECTED SYMBOLS</span><span id="critterCascade">CASCADE 0</span></div><div id="critterGrid" class="critter-grid" aria-label="5 by 5 cluster slot"><svg id="critterPaths" viewBox="0 0 500 500" aria-hidden="true"></svg></div><p id="critterMessage" role="status">MATCH CLUSTERS · WATCH THE RACCOONS RUN</p></div>
+  <button id="critterReconnect" hidden>ПОВТОРИТЬ ПОДКЛЮЧЕНИЕ</button>
   <footer class="critter-controls"><button id="critterSettingsOpen" aria-label="Настройки">⚙</button><div class="critter-bet"><button id="critterMinus" aria-label="Уменьшить ставку">−</button><div><small>BET</small><strong id="critterBet">20</strong></div><button id="critterPlus" aria-label="Увеличить ставку">+</button></div><button id="critterMax">MAX</button><button id="critterSpin">SPIN</button><div class="critter-auto-wrap"><button id="critterAuto" aria-expanded="false" aria-controls="critterAutoMenu">AUTO</button><div id="critterAutoMenu" hidden><small>AUTO ROUNDS</small><button data-critter-auto="10">10</button><button data-critter-auto="25">25</button><button data-critter-auto="50">50</button><button data-critter-auto="100">100</button><button data-critter-auto="-1">∞</button></div></div></footer>
   <div class="critter-wallet"><small>PERSONAL BALANCE</small><strong id="critterBalance">—</strong><p>ONE BET · ALL CASCADES + EARNED BONUS</p></div>
   <div id="critterBonusOverlay" class="critter-bonus-overlay" role="dialog" aria-modal="true" aria-label="Dumpster Dash Bonus" hidden><div class="critter-bonus-card"><small>3+ SCATTER · BONUS TRIGGERED</small><h2>DUMPSTER DASH</h2><p id="critterBonusMessage">THE RACCOON IS RAIDING THREE DUMPSTERS</p><div class="critter-dash-track"><img id="critterDashRunner" alt="Running raccoon"><i></i></div><div id="critterBonusBins" class="critter-bonus-bins"></div><p>ALL THREE REWARDS · ONE BONUS DROP</p></div></div>
@@ -6097,7 +6098,16 @@ const VaultCritter=window.VaultCritter=(()=>{
  }
  function spin(){if(!ready||busy||!VaultRoundService.canPlay(C.id))return;clearTimeout(timer);const next=M.start({seed:crypto.getRandomValues(new Uint32Array(1))[0],bet:BETS[betIndex],roundId:crypto.randomUUID()});VaultWalletService.holdPresentation(C.id,{stake:next.bet});if(!VaultCritterBridge.commit(next)){VaultWalletService.releasePresentation(C.id);auto=0;render();$('critterMessage').textContent='Progress is being restored. Try again shortly.';return;}round=next;if(auto>0)auto--;reveal();}
  function restore(value){generation++;busy=false;auto=0;shownX=0;clearTimeout(timer);clearFX();if(window.VaultWalletService)VaultWalletService.releasePresentation(C.id);round=M.validate(value);shownX=round?.winX||0;draw(round?(round.bonus?.plan.finalGrid||round.base.finalGrid):M.cascade(1977).initialGrid);$('critterAutoMenu').hidden=true;$('critterAuto').setAttribute('aria-expanded','false');$('critterMode').textContent=round?.bonus?'DUMPSTER DASH · FINAL RESULT':'NEON BACKSTREET · 5×5';$('critterStatus').textContent=round?'STABLE RESULT RESTORED':'READY FOR CHAOS';$('critterMessage').textContent=round?`ROUND SETTLED · ${fmt(round.payout)} BANKED`:'MATCH CLUSTERS · WATCH THE RACCOONS RUN';render();}
- async function open(){if(!VaultSession.ready||VaultSession.mode!=='authenticated')return;currentGame=C.id;document.body.classList.remove('lobby-mode','slot-active','poker-active','bird-active','table-active','swamp-active','mines-active','heist-active','magnet-active');document.body.classList.add('game-mode','critter-active');root.hidden=false;VaultStorage.schedule();syncMusic();ready=VaultCritterBridge.ready;render();if(!ready){$('critterMessage').textContent='Connecting to the backstreet…';ready=await VaultCritterBridge.connect();if(currentGame!==C.id)return;render();$('critterMessage').textContent=ready?'MATCH CLUSTERS · WATCH THE RACCOONS RUN':'CRITTER CHAOS: выполните supabase_critter.txt, затем F5.';}schedule();}
+ async function connect(){
+  $('critterReconnect').hidden=true;$('critterMessage').textContent='Подключаем Critter Chaos…';
+  ready=await VaultCritterBridge.connect();if(currentGame!==C.id)return;
+  render();$('critterReconnect').hidden=ready;
+  const messages={schema:'БД не видит функции Critter Chaos. Проверьте выполнение полного supabase_critter.txt в подключённом проекте.',permission:'Нет доступа к функциям Critter Chaos. Проверьте права authenticated из supabase_critter.txt.',version:'Версия функций Critter Chaos несовместима. Выполните актуальный supabase_critter.txt.',connection:'Не удалось проверить Critter Chaos: сервер временно недоступен. Повторим подключение при восстановлении сети.'};
+  $('critterMessage').textContent=ready?'MATCH CLUSTERS · WATCH THE RACCOONS RUN':messages[VaultCritterBridge.connectionError]||messages.connection;schedule();
+ }
+ async function open(){if(!VaultSession.ready||VaultSession.mode!=='authenticated')return;currentGame=C.id;document.body.classList.remove('lobby-mode','slot-active','poker-active','bird-active','table-active','swamp-active','mines-active','heist-active','magnet-active');document.body.classList.add('game-mode','critter-active');root.hidden=false;VaultStorage.schedule();syncMusic();ready=VaultCritterBridge.ready;render();if(!ready)await connect();else schedule();}
+ $('critterReconnect').onclick=connect;
+ window.addEventListener('online',()=>{if(currentGame===C.id&&!ready)connect();});
  $('openCritterGame').onclick=open;$('critterSpin').onclick=spin;
  for(const [id,d] of [['critterMinus',-1],['critterPlus',1],['critterMax',999]])$(id).onclick=()=>{if(busy||auto)return;betIndex=d===999?BETS.length-1:Math.max(0,Math.min(BETS.length-1,betIndex+d));render();VaultStorage.schedule();};
  $('critterAuto').onclick=()=>{if(auto){auto=0;clearTimeout(timer);$('critterAutoMenu').hidden=true;$('critterAuto').setAttribute('aria-expanded','false');render();return;}$('critterAutoMenu').hidden=!$('critterAutoMenu').hidden;$('critterAuto').setAttribute('aria-expanded',String(!$('critterAutoMenu').hidden));};root.querySelectorAll('[data-critter-auto]').forEach(n=>n.onclick=()=>{auto=Number(n.dataset.critterAuto);$('critterAutoMenu').hidden=true;$('critterAuto').setAttribute('aria-expanded','false');spin();});
@@ -6232,14 +6242,40 @@ const VaultCritter=window.VaultCritter=(()=>{
     }
   };
   // Critter is a whole deterministic paid round: one atomic debit/credit, even through bonus animation.
-  let critterSupport=false;
+  let critterSupport=false,critterConnection=null,critterConnectionError='';
   window.VaultCritterBridge={
     get ready(){return critterSupport;},
+    get connectionError(){return critterConnectionError;},
     async connect(){
       if(critterSupport)return true;if(!client||owner==='guest')return false;
+      if(critterConnection)return critterConnection;
       const known=read('critter-schema'),cached=known?.version===1&&known.project===C.supabaseUrl;
       if(!navigator.onLine&&cached){critterSupport=true;return true;}
-      try{const {data:cap,error}=await client.rpc('critter_capabilities');if(error){if(cached&&/fetch|network|offline/i.test(error.message||'')){critterSupport=true;return true;}return false;}critterSupport=cap?.version===1;if(critterSupport)write('critter-schema',{version:1,project:C.supabaseUrl});return critterSupport;}catch{return false;}
+      critterConnectionError='';const expectedOwner=owner;
+      critterConnection=(async()=>{
+        for(let attempt=0;attempt<3;attempt++){
+          try{
+            const {data:cap,error,status:responseStatus}=await client.rpc('critter_capabilities');
+            if(owner!==expectedOwner)return false;
+            if(error){
+              const temporary=!responseStatus||responseStatus>=500||/fetch|network|offline|abort|timeout/i.test(error.message||'');
+              if(temporary&&cached){critterSupport=true;return true;}
+              if(temporary&&attempt<2){await new Promise(resolve=>setTimeout(resolve,750*(attempt+1)));continue;}
+              critterConnectionError=error.code==='PGRST202'||responseStatus===404?'schema':responseStatus===401||responseStatus===403||error.code==='42501'?'permission':'connection';
+              console.error('VAULT Critter connection failed',{code:error.code,status:responseStatus,message:error.message});return false;
+            }
+            critterSupport=cap?.version===1;
+            if(critterSupport)write('critter-schema',{version:1,project:C.supabaseUrl});else critterConnectionError='version';
+            return critterSupport;
+          }catch(error){
+            if(owner!==expectedOwner)return false;
+            if(attempt<2){await new Promise(resolve=>setTimeout(resolve,750*(attempt+1)));continue;}
+            critterConnectionError='connection';console.error('VAULT Critter connection failed',error);return false;
+          }
+        }
+        return false;
+      })();
+      try{return await critterConnection;}finally{critterConnection=null;}
     },
     commit(candidate){
       if(!critterSupport||!VaultRoundService.canPlay('critter')||!storageAvailable||data.queue.length>=C.maxPendingEvents-2)return false;

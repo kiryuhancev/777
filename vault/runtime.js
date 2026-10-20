@@ -114,14 +114,40 @@
     }
   };
   // Critter is a whole deterministic paid round: one atomic debit/credit, even through bonus animation.
-  let critterSupport=false;
+  let critterSupport=false,critterConnection=null,critterConnectionError='';
   window.VaultCritterBridge={
     get ready(){return critterSupport;},
+    get connectionError(){return critterConnectionError;},
     async connect(){
       if(critterSupport)return true;if(!client||owner==='guest')return false;
+      if(critterConnection)return critterConnection;
       const known=read('critter-schema'),cached=known?.version===1&&known.project===C.supabaseUrl;
       if(!navigator.onLine&&cached){critterSupport=true;return true;}
-      try{const {data:cap,error}=await client.rpc('critter_capabilities');if(error){if(cached&&/fetch|network|offline/i.test(error.message||'')){critterSupport=true;return true;}return false;}critterSupport=cap?.version===1;if(critterSupport)write('critter-schema',{version:1,project:C.supabaseUrl});return critterSupport;}catch{return false;}
+      critterConnectionError='';const expectedOwner=owner;
+      critterConnection=(async()=>{
+        for(let attempt=0;attempt<3;attempt++){
+          try{
+            const {data:cap,error,status:responseStatus}=await client.rpc('critter_capabilities');
+            if(owner!==expectedOwner)return false;
+            if(error){
+              const temporary=!responseStatus||responseStatus>=500||/fetch|network|offline|abort|timeout/i.test(error.message||'');
+              if(temporary&&cached){critterSupport=true;return true;}
+              if(temporary&&attempt<2){await new Promise(resolve=>setTimeout(resolve,750*(attempt+1)));continue;}
+              critterConnectionError=error.code==='PGRST202'||responseStatus===404?'schema':responseStatus===401||responseStatus===403||error.code==='42501'?'permission':'connection';
+              console.error('VAULT Critter connection failed',{code:error.code,status:responseStatus,message:error.message});return false;
+            }
+            critterSupport=cap?.version===1;
+            if(critterSupport)write('critter-schema',{version:1,project:C.supabaseUrl});else critterConnectionError='version';
+            return critterSupport;
+          }catch(error){
+            if(owner!==expectedOwner)return false;
+            if(attempt<2){await new Promise(resolve=>setTimeout(resolve,750*(attempt+1)));continue;}
+            critterConnectionError='connection';console.error('VAULT Critter connection failed',error);return false;
+          }
+        }
+        return false;
+      })();
+      try{return await critterConnection;}finally{critterConnection=null;}
     },
     commit(candidate){
       if(!critterSupport||!VaultRoundService.canPlay('critter')||!storageAvailable||data.queue.length>=C.maxPendingEvents-2)return false;

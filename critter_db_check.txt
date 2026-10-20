@@ -1,0 +1,21 @@
+-- Run the WHOLE query in the Supabase SQL Editor for project umccpdbopcgluwsnhlwj.
+-- No account, balance or game data is changed.
+-- Refresh the PostgREST function/schema cache after migration.
+notify pgrst, 'reload schema';
+
+select
+  to_regprocedure('public.critter_capabilities()') is not null as capabilities_exists,
+  coalesce(has_function_privilege('authenticated',
+    to_regprocedure('public.critter_capabilities()'), 'EXECUTE'), false) as capabilities_access,
+  to_regprocedure('public.settle_critter_round(uuid,bigint,jsonb)') is not null as settlement_exists,
+  coalesce(has_function_privilege('authenticated',
+    to_regprocedure('public.settle_critter_round(uuid,bigint,jsonb)'), 'EXECUTE'), false) as settlement_access,
+  exists(select 1 from pg_constraint
+    where conrelid='public.game_rounds'::regclass and contype='c'
+    and pg_get_constraintdef(oid) like '%critter%') as rounds_allow_critter,
+  exists(select 1 from pg_constraint
+    where conrelid='public.game_stats'::regclass and contype='c'
+    and pg_get_constraintdef(oid) like '%critter%') as stats_allow_critter;
+
+-- Expected: six true values. If any is false, the Critter migration is incomplete
+-- or was run in a different project. Run the full supabase_critter.txt there.

@@ -98,4 +98,5 @@ begin
  selected_bets=coalesce(p_settings->'bets',s.selected_bets),updated_at=least(p_updated_at,clock_timestamp()) where user_id=u returning * into s;
  return to_jsonb(s);
 end $$;
+notify pgrst, 'reload schema';
 commit;
