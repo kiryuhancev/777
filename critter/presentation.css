@@ -88,7 +88,6 @@ body.critter-active .app,body.critter-active #slotApp,body.critter-active #poker
 @keyframes critter-symbol-win{0%,100%{scale:1}45%{scale:1.025}}
 @media(prefers-reduced-motion:reduce){#critterApp .critter-cell.winning>svg,#critterApp .critter-cell.winning>img{animation:none}}
 
-#critterApp .critter-wild-multiplier{position:absolute;right:3%;bottom:3%;z-index:3;padding:2px 5px;border:1px solid #fff0ad;border-radius:5px;background:#102335ed;color:#ffef9f;font:900 clamp(11px,2vw,23px) Arial;line-height:1.1;text-shadow:0 1px 2px #000;pointer-events:none}
 #critterApp .critter-cell.active-wild:after{content:'WILD'}
 
 #critterApp .persistent-bonus .critter-dash-track{display:none}
@@ -96,7 +95,6 @@ body.critter-active .app,body.critter-active #slotApp,body.critter-active #poker
 /* Original proportions: contained artwork and a uniform moving Wild sprite. */
 #critterApp .critter-cell>svg,#critterApp .critter-cell>img{object-fit:contain;object-position:center;transform:none}
 #critterApp .critter-runner>img{width:100%;height:100%;display:block;object-fit:contain}
-#critterApp .running-source .critter-wild-multiplier{opacity:0}
 #critterApp .critter-boost-indicator{width:min(700px,100%);margin:6px 0;padding:8px 12px;border:1px solid #59ded5;border-radius:8px;background:#10283c;color:#9dfff0;text-align:center;font-size:11px}
 #critterApp #critterBonusShop{width:min(540px,94vw)}
 #critterApp .critter-shop-bet{display:flex;align-items:center;justify-content:center;gap:22px;text-align:center;margin-bottom:15px}
@@ -115,10 +113,6 @@ body.critter-active .app,body.critter-active #slotApp,body.critter-active #poker
 
 /* v4 persistent identities and multiplier upgrades; artwork always scales uniformly. */
 #critterApp .critter-cell.persistent-wild{outline:1px solid #70ffe3;outline-offset:-2px}
-#critterApp .critter-wild-multiplier{max-width:96%;font-size:clamp(9px,1.8vw,19px);overflow-wrap:anywhere}
-#critterApp .critter-wild-multiplier.upgraded{animation:critter-upgrade .24s ease-out}
-@keyframes critter-upgrade{50%{scale:1.12;background:#ffe29a;color:#102335;box-shadow:0 0 12px #74ffe5}}
-@media(prefers-reduced-motion:reduce){#critterApp .critter-wild-multiplier.upgraded{animation:none}}
 
 /* Native square premium art: full bleed, no portrait stretching/cropping. */
 #critterApp .critter-cell>.critter-tile-art{width:100%;height:100%;mix-blend-mode:normal}
@@ -130,16 +124,18 @@ body.critter-active .app,body.critter-active #slotApp,body.critter-active #poker
 #critterApp .critter-cell{isolation:isolate}
 #critterApp .critter-wild-art{position:absolute;inset:0;display:block;pointer-events:none;mix-blend-mode:screen}
 #critterApp .critter-wild-art>img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
-#critterApp .critter-wild-art>.critter-wild-label{top:auto;bottom:0;height:27%;width:90%;left:5%}
 #critterApp .critter-cell>.critter-scatter-art{width:100%;height:100%;object-fit:contain;mix-blend-mode:screen}
-#critterApp .critter-wild-multiplier{right:1%;bottom:1%;width:56%;height:28%;padding:0;border:0;border-radius:0;background:none;max-width:none;display:flex;align-items:center;justify-content:center;mix-blend-mode:screen;text-shadow:none}
-#critterApp .critter-wild-multiplier>img{width:100%;height:100%;object-fit:contain}
-#critterApp .critter-wild-multiplier.dynamic{width:auto;min-width:38%;max-width:95%;height:auto;padding:1px 5px;background:linear-gradient(#b93b20,#632313);border:2px solid #ebba58;border-radius:8px;color:#ffdf65;font-weight:1000;font-size:clamp(9px,1.6vw,18px);text-shadow:1px 1px #67400d,-1px -1px #fff5b0;box-shadow:0 1px 2px #301602;mix-blend-mode:normal}
-#critterApp .critter-wild-multiplier.upgraded{animation:critter-plaque-pulse .24s ease-out}
 #critterApp .critter-cell.active-wild:after{content:none}
 #critterApp .critter-cell.winning>.critter-wild-art{filter:drop-shadow(0 0 4px #f9d273);animation:critter-symbol-win .38s ease-out}
 #critterApp .critter-grid.has-wins .critter-cell:not(.winning)>.critter-wild-art{opacity:.7}
 #critterApp .critter-cell.running-source>.critter-wild-art{opacity:.1}
 #critterApp .critter-pay-row{grid-template-columns:1.5fr repeat(3,1fr)}
-@keyframes critter-plaque-pulse{50%{scale:1.18;filter:brightness(1.5)}}
-@media(prefers-reduced-motion:reduce){#critterApp .critter-wild-multiplier.upgraded{animation:none}}
+/* One fixed plaque. WILD and xN are mutually exclusive text in this same SVG. */
+#critterApp .critter-wild-art>.critter-label{position:absolute;left:3%;bottom:0;top:auto;width:94%;height:32%;object-fit:contain;overflow:visible;mix-blend-mode:normal;transform-origin:center}
+#critterApp .critter-label text{filter:drop-shadow(0 4px 0 #aa4616) drop-shadow(0 1px 1px #ffdc74)}
+#critterApp .plaque-sparkles{opacity:0;pointer-events:none}
+#critterApp .critter-label.upgraded{animation:critter-label-upgrade .28s ease-out}
+#critterApp .critter-label.upgraded .plaque-sparkles{animation:critter-label-sparkle .28s ease-out}
+@keyframes critter-label-upgrade{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.12);filter:brightness(1.4) drop-shadow(0 0 4px #ffc94d)}}
+@keyframes critter-label-sparkle{0%,100%{opacity:0}45%{opacity:1}}
+@media(prefers-reduced-motion:reduce){#critterApp .critter-label.upgraded,#critterApp .critter-label.upgraded .plaque-sparkles{animation:none}}

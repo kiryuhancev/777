@@ -2,6 +2,7 @@
 (()=>{
  const originalRender=render;
  render=function(options={}){
+  window.VaultReelLayout?.unlock(gridEl);
   originalRender(options);
   if(currentGame!=='slot')return;
   if(!options.enter&&!options.enterCells?.size&&!options.fallMap?.size)return;

@@ -1,0 +1,303 @@
+UPSIDE PAWS — TEST CASES
+Run these after implementation. Fix failures before final report.
+
+============================================================
+A. LOAD / REGRESSION
+============================================================
+
+TC-A01 New game route opens without runtime error.
+TC-A02 Existing VAULT games still open.
+TC-A03 Existing wallet value is read correctly.
+TC-A04 Authentication/session behavior is unchanged.
+TC-A05 Refreshing lobby does not break UPSIDE PAWS assets.
+TC-A06 No relevant console errors on initial load.
+
+============================================================
+B. DUAL GRID LAYOUT
+============================================================
+
+TC-B01 Desktop shows two 4x4 grids simultaneously.
+TC-B02 Normal grid is visually distinct from Upside grid.
+TC-B03 Both grids have exactly 16 visible cell positions.
+TC-B04 Central rift/separator is visible.
+TC-B05 One paid spin operates both grids.
+TC-B06 Grid frame width/height does not change during spin.
+TC-B07 Win animation does not resize either grid.
+TC-B08 Opening popup does not resize grid container.
+
+============================================================
+C. MOBILE / RESPONSIVE
+============================================================
+
+TC-C01 Portrait mobile shows both worlds without horizontal page scrolling.
+TC-C02 If grids stack, both remain visible within normal game flow.
+TC-C03 Grid space is reserved before spin; no grid insertion jump.
+TC-C04 Spin start creates no visible vertical jump.
+TC-C05 Symbol settle creates no visible jump.
+TC-C06 Echo animation creates no page/layout shift.
+TC-C07 Portal animation creates no page/layout shift.
+TC-C08 Resonance presentation creates no layout shift.
+TC-C09 Popup open/close creates no HUD movement.
+TC-C10 Rotation/responsive resize does not corrupt active game state.
+TC-C11 Touch targets remain usable at supported smallest viewport.
+TC-C12 No symbol aspect-ratio distortion.
+
+============================================================
+D. SYMBOL PAIRING
+============================================================
+
+TC-D01 Dog has Normal and Upside counterpart IDs.
+TC-D02 Cat has Normal and Upside counterpart IDs.
+TC-D03 Rabbit has Normal and Upside counterpart IDs.
+TC-D04 Bird has Normal and Upside counterpart IDs.
+TC-D05 Hamster/guinea-pig has Normal and Upside counterpart IDs.
+TC-D06 Echo Normal Dog -> Upside produces Upside Dog art, not Normal Dog art.
+TC-D07 Echo Upside Cat -> Normal produces Normal Cat art.
+TC-D08 Low card symbols use correct world skin.
+TC-D09 No unapproved pet family appears.
+
+============================================================
+E. BASE ROUND STATE MACHINE
+============================================================
+
+TC-E01 Round plan is created before visible spin.
+TC-E02 Normal final symbols equal round plan.
+TC-E03 Upside final symbols equal round plan.
+TC-E04 Primary grid wins evaluate after both grids settle.
+TC-E05 No payout occurs before deterministic result exists.
+TC-E06 Input stays locked until round is safely complete.
+TC-E07 Rapid Spin taps cannot create overlapping paid rounds.
+
+============================================================
+F. ECHO
+============================================================
+
+TC-F01 Qualifying Normal event can Echo to Upside.
+TC-F02 Qualifying Upside event can Echo to Normal.
+TC-F03 Echo target coordinate matches round plan.
+TC-F04 Echo target symbol family matches plan.
+TC-F05 Echo may create a secondary win.
+TC-F06 Secondary win is evaluated once.
+TC-F07 Secondary win does NOT create another Echo.
+TC-F08 No Normal->Upside->Normal recursive chain.
+TC-F09 Multiple planned Echo events resolve deterministically.
+TC-F10 Visual Echo destination never differs from settlement data.
+
+============================================================
+G. PORTAL WILD
+============================================================
+
+TC-G01 Portal Wild renders as special portal visual.
+TC-G02 Portal Wild substitute behavior follows configured evaluator.
+TC-G03 Linked coordinate matches roundPlan.
+TC-G04 Copied/transferred pet uses correct world counterpart.
+TC-G05 Portal animation begins only after grid settle.
+TC-G06 Portal animation cannot change RNG result.
+TC-G07 Portal-caused secondary result evaluates at most once.
+TC-G08 Portal cannot trigger infinite inter-world reactions.
+
+============================================================
+H. RESONANCE
+============================================================
+
+TC-H01 Same coordinate winning in both worlds counts as one resonant position.
+TC-H02 Different coordinates do not falsely count as Resonance.
+TC-H03 1 resonant position resolves configured x2.
+TC-H04 2 resonant positions resolves configured x3.
+TC-H05 3 resonant positions resolves configured x5.
+TC-H06 4+ resonant positions resolves configured x10.
+TC-H07 Resonance values are config-driven.
+TC-H08 Corresponding cells highlight together.
+TC-H09 Resonance popup/effect stays inside game area.
+TC-H10 Resonance multiplier is applied once, not once per animation frame/cell.
+
+============================================================
+I. SCATTER / BONUS TRIGGER
+============================================================
+
+TC-I01 3 Scatter all on Normal triggers bonus.
+TC-I02 3 Scatter all on Upside triggers bonus.
+TC-I03 2 Normal + 1 Upside Scatter triggers bonus.
+TC-I04 1 Normal + 2 Upside Scatter triggers bonus.
+TC-I05 Fewer than 3 total Scatter does not trigger bonus.
+TC-I06 Scatter is visually distinct from ordinary square pet symbols.
+TC-I07 Scatter count uses both grids exactly once.
+TC-I08 Trigger presentation does not duplicate base payout.
+
+============================================================
+J. DIMENSION BREACH
+============================================================
+
+TC-J01 3 Scatter awards configured 10 free spins.
+TC-J02 4 Scatter awards configured 12 free spins.
+TC-J03 5 Scatter awards configured 15 free spins.
+TC-J04 6+ Scatter awards configured 20 free spins.
+TC-J05 Both grids remain visible throughout bonus.
+TC-J06 FREE SPINS counter decrements exactly once per free spin.
+TC-J07 Bonus uses enhanced feature configuration.
+TC-J08 Bonus does not silently change base paytable unless configured.
+
+============================================================
+K. BREACH METER
+============================================================
+
+TC-K01 Meter starts with correct configured value.
+TC-K02 Qualifying event increases meter exactly once.
+TC-K03 Nonqualifying event does not increase meter.
+TC-K04 Meter cannot visually diverge from persisted state.
+TC-K05 At 100%, Full Breach is queued for next eligible spin.
+TC-K06 Full Breach is not consumed before that spin.
+TC-K07 Full Breach consumption resets/updates meter according to config.
+TC-K08 Reload preserves meter.
+TC-K09 Reload preserves queued Full Breach.
+
+============================================================
+L. FULL BREACH
+============================================================
+
+TC-L01 Full Breach uses predetermined round plan.
+TC-L02 Enhanced visuals do not alter settlement.
+TC-L03 Increased mirrored/portal activity follows configured plan.
+TC-L04 Secondary evaluation cap remains one.
+TC-L05 Full Breach cannot recursively retrigger itself from presentation only.
+TC-L06 After Full Breach the bonus returns to ordinary bonus mode.
+
+============================================================
+M. BONUS WALLET / SETTLEMENT
+============================================================
+
+TC-M01 Bonus spin 1 win increases BONUS WIN only, not wallet.
+TC-M02 Bonus spin 2 win accumulates into same bonus total.
+TC-M03 Wallet remains unchanged throughout active free spins.
+TC-M04 Final bonus total equals sum of bonus spin results.
+TC-M05 Final bonus total credits wallet exactly once.
+TC-M06 Bonus Complete presentation cannot pay a second time.
+TC-M07 Reopening/dismissing popup cannot pay again.
+TC-M08 settlement flag persists.
+TC-M09 No floating-point display artifact appears in visible wallet values.
+TC-M10 Real wallet precision is not changed by display formatting.
+
+============================================================
+N. BONUS RELOAD SAFETY
+============================================================
+
+TC-N01 Reload after first free spin restores remaining spins.
+TC-N02 Reload restores accumulated BONUS WIN.
+TC-N03 Reload restores Breach Meter.
+TC-N04 Reload restores Full Breach queue.
+TC-N05 Reload after final spin before settlement completes safely.
+TC-N06 Reload after settlement does not settle again.
+TC-N07 Repeated reloads cannot duplicate bonus winnings.
+
+============================================================
+O. BONUS BUY
+============================================================
+
+TC-O01 BONUS button opens shared feature menu.
+TC-O02 Selecting DIMENSION BREACH opens custom confirmation.
+TC-O03 NO closes with no debit.
+TC-O04 backdrop/escape cancel causes no debit when supported.
+TC-O05 YES validates balance.
+TC-O06 Insufficient balance does not start bonus.
+TC-O07 Valid purchase debits cost exactly once.
+TC-O08 Double tap YES cannot double debit.
+TC-O09 Purchase starts trigger presentation spin.
+TC-O10 Trigger presentation spin charges no normal extra wager.
+TC-O11 Trigger spin visibly lands required Scatter.
+TC-O12 Trigger spin leads to Bonus Intro, not directly to free spin 1.
+TC-O13 SPACE/tap starts bonus once.
+TC-O14 Trigger spin cannot accidentally settle a second normal wager result.
+
+============================================================
+P. POPUPS
+============================================================
+
+TC-P01 Bonus Buy confirmation is inside game/grid area.
+TC-P02 Bonus Intro is inside game/grid area.
+TC-P03 Full Breach notification is inside game/grid area.
+TC-P04 Big Win is inside game/grid area.
+TC-P05 Bonus Complete is inside game/grid area.
+TC-P06 Popup backdrop dims game only, not whole web page.
+TC-P07 HUD remains positioned and does not jump.
+TC-P08 Popup opening does not alter game height.
+TC-P09 Popup closing does not alter game height.
+TC-P10 SPACE produces one transition.
+TC-P11 click/tap produces one transition.
+TC-P12 underlying Spin cannot click-through while blocking popup is active.
+TC-P13 rapid tap does not skip two states.
+
+============================================================
+Q. WIN PRESENTATION
+============================================================
+
+TC-Q01 Normal-grid winning cells remain bright.
+TC-Q02 Nonwinning Normal cells dim during presentation.
+TC-Q03 Upside-grid winning cells remain bright.
+TC-Q04 Nonwinning Upside cells dim.
+TC-Q05 Resonant coordinates receive paired visual treatment.
+TC-Q06 WIN shows current paid round.
+TC-Q07 LAST WIN updates only after completed round.
+TC-Q08 BONUS WIN represents bonus-session accumulation.
+TC-Q09 Big Win presentation does not modify payout amount.
+TC-Q10 First skip input completes counter rather than causing duplicate settlement.
+
+============================================================
+R. ANIMATION PROFILES
+============================================================
+
+TC-R01 Normal profile completes correctly.
+TC-R02 Quick profile preserves exact same result.
+TC-R03 Turbo profile preserves exact same result.
+TC-R04 Reduced Motion preserves all gameplay information.
+TC-R05 Changing speed profile cannot change result.
+TC-R06 Portal/Echo animations wait until base grids settle.
+TC-R07 Resonance waits for finalized eligible positions.
+TC-R08 Animation cancellation/skip still lands exact planned final state.
+
+============================================================
+S. PERFORMANCE
+============================================================
+
+TC-S01 Repeated 50 spins do not cause progressive DOM node growth.
+TC-S02 Repeated 50 spins do not materially leak animation timers.
+TC-S03 Mobile animation remains usable without major frame stalls.
+TC-S04 Images are preloaded/cached enough to prevent first-win layout jumps.
+TC-S05 Hidden/offscreen effects are cleaned after round.
+TC-S06 No uncontrolled recursive promises/events from Echo.
+
+============================================================
+T. WALLET / ROUND IDEMPOTENCY
+============================================================
+
+TC-T01 One base wager debited per normal paid spin.
+TC-T02 Round payout settles once.
+TC-T03 Rapid refresh around settlement does not duplicate base win.
+TC-T04 Bonus Buy purchase has unique transaction/round identity if project supports it.
+TC-T05 Bonus session settlement has unique idempotent identity.
+TC-T06 No visual callback directly performs an independent wallet credit.
+
+============================================================
+U. FINAL REGRESSION
+============================================================
+
+TC-U01 Digital Derby works.
+TC-U02 Poker Blitz works.
+TC-U03 Vault Breakers works.
+TC-U04 Blackjack works.
+TC-U05 Baccarat works.
+TC-U06 Mines works.
+TC-U07 Swamp Fishing works.
+TC-U08 Vault Heist works.
+TC-U09 MAGNET works.
+TC-U10 Critter Chaos works.
+TC-U11 Universal HUD behavior unchanged for other slots.
+TC-U12 Common wallet formatting unchanged except intended shared bug fixes.
+TC-U13 No new global CSS collision.
+TC-U14 No relevant console errors after navigating among games.
+
+============================================================
+FINAL PASS CONDITIONS
+============================================================
+
+All critical tests in sections E through P and T must pass.
+Any failed duplicate-settlement, recursive-Echo, or mobile-layout test blocks release.

@@ -25,6 +25,7 @@
  function cancel(game){renderers.get(game)?.cancel();const s=sessions.get(game);if(!s)return;s.cancelled=true;for(const timer of s.timers)clearTimeout(timer);for(const a of s.animations)a.cancel();}
  async function run(game,options){
   cancel(game);
+  const releaseLayout=window.VaultReelLayout?.lock(options.root)||(()=>{});
   const cfg=config(game,options),scale=SPEED[cfg.speedProfile]*(options.phase==='cascade'?cfg.cascadeSpeedMultiplier:1);
   const s={game,roundId:options.roundId||null,cancelled:false,animations:new Set(),timers:new Set(),started:performance.now(),settled:false};sessions.set(game,s);
   const incoming=(options.cells||[]).filter(c=>c.node?.isConnected);
@@ -60,7 +61,7 @@
    const jobs=plan.map(c=>{
     const node=c.node,identity={...base,column:c.column,row:c.row,symbol:c.symbol,anticipation:c.suspense,delay:c.delay,duration:c.duration};owners.set(node,s);
     const baseTransform=c.base==='none'?'':c.base,offset=cfg.reducedMotion?8:Math.max(c.height,1)*(c.fromRows||(c.row+1));
-    const transform=(dy,sx=1,sy=1,dx=0)=>`${baseTransform} translate(${dx}px,${dy}px) scale(${sx},${sy})`;
+    const transform=(dy,sx=1,sy=1,dx=0)=>`${baseTransform} translate3d(${dx}px,${dy}px,0) scale(${sx},${sy})`;
     const ratio=c.fall/c.duration,overshoot=c.height*cfg.overshoot*(cfg.speedProfile==='turbo'?.45:1);
     let frames;
     if(cfg.reducedMotion)frames=[{opacity:0,transform:transform(-offset)},{opacity:1,transform:transform(0)}];
@@ -79,7 +80,7 @@
    await Promise.all(jobs);
    if(!s.cancelled){s.settled=true;emit('onGridSettled',{...base,cells:plan.length,elapsed:performance.now()-s.started});if(options.settle!==false)await clock((options.feature||plan.some(c=>c.isSpecial)?cfg.featureSettleDelay:options.hasWin?cfg.winSettleDelay:cfg.noWinSettleDelay)*scale);}
    return {cancelled:s.cancelled,gridSettled:s.settled,elapsed:performance.now()-s.started};
-  }finally{for(const timer of s.timers)clearTimeout(timer);if(sessions.get(game)===s){sessions.delete(game);if(options.root?.dataset.slotDropMask===game)delete options.root.dataset.slotDropMask;}}
+  }finally{releaseLayout();for(const timer of s.timers)clearTimeout(timer);if(sessions.get(game)===s){sessions.delete(game);if(options.root?.dataset.slotDropMask===game)delete options.root.dataset.slotDropMask;}}
  }
  const api=window.VaultSymbolDrop={presets:PRESETS,games:GAMES,speeds:SPEED,
   play(game,options){const promise=options.reels&&renderers.has(game)?renderers.get(game).play(options):run(game,options);pending.set(game,promise);return promise;},

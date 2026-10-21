@@ -146,6 +146,41 @@ if "id:'critter',element:'openCritterGame'" not in s:
  s=s.replace("{id:'magnet',element:'openMagnetGame'","{id:'critter',element:'openCritterGame',category:'slots',isNew:true},{id:'magnet',element:'openMagnetGame'",1)
 art='data:image/webp;base64,'+encoded_asset((ROOT/'assets/critter/references/02_scene_alt.webp'))
 s=re.sub(r'(<img id="critterLobbyArt")([^>]*)(>)',lambda m:m[1]+re.sub(r' src="[^"]*"','',m[2])+' src="'+art+'"'+m[3],s)
+# BIG TOP WILDS adds a module; existing game code and artwork remain untouched.
+def bigtop_assets(text):
+ return re.sub(r'__BIGTOP_([^\s\x27"<>]+)__',lambda m:'data:image/png;base64,'+encoded_asset(ROOT/'assets/big-top'/m[1]),text)
+card='<button class="game-card playable" id="openBigTopGame" data-category="slots" aria-label="Играть в BIG TOP WILDS"><div class="art"><img id="bigTopLobbyArt" alt="" loading="lazy"></div><span class="info"><strong>BIG TOP WILDS</strong><small>Big Top Ways · The Big Show</small></span><span class="lobby-play" aria-hidden="true">PLAY</span></button>'
+if 'id="openBigTopGame"' not in s:s=s.replace('<button class="game-card playable" id="openCritterGame"',card+'<button class="game-card playable" id="openCritterGame"',1)
+if "id:'big_top',element:'openBigTopGame'" not in s:s=s.replace("{id:'critter',element:'openCritterGame'","{id:'big_top',element:'openBigTopGame',category:'slots',isNew:true},{id:'critter',element:'openCritterGame'",1)
+art='data:image/png;base64,'+encoded_asset(ROOT/'assets/big-top/background.png')
+s=re.sub(r'(<img id="bigTopLobbyArt")([^>]*)(>)',lambda m:m[1]+re.sub(r' src="[^"]*"','',m[2])+' src="'+art+'"'+m[3],s)
+for name,text,tag in [('BIG TOP STYLES',bigtop_assets((ROOT/'big-top/presentation.css').read_text()),'style'),('BIG TOP SCREEN',(ROOT/'big-top/screen.html').read_text(),None),('BIG TOP MODULE',bigtop_assets('\n'.join((ROOT/'big-top'/f).read_text() for f in ['config.js','model.js','assets.js','game.js'])),'script')]:
+ block=f'<!-- BEGIN {name} -->\n'+(f'<{tag}>\n{text}\n</{tag}>' if tag else text)+f'\n<!-- END {name} -->'
+ pattern=rf'<!-- BEGIN {name} -->[\s\S]*?<!-- END {name} -->'
+ if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
+ elif tag=='style':s=s.replace('</head>',block+'\n</head>',1)
+ else:s=s.replace('<!-- BEGIN VAULT RUNTIME -->',block+'\n<!-- BEGIN VAULT RUNTIME -->',1)
+
+# UPSIDE PAWS adds a module; existing game code and artwork remain untouched.
+def upsidepaws_assets(text):
+ return re.sub(r'__UPSIDEP_([^\s\x27"<>]+)__',lambda m:'data:image/png;base64,'+encoded_asset(ROOT/'assets/upside-paws'/m[1]),text)
+card='<button class="game-card playable" id="openUpsidePawsGame" data-category="slots" aria-label="Играть в UPSIDE PAWS"><div class="art"><img id="upsidePawsLobbyArt" alt="" loading="lazy"></div><span class="info"><strong>UPSIDE PAWS</strong><small>Two Worlds · Dimension Breach</small></span><span class="lobby-play" aria-hidden="true">PLAY</span></button>'
+if 'id="openUpsidePawsGame"' not in s:s=s.replace('<button class="game-card playable" id="openCritterGame"',card+'<button class="game-card playable" id="openCritterGame"',1)
+if "id:'upside_paws',element:'openUpsidePawsGame'" not in s:s=s.replace("{id:'critter',element:'openCritterGame'","{id:'upside_paws',element:'openUpsidePawsGame',category:'slots',isNew:true},{id:'critter',element:'openCritterGame'",1)
+art='data:image/png;base64,'+encoded_asset(ROOT/'assets/upside-paws/background.png')
+s=re.sub(r'(<img id="upsidePawsLobbyArt")([^>]*)(>)',lambda m:m[1]+re.sub(r' src="[^"]*"','',m[2])+' src="'+art+'"'+m[3],s)
+for name,text,tag in [('UPSIDE PAWS STYLES',upsidepaws_assets((ROOT/'upside-paws/presentation.css').read_text()),'style'),('UPSIDE PAWS SCREEN',(ROOT/'upside-paws/screen.html').read_text(),None),('UPSIDE PAWS MODULE',upsidepaws_assets('\n'.join((ROOT/'upside-paws'/f).read_text() for f in ['config.js','model.js','assets.js','game.js'])),'script')]:
+ block=f'<!-- BEGIN {name} -->\n'+(f'<{tag}>\n{text}\n</{tag}>' if tag else text)+f'\n<!-- END {name} -->'
+ pattern=rf'<!-- BEGIN {name} -->[\s\S]*?<!-- END {name} -->'
+ if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
+ elif tag=='style':s=s.replace('</head>',block+'\n</head>',1)
+ else:s=s.replace('<!-- BEGIN VAULT RUNTIME -->',block+'\n<!-- BEGIN VAULT RUNTIME -->',1)
+
+
+# Geometry/decoded-assets helper is available before auth can reopen a saved game.
+layout='<!-- BEGIN REEL LAYOUT MODULE -->\n<script>\n'+(ROOT/'slot-animation/layout.js').read_text()+'\n</script>\n<!-- END REEL LAYOUT MODULE -->'
+if '<!-- BEGIN REEL LAYOUT MODULE -->' in s:s=re.sub(r'<!-- BEGIN REEL LAYOUT MODULE -->[\s\S]*?<!-- END REEL LAYOUT MODULE -->',lambda _:layout,s)
+else:s=s.replace('<!-- BEGIN VAULT RUNTIME -->',layout+'\n<!-- BEGIN VAULT RUNTIME -->',1)
 # One presentation module adapts all five slot controllers after their handlers exist.
 for name,path,tag in [('SLOT HUD STYLES','hud.css','style'),('SLOT HUD MODULE','hud.js','script'),('BONUS POPUP STYLES','bonus-popup.css','style'),('BONUS POPUP MODULE','bonus-popup.js','script')]:
  text=(ROOT/'slot-hud'/path).read_text()

@@ -1,0 +1,41 @@
+UPSIDE PAWS — ANIMATION RULES
+
+Visual result is NEVER RNG.
+
+Before animation, roundPlan already contains:
+- both final 4x4 grids;
+- Portal events;
+- Echo events;
+- secondary transformation states;
+- Resonance coordinates;
+- bonus state.
+
+Lifecycle:
+START
+-> ACCELERATION
+-> SPIN
+-> DECELERATION
+-> SETTLE
+-> PORTAL/ECHO
+-> OPTIONAL ONE SECONDARY WIN PRESENTATION
+-> RESONANCE
+-> WIN PRESENTATION
+-> COMPLETE
+
+Use transform: translate3d(...) and opacity.
+Never animate dimensions/margins/padding for reel motion.
+
+Normal = full readable timing.
+Quick ~70%.
+Turbo ~40%.
+Reduced Motion = minimal motion but same state/order.
+
+Normal and Upside worlds should feel synchronized but can have subtly different
+visual FX layers.
+
+Mobile:
+- fixed grid viewport;
+- preload art;
+- no insertion/removal causing height changes;
+- no shaking at symbol settle;
+- no popup reflow.

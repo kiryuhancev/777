@@ -1,0 +1,13 @@
+BIG TOP WILDS — FIXED VIEWPORT / VARIABLE CELL GEOMETRY
+
+6 reels, fixed outer viewport.
+Each reel has constant width = 1/6 viewport width.
+Visible rowCount per reel is integer 2..6 and is chosen before spin animation.
+cellHeight(reel) = fixedReelViewportHeight / rowCount(reel).
+
+Do not make reel height follow content.
+Do not use intrinsic image dimensions to size rows.
+Do not change reel rowCount after the visual spin has started.
+Do not stretch symbol artwork to fill tall cells; use separate adaptive cell background + aspect-preserving foreground art.
+
+Potential ways = product(reelHeights), but payout ways are determined from matching symbols using the left-to-right evaluator.

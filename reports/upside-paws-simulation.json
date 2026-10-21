@@ -1,0 +1,14 @@
+{
+  "rounds": 1000000,
+  "rtpEstimate": 0.958149099601231,
+  "confidence95": [
+    0.9521937582678052,
+    0.9641044409346567
+  ],
+  "base": 0.8710009953011512,
+  "bonus": 0.08714810430000021,
+  "bonusFrequency": 190.36740909956217,
+  "maxWinX": 313.8312,
+  "fullBreachSpins": 7401,
+  "notes": "Empirical estimate, not certified theoretical RTP. Config applies only to new game."
+}

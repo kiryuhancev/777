@@ -1,0 +1,30 @@
+UPSIDE PAWS — CORE FLOW QUICK REFERENCE
+
+PAID SPIN
+-> lock controls
+-> create deterministic roundPlan
+-> spin BOTH 4x4 grids
+-> settle BOTH grids
+-> primary Normal evaluation
+-> primary Upside evaluation
+-> execute planned Portal/Echo transformations
+-> ONE optional secondary evaluation maximum
+-> determine Resonance
+-> presentation
+-> settle round once
+-> ready
+
+BONUS
+3+ Scatter across BOTH grids
+-> compact Bonus Intro inside game
+-> DIMENSION BREACH
+-> running bonusSession.totalWin
+-> no wallet credits during individual free spins
+-> Breach Meter
+-> queued Full Breach
+-> final free spin
+-> BONUS_COMPLETE
+-> settle total bonus win ONCE
+
+NEVER
+Normal -> Upside -> Normal -> ... recursive feature chain.

@@ -1,10 +1,16 @@
-.vault-feature-host{position:relative;isolation:isolate}
-.vault-feature-gate{position:absolute;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:#020512b8;backdrop-filter:blur(1px);pointer-events:auto}
-.vault-feature-card{width:72%;box-sizing:border-box;padding:clamp(10px,2.4vw,24px);border:2px solid #d8b062;border-radius:12px;background:radial-gradient(ellipse at top,#24394a,#101322 75%);box-shadow:0 0 0 3px #312235,0 0 24px #e6ad3640;text-align:center;color:#ffebac;outline:none;font-family:inherit}
-.vault-feature-card h2{margin:0 0 8px;font-size:clamp(13px,2.4vw,25px);letter-spacing:.03em}
-.vault-feature-card p{margin:7px 0;line-height:1.35;font-size:clamp(9px,1.4vw,14px)}
-.vault-feature-card .feature-value{display:block;font-size:clamp(22px,4.4vw,46px);overflow-wrap:anywhere;color:#ffe08c;text-shadow:0 0 10px #e4a94780}
-.vault-feature-card .feature-continue{display:block;width:100%;margin-top:12px;padding:8px 2px;border:0;background:none;color:#d4d9ca;font:inherit;font-size:clamp(8px,1.2vw,12px);cursor:pointer}
-.vault-feature-gate[data-skin=swamp] .vault-feature-card{background:radial-gradient(ellipse at top,#35472c,#101a15 75%);border-color:#b59650;box-shadow:0 0 0 3px #242719,0 0 22px #b1bd3940}
-.vault-feature-gate[data-skin=critter] .vault-feature-card{box-shadow:0 0 0 3px #4a285e,0 0 22px #8748de60}
-@media(max-width:480px){.vault-feature-card{width:75%;padding:10px}.vault-feature-card h2{font-size:13px}.vault-feature-card .feature-value{font-size:27px}.vault-feature-card p{font-size:9px}}
+.vault-feature-host{position:relative;isolation:isolate;overflow:hidden}
+.vault-feature-gate{position:absolute;inset:0;z-index:90;display:grid;place-items:center;background:#0205129c;pointer-events:auto;container-type:size;overflow:hidden}
+.vault-feature-card{position:relative;width:65%;max-height:calc(100% - 16px);box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:clamp(8px,3cqh,22px) clamp(10px,3cqw,25px);border:2px solid #cda252;border-radius:12px;background:linear-gradient(135deg,#314345,#101a20 40%,#172125);box-shadow:inset 0 0 0 2px #0b0f11,0 0 0 2px #5d4026,0 4px 16px #0009;text-align:center;color:#ffebac;outline:none;font-family:Arial,sans-serif;animation:vault-gate-enter .18s ease-out;overflow:hidden}
+.vault-feature-card>*{flex-shrink:0;max-width:100%}
+.vault-feature-card h2{margin:0;font-size:clamp(11px,min(3.1cqw,6cqh),25px);line-height:1.15;letter-spacing:.035em}
+.vault-feature-card p{margin:0;line-height:1.3;font-size:clamp(8px,min(2cqw,4cqh),13px)}
+.vault-feature-card .feature-value{display:block;font-size:clamp(20px,min(7cqw,14cqh),47px);line-height:1.05;overflow-wrap:anywhere;color:#ffe08c;text-shadow:0 1px 1px #83502d,0 0 10px #ffac3c66;font-variant-numeric:tabular-nums}
+.vault-feature-card .feature-continue{display:block;margin-top:4px;padding:5px 2px;border:0!important;box-shadow:none!important;background:none!important;color:#e6dcb9!important;font:700 clamp(8px,min(1.9cqw,3.7cqh),11px) Arial!important;letter-spacing:.035em;cursor:pointer;min-height:0!important}
+.vault-feature-card .feature-ornament{position:absolute;top:7px;right:9px;font-size:clamp(10px,3cqw,19px);line-height:1;opacity:.45;color:#eeb450;pointer-events:none}
+.vault-feature-card [hidden]{display:none!important}
+.vault-feature-gate[data-skin=critter] .vault-feature-card{border-color:#f6b24d;background:linear-gradient(155deg,#284247,#17202c 38%,#241c20 80%,#57351f);box-shadow:inset 0 0 0 2px #101925,inset 0 -5px 0 #352b23,0 0 0 2px #70502d,0 0 15px #25d3c744}
+.vault-feature-gate[data-skin=critter] .vault-feature-card h2{color:#88ece1;text-shadow:0 1px #152028}
+.vault-feature-gate[data-skin=swamp] .vault-feature-card{border-color:#b59650;border-radius:7px 10px 8px 6px;background:repeating-linear-gradient(1deg,#302b1966 0 2px,transparent 2px 8px),radial-gradient(ellipse at top,#3c5031,#14251c 70%);box-shadow:inset 0 0 0 3px #202219,0 0 0 2px #473c26,0 0 12px #d69b3730}
+@keyframes vault-gate-enter{from{opacity:0;transform:translate3d(0,6px,0) scale(.97)}to{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+@media(max-width:760px){.vault-feature-card{width:84%;gap:5px;padding:clamp(7px,2.5cqh,16px) 10px}.vault-feature-card h2{font-size:clamp(11px,min(4cqw,7cqh),17px)}.vault-feature-card .feature-value{font-size:clamp(20px,min(8cqw,13cqh),36px)}}
+@media(prefers-reduced-motion:reduce){.vault-feature-card{animation:none}}

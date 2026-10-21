@@ -1,4 +1,5 @@
 const CRITTER_ASSETS={
+ plaque:'__CRITTER_latest/empty_label_plaque.png__',
  raccoon:'__CRITTER_latest/raccoon_base.webp__',
  wildLabel:'__CRITTER_latest/wild_label.webp__',
  newScatter:'__CRITTER_latest/scatter.webp__',

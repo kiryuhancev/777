@@ -1,0 +1,12 @@
+SHARED VAULT RULES INCLUDED IN THIS BUILD
+
+1. Universal HUD logic/order is preserved; slot gets only a visual skin.
+2. Bonus winnings accumulate internally and reach wallet only once at bonus completion.
+3. Bonus Buy uses confirmation -> single debit -> presentation trigger spin -> in-reel intro -> free spins.
+4. Bonus Intro / Big Win / Bonus Complete are contained inside the reel frame, not fullscreen.
+5. Mobile reel containers are stable; animation uses transforms/opacity, not layout properties.
+6. WIN / LAST WIN / BONUS WIN semantics are consistent with other VAULT slots.
+7. Presentation never performs payout math or settlement.
+8. Reload/persistence must be idempotent and duplicate-safe.
+9. Normal/Quick/Turbo/Reduced Motion profiles are supported by the reel animation layer.
+10. No game may be overwritten or regressed when BIG TOP WILDS is added.

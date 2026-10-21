@@ -9,6 +9,7 @@
  const ease=t=>1-(1-t)**2;
  async function play(options){
   cancel();
+  const releaseLayout=window.VaultReelLayout?.lock(options.root)||(()=>{});
   const cfg={...DEFAULTS,...overrides},profile=VaultSymbolDrop.getConfig('swamp',options),reduced=profile.reducedMotion;
   const scale=({normal:1,quick:.65,turbo:.4}[profile.speedProfile]||1)*(reduced?.45:1);
   const s={roundId:options.roundId||null,cancelled:false,animations:new Set(),reels:[],started:performance.now(),raf:0,settled:false};session=s;
@@ -47,7 +48,7 @@
    }
    function state(reel,time){
     const stages=[{at:reel.accel,name:'FULL_SPEED',hook:'onReelFullSpeed'},{at:reel.accel+reel.full,name:'DECELERATION',hook:'onReelDecelerate'},{at:reel.motion,name:'FINAL_ALIGNMENT'}];
-    while(reel.stageIndex<stages.length&&time>=stages[reel.stageIndex].at){const stage=stages[reel.stageIndex++];reel.stage=stage.name;reel.node.dataset.reelPhase=stage.name;if(stage.name==='FULL_SPEED'&&cfg.blurStrength>0&&!reduced&&innerWidth>600)reel.strip.style.filter=`blur(${cfg.blurStrength}px)`;else reel.strip.style.removeProperty('filter');if(stage.name==='FINAL_ALIGNMENT'&&!reduced&&time<reel.total){reel.lockMotion=reel.node.animate([{transform:'translateX(0)'},{transform:'translateX(.4px)'},{transform:'translateX(0)'}],{duration:reel.total-time,easing:'ease-out'});s.animations.add(reel.lockMotion);}if(stage.hook)emit(stage.hook,{...base,reelIndex:reel.column,anticipation:reel.isSuspense});}
+    while(reel.stageIndex<stages.length&&time>=stages[reel.stageIndex].at){const stage=stages[reel.stageIndex++];reel.stage=stage.name;reel.node.dataset.reelPhase=stage.name;if(stage.name==='FULL_SPEED'&&cfg.blurStrength>0&&!reduced&&innerWidth>600)reel.strip.style.filter=`blur(${cfg.blurStrength}px)`;else reel.strip.style.removeProperty('filter');if(stage.hook)emit(stage.hook,{...base,reelIndex:reel.column,anticipation:reel.isSuspense});}
    }
    function position(reel,t){
     if(t<reel.accel)return reel.yStart+reel.velocity*t*t/(2*reel.accel);
@@ -96,6 +97,7 @@
    }
    return {cancelled:s.cancelled,gridSettled:s.settled,elapsed:performance.now()-s.started};
   }finally{
+   releaseLayout();
    cancelAnimationFrame(s.raf);
    for(const a of s.animations)a.cancel();
    for(const reel of s.reels){

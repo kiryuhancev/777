@@ -1,0 +1,490 @@
+BIG TOP WILDS — MASTER IMPLEMENTATION SPEC
+Version: 1.0
+Purpose: strict implementation contract for Codex.
+
+============================================================
+0. NON-NEGOTIABLE PROJECT RULES
+============================================================
+- Add BIG TOP WILDS as a new slot inside the existing VAULT project.
+- Do not overwrite or regress any existing game.
+- Preserve auth, Supabase, persistence, global wallet, routing, lobby, settings and existing shared services.
+- Preserve existing wallet precision and currency formatting.
+- Never invent alternative gameplay when this document already defines it.
+- Game state/RNG determines results; animation is presentation only.
+- No animation may determine a payout, reel height, symbol, multiplier or Scatter result.
+- No duplicate debit or settlement.
+- Reload must restore any active bonus safely.
+- Desktop and mobile use the same game rules.
+- Keep the universal VAULT slot HUD behavior and control order. BIG TOP WILDS only applies a circus skin.
+
+============================================================
+1. GAME IDENTITY
+============================================================
+Name: BIG TOP WILDS
+Theme: bright, playful, premium absurd circus show. NOT horror. NOT grim. NOT generic vintage circus.
+Mood: comic exaggeration, warmth, spectacle, controlled chaos.
+
+Main characters used ONLY by the Curtain Wild feature:
+- BOMBO: huge, round, heavy, clumsy, physical-comedy clown.
+- SKINNY: extremely thin/tall, elastic, agile, trickster clown.
+They must differ in silhouette, body proportions, movement, timing and material/wardrobe feel — not merely color.
+Do not use either clown as a normal paying symbol.
+
+============================================================
+2. REEL GEOMETRY / BIG TOP WAYS
+============================================================
+- 6 reels.
+- Each reel independently contains 2 to 6 visible symbol cells.
+- Physical reel viewport has FIXED width and FIXED height per responsive breakpoint.
+- Each reel width is constant: reelViewportWidth / 6.
+- Only cell height changes per reel: cellHeight = reelViewportHeight / rowCount.
+- Reel heights are decided BEFORE visual spin starts.
+- During a spin, reel viewport dimensions and row counts do not change.
+- UI geometry never decides game logic.
+
+Example state:
+reelHeights = [4, 6, 3, 5, 4, 6]
+Potential ways = 4*6*3*5*4*6 = 8,640.
+Maximum potential ways = 6^6 = 46,656.
+
+UI naming:
+Use "BIG TOP WAYS" or "UP TO 46,656 WAYS".
+Do NOT use the trademarked term MEGAWAYS in visible UI.
+
+Cell rendering:
+- Cell background/frame may adapt vertically.
+- Symbol artwork must preserve aspect ratio; never stretch faces/objects.
+- Symbol artwork is a separate foreground layer.
+- Use object-fit/contain-style behavior and tuned scale profiles for 2/3/4/5/6 rows.
+- Fixed reel viewport prevents page/layout jumps.
+
+============================================================
+3. WIN LOGIC — STRICT LEFT TO RIGHT
+============================================================
+Normal paying-symbol wins:
+- Must start on Reel 1.
+- Must continue through consecutive reels with no gap.
+- Minimum length: Reel 1 + Reel 2 + Reel 3.
+- Can continue through Reel 4, Reel 5, Reel 6.
+- Vertical row position does not matter.
+- Multiple matching symbols on a reel create multiple ways.
+
+Example:
+Reel 1 has 2 matching A symbols,
+Reel 2 has 3 matching A symbols,
+Reel 3 has 2 matching A symbols,
+=> 2*3*2 = 12 winning ways for the 3-reel A payout.
+
+Invalid:
+- Reel 2-3-4 without Reel 1.
+- Reel 1-2-4 with Reel 3 missing.
+
+Scatter is evaluated separately and never participates in left-to-right symbol ways.
+
+============================================================
+4. SYMBOL SET
+============================================================
+LOW SYMBOLS:
+10, J, Q, K, A.
+- Bright playful marquee/circus typography.
+- Shared family, unique accents.
+- Lower visual complexity than premium symbols.
+
+PREMIUM SYMBOL DIRECTION:
+Use absurd show-prop objects, not obvious stock circus clichés.
+Approved core direction:
+- balloon dog (mandatory)
+- oversized squeaky rubber duck
+- ridiculous wind-up boot / spring shoe
+- comic heavy weight with playful detail such as bow/star
+- roller skate with absurd propulsion / show mechanism
+- crowned goldfish / fantastical fishbowl
+
+Avoid replacing these with generic drum/trumpet/target/juggling-club sets unless explicitly approved later.
+No clown premium symbols.
+
+SCATTER:
+- Circus big-top tent with explicit SCATTER label.
+- Unique non-rectangular silhouette (tall dome/medallion/tent profile).
+- Must visually break the ordinary cell silhouette and catch the eye immediately.
+- It may visually extend slightly within a decorative layer, but MUST NOT affect grid sizing.
+- Reel viewport still clips anything outside the allowed reel field.
+- Scatter evaluates anywhere, independent of Reel 1.
+- Max one Scatter per reel/column.
+
+============================================================
+5. CURTAIN WILD — BASE FEATURE
+============================================================
+Curtain is a special symbol/feature trigger.
+It is NOT a clown symbol.
+
+Lifecycle:
+1. Curtain lands in final predetermined result.
+2. All reels finish settling.
+3. Curtain feature starts.
+4. BOMBO appears from one side (e.g. upper side) and SKINNY from opposite side (e.g. lower side).
+5. Short comic interaction/showdown plays.
+6. Feature result was already predetermined in featurePlan.
+7. Winning clown takes over / stretches visually across the curtain.
+8. Curtain resolves into final Wild state.
+9. Only after final Wild states are resolved, calculate the paid result once.
+
+Allowed standard outcomes:
+- WILD (x1)
+- x2
+- x3
+- x5
+- x10 (rarer)
+
+CRITICAL LABEL RULE:
+- x1 state displays "WILD".
+- Multiplier states REPLACE the word WILD.
+- x2 state displays ONLY "x2" in the label area.
+- x3 displays ONLY "x3".
+- x5 displays ONLY "x5".
+- x10 displays ONLY "x10".
+Never show "WILD + x3" as two stacked labels.
+Never use a black generic multiplier badge.
+The same decorative curtain label/plaque area swaps its content.
+
+Wild substitution:
+- Wild substitutes for normal paying symbols.
+- Wild does not substitute for Scatter.
+
+============================================================
+6. FULL REEL CURTAIN
+============================================================
+Rare feature state:
+- Curtain covers 100% of one reel height, regardless of whether that reel contains 2 or 6 cells.
+- It resolves via the same clown showdown language.
+- Final reel becomes a Full Reel Wild at x1 or an approved multiplier state.
+- The whole reel is one feature object visually; do not stretch clown faces independently to fill height.
+- Multiplier is applied once per participating Curtain reel for a winning way, NOT once per Wild cell.
+
+If multiple distinct multiplier Curtain reels participate in the same winning way:
+- combine reel multipliers multiplicatively for that way (example x2 reel + x3 reel => x6 for that way).
+- Do not multiply the same reel's multiplier once per cell.
+
+============================================================
+7. REEL ANIMATION — REQUIRED IMPLEMENTATION
+============================================================
+Animation phases:
+START -> ACCELERATION -> FULL SPEED -> DECELERATION -> FINAL ALIGNMENT / SOFT OVERSHOOT -> SETTLED.
+
+Normal target stop timings:
+Reel 1: 900–1100 ms
+Reel 2: 1050–1250 ms
+Reel 3: 1200–1400 ms
+Reel 4: 1350–1550 ms
+Reel 5: 1500–1700 ms
+Reel 6: 1650–1900 ms
+
+Profiles:
+- Normal: 100% duration.
+- Quick: approximately 70%.
+- Turbo: approximately 40%.
+- Reduced Motion: minimize nonessential effects while preserving state clarity.
+
+Implementation constraints:
+- Move only internal reel strips/layers.
+- Prefer transform: translate3d(...) and opacity.
+- Do NOT animate width, height, top, left, margin or padding.
+- Do NOT move the entire reel/grid container.
+- Preload symbol assets before first playable spin.
+- Fixed symbol containers; image loading must not cause reflow.
+- overflow hidden at reel viewport boundaries.
+- Curtain showdown starts only AFTER ordinary reels have visually settled.
+- Feature animation may not change the predetermined result.
+
+MOBILE STABILITY IS A HARD REQUIREMENT:
+No vertical/horizontal jump when:
+- spin starts,
+- symbols move,
+- each reel stops,
+- Curtain feature starts/ends,
+- Scatter trigger fires,
+- popup appears/disappears,
+- win presentation starts/ends.
+
+============================================================
+8. BASE GAME FLOW
+============================================================
+IDLE
+-> request/prepare deterministic roundPlan
+-> lock controls
+-> start reel animations
+-> stop reels left to right
+-> SETTLED
+-> resolve Curtain features if present
+-> resolve Scatter trigger state
+-> evaluate left-to-right ways once
+-> win presentation
+-> settle base-game payout once
+-> update LAST WIN
+-> unlock controls / transition to bonus intro if bonus triggered.
+
+No cascades.
+No second hidden payout evaluation after animation.
+
+============================================================
+9. BONUS TRIGGER — THE BIG SHOW
+============================================================
+Scatter triggers anywhere.
+Max one Scatter per column.
+
+Initial free-spin mapping:
+3 Scatter = 10 Free Spins
+4 Scatter = 12 Free Spins
+5 Scatter = 15 Free Spins
+6 Scatter = 20 Free Spins
+
+Keep mapping configurable in game config for later balancing.
+
+Bonus intro title:
+THE BIG SHOW
+
+Bonus intro is NOT fullscreen. See popup section.
+Bonus never auto-starts before player continues via safe input.
+
+============================================================
+10. BONUS CORE FEATURES
+============================================================
+During Free Spins:
+- Curtain Wild frequency is higher than base game.
+- Multiplier Curtain outcomes are allowed at increased configured chance.
+- Full Reel Curtain remains rare but can occur.
+
+ENCORE CURTAIN:
+- A resolved multiplier Curtain may receive an ENCORE state.
+- ENCORE means that resolved Curtain state persists for exactly ONE additional free spin unless later balancing config changes duration.
+- Persistence state must be explicit in bonus state, not inferred from animation.
+- Do not make every Wild sticky until bonus end.
+
+APPLAUSE METER:
+- Visible only during THE BIG SHOW.
+- Suggested configurable contribution:
+  normal Curtain Wild = +1
+  multiplier Curtain = +2
+  Full Reel Curtain = +3
+- When meter reaches threshold, arm STANDING OVATION.
+- STANDING OVATION guarantees at least one Curtain feature on the next eligible free spin.
+- After the guaranteed spin is prepared/consumed, reset the meter as configured.
+- Guarantee is determined in roundPlan, not by UI animation.
+
+Keep threshold and contributions configurable.
+
+============================================================
+11. BONUS WALLET / SETTLEMENT — SHARED VAULT RULE
+============================================================
+During bonus/free spins:
+- DO NOT credit wallet after each free spin.
+- Accumulate in bonusSession.totalWin.
+- UI can show BONUS WIN continuously.
+- Wallet remains unchanged during the bonus, apart from any already-paid entry/buy cost.
+
+At full bonus completion:
+- transition bonus session to completed/finalized state,
+- credit bonusSession.totalWin exactly ONCE,
+- persist settlement status/idempotency marker,
+- then return to base flow according to presentation state.
+
+Reload safety:
+- restore bonus spins remaining, bonus total, Encore states, Applause Meter, settlement status and any deterministic pending round state needed.
+- reloading Bonus Complete must NOT pay again.
+
+============================================================
+12. BONUS BUY FLOW — SHARED VAULT RULE
+============================================================
+Use the universal Bonus menu/confirmation behavior.
+
+Flow:
+BONUS button
+-> select BUY THE BIG SHOW
+-> themed in-reel confirmation
+-> YES/NO.
+
+YES:
+1. validate wallet,
+2. debit purchase price exactly once,
+3. lock duplicate input,
+4. play a special presentation trigger spin that visibly lands the required Scatter count,
+5. do NOT debit an additional wager for this presentation spin,
+6. trigger THE BIG SHOW intro popup,
+7. wait for player input,
+8. begin free spins.
+
+NO / X / backdrop / ESC:
+- no debit,
+- no feature.
+
+Never use browser confirm().
+Double tap/click safe.
+Purchase price based on current bet and config multiplier.
+
+============================================================
+13. POPUP SYSTEM — SHARED VAULT RULE
+============================================================
+All slot popups for this game must be REEL-CONTAINED.
+Never cover the entire viewport/page.
+
+Popup host:
+SLOT PAGE
+  REEL FRAME
+    SYMBOL GRID
+    LOCAL REEL BACKDROP
+    POPUP
+  HUD
+
+Types:
+- Bonus Buy confirmation
+- Bonus Intro
+- Standing Ovation / feature notice if used
+- Big Win
+- Bonus Complete
+
+Sizing target:
+Desktop: approx 55–70% of reel width, approx 30–50% reel height.
+Mobile: approx 75–90% reel width, auto height, still inside reel bounds.
+
+Backdrop:
+- dim only reel area.
+- HUD remains visible.
+- popup must not resize reel container or document flow.
+- position absolute inside reel container.
+- use transform/opacity for entrance/exit.
+
+Continue behavior:
+- Space on desktop.
+- click/tap in safe game/reel area.
+- one input = one transition.
+- prevent click-through and duplicate firing.
+- while a blocking popup is active, lock Spin/Auto/Bet/Max/Bonus controls.
+
+============================================================
+14. UNIVERSAL VAULT HUD
+============================================================
+Do not invent a new control layout from concept art.
+Use the existing shared VAULT slot HUD behavior and semantic control order:
+1 Settings
+2 Balance
+3 Bet -
+4 Bet value
+5 Bet +
+6 Auto
+7 Max
+8 Spin (largest/primary)
+9 Bonus / Buy Feature
+
+Top info:
+- LAST WIN left
+- STATUS / MODE center
+- contextual FEATURE INFO right
+
+BIG TOP WILDS only skins it with circus materials/lights; control behavior/order remains universal.
+Mobile keeps same semantic order and no horizontal overflow.
+
+============================================================
+15. UNIVERSAL WIN PRESENTATION
+============================================================
+For each paid spin:
+- highlight all symbol cells participating in winning left-to-right ways.
+- winning symbols remain bright/glowing.
+- non-winning symbols dim.
+- ways may be cycled visually, but payout calculation occurs once.
+
+HUD semantics:
+WIN = current paid round win.
+LAST WIN = previous completed paid round.
+BONUS WIN = accumulated current bonus-session win.
+winX = total win / bet.
+
+Big-win presentation:
+- reel-contained overlay, not fullscreen.
+- count amount and coefficient to final value.
+- first tap can complete count; second closes if that shared behavior exists.
+- presentation must never perform wallet settlement itself.
+
+============================================================
+16. RESPONSIVE / MOBILE RULES
+============================================================
+- 6 reels always remain 6 reels.
+- Do not switch to different game math on mobile.
+- Physical reel viewport remains stable within responsive layout.
+- Column width is always constant inside a given viewport.
+- Cell height varies only by predetermined rowCount.
+- No horizontal overflow.
+- Keep Scatter identifiable at smallest cell size.
+- Premium symbols need strong silhouettes and minimal tiny details.
+- Avoid filters/particle counts that cause poor mobile performance.
+- Target 60 FPS where practical; degrade decorative effects before mechanics/UI clarity.
+
+============================================================
+17. ASSET / VISUAL REFERENCE RULES
+============================================================
+Written spec wins over images if there is any conflict.
+
+Use supplied images for:
+- overall bright premium circus mood,
+- BOMBO vs SKINNY silhouette contrast,
+- Scatter tent silhouette direction,
+- Curtain feature staging,
+- fixed viewport / variable row concept,
+- popup scale and visual tone.
+
+Do NOT copy incorrect details from concept art if inconsistent with this spec, including:
+- any generic non-approved premium symbols,
+- any full-screen modal layout,
+- any control layout that differs from universal VAULT HUD,
+- any WILD+xN stacked label composition,
+- any clown appearing as a regular paying symbol.
+
+============================================================
+18. IMPLEMENTATION ORDER — DO NOT SKIP
+============================================================
+Phase A — foundation
+1. Add new game route/module without touching existing games.
+2. Implement deterministic game-state interface / config.
+3. Implement 6 fixed-width reels and variable 2–6 row rendering.
+4. Verify mobile layout stability before features.
+
+Phase B — base math/presentation
+5. Implement strict left-to-right ways.
+6. Implement symbols / Scatter max one per column.
+7. Implement reel animation profiles.
+8. Implement win presentation.
+
+Phase C — Curtain
+9. Implement Curtain state machine.
+10. Implement clown showdown presentation.
+11. Implement WILD/x2/x3/x5/x10 replacement label rule.
+12. Implement Full Reel Curtain multiplier rules.
+
+Phase D — bonus
+13. Implement Scatter -> THE BIG SHOW mapping.
+14. Implement bonusSession persistence and deferred wallet settlement.
+15. Implement Encore Curtain.
+16. Implement Applause Meter / Standing Ovation.
+17. Implement Bonus Buy presentation trigger flow.
+
+Phase E — shared UX
+18. Apply universal HUD.
+19. Apply reel-contained popup system.
+20. Verify mobile/desktop.
+21. Run full TEST_CASES.txt.
+22. Fix every reproducible failure and rerun regression tests.
+
+============================================================
+19. COMPLETION REPORT REQUIRED FROM CODEX
+============================================================
+At completion, report:
+- files changed/created,
+- game route/id,
+- where reelHeight config lives,
+- where left-to-right evaluator lives,
+- where Curtain featurePlan is created/consumed,
+- where bonus deferred settlement/idempotency lives,
+- where popup host is mounted,
+- which tests were executed and their result,
+- any requirement not implemented exactly and why.
+
+Do not claim complete if any acceptance test is knowingly failing.

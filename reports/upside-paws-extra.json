@@ -1,0 +1,20 @@
+{
+  "passed": [
+    "Natural Scatter trigger credits base once;320px touch; Full Breach meter100/armed/total/remaining restore byte-for-byte and replay same plan; one final bonus credit",
+    "Offline paid round, F5 local cache recovery, online outbox flush, same round and exact SQL balance without duplicate credit",
+    "Shared AUTO menu10 real spins, one round/stat per spin, no overlap or extra payout",
+    "Insufficient buy changes neither wallet nor round; signout hides game and returns to auth gate"
+  ],
+  "runtimeErrors": [],
+  "expectedOfflineConsole": [
+    "Failed to load resource: net::ERR_FAILED",
+    "Failed to load resource: net::ERR_FAILED",
+    "Failed to load resource: net::ERR_FAILED",
+    "Failed to load resource: net::ERR_FAILED",
+    "Failed to load resource: net::ERR_FAILED",
+    "VAULT account load failed: \u043f\u0440\u043e\u0444\u0438\u043b\u044c {message: TypeError: Failed to fetch, details: TypeError: Failed to fetch\n    at supabaseFetch (h\u20262guYmluZChyKSl9KSgpLG8oNDQwKX0pKCkpKTs=:1:110650), hint: , code: }",
+    "VAULT remote load failed Error: Could not load account data\n    at Object.load (http://127.0.0.1:8777/:7941:29)\n    at async http://127.0.0.1:8777/:8141:77",
+    "Failed to load resource: net::ERR_FAILED",
+    "Failed to load resource: net::ERR_FAILED"
+  ]
+}

@@ -1,3 +1,25 @@
+## UPSIDE PAWS (unpublished)
+
+- Added a separate Dual Grid slot: paired4×4 worlds, deterministic Echo/Portal, one secondary evaluation, Resonance, Dimension Breach and queued Full Breach.
+- Reused Universal HUD, local feature/utility popups, owner-scoped recovery/outbox and the shared wallet; bonus credit occurs once after the whole session.
+- Added original paired pet atlas/environment, additive `supabase_upside_paws.txt`, setup/report and model/SQL/browser/mobile/offline tests. Existing game modules and artwork remain unchanged.
+- New-game initial simulation:1,000,000 paid rounds, RTP estimate95.8149%,95%CI95.2194–96.4104%; not a certified theoretical RTP. No existing math changed.
+
+# Unpublished — BIG TOP WILDS
+
+- New isolated6-reel,2–6-row Big Top Ways slot; approved circus props, BOMBO/SKINNY Curtain feature, Full Reel multipliers, Encore and Applause/Standing Ovation.
+- Shared nine-control HUD and reel-contained utility/feature dialogs; single-debit bonus purchase with visible Scatter trigger.
+- Stable plan/progress recovery, one base credit after presentation, one deferred bonus credit, owner-scoped outbox/Supabase checks.
+- New setup: `supabase_big_top.txt`; implementation and115-case coverage: `BIG_TOP_WILDS_IMPLEMENTATION.md`, `BIG_TOP_WILDS_TEST_REPORT.md`. Physical iOS/Android runs remain unverified; no publication or production DB changes.
+
+# Unpublished — critical presentation fixes
+
+- Stable mobile reel/cell geometry and header; no whole-column Swamp shake or first-spin Derby resize.
+- One Critter Wild plaque: WILD at x1, x2+ replaces the text; label-only upgrade animation.
+- Compact reel-local bonus gates, locked gameplay controls and guarded tap/Space input.
+- Five-slot mobile geometry + paid bonus/reload/offline settlement regression passed; math and Swamp Scatter unchanged. Details: `CRITICAL_UI_FIXES.md`.
+- No DB migration; not published.
+
 # Unpublished — latest bonus update / Critter v6
 
 - Critter: left-to-right3–5 reel Ways, additive per-way Wild multipliers, maxone Scatter per reel, no cascades; calibrated around96% with independent sample/report.

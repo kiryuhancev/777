@@ -1,0 +1,13 @@
+{
+  "passed": [
+    "A/B/D/E/F/G/H: two simultaneous independent grids, paired art, deterministic final results/reactions, one debit/payout, stable desktop frames",
+    "R: Normal/Quick/Turbo/Reduced actual timelines preserve deterministic payout and ordering",
+    "O/P: contained selection/confirmation, YES-NO/X/backdrop/ESC, utility lock, same Universal HUD control order",
+    "I/J/K/L/M/N/O/T: actual purchase,3 Scatter trigger,no extra wager, intro/midbonus/summary F5, meter/queue restore, frozen local+SQL wallet, one final credit after reload",
+    "C/S:50 real mobile rounds, fixed layout, no overflow/DOM growth/residual effects, uniform sprite scaling, both grids remain in normal flow",
+    "P/Q: all feature gates local, rotation keeps state, heldSpace cannot skip next gate, BigWin first input completes counter and second closes without financial writes",
+    "A/U: all11 previous routes, wallet/auth session restore, unique DOM IDs, no runtime/console errors"
+  ],
+  "errors": [],
+  "consoleErrors": []
+}

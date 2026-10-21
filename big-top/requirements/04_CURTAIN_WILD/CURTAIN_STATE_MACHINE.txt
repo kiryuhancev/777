@@ -1,0 +1,21 @@
+CURTAIN WILD PRESENTATION STATE MACHINE
+
+CURTAIN_LANDED
+ -> WAIT_FOR_ALL_REELS_SETTLED
+ -> SHOWDOWN_ENTER
+ -> CLOWNS_INTERACT
+ -> REVEAL_WINNER
+ -> CURTAIN_TRANSFORM
+ -> FINAL_WILD_STATE
+ -> PAYOUT_EVALUATION
+ -> WIN_PRESENTATION
+
+featurePlan must already contain:
+- curtain location/reel,
+- standard vs full-reel curtain,
+- winning clown presentation id,
+- final multiplier state,
+- any Encore flag in bonus,
+- deterministic animation target metadata if needed.
+
+Never generate gameplay result inside an animation callback.

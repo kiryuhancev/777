@@ -1,0 +1,199 @@
+{
+  "tests": [
+    {
+      "id": "TC-B01",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-B02",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-B03",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-B04",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-B05",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-B06",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-B07",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-B08",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-E03",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-E04",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-C01",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-C07",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-D01",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-D08",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-D09",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-D10",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-G05",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-C02",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-C03",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-C04",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-C05",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-C06",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-C07",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-B09",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-O04",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-O05",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-O06",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-O07",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-J01",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-J02",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-J03",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-J04",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-J05",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-K01",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-K02",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-K03",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-K04",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-K05",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-K06",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-K07",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-L06",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-L07",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-L08",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-P02",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-P03",
+      "status": "PASS"
+    },
+    {
+      "id": "TC-J02",
+      "status": "PASS"
+    }
+  ],
+  "seeds": 3000,
+  "features": {
+    "mult5": true,
+    "mult1": true,
+    "mult3": true,
+    "mult2": true,
+    "encore": true,
+    "ovation": true,
+    "bonus": true,
+    "mult10": true
+  }
+}

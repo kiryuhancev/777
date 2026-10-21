@@ -1,0 +1,14 @@
+{
+  "passed": [
+    "320px touch: Curtain showdown clipped inside field, no horizontal overflow; shared Quick Bonus actually uses70% timings; one deferred completion credit",
+    "Full Reel label fits320px without clipping text; character atlas uses uniform scaling; no stretched faces"
+  ],
+  "quickBonusStopMs": [
+    726.2999999523163,
+    843.0,
+    943.3999999761581,
+    1043.0999999642372,
+    1159.8999999761581,
+    1276.3999999761581
+  ]
+}

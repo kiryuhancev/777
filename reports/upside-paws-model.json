@@ -1,0 +1,11 @@
+{
+  "passed": [
+    "Ways 3/4 reels, gap/right-only loss, multiples, Portal substitution, Scatter separate",
+    "Resonance intersections and configurable 0/1/2/3/4+ ladder, applied once",
+    "Scatter all-normal, all-upside, split, <3 and 3/4/5/6+ entitlements",
+    "Bidirectional Echo derives only from primary wins; counterparts and one secondary depth",
+    "Portal copy same coordinate, correct skin, fixed final state and independent evaluation",
+    "Breach charge, queue next spin, reset on consumption and no event/no charge",
+    "Determinism, max payout, paired IDs, no recursion/cascade, recovery JSONB order, tamper rejection 3000 seeds"
+  ]
+}

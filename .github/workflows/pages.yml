@@ -20,6 +20,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Check game mathematics
         run: |
+          node tools/upside-paws-model-tests.cjs
+          node tools/big-top-model-tests.cjs
           node tools/magnet-math-tests.cjs
           node tools/magnet-v2-tests.cjs
           node tools/critter-math-tests.cjs

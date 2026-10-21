@@ -1,0 +1,46 @@
+{
+  "passed": [
+    "A01\u201305/B/D02/F01\u201302/G01\u201305: fixed geometry, native aspect-ratio atlas, left-to-right normal stop timings, double-click single debit/stat",
+    "F03\u201305: actual Quick70%, Turbo40%, Reduced Motion15% stop timelines, unchanged state",
+    "Shared Settings/Paytable/Bet/Auto remain reel-contained; utility backdrop locks gameplay; ESC and internal bet selection work",
+    "L01\u201302: local Buy menu/YES-NO; NO/X/backdrop/ESC have zero debit",
+    "H/I/L03\u201309/O: single110\u00d7 purchase, visible3-Scatter trigger with no extra wager, input-gated intro, F5 intro/mid-bonus/summary, local+SQL wallet frozen then one final credit/stat",
+    "O04\u201307: F5 during paid reel motion restores the same seed/round, one debit/credit/stat",
+    "H01: natural3-Scatter entry credits the base win after presentation and before intro; free-spin winnings remain escrowed",
+    "A06/F08/N06,N07; N02 Chromium equivalent: 50 actual mobile spins, no overflow/drift/residual strips, one stats event each, no console errors",
+    "M01\u201305: winning cells glow, local Big Win counts amount/coefficient, presentation never credits money",
+    "L03: insufficient YES through real UI has no debit, outbox event or partial purchase",
+    "Shared AUTO menu:10 real rounds, one debit/stat each, clean stop and no concurrent spin",
+    "D03\u201307/E01\u201302,E05/P: WILD/x2/x3/x5/x10 replacement labels; full-reel coverage at2/6rows, clipped proportion-preserving clowns; local popups10\u00d7",
+    "O01\u201303,O08: all10 existing routes launch; shared canonical wallet/auth unchanged; no duplicate IDs/uncaught errors"
+  ],
+  "normalStopMs": [
+    1038.0,
+    1188.2000000476837,
+    1337.9000000357628,
+    1487.9000000357628,
+    1638.0,
+    1804.6000000238419
+  ],
+  "mobileGeometryDeltas": [
+    [
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0
+    ]
+  ],
+  "device": "Chromium desktop + mobile viewport; real iOS/Android not available"
+}

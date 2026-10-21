@@ -1,0 +1,446 @@
+{
+  "engine": "Chromium mobile390\u00d7844; WebKit separate check if installed",
+  "passed": [
+    "critter: stationary frame/viewport/cells/HUD through real spin + popup open/close; controls locked; held SPACE cannot skip next gate; tap works",
+    "swamp: stationary frame/viewport/cells/HUD through real spin + popup open/close; controls locked; held SPACE cannot skip next gate; tap works",
+    "vault_heist: stationary frame/viewport/cells/HUD through real spin + popup open/close; controls locked; held SPACE cannot skip next gate; tap works",
+    "magnet: stationary frame/viewport/cells/HUD through real spin + popup open/close; controls locked; held SPACE cannot skip next gate; tap works",
+    "slot: stationary frame/viewport/cells/HUD through real spin + popup open/close; controls locked; held SPACE cannot skip next gate; tap works",
+    "Wild1=WILD;2/4/8/16/32/64/128/256/512 replace it in one plaque, no old WILD image/badge/pill",
+    "Delayed symbol artwork response and viewport-height changes do not shift reels/cells/HUD"
+  ],
+  "geometry": {
+    "critter": {
+      "samples": 141,
+      "max": {
+        "host": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "frame": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "hud": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cell": [
+          0,
+          0
+        ]
+      },
+      "popup": {
+        "samples": 130,
+        "max": {
+          "host": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "frame": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "hud": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "cell": [
+            0,
+            0
+          ]
+        }
+      },
+      "browserChromeResize": {
+        "samples": 39,
+        "max": {
+          "host": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "frame": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "hud": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "cell": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "swamp": {
+      "samples": 156,
+      "max": {
+        "host": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "frame": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "hud": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cell": [
+          0,
+          0
+        ]
+      },
+      "popup": {
+        "samples": 56,
+        "max": {
+          "host": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "frame": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "hud": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "cell": [
+            0,
+            0
+          ]
+        }
+      },
+      "browserChromeResize": {
+        "samples": 41,
+        "max": {
+          "host": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "frame": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "hud": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "cell": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "vault_heist": {
+      "samples": 114,
+      "max": {
+        "host": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "frame": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "hud": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cell": [
+          0,
+          0
+        ]
+      },
+      "popup": {
+        "samples": 117,
+        "max": {
+          "host": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "frame": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "hud": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "cell": [
+            0,
+            0
+          ]
+        }
+      },
+      "browserChromeResize": {
+        "samples": 39,
+        "max": {
+          "host": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "frame": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "hud": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "cell": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "magnet": {
+      "samples": 146,
+      "max": {
+        "host": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "frame": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "hud": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cell": [
+          0,
+          0
+        ]
+      },
+      "popup": {
+        "samples": 108,
+        "max": {
+          "host": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "frame": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "hud": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "cell": [
+            0,
+            0
+          ]
+        }
+      },
+      "browserChromeResize": {
+        "samples": 39,
+        "max": {
+          "host": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "frame": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "hud": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "cell": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "slot": {
+      "samples": 107,
+      "max": {
+        "host": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "frame": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "hud": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cell": [
+          0,
+          0
+        ]
+      },
+      "popup": {
+        "samples": 109,
+        "max": {
+          "host": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "frame": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "hud": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "cell": [
+            0,
+            0
+          ]
+        }
+      },
+      "browserChromeResize": {
+        "samples": 39,
+        "max": {
+          "host": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "frame": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "hud": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "cell": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "delayedSymbolLoad": {
+      "samples": 31,
+      "max": {
+        "host": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "frame": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "hud": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cell": [
+          0,
+          0
+        ]
+      }
+    }
+  }
+}

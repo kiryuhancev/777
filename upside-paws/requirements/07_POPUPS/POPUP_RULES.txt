@@ -1,0 +1,42 @@
+UPSIDE PAWS — POPUP RULES
+
+All of these MUST be reel/game-contained:
+- Bonus Buy confirmation
+- Bonus Intro
+- Full Breach
+- Big Win
+- Bonus Complete
+
+No body-level fullscreen takeover.
+
+Popup overlay:
+- absolute inside combined Dual Grid/game viewport;
+- backdrop only over game area;
+- transform/opacity animation;
+- no layout reflow;
+- mobile width 75–90% of game viewport;
+- desktop width approx. 50–70%.
+
+Input:
+- SPACE desktop;
+- click/tap safe game area;
+- one input = one state transition;
+- prevent double fire and click-through.
+
+Suggested content:
+
+BONUS INTRO
+DIMENSION BREACH
+10 FREE SPINS
+TAP / SPACE TO CONTINUE
+
+FULL BREACH
+FULL BREACH
+THE WORLDS COLLIDE
+TAP / SPACE TO CONTINUE
+
+BONUS COMPLETE
+BONUS COMPLETE
+TOTAL WIN [amount]
+[winX]
+TAP / SPACE TO CONTINUE

@@ -1,0 +1,800 @@
+UPSIDE PAWS — MASTER IMPLEMENTATION SPEC
+Version: 1.0
+Project: VAULT
+Purpose: implement a new Dual Grid slot strictly according to this specification and provided visual references.
+
+======================================================================
+0. IMPLEMENTATION CONTRACT
+======================================================================
+
+READ THIS FILE COMPLETELY BEFORE WRITING CODE.
+
+Do not redesign mechanics, layout, UX, wallet behavior, popup behavior,
+bonus settlement, symbol relationships, or animation sequence unless this
+spec explicitly permits configuration.
+
+Preserve existing VAULT:
+- wallet;
+- authentication / Supabase;
+- persistence;
+- shared navigation/lobby;
+- existing games;
+- global formatting helpers;
+- common settings;
+- audio/settings infrastructure where present.
+
+Do not overwrite a working existing game.
+Implement UPSIDE PAWS as a new game/module/route using the project's existing conventions.
+
+Visual references define:
+- visual tone;
+- normal-vs-upside contrast;
+- paired pets;
+- portal language;
+- dual-world composition.
+
+They DO NOT authorize redesigning the universal VAULT HUD or changing the mechanics below.
+
+Core separation:
+GAME ENGINE determines the result first.
+PRESENTATION visualizes that deterministic result afterward.
+
+Never allow visual animation to generate, modify, reroll, or reinterpret payout results.
+
+======================================================================
+1. GAME IDENTITY
+======================================================================
+
+Working title:
+UPSIDE PAWS
+
+Core fantasy:
+Two versions of the same pet world exist simultaneously:
+A) NORMAL WORLD — bright, playful, warm, animated-pet neighborhood.
+B) UPSIDE WORLD — eerie alternate counterpart with strange light, spores,
+   broken geometry and mutated-but-recognizable versions of the SAME pets.
+
+Important:
+Do not copy named characters, exact designs, locations or proprietary assets
+from existing films/series. Use the reference only for broad tonal inspiration.
+
+The player must instantly understand:
+SAME PET / TWO VERSIONS / TWO CONNECTED WORLDS.
+
+======================================================================
+2. BASE LAYOUT — DUAL GRID
+======================================================================
+
+Two independent 4 x 4 grids.
+
+Desktop:
+NORMAL GRID on the LEFT.
+UPSIDE GRID on the RIGHT.
+A visible rift/portal seam separates them.
+
+Mobile:
+Both grids MUST remain visible in the same game screen.
+Preferred layout: stacked vertically if necessary.
+Do not hide one grid behind tabs, swipes, pages or carousels.
+
+Each grid:
+- 4 columns;
+- 4 rows;
+- 16 cells;
+- fixed physical viewport during a spin.
+
+Grid dimensions MUST NOT change during reel/spin/result/popup animations.
+
+Both grids belong to ONE paid round.
+There is one wager per combined Dual Grid spin, not one wager per grid.
+
+======================================================================
+3. SYMBOL SET
+======================================================================
+
+Low symbols:
+10, J, Q, K, A.
+
+Normal and Upside grids use paired visual versions of these symbols.
+
+Premium pet families:
+1. Dog
+2. Cat
+3. Rabbit
+4. Parrot / bird
+5. Hamster / guinea pig
+
+Every pet family has TWO linked visual IDs:
+pet.normal
+pet.upside
+
+These are counterparts of one symbol family, not unrelated symbols.
+
+Example:
+DOG_NORMAL and DOG_UPSIDE share the same paytable family unless the configured
+math explicitly differentiates them.
+
+Do not invent additional pet characters without explicit approval.
+
+======================================================================
+4. NORMAL / UPSIDE VISUAL RULE
+======================================================================
+
+Normal:
+- warm daylight;
+- playful;
+- cozy;
+- clean silhouettes;
+- inviting pet-world props.
+
+Upside:
+- same recognizable character identity;
+- darker purple/blue/magenta atmosphere;
+- strange organic/energy details;
+- altered silhouette details;
+- eerie but stylized;
+- NOT gore;
+- NOT realistic body horror;
+- still readable as the paired pet.
+
+The counterpart relationship must be obvious at slot-cell size.
+
+======================================================================
+5. BASE WIN MODEL
+======================================================================
+
+Use the existing chosen project-compatible win evaluator for each 4x4 grid,
+but the two grids must resolve independently before inter-grid mechanics run.
+
+Important ordering:
+
+1. predetermined round plan created;
+2. both grids visually spin;
+3. both grids settle;
+4. evaluate primary Normal grid wins;
+5. evaluate primary Upside grid wins;
+6. execute predetermined inter-grid feature presentation;
+7. apply at most ONE secondary evaluation caused by Echo/Portal;
+8. evaluate Resonance from finalized eligible positions;
+9. calculate total round win;
+10. win presentation;
+11. settle base-round payout once.
+
+NO CASCADES unless explicitly added in a future specification.
+
+There must never be an unbounded chain:
+Normal -> Upside -> Normal -> Upside -> ...
+
+MAXIMUM SECONDARY REACTION DEPTH = 1.
+
+======================================================================
+6. ECHO MECHANIC
+======================================================================
+
+ECHO is the main inter-world reaction.
+
+Concept:
+A qualifying event/win in one world may create a paired symbol effect in the
+corresponding position of the other world.
+
+Echo behavior MUST be fully described in roundPlan before animation.
+
+Recommended state:
+roundPlan.echoEvents = [
+  {
+    sourceWorld,
+    sourceCell,
+    targetWorld,
+    targetCell,
+    symbolFamily,
+    targetResultSymbol
+  }
+]
+
+Rules:
+- Echo target coordinate is deterministic.
+- Animation does NOT select its destination.
+- Echo may create or improve a win on the opposite grid.
+- After Echo transformations are applied, allow ONE secondary evaluation.
+- A secondary win may NOT generate another Echo.
+- No recursive loops.
+
+Visual:
+source symbol glows -> energy/paw-shaped trace enters central rift ->
+counterpart appears/transforms in target cell.
+
+======================================================================
+7. PORTAL WILD
+======================================================================
+
+PORTAL WILD is the principal special symbol.
+
+Visual:
+A rift/portal contained within the cell.
+It visibly suggests the opposite world is behind it.
+
+Behavior:
+- substitutes according to the game's configured Wild rules;
+- may link the same coordinate between the two worlds;
+- any copy/transfer/transformation is predetermined in roundPlan.
+
+A Portal Wild MUST NOT randomly choose a symbol during animation.
+
+Suggested plan object:
+portalEvents[]:
+{
+  world,
+  cell,
+  linkedWorld,
+  linkedCell,
+  copiedFamily,
+  finalSymbol
+}
+
+Portal animation:
+settled grids -> portal opens -> linked cell highlights -> transfer/copy effect ->
+portal resolves -> optional secondary evaluation.
+
+======================================================================
+8. MIRRORED PET / COUNTERPART LOGIC
+======================================================================
+
+A Normal pet and its Upside counterpart are one family.
+
+If a feature creates a Mirrored Pet:
+- it appears at the same coordinate in the opposite grid unless roundPlan
+  explicitly specifies another allowed coordinate;
+- the correct visual counterpart must be used.
+
+Never copy DOG_NORMAL into the Upside world unchanged.
+Use DOG_UPSIDE.
+
+Never copy UPSIDE visual art into the Normal world unchanged.
+
+======================================================================
+9. RESONANCE
+======================================================================
+
+Resonance rewards alignment between worlds.
+
+Definition:
+A coordinate qualifies for Resonance when the SAME coordinate contributes
+to eligible wins in BOTH finalized grids during the same paid round.
+
+Example:
+Normal R2C3 participates in a qualifying win
+AND
+Upside R2C3 participates in a qualifying win
+=> one Resonant Position.
+
+Proposed multiplier ladder:
+1 resonant position  = x2
+2 resonant positions = x3
+3 resonant positions = x5
+4+ resonant positions = x10
+
+These values must live in config, not scattered hardcoded constants.
+
+Resonance multiplier applies to the configured combined eligible win total
+for the round. Implement it in one clearly documented function so balancing
+can be changed later.
+
+Presentation:
+- matching coordinates light simultaneously;
+- energy beams connect across the central rift;
+- rift intensifies;
+- show RESONANCE xN inside the game/reel area.
+
+Do not obscure both grids with a fullscreen effect.
+
+======================================================================
+10. SCATTER
+======================================================================
+
+Special symbol:
+RIFT SCATTER.
+
+Visual:
+distinct round/oval/portal-like form factor.
+It must not look like a normal square pet tile.
+Label: SCATTER.
+
+Scatter trigger is counted ACROSS BOTH GRIDS.
+
+Example:
+2 Normal-grid Scatter + 1 Upside-grid Scatter = 3 Scatter trigger.
+
+Default trigger:
+3+ total Scatter => DIMENSION BREACH bonus.
+
+Scatter is evaluated independently from ordinary wins.
+
+Do not require Scatter to appear on specific columns unless future math config says so.
+
+======================================================================
+11. BONUS — DIMENSION BREACH
+======================================================================
+
+Bonus name:
+DIMENSION BREACH
+
+Initial recommended configuration:
+3 Scatter = 10 Free Spins
+4 Scatter = 12 Free Spins
+5 Scatter = 15 Free Spins
+6+ Scatter = 20 Free Spins
+
+All values configurable.
+
+Bonus core:
+- both grids remain active;
+- Portal Wild frequency increases;
+- Echo frequency increases;
+- Resonance remains active;
+- BREACH METER is visible.
+
+No separate unrelated minigame.
+The bonus amplifies the base Dual Grid fantasy.
+
+======================================================================
+12. BREACH METER
+======================================================================
+
+Bonus-only progression.
+
+Meter fills from configured events, for example:
+- Echo event;
+- Portal activation;
+- Resonance event.
+
+Exact charge values belong in configuration.
+
+When meter reaches 100%:
+- queue FULL BREACH for the NEXT eligible free spin;
+- show compact FULL BREACH notification;
+- do not resize layout.
+
+After Full Breach is consumed:
+- reset meter according to config.
+
+Persist:
+- current meter value;
+- queued Full Breach state.
+
+Reload MUST restore it exactly.
+
+======================================================================
+13. FULL BREACH SPIN
+======================================================================
+
+Full Breach is a single enhanced free spin.
+
+During Full Breach:
+- increased mirrored/portal activity according to predetermined roundPlan;
+- stronger world synchronization;
+- visually stronger rift;
+- still only ONE allowed secondary evaluation;
+- no infinite reaction chains.
+
+Full Breach is NOT permission to change the payout after animations begin.
+
+At end:
+return to normal bonus rules unless another Full Breach has been earned.
+
+======================================================================
+14. BONUS BUY
+======================================================================
+
+Use the shared VAULT Bonus Buy UX.
+
+Flow:
+BONUS button
+-> bonus selection popup
+-> choose DIMENSION BREACH
+-> custom in-game confirmation popup
+-> YES / NO
+
+NO:
+close safely, no debit, no feature.
+
+YES:
+1. validate balance;
+2. debit purchase cost ONCE;
+3. lock duplicate input;
+4. play a special PRESENTATION TRIGGER SPIN;
+5. this trigger spin visually lands the required Scatter;
+6. DO NOT charge another normal spin wager;
+7. show Bonus Intro popup;
+8. wait for SPACE/click/tap;
+9. start free spins.
+
+Do NOT teleport directly from payment to the first free spin.
+
+Bonus-buy trigger result must be clearly tagged as presentation-only where required
+so it cannot settle an additional wager/payout incorrectly.
+
+======================================================================
+15. BONUS PAYOUT SETTLEMENT — UNIVERSAL VAULT RULE
+======================================================================
+
+During free spins:
+wallet balance MUST NOT increase after each individual free spin.
+
+Instead:
+bonusSession.totalWin += each bonus spin win.
+
+UI may show:
+BONUS WIN = running accumulated total.
+
+Real wallet remains unchanged during active bonus, other than the already-paid
+base trigger wager or Bonus Buy purchase.
+
+When the entire bonus ends:
+- finalize bonus result;
+- transition to BONUS_COMPLETE;
+- settle bonusSession.totalWin to wallet EXACTLY ONCE.
+
+Required state:
+bonusSession.id
+bonusSession.totalWin
+bonusSession.status
+bonusSession.settled
+
+Settlement must be idempotent.
+
+Reload cases:
+- mid bonus: resume without losing accumulated win;
+- final free spin resolved but popup not dismissed: do not duplicate;
+- bonus already settled: never settle again.
+
+======================================================================
+16. UNIVERSAL VAULT HUD
+======================================================================
+
+Use the existing universal VAULT slot HUD architecture.
+Do not invent a completely new control system.
+
+Maintain semantic order:
+Settings
+Balance
+Bet -
+Bet amount
+Bet +
+Auto
+Max
+Spin
+Bonus / Buy Feature
+
+Spin remains the dominant control.
+
+UPSIDE PAWS may skin the HUD:
+Normal-side warmth + Upside-side rift accents.
+
+Do not alter common control behavior.
+
+Top information:
+LAST WIN
+STATUS / MODE
+contextual FEATURE information
+
+Bonus:
+show FREE SPINS and BONUS WIN clearly.
+
+======================================================================
+17. POPUP SYSTEM — REEL/GAME CONTAINED
+======================================================================
+
+NO fullscreen bonus popups.
+
+All slot feature popups must be rendered inside the main game/grid viewport.
+
+Popup types:
+- Bonus Buy confirmation
+- Bonus Intro
+- Full Breach
+- Big Win
+- Bonus Complete
+
+Backdrop dims ONLY the game/grid area.
+Do not dim the entire web page.
+
+HUD should remain visible where possible.
+
+Desktop approximate popup width:
+50–70% of combined dual-grid viewport.
+
+Mobile:
+75–90% of game viewport width.
+
+Use:
+position:absolute
+transform
+opacity
+
+Do NOT insert popups into document flow in a way that changes game height.
+
+Continue:
+SPACE on desktop
+click/tap inside safe game area
+
+One input = one transition.
+Prevent click-through and double fire.
+
+While blocking popup open:
+Spin / Auto / Bet / Max / Bonus controls locked as appropriate.
+
+======================================================================
+18. WIN PRESENTATION — UNIVERSAL RULES
+======================================================================
+
+WIN = current paid round.
+LAST WIN = previous completed paid round.
+BONUS WIN = accumulated bonus-session win.
+
+When showing a win:
+- winning symbols remain bright;
+- non-winning symbols dim;
+- highlight relevant symbols in each world;
+- if Resonance, highlight corresponding coordinates together.
+
+Recommended win tiers remain configurable:
+<5x normal
+5–15x strong
+15–30x NICE
+30–75x BIG
+75–150x MEGA
+150–500x EPIC
+500x+ LEGENDARY
+
+Big Win popup:
+- inside game area;
+- amount counts upward;
+- coefficient counts upward;
+- first input completes count;
+- second input closes if project behavior follows this convention;
+- payout logic must remain separate from presentation.
+
+======================================================================
+19. SPIN / REEL ANIMATION
+======================================================================
+
+Both grids begin as one synchronized paid spin.
+
+Important:
+The DOM/game view MUST remain dimensionally stable.
+
+Before animation starts:
+roundPlan is complete:
+- final symbols Normal;
+- final symbols Upside;
+- Scatter;
+- Portal;
+- Echo;
+- Resonance-relevant data;
+- bonus trigger;
+- Full Breach data.
+
+Animation lifecycle:
+
+REQUEST
+-> LOCK INPUT
+-> CREATE ROUND PLAN
+-> PREPARE BOTH GRID STRIPS/LAYERS
+-> ACCELERATE
+-> FULL SPEED
+-> DECELERATE
+-> SETTLE BOTH GRIDS
+-> PRIMARY EVALUATION VISUALS
+-> PORTAL/ECHO PRESENTATION
+-> OPTIONAL ONE SECONDARY EVALUATION
+-> RESONANCE PRESENTATION
+-> WIN PRESENTATION
+-> SETTLEMENT
+-> READY
+
+Recommended Normal pacing:
+Grid/reel stop should feel deliberate rather than instant.
+Use stagger within a grid if the existing engine is reel-based, while keeping
+both worlds visually coordinated.
+
+Profiles:
+Normal = 100%
+Quick = ~70%
+Turbo = ~40%
+Reduced Motion = minimal translation/effects, preserve gameplay readability.
+
+Use transform: translate3d(...) and opacity for moving visual layers.
+
+Do NOT animate layout properties:
+top
+left
+width
+height
+margin
+padding
+
+Preload symbol assets.
+Cell boxes and grid boxes must have known dimensions before assets appear.
+
+======================================================================
+20. MOBILE STABILITY
+======================================================================
+
+Critical acceptance requirement:
+NO visible jump/shake when:
+- spin begins;
+- symbols move;
+- grids stop;
+- Echo occurs;
+- Portal activates;
+- Resonance appears;
+- popup opens/closes;
+- bonus begins/ends.
+
+Both grid containers must be fixed for the current responsive breakpoint.
+
+If stacked:
+their reserved space exists before the spin.
+
+Do not dynamically insert a second grid after spin starts.
+
+Prevent:
+- image intrinsic-size layout shift;
+- font layout shift affecting grid frame;
+- border/padding dimension changes;
+- popup flow resizing;
+- orientation overflow;
+- horizontal page overflow.
+
+Test portrait mobile thoroughly.
+
+======================================================================
+21. RESPONSIVE DESIGN
+======================================================================
+
+Desktop:
+two grids side by side.
+
+Tablet:
+side-by-side when legible; otherwise responsive stacked arrangement.
+
+Mobile:
+both grids visible, typically stacked.
+
+Never shrink symbols until they are illegible merely to preserve desktop layout.
+
+No horizontal scrolling.
+
+Rift relationship must remain visually apparent in stacked mode, e.g. a horizontal
+rift separator/connector replacing the desktop vertical seam.
+
+======================================================================
+22. AUDIO / FX GUIDANCE
+======================================================================
+
+Use project audio conventions.
+
+Suggested differentiation:
+Normal world: playful, warm, light.
+Upside: low distorted echoes / spectral layer.
+Portal: dimensional whoosh.
+Resonance: synchronized harmonic impact.
+Full Breach: stronger but short impact.
+
+Respect sound settings.
+
+Do not let audio timing determine game result.
+
+======================================================================
+23. PERSISTENCE
+======================================================================
+
+Persist all state necessary to resume safely:
+- active base/bonus mode;
+- bonusSession ID;
+- remaining free spins;
+- bonusSession.totalWin;
+- bonusSession.settled;
+- Breach Meter;
+- queued Full Breach;
+- any deterministic round state required by project's recovery model.
+
+Never regenerate a completed unsettled round after reload.
+
+Never settle twice.
+
+======================================================================
+24. IMPLEMENTATION ORDER
+======================================================================
+
+Follow this order:
+
+PHASE 1
+- route/game shell
+- shared HUD integration
+- fixed dual-grid layout
+- responsive/mobile layout
+
+PHASE 2
+- deterministic base spin
+- both-grid rendering
+- base win evaluation
+
+PHASE 3
+- paired pet/symbol model
+- Portal Wild
+- Echo
+- one secondary evaluation cap
+- Resonance
+
+PHASE 4
+- Scatter / bonus trigger
+- DIMENSION BREACH
+- Breach Meter
+- Full Breach
+
+PHASE 5
+- Bonus Buy trigger-spin flow
+- bonus payout accumulation and single settlement
+
+PHASE 6
+- popups
+- win presentation
+- animations/audio
+
+PHASE 7
+- persistence/reload hardening
+- mobile performance
+- all test cases
+- regression of existing games
+
+Do not start polish before the deterministic mechanic state machine works.
+
+======================================================================
+25. PROHIBITED INTERPRETATIONS
+======================================================================
+
+DO NOT:
+- turn the game into a single 8x4 grid;
+- hide one world during play;
+- turn Echo into unlimited cascades;
+- allow animations to pick RNG outcomes;
+- make Normal and Upside pets unrelated characters;
+- use a fullscreen bonus popup;
+- update wallet after every free spin;
+- directly launch purchased bonus without trigger-spin presentation;
+- change global HUD semantics;
+- introduce new mechanics not described here;
+- modify other VAULT games to implement this slot;
+- cause mobile layout shifts;
+- create a second settlement path.
+
+======================================================================
+26. DEFINITION OF DONE
+======================================================================
+
+The feature is complete only when:
+- core mechanics match this spec;
+- visual relationships are understandable;
+- all tests in 09_TESTS/TEST_CASES.txt pass;
+- no duplicate settlement;
+- no recursive Echo;
+- no mobile layout jumping;
+- reload behavior is correct;
+- existing VAULT games are regression-safe;
+- console has no relevant runtime errors.
+
+Final implementation report must state:
+DUAL GRID IMPLEMENTED
+NORMAL / UPSIDE COUNTERPARTS IMPLEMENTED
+ECHO DEPTH LIMITED TO ONE
+PORTAL WILD IMPLEMENTED
+RESONANCE IMPLEMENTED
+DIMENSION BREACH IMPLEMENTED
+BREACH METER / FULL BREACH IMPLEMENTED
+BONUS WALLET SETTLES ONCE AT END
+BONUS BUY USES TRIGGER SPIN
+POPUPS ARE GAME-CONTAINED
+MOBILE LAYOUT STABLE
+RELOAD / SETTLEMENT TESTS PASS
+EXISTING VAULT GAMES UNAFFECTED

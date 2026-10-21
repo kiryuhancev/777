@@ -10,3 +10,21 @@
 .slot-animation-debug label{display:flex;justify-content:space-between;gap:10px}.slot-animation-debug output{overflow-wrap:anywhere}
 @media(prefers-reduced-motion:reduce){[data-slot-landing]::after{display:none}}
 body.slot-reduced-motion [data-slot-landing]::after{display:none}
+
+/* Stable viewports: intrinsic image size and scroll anchoring cannot move a frame. */
+body.slot-active,body.swamp-active,body.heist-active,body.magnet-active,body.critter-active{overflow-anchor:none}
+#grid,#swampReels,#heistReels,#magnetField,#critterGrid{overflow:hidden;overflow-anchor:none;flex-shrink:0}
+[data-reel-geometry-locked]{transition:none!important}
+#swampReels{aspect-ratio:1.8;grid-template-rows:minmax(0,1fr)}
+#swampReels>.swamp-reel{height:100%;min-height:0;aspect-ratio:auto}
+#swampReels .swamp-cell,#heistReels .heist-cell,#critterGrid .critter-cell{min-width:0;min-height:0}
+#critterApp .critter-cell>svg,#critterApp .critter-cell>.critter-scatter-art{position:absolute;inset:1%;width:98%;height:98%}
+#critterApp .critter-cell>.critter-tile-art{inset:0;width:100%;height:100%}
+#critterApp #critterMessage{height:32px;max-height:32px;overflow:hidden}
+body .slot-top-status{height:72px;max-height:72px;overflow:hidden}
+body .slot-top-status>div{overflow:hidden}
+body .slot-status-mode strong,body .slot-status-feature strong{overflow:hidden;max-height:3.4em}
+@media(max-width:760px){body .slot-top-status{height:62px;min-height:62px;max-height:62px}#critterApp #critterMessage{height:38px;max-height:38px}}
+#critterApp #critterLogo{aspect-ratio:3/1;object-fit:contain}
+/* The account balance may gain digits during count-up; never let it wrap the shell header. */
+@media(max-width:760px){body.game-mode .lobby-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);grid-template-rows:44px 30px;gap:4px 8px;height:98px;min-height:98px;padding:8px 0}body.game-mode .vault-brand-lockup{grid-column:1;grid-row:1;min-width:0}body.game-mode .vault-account-bar{grid-column:2;grid-row:1;min-width:0;max-width:100%;margin:0;justify-content:flex-end}body.game-mode .vault-shell-back{grid-column:1/-1;grid-row:2;justify-self:start}body.game-mode .lobby-balance{min-width:0;flex-shrink:1}body.game-mode .lobby-balance strong{overflow:hidden;text-overflow:ellipsis}body.game-mode .vault-auth-actions{flex-shrink:0}}

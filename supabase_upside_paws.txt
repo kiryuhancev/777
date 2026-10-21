@@ -1,0 +1,202 @@
+-- UPSIDE PAWS additive migration, after supabase_big_top.txt. Re-runnable; no balances reset.
+begin;
+create or replace function public.upside_paws_capabilities() returns jsonb language sql stable set search_path='' as $$select '{"version":1}'::jsonb$$;
+revoke all on function public.upside_paws_capabilities() from public,anon;
+grant execute on function public.upside_paws_capabilities() to authenticated;
+create or replace function public.upside_paws_grid_result(g jsonb) returns jsonb language plpgsql immutable set search_path='' as $$
+declare ids text[]:=array['ten','j','q','k','a','dog','cat','rabbit','bird','hamster'];pay numeric[][]:=array[[.035,.08],[.04,.09],[.045,.1],[.05,.12],[.06,.14],[.08,.2],[.1,.25],[.12,.3],[.15,.4],[.2,.5]];i integer;r integer;j integer;len integer;ways integer;pure_len integer:=0;pure integer:=1;hits integer[];positions integer[];pure_positions integer[]:=array[]::integer[];all_positions integer[]:=array[]::integer[];wins jsonb:='[]';total numeric:=0;v numeric;
+begin
+ if jsonb_typeof(g) is distinct from 'array' or jsonb_array_length(g)<>16 then raise exception 'Invalid dual grid';end if;
+ for j in 0..15 loop if not coalesce(g->j->>'family'=any(ids) or g->j->>'family' in ('portal','scatter'),false) then raise exception 'Invalid family';end if;end loop;
+ for r in 0..3 loop select array_agg(k) into hits from generate_series(0,15) k where k%4=r and g->k->>'family'='portal';if hits is null then exit;end if;pure_len:=pure_len+1;pure:=pure*cardinality(hits);pure_positions:=pure_positions||hits;end loop;
+ for i in 1..10 loop len:=0;ways:=1;positions:=array[]::integer[];
+  for r in 0..3 loop select array_agg(k) into hits from generate_series(0,15) k where k%4=r and g->k->>'family' in (ids[i],'portal');if hits is null then exit;end if;len:=len+1;ways:=ways*cardinality(hits);positions:=positions||hits;end loop;
+  if len<3 then continue;end if;if pure_len>=len then ways:=ways-pure;end if;
+  if ways>0 then v:=round(pay[i][len-2]*ways*2.58,6);total:=total+v;wins:=wins||jsonb_build_array(jsonb_build_object('family',ids[i],'length',len,'ways',ways,'positions',positions,'winX',v));all_positions:=all_positions||positions;end if;
+ end loop;
+ if pure_len>=3 then v:=round(pay[10][pure_len-2]*pure*2.58,6);total:=total+v;wins:=wins||jsonb_build_array(jsonb_build_object('family','portal','length',pure_len,'ways',pure,'positions',pure_positions,'winX',v));all_positions:=all_positions||pure_positions;end if;
+ select coalesce(array_agg(distinct k order by k),array[]::integer[]) into all_positions from unnest(all_positions) k;
+ return jsonb_build_object('wins',wins,'positions',all_positions,'winX',round(total,6));
+end$$;
+revoke all on function public.upside_paws_grid_result(jsonb) from public,anon,authenticated;
+create or replace function public.upside_paws_validate_plan(p jsonb,is_bonus boolean,previous jsonb default null) returns numeric language plpgsql immutable set search_path='' as $$
+declare w text;other text;j integer;f text;e jsonb;initial jsonb:=p->'initialGrid';final jsonb;primary_results jsonb:='{}';results jsonb:='{}';sc integer:=0;count integer;depth integer;meter integer:=0;armed boolean:=false;charge integer:=0;positions jsonb;mult integer;value numeric;eligible numeric;seen text[]:=array[]::text[];key text;expected jsonb;portals jsonb:='[]';
+begin
+ if jsonb_typeof(initial) is distinct from 'object' or jsonb_typeof(p->'echoEvents') is distinct from 'array' or jsonb_typeof(p->'portalEvents') is distinct from 'array' or jsonb_array_length(p->'echoEvents')>32 then raise exception 'Invalid reactions';end if;
+ final:=initial;
+ foreach w in array array['normal','upside'] loop other:=case w when 'normal' then 'upside' else 'normal' end;primary_results:=primary_results||jsonb_build_object(w,public.upside_paws_grid_result(initial->w));
+ for j in 0..15 loop f:=initial->w->j->>'family';if initial->w->j->>'visualId' is distinct from f||'.'||w then raise exception 'Counterpart mismatch';end if;if f='scatter' then sc:=sc+1;end if;
+ if f='portal' and initial->other->j->>'family' in ('ten','j','q','k','a','dog','cat','rabbit','bird','hamster') then e:=jsonb_build_object('world',w,'cell',j,'linkedWorld',other,'linkedCell',j,'copiedFamily',initial->other->j->>'family','finalSymbol',jsonb_build_object('family',initial->other->j->>'family','visualId',(initial->other->j->>'family')||'.'||w));portals:=portals||jsonb_build_array(e);final:=jsonb_set(final,array[w,j::text],e->'finalSymbol');end if;
+ end loop;end loop;
+ if primary_results is distinct from p->'primary' or portals is distinct from p->'portalEvents' then raise exception 'Primary or Portal mismatch';end if;
+ for e in select * from jsonb_array_elements(p->'echoEvents') loop
+ w:=e->>'sourceWorld';other:=e->>'targetWorld';j:=(e->>'sourceCell')::integer;f:=e->>'symbolFamily';key:=other||':'||j;
+ if w not in ('normal','upside') or other is distinct from (case w when 'normal' then 'upside' else 'normal' end) or j not between 0 and 15 or (e->>'targetCell')::integer is distinct from j or f not in ('dog','cat','rabbit','bird','hamster') or initial->w->j->>'family' is distinct from f or not(primary_results->w->'positions' @> to_jsonb(j)) or initial->other->j->>'family'='scatter' or key=any(seen) then raise exception 'Invalid Echo';end if;
+ expected:=jsonb_build_object('family',f,'visualId',f||'.'||other);if expected is distinct from e->'targetResultSymbol' then raise exception 'Echo counterpart mismatch';end if;seen:=array_append(seen,key);final:=jsonb_set(final,array[other,j::text],expected);
+ end loop;
+ if final is distinct from p->'finalGrid' then raise exception 'Final grid mismatch';end if;
+ depth:=case when jsonb_array_length(portals)+jsonb_array_length(p->'echoEvents')>0 then 1 else 0 end;if (p->>'secondaryDepth')::integer is distinct from depth then raise exception 'Recursive reaction';end if;
+ foreach w in array array['normal','upside'] loop results:=results||jsonb_build_object(w,public.upside_paws_grid_result(final->w));end loop;
+ if results is distinct from p->'finalWins' then raise exception 'Secondary mismatch';end if;
+ select coalesce(jsonb_agg(n order by n),'[]') into positions from generate_series(0,15) n where results->'normal'->'positions' @> to_jsonb(n) and results->'upside'->'positions' @> to_jsonb(n);
+ mult:=case jsonb_array_length(positions) when 0 then 1 when 1 then 2 when 2 then 3 when 3 then 5 else 10 end;eligible:=round((results->'normal'->>'winX')::numeric+(results->'upside'->>'winX')::numeric,6);value:=round(eligible*mult,6);
+ if p->'resonance' is distinct from jsonb_build_object('positions',positions,'multiplier',mult,'eligibleWinX',eligible,'winX',value) then raise exception 'Resonance mismatch';end if;
+ count:=case when sc>=6 then 20 when sc=5 then 15 when sc=4 then 12 when sc=3 then 10 else 0 end;
+ if sc is distinct from (p->>'scatters')::integer or count is distinct from (p->>'freeSpins')::integer then raise exception 'Scatter mismatch';end if;
+ if is_bonus then meter:=coalesce((previous->>'meterAfter')::integer,0);armed:=coalesce((previous->>'armedAfter')::boolean,false);charge:=jsonb_array_length(p->'echoEvents')*8+jsonb_array_length(portals)*10+case when jsonb_array_length(positions)>0 then 12 else 0 end;end if;
+ if meter is distinct from (p->>'meterBefore')::integer or armed is distinct from (p->>'armedBefore')::boolean or armed is distinct from (p->>'fullBreach')::boolean then raise exception 'Breach queue mismatch';end if;
+ meter:=case when is_bonus then least(100,case when armed then 0 else meter end+charge) else 0 end;
+ if meter is distinct from (p->>'meterAfter')::integer or (is_bonus and meter>=100) is distinct from (p->>'armedAfter')::boolean then raise exception 'Meter mismatch';end if;
+ if coalesce((p->>'purchase')::boolean,false) then if is_bonus or sc<>3 then raise exception 'Invalid purchase trigger';end if;value:=0;end if;
+ if value is distinct from (p->>'winX')::numeric then raise exception 'Dual-grid payout mismatch';end if;return value;
+end$$;
+revoke all on function public.upside_paws_validate_plan(jsonb,boolean,jsonb) from public,anon,authenticated;
+alter table public.game_stats drop constraint if exists game_stats_game_id_check;
+alter table public.game_stats add constraint game_stats_game_id_check check(game_id in ('slot','poker','bird','blackjack','baccarat','swamp','mines','vault_heist','magnet','critter','big_top','upside_paws'));
+alter table public.game_rounds drop constraint if exists game_rounds_game_id_check;
+alter table public.game_rounds add constraint game_rounds_game_id_check check(game_id in ('slot','poker','bird','blackjack','baccarat','swamp','mines','vault_heist','magnet','critter','big_top','upside_paws'));
+alter table public.user_settings drop constraint if exists user_settings_last_game_id_check;
+alter table public.user_settings add constraint user_settings_last_game_id_check check(last_game_id in ('lobby','slot','poker','bird','blackjack','baccarat','swamp','mines','vault_heist','magnet','critter','big_top','upside_paws'));
+alter table public.vault_bonus_sessions drop constraint if exists vault_bonus_sessions_game_id_check;
+alter table public.vault_bonus_sessions add constraint vault_bonus_sessions_game_id_check check(game_id in ('slot','swamp','vault_heist','magnet','critter','big_top','upside_paws'));
+create or replace function public.settle_upside_paws_round(p_round_id uuid,p_expected_revision bigint,p_checkpoint jsonb) returns jsonb language plpgsql security definer set search_path='' as $$
+declare u uuid:=auth.uid();c jsonb:=p_checkpoint;w public.wallets;r public.game_rounds;p jsonb;previous jsonb;stake numeric;base numeric;bonus numeric:=0;total numeric;pay numeric;count integer;progress jsonb;
+begin
+ if u is null then raise exception 'Authentication required';end if;
+ if c->>'version' is distinct from '1' or c->>'roundId' is distinct from p_round_id::text or c->>'status' is distinct from 'SETTLED' or octet_length(c::text)>1000000 or (c->>'seed')::bigint not between 0 and 4294967295 or (c->>'bet')::numeric<=0 or (c->>'bet')::numeric>1000000000 then raise exception 'Invalid Upside Paws round';end if;
+ stake:=round((c->>'bet')::numeric*case when (c->>'purchase')::boolean then 17 else 1 end,6);if stake is distinct from (c->>'cost')::numeric then raise exception 'Invalid purchase cost';end if;
+ base:=least(10000,public.upside_paws_validate_plan(c->'base',false));count:=(c->'base'->>'freeSpins')::integer;
+ if (count=0) is distinct from (c->'bonus'='null'::jsonb) or (c->>'purchase')::boolean is distinct from (c->'base'->>'purchase')::boolean then raise exception 'Invalid bonus entitlement';end if;
+ if count>0 and current_setting('vault.upsidepaws.escrow',true) is distinct from 'on' then raise exception 'Bonus escrow required';end if;
+ if count>0 then
+  if (c->'bonus'->>'spinCount')::integer is distinct from count or jsonb_array_length(c->'bonus'->'spins') is distinct from count then raise exception 'Invalid free spins';end if;
+  for p in select * from jsonb_array_elements(c->'bonus'->'spins') loop bonus:=bonus+public.upside_paws_validate_plan(p,true,previous);previous:=p;end loop;
+ end if;
+ bonus:=round(least(10000-base,bonus),6);total:=round(base+bonus,6);pay:=round(total*(c->>'bet')::numeric,6);
+ if base is distinct from (c->>'baseWinX')::numeric or bonus is distinct from (c->>'bonusWinX')::numeric or total is distinct from (c->>'winX')::numeric or pay is distinct from (c->>'payout')::numeric or count>0 and bonus is distinct from (c->'bonus'->>'totalWinX')::numeric then raise exception 'Invalid Upside Paws settlement';end if;
+ select * into w from public.wallets where user_id=u for update;if not found then raise exception 'Wallet missing';end if;
+ select * into r from public.game_rounds where round_id=p_round_id and user_id=u;if found then if r.game_id<>'upside_paws' or r.metadata->'upsidePaws' is distinct from c then raise exception 'VAULT_WALLET_CONFLICT';end if;return jsonb_build_object('balance',w.balance,'revision',w.revision,'duplicate',true);end if;
+ if exists(select 1 from public.game_rounds where round_id=p_round_id) or w.revision is distinct from p_expected_revision or w.balance<stake then raise exception 'VAULT_WALLET_CONFLICT';end if;
+ if not public.vault_game_access() then raise exception 'VAULT_ACCOUNT_DISABLED';end if;
+ if exists(select 1 from public.vault_bonus_sessions where user_id=u and game_id='upside_paws' and status='active') then raise exception 'Bonus active';end if;
+ progress:=jsonb_build_object('version',1,'roundId',p_round_id,'baseDone',false,'introDone',false,'nextSpin',0,'totalWinX',0,'meter',0,'armed',false,'complete',false);
+ insert into public.game_rounds(round_id,user_id,game_id,bet,payout,multiplier,result,status,metadata,settled_at) values(p_round_id,u,'upside_paws',stake,pay,total,c->>'result','settled',jsonb_build_object('upsidePaws',c),now());
+ update public.wallets set balance=balance-stake+pay-round(base*(c->>'bet')::numeric,6),revision=revision+1,recovery=recovery||jsonb_build_object('upsidePawsRound',c,'upsidePawsProgress',progress),updated_at=now() where user_id=u returning * into w;
+ insert into public.game_stats(user_id,game_id,rounds_played,total_wagered,total_won,biggest_win,biggest_multiplier) values(u,'upside_paws',1,stake,pay,pay,total) on conflict(user_id,game_id) do update set rounds_played=public.game_stats.rounds_played+1,total_wagered=public.game_stats.total_wagered+excluded.total_wagered,total_won=public.game_stats.total_won+excluded.total_won,biggest_win=greatest(public.game_stats.biggest_win,excluded.biggest_win),biggest_multiplier=greatest(public.game_stats.biggest_multiplier,excluded.biggest_multiplier),updated_at=now();
+ update public.profiles set xp=xp+10,level=1+(xp+10)/1000 where id=u;
+ return jsonb_build_object('balance',w.balance,'revision',w.revision,'duplicate',false);
+end $$;
+revoke all on function public.settle_upside_paws_round(uuid,bigint,jsonb) from public,anon;
+grant execute on function public.settle_upside_paws_round(uuid,bigint,jsonb) to authenticated;
+
+create or replace function public.credit_upside_paws_base(p_round_id uuid,p_expected_revision bigint) returns jsonb language plpgsql security definer set search_path='' as $$
+declare u uuid:=auth.uid();w public.wallets;c jsonb;p jsonb;credit numeric;
+begin
+ if u is null then raise exception 'Authentication required';end if;
+ select * into w from public.wallets where user_id=u for update;c:=w.recovery->'upsidePawsRound';p:=w.recovery->'upsidePawsProgress';
+ if c->>'roundId' is distinct from p_round_id::text or p->>'roundId' is distinct from p_round_id::text then raise exception 'Round identity mismatch';end if;
+ if (p->>'baseDone')::boolean then return jsonb_build_object('balance',w.balance,'revision',w.revision,'duplicate',true);end if;
+ if w.revision is distinct from p_expected_revision then raise exception 'VAULT_WALLET_CONFLICT';end if;
+ credit:=round((c->>'baseWinX')::numeric*(c->>'bet')::numeric,6);p:=jsonb_set(p,'{baseDone}','true');
+ update public.wallets set balance=balance+credit,revision=revision+1,recovery=jsonb_set(recovery,'{upsidePawsProgress}',p,true),updated_at=now() where user_id=u returning * into w;
+ return jsonb_build_object('balance',w.balance,'revision',w.revision,'duplicate',false);
+end $$;
+revoke all on function public.credit_upside_paws_base(uuid,bigint) from public,anon;
+grant execute on function public.credit_upside_paws_base(uuid,bigint) to authenticated;
+
+create or replace function public.save_upside_paws_progress(p_round_id uuid,p_progress jsonb) returns jsonb language plpgsql security definer set search_path='' as $$
+declare u uuid:=auth.uid();w public.wallets;c jsonb;old jsonb;p jsonb:=p_progress;last jsonb;n integer;count integer;total numeric:=0;expected jsonb;
+begin
+ if u is null then raise exception 'Authentication required';end if;
+ select * into w from public.wallets where user_id=u for update;c:=w.recovery->'upsidePawsRound';old:=w.recovery->'upsidePawsProgress';
+ if c->>'roundId' is distinct from p_round_id::text or p->>'roundId' is distinct from p_round_id::text then raise exception 'Progress identity mismatch';end if;
+ if coalesce((p->>'baseDone')::boolean,false) and not coalesce((old->>'baseDone')::boolean,false) then raise exception 'Base credit checkpoint required';end if;
+ n:=(p->>'nextSpin')::integer;count:=coalesce((c->'bonus'->>'spinCount')::integer,0);
+ if n is null or n<0 or n>count or n>0 and not(coalesce((p->>'introDone')::boolean,false) and coalesce((p->>'baseDone')::boolean,false)) then raise exception 'Invalid progress';end if;
+ if n>0 then select coalesce(sum((s->>'winX')::numeric),0) into total from jsonb_array_elements(c->'bonus'->'spins') with ordinality x(s,i) where i<=n;last:=c->'bonus'->'spins'->(n-1);end if;
+ expected:=jsonb_build_object('version',1,'roundId',p_round_id,'baseDone',(p->>'baseDone')::boolean,'introDone',(p->>'introDone')::boolean,'nextSpin',n,'totalWinX',round(least((c->>'bonusWinX')::numeric,total),6),'meter',coalesce((last->>'meterAfter')::integer,0),'armed',coalesce((last->>'armedAfter')::boolean,false),'complete',(p->>'complete')::boolean);
+ if p is distinct from expected or coalesce((p->>'complete')::boolean,false) and (not (p->>'baseDone')::boolean or n<>count) then raise exception 'Invalid stable checkpoint';end if;
+ if n<coalesce((old->>'nextSpin')::integer,0) or (old->>'complete')::boolean and not(p->>'complete')::boolean or (old->>'baseDone')::boolean and not(p->>'baseDone')::boolean or (old->>'introDone')::boolean and not(p->>'introDone')::boolean then return jsonb_build_object('progress',old,'duplicate',true);end if;
+ update public.wallets set recovery=jsonb_set(recovery,'{upsidePawsProgress}',p,true) where user_id=u;return jsonb_build_object('progress',p);
+end $$;
+revoke all on function public.save_upside_paws_progress(uuid,jsonb) from public,anon;
+grant execute on function public.save_upside_paws_progress(uuid,jsonb) to authenticated;
+
+-- Backward-compatible additive escrow dispatch. Existing game branches unchanged.
+create or replace function public.apply_bonus_checkpoint(p_action text,p_payload jsonb,p_session_id uuid,p_game_id text) returns jsonb
+language plpgsql security definer set search_path='' as $$
+declare u uuid:=auth.uid();w public.wallets;s public.vault_bonus_sessions;r jsonb;c jsonb:=p_payload->'p_checkpoint';rid uuid:=(p_payload->>'p_round_id')::uuid;key text;held numeric:=0;rev bigint;existing boolean;mirror jsonb;
+begin
+ if u is null or p_game_id not in ('slot','swamp','vault_heist','magnet','critter','big_top','upside_paws') or p_action not in ('begin','settle','critter','heist','magnet','big_top','upside_paws') or p_session_id is null or rid is null then raise exception 'Invalid bonus event';end if;
+ if p_action in ('begin','settle') and p_payload->>'p_game_id' is distinct from p_game_id or p_action='upside_paws' and p_game_id<>'upside_paws' or p_action='big_top' and p_game_id<>'big_top' or p_action='critter' and p_game_id<>'critter' or p_action='heist' and p_game_id<>'vault_heist' or p_action='magnet' and p_game_id<>'magnet' then raise exception 'Bonus game mismatch';end if;
+ select * into w from public.wallets where user_id=u for update;if not found then raise exception 'Wallet missing';end if;
+ select * into s from public.vault_bonus_sessions where user_id=u and session_id=p_session_id;existing:=found;
+ if existing and s.game_id<>p_game_id then raise exception 'Bonus identity mismatch';end if;
+ key:=p_action||':'||rid::text||':'||coalesce(c->>'step','0');
+ if exists(select 1 from public.vault_bonus_events where user_id=u and session_id=p_session_id and event_key=key) then return jsonb_build_object('balance',w.balance,'revision',w.revision,'duplicate',true);end if;
+ if existing and s.status='settled' then raise exception 'Bonus already settled';end if;
+ if not existing then
+  if p_session_id<>rid then raise exception 'Bonus root missing';end if;
+  if p_action in ('big_top','upside_paws') and (c->'bonus' is null or c->'bonus'='null') then raise exception 'Bonus entitlement missing';end if;
+  if p_action='critter' and (c->'bonus' is null or c->'bonus'='null') or p_action='magnet' and coalesce((c->'bonus'->>'triggered')::boolean,false)=false or p_action='heist' and c->>'status'='SETTLED' and c->>'result'='base' then raise exception 'Bonus entitlement missing';end if;
+  if p_action='settle' and (p_payload->'p_recovery'->(case when p_game_id='slot' then 'slotBonus' else 'swampBonus' end) is null or p_payload->'p_recovery'->(case when p_game_id='slot' then 'slotBonus' else 'swampBonus' end)='null') then raise exception 'Bonus checkpoint missing';end if;
+ end if;
+ rev:=case when existing then w.revision else (p_payload->>'p_expected_revision')::bigint end;
+ if p_action='begin' then r:=public.begin_game_round(rid,p_game_id,(p_payload->>'p_bet')::numeric,rev,p_payload->'p_metadata',p_payload->'p_recovery');
+ elsif p_action='settle' then r:=public.record_game_round(rid,p_game_id,(p_payload->>'p_bet')::numeric,(p_payload->>'p_payout')::numeric,(p_payload->>'p_multiplier')::numeric,p_payload->>'p_result',p_payload->'p_metadata',p_payload->>'p_status',p_payload->'p_recovery');if coalesce((p_payload->'p_metadata'->>'freeSpin')::boolean,false) then held:=(p_payload->>'p_payout')::numeric;end if;
+ elsif p_action='big_top' then perform set_config('vault.bigtop.escrow','on',true);r:=public.settle_big_top_round(rid,rev,c);perform set_config('vault.bigtop.escrow','off',true);held:=round((c->>'bonusWinX')::numeric*(c->>'bet')::numeric,6);
+ elsif p_action='upside_paws' then perform set_config('vault.upsidepaws.escrow','on',true);r:=public.settle_upside_paws_round(rid,rev,c);perform set_config('vault.upsidepaws.escrow','off',true);held:=round((c->>'bonusWinX')::numeric*(c->>'bet')::numeric,6);
+ elsif p_action='critter' then r:=public.settle_critter_round(rid,rev,c);held:=greatest(0,(c->>'payout')::numeric-least((c->>'payout')::numeric,round((c->'base'->>'winX')::numeric*(c->>'bet')::numeric,6)));
+ elsif p_action='heist' then r:=public.apply_heist_checkpoint(rid,(p_payload->>'p_previous_step')::integer,rev,c);if c->>'status'='SETTLED' then held:=(c->>'payout')::numeric;end if;
+ elsif c->>'version'='2' then r:=public.apply_magnet_v2_checkpoint(rid,(p_payload->>'p_previous_step')::integer,rev,c);if c->>'status'='SETTLED' then held:=(c->>'payout')::numeric;end if;
+ else r:=public.apply_magnet_checkpoint(rid,(p_payload->>'p_previous_step')::integer,rev,c);if c->>'status'='SETTLED' then held:=(c->>'payout')::numeric;end if;end if;
+ if coalesce((r->>'duplicate')::boolean,false) then raise exception 'Legacy round already applied';end if;
+ if not existing then insert into public.vault_bonus_sessions(user_id,session_id,game_id) values(u,p_session_id,p_game_id);end if;
+ insert into public.vault_bonus_events values(u,p_session_id,key);
+ update public.vault_bonus_sessions set held_win=held_win+held where user_id=u and session_id=p_session_id returning * into s;
+ mirror:=jsonb_build_object('version',1,'id',s.session_id,'gameId',s.game_id,'status',s.status,'heldWin',s.held_win,'totalWin',s.held_win);
+ -- Old RPC credit and escrow transfer are in one transaction; no intermediate credit is observable.
+ update public.wallets set balance=balance-held,recovery=jsonb_set(recovery,'{bonusSessions}',coalesce(recovery->'bonusSessions','{}')||jsonb_build_object(p_game_id,mirror),true) where user_id=u returning * into w;
+ return r||jsonb_build_object('balance',w.balance,'revision',w.revision,'bonusSession',mirror);
+end $$;
+revoke all on function public.apply_bonus_checkpoint(text,jsonb,uuid,text) from public,anon;
+grant execute on function public.apply_bonus_checkpoint(text,jsonb,uuid,text) to authenticated;
+create or replace function public.settle_bonus_session(p_session_id uuid,p_game_id text,p_expected_revision bigint,p_completion jsonb) returns jsonb
+language plpgsql security definer set search_path='' as $$
+declare u uuid:=auth.uid();w public.wallets;s public.vault_bonus_sessions;c jsonb;terminal boolean:=false;mirror jsonb;
+begin
+ if u is null then raise exception 'Authentication required';end if;
+ select * into w from public.wallets where user_id=u for update;
+ select * into s from public.vault_bonus_sessions where user_id=u and session_id=p_session_id for update;
+ if not found or s.game_id is distinct from p_game_id then raise exception 'Bonus session missing';end if;
+ if s.status='settled' then return jsonb_build_object('balance',w.balance,'revision',w.revision,'duplicate',true);end if;
+ if p_game_id='upside_paws' then c:=w.recovery->'upsidePawsProgress';terminal:=c->>'roundId'=p_session_id::text and (c->>'baseDone')::boolean and (c->>'introDone')::boolean and (c->>'nextSpin')::integer=(w.recovery->'upsidePawsRound'->'bonus'->>'spinCount')::integer;
+  elsif p_game_id='big_top' then c:=w.recovery->'bigTopProgress';terminal:=c->>'roundId'=p_session_id::text and (c->>'baseDone')::boolean and (c->>'introDone')::boolean and (c->>'nextSpin')::integer=(w.recovery->'bigTopRound'->'bonus'->>'spinCount')::integer;
+ elsif p_game_id='slot' then c:=w.recovery->'slotBonus';terminal:=c is not null and (c->>'freeSpins')::integer=0;
+ elsif p_game_id='swamp' then c:=w.recovery->'swampBonus';terminal:=c->>'featureId'=p_session_id::text and c->>'phase'='complete';
+ else c:=w.recovery->(case p_game_id when 'critter' then 'critterRound' when 'magnet' then 'magnetRound' else 'heistRound' end);terminal:=c->>'roundId'=p_session_id::text and c->>'status'='SETTLED';end if;
+ if terminal is distinct from true then raise exception 'Bonus is not complete';end if;
+ update public.vault_bonus_sessions set status='settled',settled_at=now() where user_id=u and session_id=p_session_id returning * into s;
+ mirror:=jsonb_build_object('version',1,'id',s.session_id,'gameId',s.game_id,'status',s.status,'heldWin',s.held_win,'totalWin',s.held_win);
+ update public.wallets set balance=balance+s.held_win,revision=revision+1,recovery=jsonb_set(recovery,'{bonusSessions}',coalesce(recovery->'bonusSessions','{}')||jsonb_build_object(p_game_id,mirror),true),updated_at=now() where user_id=u returning * into w;
+ return jsonb_build_object('balance',w.balance,'revision',w.revision,'bonusSession',mirror);
+end $$;
+revoke all on function public.settle_bonus_session(uuid,text,bigint,jsonb) from public,anon;
+grant execute on function public.settle_bonus_session(uuid,text,bigint,jsonb) to authenticated;
+
+create or replace function public.save_vault_settings(p_settings jsonb,p_updated_at timestamptz) returns jsonb language plpgsql security definer set search_path='' as $$
+declare u uuid:=auth.uid();s public.user_settings;
+begin
+ if u is null then raise exception 'Authentication required';end if;
+ if jsonb_typeof(p_settings)<>'object' or octet_length(p_settings::text)>4096 or p_updated_at is null then raise exception 'Invalid settings';end if;
+ select * into s from public.user_settings where user_id=u for update;
+ if p_updated_at<=s.updated_at then return to_jsonb(s);end if;
+ update public.user_settings set sound_enabled=coalesce((p_settings->>'sound')::boolean,s.sound_enabled),music_enabled=coalesce((p_settings->>'music')::boolean,s.music_enabled),fast_mode=coalesce((p_settings->>'fastGame')::boolean,s.fast_mode),
+ fast_bonus=coalesce((p_settings->>'fastBonus')::boolean,s.fast_bonus),scatter_boost=coalesce((p_settings->>'scatterBoost')::boolean,s.scatter_boost),
+ last_game_id=case when p_settings->>'lastGame' in ('lobby','slot','poker','bird','blackjack','baccarat','swamp','mines','vault_heist','magnet','critter','big_top','upside_paws') then p_settings->>'lastGame' else s.last_game_id end,
+ selected_bets=coalesce(p_settings->'bets',s.selected_bets),updated_at=least(p_updated_at,clock_timestamp()) where user_id=u returning * into s;
+ return to_jsonb(s);
+end $$;
+
+notify pgrst,'reload schema';
+commit;
