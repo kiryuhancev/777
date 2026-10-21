@@ -1,6 +1,6 @@
 const VaultCritter=window.VaultCritter=(()=>{
  const C=CRITTER_CONFIG,M=CRITTER_MODEL,A=CRITTER_ASSETS,$=id=>document.getElementById(id),root=$('critterApp'),gridEl=$('critterGrid');
- let round=null,betIndex=2,boost=false,busy=false,ready=false,auto=0,timer=null,generation=0,shownX=0,progress=null;
+ let round=null,betIndex=2,boost=false,busy=false,ready=false,auto=0,timer=null,generation=0,shownX=0,progress=null,vortexReady=false;
  const sleep=ms=>new Promise(r=>setTimeout(r,ms)),fmt=n=>Number(n).toLocaleString('ru-RU',{maximumFractionDigits:6});
  const finalGrid=r=>r.bonus?.spins?.at(-1)?.finalGrid||r.bonus?.plan?.finalGrid||r.base.finalGrid;
  const spinCost=()=>M.cost({bet:BETS[betIndex],scatterBoost:!!boost});
@@ -8,10 +8,11 @@ const VaultCritter=window.VaultCritter=(()=>{
  const atlas=document.createElementNS('http://www.w3.org/2000/svg','svg');atlas.setAttribute('width','0');atlas.setAttribute('height','0');atlas.style.position='absolute';atlas.setAttribute('aria-hidden','true');atlas.innerHTML=`<defs><image id="critterAtlasImage" href="${A.sheet}" width="1200" height="900"/>${Object.entries(CRITTER_SPRITES).map(([id,[x,y,w,h]])=>`<clipPath id="critterClip${id}" clipPathUnits="userSpaceOnUse"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>`).join('')}</defs>`;root.prepend(atlas);
  const tileImage=document.createElementNS('http://www.w3.org/2000/svg','image');tileImage.id='critterTileAtlas';tileImage.setAttribute('href',A.tiles);tileImage.setAttribute('width',1536);tileImage.setAttribute('height',1024);atlas.querySelector('defs').append(tileImage);
  const cells=Array.from({length:25},(_,i)=>{const n=document.createElement('div');n.className='critter-cell';n.style.setProperty('--column',i%5);gridEl.append(n);return n;});
- function art(id){if(CRITTER_TILE_SPRITES[id])return `<svg class="critter-tile-art" preserveAspectRatio="xMidYMid meet" viewBox="${CRITTER_TILE_SPRITES[id].join(' ')}" aria-hidden="true"><use href="#critterTileAtlas"/></svg>`;return `<svg preserveAspectRatio="xMidYMid meet" viewBox="${CRITTER_SPRITES[id].join(' ')}" aria-hidden="true"><use href="#critterAtlasImage" clip-path="url(#critterClip${id})"/></svg>`;}
+ function art(id){if(id==='wild')return `<span class="critter-wild-art"><img src="${A.raccoon}" alt=""><img class="critter-wild-label" src="${A.wildLabel}" alt="WILD"></span>`;if(id==='scatter')return `<img class="critter-scatter-art" src="${A.newScatter}" alt="Scatter">`;if(CRITTER_TILE_SPRITES[id])return `<svg class="critter-tile-art" preserveAspectRatio="xMidYMid meet" viewBox="${CRITTER_TILE_SPRITES[id].join(' ')}" aria-hidden="true"><use href="#critterTileAtlas"/></svg>`;return `<svg preserveAspectRatio="xMidYMid meet" viewBox="${CRITTER_SPRITES[id].join(' ')}" aria-hidden="true"><use href="#critterAtlasImage" clip-path="url(#critterClip${id})"/></svg>`;}
 
- function draw(grid,{wins=[],activeWilds=[]}={}){gridEl.classList.toggle('has-wins',wins.length>0);const winning=new Set(wins.flatMap(w=>w.positions)),active=new Set(activeWilds);for(let i=0;i<25;i++){const t=grid[i],n=cells[i];n.className='critter-cell'+(winning.has(i)?' winning':'')+(active.has(t.uid)?' active-wild':'');n.dataset.uid=t.uid;n.setAttribute('aria-label',`${name(t.symbol)}, row ${Math.floor(i/5)+1}, column ${i%5+1}`);if(n.dataset.symbol!==t.symbol){n.innerHTML=art(t.symbol);n.dataset.symbol=t.symbol;}n.querySelector('.critter-wild-multiplier')?.remove();if(t.symbol==='wild'){const badge=document.createElement('span');badge.className='critter-wild-multiplier';badge.textContent='x'+(t.multiplier||1);badge.setAttribute('aria-label','Wild multiplier '+(t.multiplier||1));n.append(badge);}}}
- function clearFX(){$('critterBonusOverlay').classList.remove('persistent-bonus');gridEl.classList.remove('has-wins');root.classList.remove('critter-reeling');$('critterPaths').replaceChildren();$('critterBonusOverlay').hidden=true;gridEl.querySelectorAll('.critter-runner').forEach(n=>n.remove());cells.forEach(n=>n.classList.remove('winning','active-wild','removing','falling','destination'));}
+ function multiplierBadge(value){const badge=document.createElement('span');badge.className='critter-wild-multiplier';badge.setAttribute('aria-label','Wild multiplier '+value);if(value===1)badge.style.display='none';if(A.multipliers[value]){const image=document.createElement('img');image.src=A.multipliers[value];image.alt='x'+value;badge.append(image);}else{badge.classList.add('dynamic');badge.textContent='x'+value;}return badge;}
+ function draw(grid,{wins=[],activeWilds=[]}={}){gridEl.classList.toggle('has-wins',wins.length>0);const winning=new Set(wins.flatMap(w=>w.positions)),active=new Set(activeWilds);for(let i=0;i<25;i++){const t=grid[i],n=cells[i];n.className='critter-cell'+(winning.has(i)?' winning':'')+(active.has(t.uid)?' active-wild':'');n.dataset.uid=t.uid;n.setAttribute('aria-label',`${name(t.symbol)}, row ${Math.floor(i/5)+1}, column ${i%5+1}`);if(n.dataset.symbol!==t.symbol){n.innerHTML=art(t.symbol);n.dataset.symbol=t.symbol;}n.querySelector('.critter-wild-multiplier')?.remove();if(t.symbol==='wild'){n.append(multiplierBadge(t.multiplier||1));}}}
+ function clearFX(){window.VaultBonusPopup?.cancel(C.id);vortexReady=false;$('critterBonusOverlay').classList.remove('persistent-bonus');gridEl.classList.remove('has-wins');root.classList.remove('critter-reeling');$('critterPaths').replaceChildren();$('critterBonusOverlay').hidden=true;gridEl.querySelectorAll('.critter-runner').forEach(n=>n.remove());cells.forEach(n=>n.classList.remove('winning','active-wild','removing','falling','destination'));}
  function render(){
   root.classList.toggle('critter-fast',state.fastGame);
   $('critterBet').textContent=fmt(BETS[betIndex]);$('critterWin').textContent=fmt(Math.min(C.maxWinX,shownX)*(round?.bet||BETS[betIndex]));$('critterBalance').textContent=window.VaultWalletService?VaultWalletService.formatBalance():'—';
@@ -26,19 +27,24 @@ const VaultCritter=window.VaultCritter=(()=>{
  function schedule(){clearTimeout(timer);if(currentGame===C.id&&!document.hidden&&!busy&&auto)timer=setTimeout(spin,state.fastGame?450:850);}
  function tone(){if(!state.sound)return;try{const a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.frequency.setValueAtTime(330,a.currentTime);o.frequency.exponentialRampToValueAtTime(660,a.currentTime+.12);g.gain.setValueAtTime(.012,a.currentTime);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.16);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.16);o.onended=()=>a.close();}catch{}}
  function makeWildRunner(multiplier,label='Running Wild'){
-  const runner=document.createElement('div'),badge=document.createElement('span');runner.className='critter-runner';runner.setAttribute('aria-label',label+' x'+(multiplier||1));runner.innerHTML=art('wild');badge.className='critter-wild-multiplier';badge.textContent='x'+(multiplier||1);runner.append(badge);return runner;
+  const runner=document.createElement('div');runner.className='critter-runner';runner.setAttribute('aria-label',label+' x'+(multiplier||1));runner.innerHTML=art('wild');runner.append(multiplierBadge(multiplier||1));return runner;
  }
  async function runBonusWilds(step,g,fast,reduced){
   $('critterStatus').textContent='RUNNING WILDS · '+step.movements.length;$('critterMessage').textContent='BONUS RACCOON RUN · MULTIPLIERS TRAVEL WITH THE WILDS';
   const paths=[],animations=[],runners=[],width=gridEl.clientWidth,height=gridEl.clientHeight,duration=reduced?60:fast?220:340;
   for(const move of step.movements){
-   const wild=step.initialGrid[move.from],runner=makeWildRunner(wild.multiplier,'Bonus Running Wild');runner.style.left=(move.from%5*20)+'%';runner.style.top=(Math.floor(move.from/5)*20)+'%';gridEl.append(runner);runners.push(runner);
+   const wild=step.initialGrid[move.from],runner=makeWildRunner(wild.multiplier,'Bonus Running Wild');const origin=vortexReady?12:move.from;runner.style.left=(origin%5*20)+'%';runner.style.top=(Math.floor(origin/5)*20)+'%';gridEl.append(runner);runners.push(runner);
    cells[move.from].classList.add('running-source');cells[move.to].classList.add('destination');
-   const dx=(move.to%5-move.from%5)*width/5,dy=(Math.floor(move.to/5)-Math.floor(move.from/5))*height/5,startY=Math.floor(move.from/5)*height/5,midY=reduced?dy/2:Math.max(0,Math.min(height*.8,startY+dy/2-height*.06))-startY;
-   const x=i=>i%5*100+50,y=i=>Math.floor(i/5)*100+50;paths.push(`<path d="M${x(move.from)},${y(move.from)} Q${(x(move.from)+x(move.to))/2},${Math.max(50,(y(move.from)+y(move.to))/2-50)} ${x(move.to)},${y(move.to)}"/>`);
+   const dx=(move.to%5-origin%5)*width/5,dy=(Math.floor(move.to/5)-Math.floor(origin/5))*height/5,startY=Math.floor(origin/5)*height/5,midY=reduced?dy/2:Math.max(0,Math.min(height*.8,startY+dy/2-height*.06))-startY;
+   const x=i=>i%5*100+50,y=i=>Math.floor(i/5)*100+50;paths.push(`<path d="M${x(origin)},${y(origin)} Q${(x(origin)+x(move.to))/2},${Math.max(50,(y(origin)+y(move.to))/2-50)} ${x(move.to)},${y(move.to)}"/>`);
    const a=runner.animate([{transform:'translate(0,0)'},{transform:`translate(${dx/2}px,${midY}px) scale(${reduced?1:.94})`,offset:.5},{transform:`translate(${dx}px,${dy}px)`}],{duration,fill:'forwards',easing:'ease-in-out'});animations.push(a);
   }
-  $('critterPaths').innerHTML=paths.join('');await Promise.all(animations.map(a=>a.finished.catch(()=>{})));animations.forEach(a=>a.cancel());runners.forEach(n=>n.remove());if(g!==generation)return false;$('critterPaths').replaceChildren();draw(step.finalGrid);cells.forEach((n,i)=>{if(step.movements.some(m=>m.to===i))n.classList.add('destination');});return true;
+  $('critterPaths').innerHTML=paths.join('');await Promise.all(animations.map(a=>a.finished.catch(()=>{})));animations.forEach(a=>a.cancel());runners.forEach(n=>n.remove());if(g!==generation)return false;$('critterPaths').replaceChildren();vortexReady=false;draw(step.finalGrid);cells.forEach((n,i)=>{if(step.movements.some(m=>m.to===i))n.classList.add('destination');});return true;
+ }
+ async function gatherWilds(plan,g){
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,duration=reduced?0:state.fastGame?280:680,width=gridEl.clientWidth,height=gridEl.clientHeight,runners=[],animations=[];
+  for(const w of plan.persistentWildsAfter){const n=makeWildRunner(w.multiplier);n.style.left=(w.cell%5*20)+'%';n.style.top=(Math.floor(w.cell/5)*20)+'%';gridEl.append(n);runners.push(n);cells[w.cell].classList.add('running-source');const dx=(2-w.cell%5)*width/5,dy=(2-Math.floor(w.cell/5))*height/5;animations.push(n.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:`translate(${dx}px,${dy}px) rotate(180deg) scale(.35)`,opacity:.8,offset:.72},{transform:`translate(${dx}px,${dy}px) rotate(360deg) scale(.08)`,opacity:0}],{duration,fill:'forwards',easing:'ease-in-out'}));}
+  await Promise.all(animations.map(a=>a.finished.catch(()=>{})));animations.forEach(a=>a.cancel());runners.forEach(n=>n.remove());if(g===generation)vortexReady=true;
  }
  function checkpoint(p){progress=M.progress(round,p);return VaultCritterBridge.saveProgress(progress);}
  async function countWin(from,to,g){
@@ -50,20 +56,14 @@ const VaultCritter=window.VaultCritter=(()=>{
   draw(plan.initialGrid);$('critterStatus').textContent=bonus?'FREE SPIN · PERSISTENT WILDS':'REELS STOPPING';
   const persistentPositions=plan.persistentWildsBefore.map(w=>w.cell);
   persistentPositions.forEach(i=>cells[i].classList.add('persistent-wild'));
-  await VaultSymbolDrop.play(C.id,{root:gridEl,cells:plan.initialGrid.flatMap((t,i)=>persistentPositions.includes(i)?[]:[{node:cells[i],column:i%5,row:Math.floor(i/5),symbol:t.symbol}]),rows:5,roundId:round.roundId,hasWin:!!plan.wins.length,feature:bonus,speedProfile:fast?'quick':'normal'});
-  if(g!==generation)return false;
-  if(bonus&&plan.movements.length){
-   $('critterStatus').textContent='PERSISTENT WILDS · READY TO RUN';
-   persistentPositions.forEach(i=>cells[i].classList.add('active-wild'));
-   await sleep(reduced?40:fast?110:200);if(g!==generation)return false;
-   if(!await runBonusWilds({...plan,moves:plan.movements},g,fast,reduced))return false;
-   await sleep(reduced?40:fast?90:150);if(g!==generation)return false;
-  }
+  const drop=VaultSymbolDrop.play(C.id,{root:gridEl,cells:plan.initialGrid.flatMap((t,i)=>persistentPositions.includes(i)?[]:[{node:cells[i],column:i%5,row:Math.floor(i/5),symbol:t.symbol}]),rows:5,roundId:round.roundId,hasWin:!!plan.wins.length,feature:bonus,speedProfile:fast?'quick':'normal'});
+  const running=bonus&&plan.movements.length?runBonusWilds(plan,g,fast,reduced):Promise.resolve(true);
+  const [,moved]=await Promise.all([drop,running]);if(g!==generation||!moved)return false;
   // Exactly one reveal/evaluation: every payout and multiplier is already in the immutable plan.
   draw(plan.finalGrid,{wins:plan.wins,activeWilds:bonus?plan.activeWilds:[]});
   $('critterCascade').textContent='ONE RESULT PER SPIN';
   $('critterStatus').textContent=plan.wins.length?'WIN · '+fmt(plan.winX)+'×':'NO WIN THIS SPIN';
-  $('critterMessage').textContent=plan.wins.length?plan.wins.map(w=>name(w.symbol)+' · '+w.size+' CONNECTED'+(w.multiplier>1?' · x'+w.multiplier:'')).join(' / '):'FIELD SETTLED · NEXT SPIN';
+  $('critterMessage').textContent=plan.wins.length?plan.wins.map(w=>name(w.symbol)+' · '+(w.length?w.length+' REELS · '+w.ways+' WAYS':w.size+' CONNECTED')+(w.multiplier>1?' · x'+w.multiplier:'')).join(' / '):'FIELD SETTLED · NEXT SPIN';
   const from=shownX;shownX=M.round(Math.min(C.maxWinX,shownX+plan.winX));render();if(plan.wins.length){tone();await countWin(from,shownX,g);if(g!==generation)return false;}
   await sleep(fast?250:650);if(g!==generation)return false;
   if(bonus){
@@ -83,26 +83,22 @@ const VaultCritter=window.VaultCritter=(()=>{
   if(round.bonus){
    const b=round.bonus;
    if(progress.nextSpin===0){
-    $('critterBonusOverlay').classList.add('persistent-bonus');$('critterBonusOverlay').querySelector('h2').textContent=b.kind==='super'?'DUMPSTER DASH · SUPER':'DUMPSTER DASH';
-    $('critterBonusOverlay').hidden=false;$('critterBonusMessage').textContent=b.spinCount+' FREE SPINS · RUNNING WILDS + PERSONAL MULTIPLIERS STAY';$('critterBonusBins').replaceChildren();
-    await sleep(state.fastGame?450:900);if(g!==generation)return;$('critterBonusOverlay').hidden=true;
+    if(!await VaultBonusPopup.show(C.id,{title:b.kind==='super'?'SUPER BONUS':'FREE SPINS BONUS',value:b.spinCount+' FREE SPINS',detail:'PERSISTENT RUNNING WILDS · PERSONAL MULTIPLIERS'}))return;if(g!==generation)return;
    }
    for(let i=progress.nextSpin;i<b.spins.length;i++){
     $('critterMode').textContent=(b.kind==='super'?'SUPER · ':'')+'BONUS SPIN '+(i+1)+' / '+b.spinCount;
     if(!await showPlan(b.spins[i],g,{bonus:true}))return;
     if(!checkpoint({baseDone:true,nextSpin:i+1})){busy=false;render();return;}
     $('critterMessage').textContent=b.spins[i].persistentWildsAfter.length+' PERSISTENT WILDS · MULTIPLIERS SAVED FOR NEXT FREE SPIN';
-    await sleep(state.fastGame?180:350);if(g!==generation)return;
+    if(i<b.spins.length-1)await gatherWilds(b.spins[i],g);if(g!==generation)return;
    }
   }
   if(g!==generation)return;
   if(!checkpoint({baseDone:true,nextSpin:round.bonus?.spinCount||0,complete:true})){busy=false;render();return;}
   const amount=round.payout,stake=round.bet;
-  if(amount&&typeof showWinMilestones==='function'&&round.winX>=WIN_LEVELS.find(l=>l.label==='BIG WIN').mult){await showWinMilestones(amount,stake);if(g!==generation)return;}
+  if(!round.bonus&&amount&&typeof showWinMilestones==='function'&&round.winX>=WIN_LEVELS.find(l=>l.label==='BIG WIN').mult){await showWinMilestones(amount,stake);if(g!==generation)return;}
   if(round.bonus){
-   $('critterBonusOverlay').classList.add('persistent-bonus');$('critterBonusOverlay').querySelector('h2').textContent='BONUS COMPLETE';$('critterBonusOverlay').hidden=false;
-   $('critterBonusMessage').textContent='TOTAL WIN '+fmt(M.round(Math.max(0,round.winX-round.base.winX)*stake))+' · TOTAL '+fmt(Math.max(0,round.winX-round.base.winX))+'×';$('critterBonusBins').replaceChildren();
-   await sleep(state.fastGame?850:1800);if(g!==generation)return;
+   if(!await VaultBonusPopup.show(C.id,{title:'BONUS COMPLETE',kicker:'TOTAL WIN',value:fmt(M.round(Math.max(0,round.winX-round.base.winX)*stake)),detail:fmt(Math.max(0,round.winX-round.base.winX))+'× TOTAL'}))return;if(g!==generation)return;if(!VaultBonusSession.complete(C.id)){busy=false;render();return;}
   }
   clearFX();shownX=round.winX;draw(round.base.finalGrid);VaultWalletService.releasePresentation(C.id);busy=false;render();$('critterMode').textContent='NEON BACKSTREET · 5×5';
   $('critterStatus').textContent=round.payout?'LAST WIN · '+fmt(round.winX)+'×':'NO WIN THIS ROUND';$('critterMessage').textContent=round.bonus?'BONUS COMPLETE · '+fmt(round.payout)+' TOTAL BANKED':'ROUND SETTLED · '+fmt(round.payout)+' BANKED';
@@ -123,15 +119,15 @@ const VaultCritter=window.VaultCritter=(()=>{
   const stable=progress&&!progress.complete?(progress.nextSpin?round.bonus.spins[progress.nextSpin-1].updatedGrid:round.base.finalGrid):round?.version<4?finalGrid(round):round?.base?.finalGrid;
   draw(stable||M.spinPlan(1977).initialGrid);$('critterAutoMenu').hidden=true;$('critterAuto').setAttribute('aria-expanded','false');
   $('critterMode').textContent=progress&&!progress.complete?'BONUS · '+progress.remainingFreeSpins+' FREE SPINS REMAINING':'NEON BACKSTREET · 5×5';$('critterCascade').textContent='ONE RESULT PER SPIN';
-  $('critterStatus').textContent=round?'STABLE RESULT RESTORED':'READY FOR CHAOS';$('critterMessage').textContent=progress&&!progress.complete?'BONUS RESTORED · POSITIONS AND MULTIPLIERS PRESERVED':round?'ROUND SETTLED · '+fmt(round.payout)+' BANKED':'5+ CONNECTED SYMBOLS · ONE RESULT PER SPIN';render();
+  $('critterStatus').textContent=round?'STABLE RESULT RESTORED':'READY FOR CHAOS';$('critterMessage').textContent=progress&&!progress.complete?'BONUS RESTORED · POSITIONS AND MULTIPLIERS PRESERVED':round?'ROUND SETTLED · '+fmt(round.payout)+' BANKED':'3+ REELS LEFT TO RIGHT · ONE RESULT PER SPIN';render();
  }
- function resumeFeature(){if(currentGame===C.id&&ready&&!busy&&progress&&!progress.complete){ready=VaultCritterBridge.ready;reveal();return true;}return false;}
+ function resumeFeature(){if(progress?.complete&&window.VaultBonusSession?.get(C.id)?.status==='active'){VaultBonusSession.resume(C.id);return true;}if(currentGame===C.id&&ready&&!busy&&progress&&!progress.complete){ready=VaultCritterBridge.ready;reveal();return true;}return false;}
  async function connect(){
   $('critterReconnect').hidden=true;$('critterMessage').textContent='Подключаем Critter Chaos…';
   ready=await VaultCritterBridge.connect();if(currentGame!==C.id)return;
   render();$('critterReconnect').hidden=ready;
   const messages={schema:'БД не видит функции Critter Chaos. Проверьте выполнение полного VAULT_RELEASE_SETUP.txt в подключённом проекте.',permission:'Нет доступа к функциям Critter Chaos. Проверьте права authenticated из VAULT_RELEASE_SETUP.txt.',version:'Версия функций Critter Chaos несовместима. Выполните актуальный VAULT_RELEASE_SETUP.txt.',connection:'Не удалось проверить Critter Chaos: сервер временно недоступен. Повторим подключение при восстановлении сети.'};
-  $('critterMessage').textContent=ready?'5+ CONNECTED SYMBOLS · ONE RESULT PER SPIN':messages[VaultCritterBridge.connectionError]||messages.connection;if(!resumeFeature())schedule();
+  $('critterMessage').textContent=ready?'3+ REELS LEFT TO RIGHT · ONE RESULT PER SPIN':messages[VaultCritterBridge.connectionError]||messages.connection;if(!resumeFeature())schedule();
  }
  async function open(){if(!VaultSession.ready||VaultSession.mode!=='authenticated')return;currentGame=C.id;document.body.classList.remove('lobby-mode','slot-active','poker-active','bird-active','table-active','swamp-active','mines-active','heist-active','magnet-active');document.body.classList.add('game-mode','critter-active');root.hidden=false;VaultStorage.schedule();syncMusic();ready=VaultCritterBridge.ready;render();if(!ready)await connect();else if(!resumeFeature())schedule();}
 
@@ -158,9 +154,9 @@ const VaultCritter=window.VaultCritter=(()=>{
  document.addEventListener('click',e=>{if(!e.target.closest('.critter-auto-wrap')){$('critterAutoMenu').hidden=true;$('critterAuto').setAttribute('aria-expanded','false');}});
  for(const [openId,id,closeId] of [['critterSettingsOpen','critterSettings','critterSettingsClose'],['critterHelpOpen','critterHelp','critterHelpClose']]){$(openId).onclick=()=>$(id).showModal();$(closeId).onclick=()=>$(id).close();}
  $('critterSound').onclick=()=>{toggleSetting('sound');render();};$('critterFast').onclick=()=>{toggleSetting('fastGame');render();};
- $('critterPaytable').innerHTML=['base','normal','super'].map(mode=>'<h3>'+({base:'BASE GAME',normal:'BONUS',super:'SUPER BONUS'}[mode])+'</h3><div class="critter-pay-row"><b>SYMBOL · × BET</b>'+C.sizes.map(n=>'<b>'+n+'+</b>').join('')+'</div>'+C.symbols.map(s=>'<div class="critter-pay-row"><span>'+art(s.id)+s.name+'</span>'+s.pays.map(p=>'<b>'+fmt(M.round(p*C.payScales[mode]))+'×</b>').join('')+'</div>').join('')).join('')+'<p>Each mode uses its displayed paytable. Base Wild is x1; bonus Wild multipliers add together and double after a win for subsequent Free Spins. Maximum whole-round win10,000× bet.</p>';
+ $('critterPaytable').innerHTML=['base','normal','super'].map(mode=>'<h3>'+({base:'BASE GAME',normal:'BONUS',super:'SUPER BONUS'}[mode])+'</h3><div class="critter-pay-row"><b>SYMBOL · × BET</b>'+C.sizes.map(n=>'<b>'+n+'+</b>').join('')+'</div>'+C.symbols.map(s=>'<div class="critter-pay-row"><span>'+art(s.id)+s.name+'</span>'+s.waysPays.map(p=>'<b>'+fmt(M.round(p*C.payScales[mode]))+'×</b>').join('')+'</div>').join('')).join('')+'<p>Each mode uses its displayed paytable. Base Wild is x1; bonus Wild multipliers add together and double after a win for subsequent Free Spins. Maximum whole-round win10,000× bet.</p>';
  $('critterLogo').src=A.logo;$('critterDashRunner').src=A.wild;root.querySelector('.critter-scene').style.backgroundImage=`linear-gradient(#060b1833,#09091a55),url('${A.background}')`;
- for(const src of Object.values(A)){const img=new Image();img.src=src;img.decode?.().catch(()=>{});}
+ for(const src of [...Object.values(A).filter(v=>typeof v==='string'),...Object.values(A.multipliers)]){const img=new Image();img.src=src;img.decode?.().catch(()=>{});}
  new MutationObserver(()=>{if(currentGame!==C.id&&!root.hidden){root.hidden=true;restore(round,progress);for(const id of ['critterHelp','critterSettings','critterBonusShop'])if($(id).open)$(id).close();document.body.classList.remove('critter-active');}}).observe(document.body,{attributes:true,attributeFilter:['class']});
  document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(timer);else if(currentGame===C.id)schedule();});
  restore(null);return {getHudState:()=>({spinCost:spinCost(),scatterBoost:!!boost,round:round?{status:round.status,payout:round.payout,bonus:!!round.bonus}:null}),open,restore,resume(){if(currentGame===C.id&&!busy){ready=VaultCritterBridge.ready;render();if(!resumeFeature())schedule();}},getCheckpoint:()=>round?structuredClone(round):null,get isBusy(){return busy;},get scatterBoost(){return boost;},set scatterBoost(v){boost=v===true;render();},get betIndex(){return betIndex;},set betIndex(v){if(Number.isInteger(v)&&v>=0&&v<BETS.length)betIndex=v;render();},inspect:()=>({round:round?structuredClone(round):null,progress:progress?structuredClone(progress):null,busy,ready,auto})};

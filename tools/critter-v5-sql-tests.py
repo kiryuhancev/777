@@ -13,7 +13,7 @@ assert before==sql(protected)
 A='91919191-9191-4919-8919-191919191919';B='92929292-9292-4929-8929-292929292929'
 for uid in [A,B]:sql(f"insert into auth.users(id,raw_user_meta_data,email,email_confirmed_at) values('{uid}','{{\"username\":\"Critter\"}}','{uid}@example.test',now()) on conflict(id) do nothing;")
 def auth(uid):return f"set role authenticated;select set_config('request.jwt.claim.sub','{uid}',false);"
-script="""const M=require('./critter/model'),out={};for(let s=0;Object.keys(out).length<4&&s<100000;s++){const r=M.start({seed:s,bet:20,roundId:'11111111-1111-4111-8111-111111111111'});if(r.bonus){out.bonus??=r;if(r.bonus.kind==='super')out.super??=r;}else if(r.base.wins.length)out.win??=r;else out.loss??=r;}for(const [k,options] of Object.entries({boost:{scatterBoost:true},buy:{purchaseType:'bonus'},buySuper:{purchaseType:'super'}}))out[k]=M.start({seed:63,bet:20,roundId:'11111111-1111-4111-8111-111111111111',...options});for(const [k,m] of Object.entries({v1:M.legacy,v2:M.previous,v3:M.v3,v4:M.v4}))out[k]=m.start({seed:63,bet:20,roundId:'11111111-1111-4111-8111-111111111111'});console.log(JSON.stringify(out));"""
+script="""const M=require('./critter/model-v5'),out={};for(let s=0;Object.keys(out).length<4&&s<100000;s++){const r=M.start({seed:s,bet:20,roundId:'11111111-1111-4111-8111-111111111111'});if(r.bonus){out.bonus??=r;if(r.bonus.kind==='super')out.super??=r;}else if(r.base.wins.length)out.win??=r;else out.loss??=r;}for(const [k,options] of Object.entries({boost:{scatterBoost:true},buy:{purchaseType:'bonus'},buySuper:{purchaseType:'super'}}))out[k]=M.start({seed:63,bet:20,roundId:'11111111-1111-4111-8111-111111111111',...options});for(const [k,m] of Object.entries({v1:M.legacy,v2:M.previous,v3:M.v3,v4:M.v4}))out[k]=m.start({seed:63,bet:20,roundId:'11111111-1111-4111-8111-111111111111'});console.log(JSON.stringify(out));"""
 paths=json.loads(subprocess.check_output(['node','-e',script],cwd=ROOT))
 checks=[]
 for idx,(kind,c) in enumerate(paths.items()):
@@ -54,7 +54,7 @@ assert json.loads(sql(auth(A)+"select public.critter_capabilities();").strip().s
 print('PASS v5 movements/multiplier/price/cascade tampering rejected; mathVersion5')
 
 # Independent real-model sample through the server evaluator/validator (no wallet write).
-samples=json.loads(subprocess.check_output(['node','-e',"const M=require('./critter/model');console.log(JSON.stringify(Array.from({length:100},(_,seed)=>M.start({seed,bet:20,roundId:'11111111-1111-4111-8111-111111111111',purchaseType:seed%2?'bonus':'super'}))))"],cwd=ROOT))
+samples=json.loads(subprocess.check_output(['node','-e',"const M=require('./critter/model-v5');console.log(JSON.stringify(Array.from({length:100},(_,seed)=>M.start({seed,bet:20,roundId:'11111111-1111-4111-8111-111111111111',purchaseType:seed%2?'bonus':'super'}))))"],cwd=ROOT))
 commands=''.join("select public.critter_v5_validate('"+json.dumps(c).replace("'","''")+"');" for c in samples)
 sql(commands)
 checks.append('100 independent buy plans: SQL cluster evaluation, movement and multiplier validation agree with real JS model')

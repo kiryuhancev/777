@@ -1,0 +1,10 @@
+.vault-feature-host{position:relative;isolation:isolate}
+.vault-feature-gate{position:absolute;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:#020512b8;backdrop-filter:blur(1px);pointer-events:auto}
+.vault-feature-card{width:72%;box-sizing:border-box;padding:clamp(10px,2.4vw,24px);border:2px solid #d8b062;border-radius:12px;background:radial-gradient(ellipse at top,#24394a,#101322 75%);box-shadow:0 0 0 3px #312235,0 0 24px #e6ad3640;text-align:center;color:#ffebac;outline:none;font-family:inherit}
+.vault-feature-card h2{margin:0 0 8px;font-size:clamp(13px,2.4vw,25px);letter-spacing:.03em}
+.vault-feature-card p{margin:7px 0;line-height:1.35;font-size:clamp(9px,1.4vw,14px)}
+.vault-feature-card .feature-value{display:block;font-size:clamp(22px,4.4vw,46px);overflow-wrap:anywhere;color:#ffe08c;text-shadow:0 0 10px #e4a94780}
+.vault-feature-card .feature-continue{display:block;width:100%;margin-top:12px;padding:8px 2px;border:0;background:none;color:#d4d9ca;font:inherit;font-size:clamp(8px,1.2vw,12px);cursor:pointer}
+.vault-feature-gate[data-skin=swamp] .vault-feature-card{background:radial-gradient(ellipse at top,#35472c,#101a15 75%);border-color:#b59650;box-shadow:0 0 0 3px #242719,0 0 22px #b1bd3940}
+.vault-feature-gate[data-skin=critter] .vault-feature-card{box-shadow:0 0 0 3px #4a285e,0 0 22px #8748de60}
+@media(max-width:480px){.vault-feature-card{width:75%;padding:10px}.vault-feature-card h2{font-size:13px}.vault-feature-card .feature-value{font-size:27px}.vault-feature-card p{font-size:9px}}

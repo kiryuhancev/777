@@ -1,0 +1,26 @@
+{
+  "mode": "isolated PostgreSQL only",
+  "passed": [
+    "win: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "loss: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "bonus: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "super: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "boost: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "buy: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "buySuper: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "v1: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "v2: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "v3: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "v4: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "v5: one bet+one result per spin+bonus settle atomically, duplicate idempotency, exact checkpoint, one stats row, own-user RLS",
+    "Altered payout and blocked new bet rejected; migration repeat-safe; existing MAGNET/Heist/begin RPC byte-identical",
+    "lost-persistent: v6 tampering rejected",
+    "bad-move: v6 tampering rejected",
+    "bad-multiplier: v6 tampering rejected",
+    "bad-cost: v6 tampering rejected",
+    "cascade: v6 tampering rejected",
+    "bad-win: v6 tampering rejected",
+    "base-wild: v6 tampering rejected",
+    "1000 independent buy plans: SQL Ways evaluation, movement and multiplier validation agree with real JS model"
+  ]
+}

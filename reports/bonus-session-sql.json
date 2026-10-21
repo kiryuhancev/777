@@ -1,0 +1,8 @@
+{
+  "mode": "isolated local PostgreSQL",
+  "passed": [
+    "critter: no premature wallet credit, one final credit/revision/stat, duplicate calls safe, own-user RLS",
+    "vault_heist: no premature wallet credit, one final credit/revision/stat, duplicate calls safe, own-user RLS",
+    "magnet: no premature wallet credit, one final credit/revision/stat, duplicate calls safe, own-user RLS"
+  ]
+}

@@ -1,0 +1,92 @@
+[
+  {
+    "command": "node tools/magnet-math-tests.cjs",
+    "passed": true,
+    "seconds": 0.459
+  },
+  {
+    "command": "node tools/magnet-v2-tests.cjs",
+    "passed": true,
+    "seconds": 1.853
+  },
+  {
+    "command": "node tools/critter-math-tests.cjs",
+    "passed": true,
+    "seconds": 1.768
+  },
+  {
+    "command": "node tools/critter-v2-math-tests.cjs",
+    "passed": true,
+    "seconds": 3.285
+  },
+  {
+    "command": "node tools/critter-v3-tests.cjs",
+    "passed": true,
+    "seconds": 11.855
+  },
+  {
+    "command": "node tools/critter-v4-tests.cjs",
+    "passed": true,
+    "seconds": 3.617
+  },
+  {
+    "command": "node tools/critter-v5-tests.cjs",
+    "passed": true,
+    "seconds": 9.197
+  },
+  {
+    "command": "node tools/critter-ways-check.cjs",
+    "passed": true,
+    "seconds": 0.636
+  },
+  {
+    "command": "node tools/slot-features-tests.cjs --modes-only",
+    "passed": true,
+    "seconds": 0.079
+  },
+  {
+    "command": "node tools/heist-math-tests.cjs",
+    "passed": true,
+    "seconds": 0.768
+  },
+  {
+    "command": "node tools/mines-math-tests.cjs",
+    "passed": true,
+    "seconds": 1.54
+  },
+  {
+    "command": "node tools/swamp-math-tests.cjs",
+    "passed": true,
+    "seconds": 0.14
+  },
+  {
+    "command": "node tools/swamp-levels-tests.cjs",
+    "passed": true,
+    "seconds": 0.21
+  },
+  {
+    "command": "node tools/swamp-v4-tests.cjs",
+    "passed": true,
+    "seconds": 0.037
+  },
+  {
+    "command": "node tools/table-rules-tests.cjs",
+    "passed": true,
+    "seconds": 0.034
+  },
+  {
+    "command": "node tools/math-tests.cjs",
+    "passed": true,
+    "seconds": 0.229
+  },
+  {
+    "command": "node tools/bird-physics-tests.cjs",
+    "passed": true,
+    "seconds": 0.352
+  },
+  {
+    "command": "node tools/bird-round-tests.cjs",
+    "passed": true,
+    "seconds": 15.265
+  }
+]

@@ -1,4 +1,4 @@
-const assert=require('node:assert/strict'),M=require('../critter/model'),C=M.config,id='11111111-1111-4111-8111-111111111111';
+const assert=require('node:assert/strict'),M=require('../critter/model-v5'),C=M.config,id='11111111-1111-4111-8111-111111111111';
 assert.equal(C.version,5);for(const k of ['symbols','wildChance','scatterChance'])assert.deepEqual(C[k],M.v4.config[k]);
 for(let seed=0;seed<500;seed++)for(const purchaseType of [null,'bonus','super']){
  const options={seed,bet:20,roundId:id,purchaseType,scatterBoost:!purchaseType&&seed%2===0},r=M.start(options),old=M.v4.start(options);assert(M.validate(r));assert(M.validate(old));assert.equal(r.version,5);assert.equal(r.cost,M.round(20*(purchaseType?C.features[purchaseType+'Cost']:options.scatterBoost?C.features.boostCost:1)));

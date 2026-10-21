@@ -1,3 +1,11 @@
+# Текущее обновление: бонусные сессии и Critter Ways v6
+
+Для уже работающего VAULT выполните **весь `VAULT_LATEST_UPDATE_SETUP.txt`** в SQL Editor. Балансы и аккаунты не сбрасываются. Проверки версий находятся в конце файла: Critter `mathVersion:6`, `gameplayVersion:6`; бонусные сессии `version:1`; Swamp остаётся `mathVersion:4`.
+
+При новой установке сначала выполните базовые шаги ниже и миграции существующих игр, затем этот файл **последним**. Старые versioned/release SQL после него не запускайте: они могут вернуть устаревшую capability. Pages не выполняет SQL автоматически. Scatter Swamp Fishing в этом обновлении не меняется.
+
+Подробности, тесты и данные RTP: `LATEST_BONUS_UPDATE.md`.
+
 > Existing VAULT project, release2026-10-20: run the whole [VAULT_RELEASE_SETUP.txt](VAULT_RELEASE_SETUP.txt) in SQL Editor, then reload. It includes current Critter5 and Swamp math4/levels support. See [RELEASE_NOTES.md](RELEASE_NOTES.md). This does not replace the base schema for a brand-new Supabase project.
 
 > **Последнее обновление:** если VAULT HEIST уже установлен, выполнить целиком [supabase_slot_features.txt](supabase_slot_features.txt), затем F5. Покупки HEIST и Boost в HEIST/Swamp: [SLOT_FEATURES.md](SLOT_FEATURES.md). Если HEIST ещё не установлен, сначала выполнить `supabase_heist.txt`. Старые реестровые миграции после этого не запускать.

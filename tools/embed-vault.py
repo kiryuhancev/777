@@ -132,7 +132,7 @@ s=re.sub(r'(<img id="magnetLobbyArt")([^>]*)(>)',lambda m:m[1]+re.sub(r' src="[^
 # Critter Chaos is isolated from all existing game modules.
 def critter_assets(text):
  return re.sub(r'__CRITTER_([^\s\x27"<>]+)__',lambda m:'data:image/'+('png' if m[1].endswith('.png') else 'webp')+';base64,'+encoded_asset((ROOT/'assets/critter'/m[1])),text)
-for name,text,tag in [('CRITTER STYLES',(ROOT/'critter/presentation.css').read_text(),'style'),('CRITTER SCREEN',(ROOT/'critter/screen.html').read_text(),None),('CRITTER MODULE',critter_assets('\n'.join((ROOT/'critter'/f).read_text() for f in ['config-v1.js','model-v1.js','config-v2.js','model-v2.js','config-v3.js','model-v3.js','config-v4.js','model-v4.js','config.js','model.js','assets.js','game.js'])),'script')]:
+for name,text,tag in [('CRITTER STYLES',(ROOT/'critter/presentation.css').read_text(),'style'),('CRITTER SCREEN',(ROOT/'critter/screen.html').read_text(),None),('CRITTER MODULE',critter_assets('\n'.join((ROOT/'critter'/f).read_text() for f in ['config-v1.js','model-v1.js','config-v2.js','model-v2.js','config-v3.js','model-v3.js','config-v4.js','model-v4.js','config-v5.js','model-v5.js','config.js','model.js','assets.js','game.js'])),'script')]:
  block=f'<!-- BEGIN {name} -->\n'+(f'<{tag}>\n{text}\n</{tag}>' if tag else text)+f'\n<!-- END {name} -->'
  pattern=rf'<!-- BEGIN {name} -->[\s\S]*?<!-- END {name} -->'
  if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)
@@ -147,7 +147,7 @@ if "id:'critter',element:'openCritterGame'" not in s:
 art='data:image/webp;base64,'+encoded_asset((ROOT/'assets/critter/references/02_scene_alt.webp'))
 s=re.sub(r'(<img id="critterLobbyArt")([^>]*)(>)',lambda m:m[1]+re.sub(r' src="[^"]*"','',m[2])+' src="'+art+'"'+m[3],s)
 # One presentation module adapts all five slot controllers after their handlers exist.
-for name,path,tag in [('SLOT HUD STYLES','hud.css','style'),('SLOT HUD MODULE','hud.js','script')]:
+for name,path,tag in [('SLOT HUD STYLES','hud.css','style'),('SLOT HUD MODULE','hud.js','script'),('BONUS POPUP STYLES','bonus-popup.css','style'),('BONUS POPUP MODULE','bonus-popup.js','script')]:
  text=(ROOT/'slot-hud'/path).read_text()
  block=f'<!-- BEGIN {name} -->\n<{tag}>\n{text}\n</{tag}>\n<!-- END {name} -->'
  pattern=rf'<!-- BEGIN {name} -->[\s\S]*?<!-- END {name} -->'

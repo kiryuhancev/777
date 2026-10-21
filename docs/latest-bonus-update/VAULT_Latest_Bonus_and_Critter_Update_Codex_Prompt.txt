@@ -1,0 +1,311 @@
+VAULT — BONUS FLOW + CRITTER CHAOS WILD UPDATE + POPUP REWORK
+
+Apply these changes to the existing slot project. Do not rebuild the games from scratch.
+
+CRITICAL
+- Preserve RNG, paytables, RTP, symbol weights, bonus math unless explicitly changed below.
+- Preserve global wallet and settlement safeguards.
+- No duplicate payouts.
+- Use the attached assets as visual references / source assets.
+- These rules apply to ALL SLOT games where noted, and specifically to CRITTER CHAOS where noted.
+
+==================================================
+1. BONUS PAYOUT SETTLEMENT — ALL SLOTS
+==================================================
+During any bonus game / free-spins session:
+- DO NOT credit the wallet after each individual free spin.
+- Accumulate all wins inside bonusSession.totalWin.
+- Update only the visual BONUS WIN / current bonus total during the bonus.
+- The real wallet balance must remain unchanged during the bonus session.
+- When the entire bonus session is finished, credit the accumulated bonus result ONCE.
+- Settlement must happen exactly once.
+
+Required flow:
+BONUS START
+→ free spin wins accumulate in bonusSession.totalWin
+→ final bonus spin
+→ BONUS COMPLETE presentation
+→ final bonus settlement
+→ wallet += bonusSession.totalWin ONCE
+→ return to base game
+
+Reload safety:
+- persist bonusSession.totalWin;
+- persist settlement status;
+- reload must never cause a second payout.
+
+==================================================
+2. BONUS POPUPS — ALL SLOTS
+==================================================
+Bonus intro / level-up / bonus-complete popups must open INSIDE THE REEL / GAME-FIELD AREA.
+
+They must NOT cover the full page or whole HUD.
+
+Use the attached Critter Chaos and Swamp Fishing popup references as visual direction.
+
+Requirements:
+- centered inside reel area;
+- roughly 50–75% of reel width;
+- reel context remains visible around popup;
+- dim only reel area / local background;
+- readable on mobile;
+- SPACE on desktop or click/tap to continue;
+- one input = one transition;
+- prevent double-trigger.
+
+==================================================
+3. CRITTER CHAOS — SCATTER RULE
+==================================================
+A single reel/column can NEVER contain more than one SCATTER.
+
+Hard rule:
+maxScatterPerColumn = 1
+
+Applies to:
+- base game;
+- bonus mode;
+- bonus-buy trigger round;
+- scatter boost;
+- any forced/presentation trigger.
+
+If generation violates this rule, resolve it before presentation.
+
+==================================================
+4. CRITTER CHAOS — SCATTER VISUAL
+==================================================
+Use the supplied new SCATTER asset.
+
+The Scatter should:
+- be more noticeable than normal symbols;
+- use a circular / medallion-like composition;
+- fill the cell strongly;
+- remain clearly readable as SCATTER;
+- preserve aspect ratio;
+- never stretch or distort.
+
+==================================================
+5. CRITTER CHAOS — WILD ASSET COMPOSITION
+==================================================
+Stop using the current black multiplier badge overlay.
+
+Use separate visual layers:
+1. raccoon/base Wild character asset;
+2. WILD plaque / label asset;
+3. multiplier badge / multiplier text layer.
+
+The result should look like ONE integrated symbol.
+
+x1:
+- treat as normal WILD;
+- x1 may be hidden visually.
+
+x2 and above:
+- show multiplier in the same visual language as WILD lettering;
+- no black rectangle;
+- no generic CSS badge.
+
+Use supplied x2/x4/x8/x16/x32/x64 assets as style references.
+
+IMPORTANT:
+x64 IS NOT THE FINAL MULTIPLIER.
+
+Multiplier progression must continue:
+x1 → x2 → x4 → x8 → x16 → x32 → x64 → x128 → x256 → x512 → ...
+
+Do NOT hardcode x64 as a cap.
+The maximum multiplier must be configurable:
+wildMultiplierCap
+
+For multipliers beyond supplied image assets:
+- render the numeric multiplier dynamically using the same styled plaque/typography,
+OR
+- use supplied badges as style references for scalable generated presentation.
+Never fall back to a black badge.
+
+==================================================
+6. CRITTER CHAOS — BONUS WILDS
+==================================================
+Base game:
+- Wild is a normal standard Wild;
+- it does not move;
+- it does not persist;
+- no running-Wild logic in base game.
+
+Bonus game:
+- every landed Wild becomes persistent;
+- every new Wild starts at x1;
+- persistent Wilds remain for the entire bonus;
+- each Wild keeps its own multiplier;
+- after a Wild participates in a win, its multiplier doubles for future bonus spins.
+
+Example:
+x1 → win → x2
+x2 → win → x4
+x4 → win → x8
+...
+
+Multiple Wild multipliers in one win:
+ADD them, do not multiply them.
+Example: x8 + x2 = x10.
+
+==================================================
+7. CRITTER CHAOS — MOVE WILDS BEFORE / DURING REEL FILL
+==================================================
+CURRENT PROBLEM:
+Persistent Wilds only start moving after all reel symbols have already landed.
+
+NEW TIMING:
+START BONUS SPIN
+→ determine new positions for all persistent Wilds
+→ Wild movement begins immediately
+→ reels/symbols begin filling at the same time OR immediately after Wild placement
+→ persistent Wilds arrive in their new cells before the final field is fully resolved
+→ remaining symbol positions finish filling
+→ final field locks
+→ win is evaluated once
+
+Do NOT wait for a completed static grid before moving Wilds.
+The movement plan must be predetermined before animation.
+
+==================================================
+8. CRITTER CHAOS — WILD SHUFFLE / VORTEX EFFECT
+==================================================
+Add a clear chaos-shuffle animation involving all persistent Wilds.
+
+At the END of a bonus spin / transition to the next bonus spin:
+1. persistent Wilds highlight;
+2. they move toward the center of the reel area;
+3. briefly circle/swirl around each other;
+4. create a short vortex/whirlwind effect;
+5. next target positions are already predetermined;
+6. at the beginning of the next spin they travel from the vortex/center into target positions while reels begin to fill.
+
+The effect should communicate:
+“the raccoons are mixing up their positions.”
+
+Timing:
+- around 500–900ms in Normal mode;
+- shorter in Quick/Turbo;
+- keep effect inside reel area.
+
+No gameplay RNG is decided by the vortex animation.
+
+==================================================
+9. CRITTER CHAOS — BONUS SPIN ORDER
+==================================================
+Recommended lifecycle:
+
+END OF BONUS SPIN N
+→ show win
+→ update Wild multipliers
+→ if bonus continues:
+   gather persistent Wilds to center
+   → vortex/shuffle
+   → prepare nextRoundPlan
+
+BONUS SPIN N+1
+→ reels start
+→ Wilds simultaneously move from center to predetermined positions
+→ reels fill around them
+→ field settles
+→ calculate ONE result
+→ show win
+→ repeat
+
+No cascades.
+No second win recalculation after movement.
+
+==================================================
+10. CRITTER CHAOS — SYMBOL FIT
+==================================================
+For all NON-CARD symbols with their own background / portrait frame:
+- background edges must align visually with cell edges;
+- symbols should fill the cell as much as possible;
+- preserve aspect ratio;
+- no distortion;
+- no stretched faces/characters.
+
+If an asset cannot fill the cell while preserving aspect ratio:
+DO NOT force-stretch it.
+Regenerate / replace the asset with a correctly composed tile asset.
+
+Applies especially to:
+- animal portraits;
+- WILD;
+- SCATTER;
+- other full-background premium symbols.
+
+==================================================
+11. SWAMP FISHING — POPUP REFERENCE
+==================================================
+Apply the compact in-reel popup treatment to Swamp Fishing too.
+
+Bonus intro example:
+CONGRATULATIONS
+15
+FREE SPINS
+TAP / SPACE TO CONTINUE
+
+The number of Free Spins must be the strongest element.
+Level-up and Bonus Complete use the same compact reel-contained architecture.
+
+==================================================
+12. UNIVERSAL BONUS PRESENTATION
+==================================================
+Create/update shared components where possible:
+
+BonusIntroPopup
+BonusLevelUpPopup
+BonusCompletePopup
+BonusSessionSettlement
+
+Shared behavior:
+- reel-contained;
+- themed per slot;
+- SPACE / tap/click continue;
+- no accidental click-through;
+- no full-screen takeover;
+- final wallet credit only after bonus completion.
+
+==================================================
+13. DEBUG / TESTS
+==================================================
+GENERAL:
+1. bonus wins do not change wallet after every free spin;
+2. bonus total accumulates visually;
+3. final bonus amount credits wallet exactly once;
+4. reload cannot duplicate payout;
+5. bonus popup stays inside reel area;
+6. mobile popup fits reel area and remains readable.
+
+CRITTER CHAOS:
+7. max one Scatter per column;
+8. new circular Scatter asset is used;
+9. no black multiplier badge;
+10. x64 is not hardcoded as max;
+11. x128/x256/x512/etc can be represented;
+12. base Wild does not move;
+13. bonus Wilds persist;
+14. bonus Wilds retain personal multiplier progression;
+15. Wilds do not wait for a fully populated reel before moving;
+16. vortex happens at spin transition;
+17. next bonus spin places Wilds while reels are filling;
+18. final win is calculated only after final positions settle;
+19. no cascades;
+20. no stretched full-background symbols.
+
+SWAMP FISHING:
+21. intro popup uses compact in-reel layout;
+22. level-up popup uses compact in-reel layout;
+23. bonus complete uses compact in-reel layout.
+
+After implementation confirm:
+
+BONUS WALLET SETTLES ONCE AT END
+BONUS POPUPS ARE REEL-CONTAINED
+CRITTER SCATTER MAX 1 PER COLUMN
+CRITTER WILD MULTIPLIER HAS NO x64 HARD CAP
+CRITTER WILDS SHUFFLE THROUGH CENTER VORTEX
+CRITTER BASE WILD HAS NO RUNNING LOGIC
+NO CASCADES IN CRITTER CHAOS
+RNG / RTP / PAYOUT LOGIC PRESERVED EXCEPT EXPLICIT BONUS SETTLEMENT TIMING

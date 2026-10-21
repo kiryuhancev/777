@@ -124,3 +124,22 @@ body.critter-active .app,body.critter-active #slotApp,body.critter-active #poker
 #critterApp .critter-cell>.critter-tile-art{width:100%;height:100%;mix-blend-mode:normal}
 #critterApp .critter-runner>.critter-tile-art{width:100%;height:100%;display:block;overflow:hidden}
 #critterApp .critter-cell.running-source>.critter-tile-art{opacity:.15}
+
+/* v6 supplied art: independent raccoon, WILD plaque and multiplier. Black source
+   mattes blend into the local tile without cropping or deforming source art. */
+#critterApp .critter-cell{isolation:isolate}
+#critterApp .critter-wild-art{position:absolute;inset:0;display:block;pointer-events:none;mix-blend-mode:screen}
+#critterApp .critter-wild-art>img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+#critterApp .critter-wild-art>.critter-wild-label{top:auto;bottom:0;height:27%;width:90%;left:5%}
+#critterApp .critter-cell>.critter-scatter-art{width:100%;height:100%;object-fit:contain;mix-blend-mode:screen}
+#critterApp .critter-wild-multiplier{right:1%;bottom:1%;width:56%;height:28%;padding:0;border:0;border-radius:0;background:none;max-width:none;display:flex;align-items:center;justify-content:center;mix-blend-mode:screen;text-shadow:none}
+#critterApp .critter-wild-multiplier>img{width:100%;height:100%;object-fit:contain}
+#critterApp .critter-wild-multiplier.dynamic{width:auto;min-width:38%;max-width:95%;height:auto;padding:1px 5px;background:linear-gradient(#b93b20,#632313);border:2px solid #ebba58;border-radius:8px;color:#ffdf65;font-weight:1000;font-size:clamp(9px,1.6vw,18px);text-shadow:1px 1px #67400d,-1px -1px #fff5b0;box-shadow:0 1px 2px #301602;mix-blend-mode:normal}
+#critterApp .critter-wild-multiplier.upgraded{animation:critter-plaque-pulse .24s ease-out}
+#critterApp .critter-cell.active-wild:after{content:none}
+#critterApp .critter-cell.winning>.critter-wild-art{filter:drop-shadow(0 0 4px #f9d273);animation:critter-symbol-win .38s ease-out}
+#critterApp .critter-grid.has-wins .critter-cell:not(.winning)>.critter-wild-art{opacity:.7}
+#critterApp .critter-cell.running-source>.critter-wild-art{opacity:.1}
+#critterApp .critter-pay-row{grid-template-columns:1.5fr repeat(3,1fr)}
+@keyframes critter-plaque-pulse{50%{scale:1.18;filter:brightness(1.5)}}
+@media(prefers-reduced-motion:reduce){#critterApp .critter-wild-multiplier.upgraded{animation:none}}

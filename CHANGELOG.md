@@ -1,3 +1,11 @@
+# Unpublished — latest bonus update / Critter v6
+
+- Critter: left-to-right3–5 reel Ways, additive per-way Wild multipliers, maxone Scatter per reel, no cascades; calibrated around96% with independent sample/report.
+- Supplied layered Wild/Scatter art, larger undistorted symbols, center-vortex movement during the next fill. Swamp Scatter and all fishing symbols unchanged.
+- Five slots share reel-local guarded bonus gates and a persisted bonus-session ledger. Canonical/local+remote wallet credits the bonus once after final confirmation.
+- Frozen old rounds, RLS/idempotent SQL, offline outbox/rebase, F5 recovery. Setup: `VAULT_LATEST_UPDATE_SETUP.txt`; details: `LATEST_BONUS_UPDATE.md`.
+- Not deployed; production database untouched.
+
 # Оптимизации после ревью
 
 - Веб-HTML32,7→0,97МБ;100 уникальных изображений вынесены в файлы с SHA-256 именами. Standalone сохранён.

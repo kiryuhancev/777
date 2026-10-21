@@ -1,0 +1,26 @@
+{
+  "unchanged": [
+    "swamp/assets.js",
+    "swamp/config.js",
+    "swamp/model.js",
+    "magnet/model.js",
+    "magnet/features-model.js",
+    "magnet/config.js",
+    "heist/model.js",
+    "heist/config.js",
+    "slot-hud/hud.js",
+    "slot-hud/hud.css"
+  ],
+  "swampAssets": "all existing Swamp asset bytes including Scatter unchanged",
+  "baseline": "c467f81",
+  "digitalDerbyMath": [
+    {
+      "section": "const SYMBOLS=",
+      "sha256": "245d6339e308272f131558a31c4899e5cebd6f2f3397d5e81fb93035c884fe17"
+    },
+    {
+      "section": "// CONFIG / RNG / HEADLESS MATH",
+      "sha256": "00278acaafbca7bafd910e4519febdf7ce139b08c09c5bc68920174a5cef6764"
+    }
+  ]
+}

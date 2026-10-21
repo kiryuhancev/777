@@ -1,4 +1,8 @@
 const CRITTER_ASSETS={
+ raccoon:'__CRITTER_latest/raccoon_base.webp__',
+ wildLabel:'__CRITTER_latest/wild_label.webp__',
+ newScatter:'__CRITTER_latest/scatter.webp__',
+ multipliers:{2:'__CRITTER_latest/x2.webp__',4:'__CRITTER_latest/x4.webp__',8:'__CRITTER_latest/x8.webp__',16:'__CRITTER_latest/x16.webp__',32:'__CRITTER_latest/x32.webp__',64:'__CRITTER_latest/x64.webp__'},
  tiles:'__CRITTER_premium-tiles.png__',
  background:'__CRITTER_environment.webp__',
  sheet:'__CRITTER_references/05_symbol_set.webp__',
