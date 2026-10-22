@@ -1,3 +1,16 @@
+## Unpublished — BIG TOP large characters V5
+
+- Replace centered V2 poster/blurred continuation with supplied full-height V5 stages: MOBILE art at ≤760px, FULL art above 760px. Keep original proportions; clip horizontal overflow per reel only.
+- Use exact V5 ticket, badges, closing panels and optional sharp stage backdrop. Keep final winner open and one plaque near bottom.
+- Preserve actual spin/duel/bonus persistence and settlement; no math, wallet, HUD or reel geometry changes.
+
+## Unpublished — BIG TOP V2 scenes + V3 closing panels
+
+- Use exact supplied V2 ticket, whole duo/final scenes and one WILD/multiplier badge, plus independent V3 closing PNGs.
+- Remove runtime tiled velvet, old generated final art and duplicate frame; contain complete scenes with proportional background continuation. Clip only source caption strips through SVG viewports.
+- Keep persistent scenes open across bonus spins/reload. Existing reels, math, wallet and settlement are unchanged.
+- Mobile acceptance at 320/375/390/430px and desktop; actual seeded spin/bonus/reload and duplicate-settlement checks.
+
 ## Unpublished — CurtainOverlay correction
 
 - Replaced annotated ticket reference with existing clean standalone SHOW ticket asset.

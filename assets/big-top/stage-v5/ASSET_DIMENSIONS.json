@@ -1,0 +1,121 @@
+{
+  "10_SHOW_TICKET.png": {
+    "size": [
+      285,
+      170
+    ],
+    "mode": "RGBA"
+  },
+  "03_STAGE_DUO_MOBILE_FULLHEIGHT.png": {
+    "size": [
+      254,
+      1528
+    ],
+    "mode": "RGB"
+  },
+  "CURTAIN_RIGHT_CLOSING_FULLHEIGHT.png": {
+    "size": [
+      128,
+      1536
+    ],
+    "mode": "RGBA"
+  },
+  "01_CURTAIN_CLOSED_FULL.png": {
+    "size": [
+      235,
+      764
+    ],
+    "mode": "RGB"
+  },
+  "02_STAGE_EMPTY_FULL.png": {
+    "size": [
+      237,
+      764
+    ],
+    "mode": "RGB"
+  },
+  "12_BADGE_X2.png": {
+    "size": [
+      268,
+      140
+    ],
+    "mode": "RGBA"
+  },
+  "04_STAGE_BOMBO_MOBILE_FULLHEIGHT.png": {
+    "size": [
+      254,
+      1528
+    ],
+    "mode": "RGB"
+  },
+  "03_STAGE_DUO_FULL.png": {
+    "size": [
+      237,
+      764
+    ],
+    "mode": "RGB"
+  },
+  "11_BADGE_WILD.png": {
+    "size": [
+      261,
+      140
+    ],
+    "mode": "RGBA"
+  },
+  "05_STAGE_SKINNY_FULL.png": {
+    "size": [
+      235,
+      764
+    ],
+    "mode": "RGB"
+  },
+  "14_BADGE_X5.png": {
+    "size": [
+      288,
+      140
+    ],
+    "mode": "RGBA"
+  },
+  "CURTAIN_LEFT_CLOSING_FULLHEIGHT.png": {
+    "size": [
+      128,
+      1536
+    ],
+    "mode": "RGBA"
+  },
+  "13_BADGE_X3.png": {
+    "size": [
+      255,
+      140
+    ],
+    "mode": "RGBA"
+  },
+  "06_STAGE_BACKGROUND_FULL.png": {
+    "size": [
+      234,
+      764
+    ],
+    "mode": "RGB"
+  },
+  "05_STAGE_SKINNY_MOBILE_FULLHEIGHT.png": {
+    "size": [
+      254,
+      1528
+    ],
+    "mode": "RGB"
+  },
+  "15_BADGE_X10.png": {
+    "size": [
+      269,
+      140
+    ],
+    "mode": "RGBA"
+  },
+  "04_STAGE_BOMBO_FULL.png": {
+    "size": [
+      236,
+      764
+    ],
+    "mode": "RGB"
+  }
+}

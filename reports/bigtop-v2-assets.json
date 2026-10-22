@@ -1,0 +1,250 @@
+{
+  "assets": [
+    {
+      "path": "assets/big-top/curtain-v2/10_SHOW_TICKET.png",
+      "size": [
+        285,
+        170
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "bb6a34338306ceefca88f815a86e455f1f5b9ebda0e93004cf12c2249a2630cf",
+      "originalBytes": true
+    },
+    {
+      "path": "assets/big-top/curtain-v2/06_STAGE_EMPTY.png",
+      "size": [
+        243,
+        538
+      ],
+      "alpha": [
+        255,
+        255
+      ],
+      "sha256": "07f9623b2cc293d562eab5f611f8e8c43f178ae4e5fcae553c20e740a2ec17e5",
+      "originalBytes": true
+    },
+    {
+      "path": "assets/big-top/curtain-v2/01_CURTAIN_CLOSED.png",
+      "size": [
+        223,
+        538
+      ],
+      "alpha": [
+        255,
+        255
+      ],
+      "sha256": "c6cb73eaf9d10f323d599e1074eb200cbdc17023b6e1ee01e786e26abb7f61b1",
+      "originalBytes": true
+    },
+    {
+      "path": "assets/big-top/curtain-v2/04_STAGE_BOMBO.png",
+      "size": [
+        257,
+        538
+      ],
+      "alpha": [
+        255,
+        255
+      ],
+      "sha256": "b666716a0bd77df7321e2bcbeeed8f06aa1139e675090c88f2242b581b576388",
+      "originalBytes": true
+    },
+    {
+      "path": "assets/big-top/curtain-v2/12_BADGE_X2.png",
+      "size": [
+        268,
+        140
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "ecddebb4e0c774026ed5651e58c3ca0636d4c89873423b77e9d4055242d9f036",
+      "originalBytes": true
+    },
+    {
+      "path": "assets/big-top/curtain-v2/03_STAGE_DUO.png",
+      "size": [
+        236,
+        538
+      ],
+      "alpha": [
+        255,
+        255
+      ],
+      "sha256": "11625662acb6c846384fb90ea091dd9ce41a9e06b99205e0286e825d2507466b",
+      "originalBytes": true
+    },
+    {
+      "path": "assets/big-top/curtain-v2/11_BADGE_WILD.png",
+      "size": [
+        261,
+        140
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "efd64592805b25d974c2c6bf127912ec97e86f43d59424d04a9a1ce9edd0f2ac",
+      "originalBytes": true
+    },
+    {
+      "path": "assets/big-top/curtain-v2/14_BADGE_X5.png",
+      "size": [
+        288,
+        140
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "b4f09f6f06ec2ec0df2cd1c9f4e2bff4609d206b9fa0904845fc094052e60cab",
+      "originalBytes": true
+    },
+    {
+      "path": "assets/big-top/curtain-v2/05_STAGE_SKINNY.png",
+      "size": [
+        241,
+        538
+      ],
+      "alpha": [
+        255,
+        255
+      ],
+      "sha256": "2e284e43079db6b93598a25820500135226288d3e3d0748a7cbf4ad8cc28ea71",
+      "originalBytes": true
+    },
+    {
+      "path": "assets/big-top/curtain-v2/09_CURTAIN_TOP_VALANCE.png",
+      "size": [
+        542,
+        153
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "5202029d92d202e23d403aa52b69e428371390a48ae0eea80720886a96b84364",
+      "originalBytes": true
+    },
+    {
+      "path": "assets/big-top/curtain-v2/13_BADGE_X3.png",
+      "size": [
+        255,
+        140
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "188284496e98e6a76569c2609d783bf8f6a92fcdc2687dc883001d974d87ffda",
+      "originalBytes": true
+    },
+    {
+      "path": "assets/big-top/curtain-v2/08_CURTAIN_RIGHT_DETAIL.png",
+      "size": [
+        166,
+        203
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "f3ab68754177f815a71976ceee21cf5f4e6ce0fe0e8a83c5646764b3534c1455",
+      "originalBytes": true
+    },
+    {
+      "path": "assets/big-top/curtain-v2/15_BADGE_X10.png",
+      "size": [
+        269,
+        140
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "d92a2bd6d04a02a935afb43e61782d58e731e94183cad5b63136a96d88fba8eb",
+      "originalBytes": true
+    },
+    {
+      "path": "assets/big-top/curtain-v2/07_CURTAIN_LEFT_DETAIL.png",
+      "size": [
+        210,
+        203
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "d221052ea009945109a7a350586dea379d83e075c08822ddb0cf8178fd65d1bb",
+      "originalBytes": true
+    },
+    {
+      "path": "assets/big-top/curtain-v2/02_CURTAIN_OPEN_FRAME.png",
+      "size": [
+        228,
+        538
+      ],
+      "alpha": [
+        255,
+        255
+      ],
+      "sha256": "7ce5babda41f0752b0ccf9e7fb3e811f00f1b1c37f7eb20ca4c6737d4f5833d6",
+      "originalBytes": true
+    },
+    {
+      "path": "assets/big-top/closing-v3/CURTAIN_RIGHT_CLOSING_FULLHEIGHT.png",
+      "size": [
+        128,
+        1536
+      ],
+      "alpha": [
+        255,
+        255
+      ],
+      "sha256": "dc23023ed1ded6f8ed255cf4195f0591af196d520ad14843d90235d92c5d693a",
+      "originalBytes": true
+    },
+    {
+      "path": "assets/big-top/closing-v3/CURTAIN_LEFT_CLOSING_FULLHEIGHT.png",
+      "size": [
+        128,
+        1536
+      ],
+      "alpha": [
+        255,
+        255
+      ],
+      "sha256": "685919670eb21f97d4d232241c4289c47c52da5dc72c6626a8c6d1d9bb5f288b",
+      "originalBytes": true
+    },
+    {
+      "path": "assets/big-top/closing-v3/preview.png",
+      "size": [
+        128,
+        768
+      ],
+      "alpha": [
+        255,
+        255
+      ],
+      "sha256": "174edf379e22b6d38fa0d63316bab21cca8137318252a832c7db2716010ef035",
+      "originalBytes": true
+    }
+  ],
+  "protectedFilesUnchanged": [
+    "big-top/config.js",
+    "big-top/model.js",
+    "big-top/config-v1.js",
+    "big-top/model-v1.js",
+    "big-top/config-v2.js",
+    "big-top/model-v2.js",
+    "vault/runtime.js",
+    "supabase_big_top_v3.txt"
+  ],
+  "sourceCaptionHandling": "V2 scene image viewport excludes y>=506; nested SVG clips captions inside contain letterbox. Source PNG files remain unchanged.",
+  "closingFit": "V3 opaque PNG leaves: cover with uniform scale and center crop, no runtime tiling; horizontal translations only."
+}

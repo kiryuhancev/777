@@ -35,21 +35,19 @@ body #bigTopApp .bigtop-local-dialog>header{margin-bottom:8px;padding-bottom:6px
 @media(max-width:760px){body #bigTopApp dialog.bigtop-local-dialog{width:86%!important;padding:9px!important}}
 #bigTopReels.has-wins .full-reel:not(.winning){filter:brightness(.58)}
 #bigTopReels.has-wins .full-reel.winning{filter:drop-shadow(0 0 5px #ffd776);box-shadow:inset 0 0 0 2px #fff0b0}
-/* STRICT: photographic frame, fabric, duo and badge are immutable supplied WebP art. */
+/* V5 full-height scenes, responsive art sources, closing-only independent leaves. */
 .bigtop-ticket{object-fit:contain}.bigtop-reel.feature-focus{box-shadow:inset 0 0 14px #ffd56f;z-index:9}
-.bigtop-curtain{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;isolation:isolate;z-index:8;container-type:inline-size}
-.bigtop-stage,.bigtop-stage-lights{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;pointer-events:none}
-.bigtop-stage-floor{position:absolute;left:0;bottom:0;width:100%;height:23%;overflow:hidden}
+.bigtop-curtain{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;isolation:isolate;z-index:8;container-type:size;box-shadow:inset 1px 0 #dba543,inset -1px 0 #dba543}
+.bigtop-stage{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.bigtop-stage-empty,.bigtop-duo-scene,.bigtop-clown{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}
+.bigtop-stage-empty,.bigtop-duo-scene,.bigtop-winner-scene{display:block;overflow:hidden}
+.bigtop-winner-scene{position:absolute;inset:0;width:100%;height:100%}
+.bigtop-stage-background{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.bigtop-stage-art{position:absolute;top:0;left:50%;height:100%;width:auto;max-width:none;object-fit:cover;transform:translateX(-50%)}
 .bigtop-drape{position:absolute;top:0;bottom:0;width:50%;z-index:7;overflow:hidden;pointer-events:none}
-.bigtop-drape svg{display:block;width:100%;height:100%}.bigtop-drape.left{left:0}.bigtop-drape.right{right:0}
-.bigtop-frame-art{position:absolute;inset:0;display:grid;grid-template-columns:20% 60% 20%;grid-template-rows:35cqw minmax(0,1fr) 26.6667cqw;z-index:9;pointer-events:none;overflow:hidden}
-.bigtop-frame-art svg{display:block;width:100%;height:100%;overflow:hidden;min-height:0;min-width:0}
+.bigtop-drape img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+.bigtop-drape.left{left:0}.bigtop-drape.right{right:0}
 .bigtop-curtain.resolved .left{transform:translate3d(-100%,0,0)}.bigtop-curtain.resolved .right{transform:translate3d(100%,0,0)}
-.bigtop-duo-scene,.bigtop-clown{position:absolute;inset:7% 8% 8%;width:84%;height:85%;z-index:3;pointer-events:none}
-.bigtop-duo-scene,.bigtop-winner-scene{object-fit:contain;object-position:center;display:block}
-.bigtop-winner-scene{width:100%;height:100%}.bigtop-clown{inset:6% 8% 12%;height:82%}
-.bigtop-label{position:absolute;z-index:10;bottom:4%;left:3%;width:94%;height:23%;pointer-events:none;visibility:hidden}
+.bigtop-label{position:absolute;z-index:6;left:4%;width:92%;height:44cqw;bottom:2%;pointer-events:none;visibility:hidden}
 .bigtop-label img{display:block;object-fit:contain;width:100%;height:100%}.bigtop-curtain.resolved .bigtop-label{visibility:visible}
-.bigtop-curtain .bigtop-encore{position:absolute;z-index:10;top:10%;left:0;width:100%;text-align:center;color:#ffe7a4;letter-spacing:0;font-size:clamp(5px,1vw,10px)}
-#bigTopReels.has-wins .full-reel.persistent-closed{filter:none;box-shadow:inset 0 0 9px #ffd36b}
 #bigTopWays{font-variant-numeric:tabular-nums;white-space:nowrap;max-width:100%;font-size:clamp(9px,1.4vw,13px)}

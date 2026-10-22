@@ -1,0 +1,247 @@
+{
+  "assets": [
+    {
+      "path": "assets/big-top/stage-v5/10_SHOW_TICKET.png",
+      "sha256": "bb6a34338306ceefca88f815a86e455f1f5b9ebda0e93004cf12c2249a2630cf",
+      "sourceBytesUnchanged": true,
+      "size": [
+        285,
+        170
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "path": "assets/big-top/stage-v5/PREVIEW_FULL_VS_MOBILE.jpg",
+      "sha256": "aff6006882b0c0398919e21fd3ba5b8e8654c6773568c24c834a1707cd62868c",
+      "sourceBytesUnchanged": true
+    },
+    {
+      "path": "assets/big-top/stage-v5/03_STAGE_DUO_MOBILE_FULLHEIGHT.png",
+      "sha256": "b79d8fb5ff1fe3d21530f5a18e8fd6899d3fc8e2c5ac8f50e7fb93a6754bd748",
+      "sourceBytesUnchanged": true,
+      "size": [
+        254,
+        1528
+      ],
+      "mode": "RGB",
+      "alpha": null
+    },
+    {
+      "path": "assets/big-top/stage-v5/CURTAIN_RIGHT_CLOSING_FULLHEIGHT.png",
+      "sha256": "dc23023ed1ded6f8ed255cf4195f0591af196d520ad14843d90235d92c5d693a",
+      "sourceBytesUnchanged": true,
+      "size": [
+        128,
+        1536
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        255,
+        255
+      ]
+    },
+    {
+      "path": "assets/big-top/stage-v5/ASSET_DIMENSIONS.json",
+      "sha256": "cd6b57b3e0207335313034afddbcb8cd7b9b86cd97ada33205442574580f3279",
+      "sourceBytesUnchanged": true
+    },
+    {
+      "path": "assets/big-top/stage-v5/01_CURTAIN_CLOSED_FULL.png",
+      "sha256": "41cf3ba06ebc1bfc15242f2462080ad68a7eaed0587754153631a6e146cdf770",
+      "sourceBytesUnchanged": true,
+      "size": [
+        235,
+        764
+      ],
+      "mode": "RGB",
+      "alpha": null
+    },
+    {
+      "path": "assets/big-top/stage-v5/02_STAGE_EMPTY_FULL.png",
+      "sha256": "1673bf94814b62d1f02c72509a1e11edb179ee52d85f62efe3cd462c7fe9a7c2",
+      "sourceBytesUnchanged": true,
+      "size": [
+        237,
+        764
+      ],
+      "mode": "RGB",
+      "alpha": null
+    },
+    {
+      "path": "assets/big-top/stage-v5/12_BADGE_X2.png",
+      "sha256": "ecddebb4e0c774026ed5651e58c3ca0636d4c89873423b77e9d4055242d9f036",
+      "sourceBytesUnchanged": true,
+      "size": [
+        268,
+        140
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "path": "assets/big-top/stage-v5/04_STAGE_BOMBO_MOBILE_FULLHEIGHT.png",
+      "sha256": "75ec9d8823f21491c7c9bc5e20818f5d0a0dee7d81f0d0f7bc2bf00852d0454b",
+      "sourceBytesUnchanged": true,
+      "size": [
+        254,
+        1528
+      ],
+      "mode": "RGB",
+      "alpha": null
+    },
+    {
+      "path": "assets/big-top/stage-v5/03_STAGE_DUO_FULL.png",
+      "sha256": "65a03a6057e57fb437f5dd203e5927c7316706981566eb3f9885860da4fcc177",
+      "sourceBytesUnchanged": true,
+      "size": [
+        237,
+        764
+      ],
+      "mode": "RGB",
+      "alpha": null
+    },
+    {
+      "path": "assets/big-top/stage-v5/11_BADGE_WILD.png",
+      "sha256": "efd64592805b25d974c2c6bf127912ec97e86f43d59424d04a9a1ce9edd0f2ac",
+      "sourceBytesUnchanged": true,
+      "size": [
+        261,
+        140
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "path": "assets/big-top/stage-v5/05_STAGE_SKINNY_FULL.png",
+      "sha256": "4896919ee4bffd4294f730ea5939059ccc45d46a5225dfa40b6522cb6d5e5e18",
+      "sourceBytesUnchanged": true,
+      "size": [
+        235,
+        764
+      ],
+      "mode": "RGB",
+      "alpha": null
+    },
+    {
+      "path": "assets/big-top/stage-v5/14_BADGE_X5.png",
+      "sha256": "b4f09f6f06ec2ec0df2cd1c9f4e2bff4609d206b9fa0904845fc094052e60cab",
+      "sourceBytesUnchanged": true,
+      "size": [
+        288,
+        140
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "path": "assets/big-top/stage-v5/CURTAIN_LEFT_CLOSING_FULLHEIGHT.png",
+      "sha256": "685919670eb21f97d4d232241c4289c47c52da5dc72c6626a8c6d1d9bb5f288b",
+      "sourceBytesUnchanged": true,
+      "size": [
+        128,
+        1536
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        255,
+        255
+      ]
+    },
+    {
+      "path": "assets/big-top/stage-v5/README_FIRST.txt",
+      "sha256": "7c000a6e49f8027c6fe1e34f6da4fc82c41d57e6d5c0a2a4fc6aa729a2696546",
+      "sourceBytesUnchanged": true
+    },
+    {
+      "path": "assets/big-top/stage-v5/13_BADGE_X3.png",
+      "sha256": "188284496e98e6a76569c2609d783bf8f6a92fcdc2687dc883001d974d87ffda",
+      "sourceBytesUnchanged": true,
+      "size": [
+        255,
+        140
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "path": "assets/big-top/stage-v5/06_STAGE_BACKGROUND_FULL.png",
+      "sha256": "6098f8d82642d87f006e3a9cc05650dd0b90f2aba8a59deb8599770c70d3cc20",
+      "sourceBytesUnchanged": true,
+      "size": [
+        234,
+        764
+      ],
+      "mode": "RGB",
+      "alpha": null
+    },
+    {
+      "path": "assets/big-top/stage-v5/05_STAGE_SKINNY_MOBILE_FULLHEIGHT.png",
+      "sha256": "ea0b5968d2437207444ba9e1b7ec11d01d9f3c581cb91f21bc212bf8350d9428",
+      "sourceBytesUnchanged": true,
+      "size": [
+        254,
+        1528
+      ],
+      "mode": "RGB",
+      "alpha": null
+    },
+    {
+      "path": "assets/big-top/stage-v5/15_BADGE_X10.png",
+      "sha256": "d92a2bd6d04a02a935afb43e61782d58e731e94183cad5b63136a96d88fba8eb",
+      "sourceBytesUnchanged": true,
+      "size": [
+        269,
+        140
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "path": "assets/big-top/stage-v5/04_STAGE_BOMBO_FULL.png",
+      "sha256": "fd064514d3c927ba44f14da906f2b083ea6493d4b3f232ef9d00b23f2bf8c319",
+      "sourceBytesUnchanged": true,
+      "size": [
+        236,
+        764
+      ],
+      "mode": "RGB",
+      "alpha": null
+    },
+    {
+      "path": "assets/big-top/stage-v5/BIG_TOP_STAGE_LARGE_CHARACTERS_V5_Codex_Prompt.txt",
+      "sha256": "8aac7b7c530fb4529658cfed5df1c320e346a64a2eba20f8012d7a6baceecee8",
+      "sourceBytesUnchanged": true
+    }
+  ],
+  "unchangedLogic": [
+    "big-top/model.js",
+    "big-top/config.js",
+    "big-top/model-v1.js",
+    "big-top/config-v1.js",
+    "big-top/model-v2.js",
+    "big-top/config-v2.js",
+    "vault/runtime.js",
+    "supabase_big_top_v3.txt"
+  ],
+  "identityComparison": "New supplied V5 art differs from historical identity sheet (Bombo patchwork trousers/top hat vs multicolored dotted costume; Skinny feathered hat/unicycle vs earlier juggler). Exact new user-supplied V5 proposal used, no invented replacements or independent final identity approval.",
+  "separateOpenFrame": "Not included in V5. Whole V5 scenes already contain curtain frame; no missing visual state and no extra frame added."
+}
