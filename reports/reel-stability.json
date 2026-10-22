@@ -37,7 +37,7 @@
         ]
       },
       "popup": {
-        "samples": 130,
+        "samples": 111,
         "max": {
           "host": [
             0,
@@ -92,7 +92,7 @@
       }
     },
     "swamp": {
-      "samples": 156,
+      "samples": 157,
       "max": {
         "host": [
           0,
@@ -145,7 +145,7 @@
         }
       },
       "browserChromeResize": {
-        "samples": 41,
+        "samples": 39,
         "max": {
           "host": [
             0,
@@ -173,169 +173,7 @@
       }
     },
     "vault_heist": {
-      "samples": 114,
-      "max": {
-        "host": [
-          0,
-          0,
-          0,
-          0
-        ],
-        "frame": [
-          0,
-          0,
-          0,
-          0
-        ],
-        "hud": [
-          0,
-          0,
-          0,
-          0
-        ],
-        "cell": [
-          0,
-          0
-        ]
-      },
-      "popup": {
-        "samples": 117,
-        "max": {
-          "host": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "frame": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "hud": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "cell": [
-            0,
-            0
-          ]
-        }
-      },
-      "browserChromeResize": {
-        "samples": 39,
-        "max": {
-          "host": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "frame": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "hud": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "cell": [
-            0,
-            0
-          ]
-        }
-      }
-    },
-    "magnet": {
-      "samples": 146,
-      "max": {
-        "host": [
-          0,
-          0,
-          0,
-          0
-        ],
-        "frame": [
-          0,
-          0,
-          0,
-          0
-        ],
-        "hud": [
-          0,
-          0,
-          0,
-          0
-        ],
-        "cell": [
-          0,
-          0
-        ]
-      },
-      "popup": {
-        "samples": 108,
-        "max": {
-          "host": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "frame": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "hud": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "cell": [
-            0,
-            0
-          ]
-        }
-      },
-      "browserChromeResize": {
-        "samples": 39,
-        "max": {
-          "host": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "frame": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "hud": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "cell": [
-            0,
-            0
-          ]
-        }
-      }
-    },
-    "slot": {
-      "samples": 107,
+      "samples": 113,
       "max": {
         "host": [
           0,
@@ -415,8 +253,170 @@
         }
       }
     },
+    "magnet": {
+      "samples": 145,
+      "max": {
+        "host": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "frame": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "hud": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cell": [
+          0,
+          0
+        ]
+      },
+      "popup": {
+        "samples": 102,
+        "max": {
+          "host": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "frame": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "hud": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "cell": [
+            0,
+            0
+          ]
+        }
+      },
+      "browserChromeResize": {
+        "samples": 39,
+        "max": {
+          "host": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "frame": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "hud": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "cell": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "slot": {
+      "samples": 101,
+      "max": {
+        "host": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "frame": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "hud": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cell": [
+          0,
+          0
+        ]
+      },
+      "popup": {
+        "samples": 96,
+        "max": {
+          "host": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "frame": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "hud": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "cell": [
+            0,
+            0
+          ]
+        }
+      },
+      "browserChromeResize": {
+        "samples": 39,
+        "max": {
+          "host": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "frame": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "hud": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "cell": [
+            0,
+            0
+          ]
+        }
+      }
+    },
     "delayedSymbolLoad": {
-      "samples": 31,
+      "samples": 30,
       "max": {
         "host": [
           0,

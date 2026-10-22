@@ -1,0 +1,10 @@
+{
+  "passed": [
+    "loss: exact SQL Ways, single debit/stat, duplicate idempotency, escrow/end credit, progress identity/RLS",
+    "win: exact SQL Ways, single debit/stat, duplicate idempotency, escrow/end credit, progress identity/RLS",
+    "bonus: exact SQL Ways, single debit/stat, duplicate idempotency, escrow/end credit, progress identity/RLS",
+    "legacy: exact SQL Ways, single debit/stat, duplicate idempotency, escrow/end credit, progress identity/RLS",
+    "buy: exact SQL Ways, single debit/stat, duplicate idempotency, escrow/end credit, progress identity/RLS",
+    "Insufficient buy has no partial debit/row; direct bonus credit bypass denied; payout tampering and blocked-account stakes denied"
+  ]
+}

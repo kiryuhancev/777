@@ -1,0 +1,152 @@
+BIG TOP WILDS — ACCEPTANCE / REGRESSION TEST CASES
+Run on desktop and mobile where applicable.
+
+A. REEL GEOMETRY / RESPONSIVE
+TC-A01: Spin with [2,2,2,2,2,2]. Reel viewport outer width/height remain unchanged before/during/after spin.
+TC-A02: Spin with [6,6,6,6,6,6]. Same outer viewport dimensions as A01.
+TC-A03: Spin with [2,6,3,5,4,2]. Each column width is identical; only cell height differs.
+TC-A04: Confirm symbol artwork preserves aspect ratio in 2-row and 6-row cells; no stretched faces/objects.
+TC-A05: Change from one reel-height pattern to another across spins. No page/HUD jump.
+TC-A06: Mobile portrait repeated 20 spins. No horizontal overflow and no visible reel/container shake.
+TC-A07: Popup open/close does not change reel height or push HUD.
+
+B. BIG TOP WAYS / PAYOUT EVALUATION
+TC-B01: Matching symbol on Reel 1-2-3 => valid 3-reel win.
+TC-B02: Matching symbol on Reel 1-2-3-4 => valid 4-reel win.
+TC-B03: Matching symbol on Reel 1-2-3-4-5-6 => valid 6-reel win.
+TC-B04: Matching symbol only on Reel 2-3-4 => no normal-symbol win.
+TC-B05: Matching symbol on Reel 1-2-4 with Reel 3 absent => no win.
+TC-B06: Counts [2,3,2] of same symbol on Reel 1-2-3 => 12 ways for that length.
+TC-B07: Wild substitutes for normal paying symbol.
+TC-B08: Wild does not substitute for Scatter.
+TC-B09: Payout evaluation is identical after reload of a deterministic saved round.
+
+C. SCATTER
+TC-C01: Max one Scatter in any single column.
+TC-C02: 2 Scatter anywhere => no bonus trigger.
+TC-C03: 3 Scatter anywhere => 10 Free Spins.
+TC-C04: 4 Scatter => 12 Free Spins.
+TC-C05: 5 Scatter => 15 Free Spins.
+TC-C06: 6 Scatter => 20 Free Spins.
+TC-C07: Scatter works regardless of Reel 1 and row positions.
+TC-C08: Scatter silhouette never changes grid row height or reel viewport dimensions.
+
+D. CURTAIN WILD BASE
+TC-D01: Curtain final result is predetermined before feature animation.
+TC-D02: Curtain showdown does not begin until all reels are settled.
+TC-D03: x1 Curtain final label shows only WILD.
+TC-D04: x2 final label shows only x2; WILD text is absent.
+TC-D05: x3/x5/x10 follow the same replacement behavior.
+TC-D06: No black/generic multiplier badge appears.
+TC-D07: Winning clown changes final curtain presentation; losing clown does not remain as a second overlay.
+TC-D08: Feature animation does not cause second RNG draw or result mutation.
+TC-D09: Paid result is evaluated once after Curtain resolution.
+TC-D10: Multiple Curtain cells resolve consistently and do not duplicate settlement.
+
+E. FULL REEL CURTAIN
+TC-E01: Full Reel Curtain covers exactly 100% reel height on a 2-row reel.
+TC-E02: Same visual coverage on a 6-row reel.
+TC-E03: Full Reel x3 applies x3 once per participating reel/way, not six times for six cells.
+TC-E04: Two participating multiplier Curtain reels x2 and x3 yield combined x6 for that way under specified rule.
+TC-E05: Full Reel Curtain does not stretch clown face/body to reel height.
+
+F. REEL ANIMATION
+TC-F01: Normal stop order is Reel 1 -> 2 -> 3 -> 4 -> 5 -> 6.
+TC-F02: Normal timings roughly match configured windows.
+TC-F03: Quick profile is about 70% of Normal.
+TC-F04: Turbo profile is about 40% of Normal.
+TC-F05: Reduced Motion preserves readable state changes with reduced decoration.
+TC-F06: Inspect CSS/animation: no width/height/top/left/margin/padding animation for reel movement.
+TC-F07: Symbols are preloaded/no late image reflow on first spin.
+TC-F08: 50 consecutive mobile spins: no accumulating drift, jump, blank strip or misalignment.
+
+G. BASE ROUND SETTLEMENT
+TC-G01: One paid base spin debits wager exactly once.
+TC-G02: One winning base spin credits exact final win once.
+TC-G03: Rapid double click on Spin cannot create two concurrent debits/rounds.
+TC-G04: WIN and LAST WIN values update according to shared HUD semantics.
+TC-G05: No cascades occur.
+
+H. BONUS START / INTRO POPUP
+TC-H01: Triggering Scatter finishes paid round before Bonus Intro.
+TC-H02: Bonus Intro appears inside reel frame only.
+TC-H03: Reel-area backdrop dims reels but HUD remains visible.
+TC-H04: Popup does not alter outer layout dimensions.
+TC-H05: Bonus does not auto-start before player continue input.
+TC-H06: SPACE starts once on desktop.
+TC-H07: Tap/click starts once on mobile/desktop.
+TC-H08: Underlying Spin/Bet/Auto/Max/Bonus controls cannot receive click-through.
+
+I. BONUS DEFERRED WALLET SETTLEMENT
+TC-I01: Record wallet before bonus. After first winning free spin, wallet value remains unchanged.
+TC-I02: bonusSession.totalWin increases correctly per free spin.
+TC-I03: BONUS WIN displays running accumulated amount.
+TC-I04: After final free spin, total bonus win is credited exactly once.
+TC-I05: Reload mid-bonus restores spins remaining and totalWin without wallet credit.
+TC-I06: Reload on Bonus Complete does not duplicate final payout.
+TC-I07: Repeated dismiss/continue input cannot duplicate payout.
+
+J. ENCORE CURTAIN
+TC-J01: Eligible multiplier Curtain can receive explicit Encore state.
+TC-J02: Encore Curtain persists for exactly one additional free spin under default config.
+TC-J03: Non-Encore Curtains do not persist unexpectedly.
+TC-J04: Reload preserves active Encore state.
+TC-J05: Encore presentation does not mutate predetermined next-round state.
+
+K. APPLAUSE METER / STANDING OVATION
+TC-K01: Normal Curtain adds configured meter amount.
+TC-K02: Multiplier Curtain adds configured amount.
+TC-K03: Full Reel Curtain adds configured amount.
+TC-K04: Reaching threshold arms Standing Ovation.
+TC-K05: Next eligible free spin contains guaranteed Curtain in deterministic roundPlan.
+TC-K06: Guarantee is consumed once and meter resets per config.
+TC-K07: Reload preserves meter/armed state without duplicate guarantee.
+
+L. BONUS BUY
+TC-L01: Bonus menu opens without browser-native confirm dialog.
+TC-L02: NO/X/backdrop/ESC exits without debit.
+TC-L03: YES with insufficient balance fails safely with no partial state.
+TC-L04: YES with sufficient balance debits purchase cost once.
+TC-L05: Rapid double tap on YES does not double-debit.
+TC-L06: After purchase, game runs presentation trigger spin; it does not teleport directly into free spins.
+TC-L07: Presentation trigger spin receives no additional wager debit.
+TC-L08: Trigger spin visibly produces required Scatter trigger.
+TC-L09: Bonus Intro waits for player input before starting free spins.
+
+M. WIN PRESENTATION
+TC-M01: Winning way cells highlight; non-winning cells dim.
+TC-M02: Multiple ways may cycle visually but payout remains one calculated round result.
+TC-M03: Big Win overlay stays inside reel area.
+TC-M04: Big Win presentation never directly changes wallet.
+TC-M05: winX equals total round win / bet with correct precision.
+
+N. MOBILE / PERFORMANCE
+TC-N01: iOS Safari portrait: 20 normal spins, no visible layout jump.
+TC-N02: Android Chrome portrait: same.
+TC-N03: Popup open/close repeated 10 times: no scroll/viewport jump.
+TC-N04: Curtain showdown on smallest supported viewport remains inside reel bounds.
+TC-N05: Scatter remains recognizable in a 6-row reel.
+TC-N06: No console errors during 50-spin autoplay/normal stress test if autoplay exists.
+TC-N07: Decorative effects may degrade but mechanics/HUD remain fully usable.
+
+O. PERSISTENCE / REGRESSION
+TC-O01: Existing VAULT games still launch after adding BIG TOP WILDS.
+TC-O02: Auth/Supabase behavior unchanged.
+TC-O03: Global wallet shared correctly when leaving/returning to BIG TOP WILDS.
+TC-O04: Refresh in base idle state is safe.
+TC-O05: Refresh mid-spin resolves/restores according to existing project round-safety policy; no double settlement.
+TC-O06: Refresh mid-bonus restores state.
+TC-O07: Refresh after settlement never repeats credit/debit.
+TC-O08: No new uncaught console errors on lobby or existing games.
+
+P. VISUAL CONTRACT
+TC-P01: BOMBO and SKINNY are not recolors of same body: clearly different silhouettes/proportions.
+TC-P02: Clowns never appear as ordinary paying symbols.
+TC-P03: Approved premium-symbol direction is used; no generic stock circus replacement set.
+TC-P04: Scatter is tent-shaped/non-rectangular and labeled SCATTER.
+TC-P05: Multiplier replaces WILD label rather than overlays it.
+TC-P06: Universal VAULT HUD semantic control order preserved.
+TC-P07: No fullscreen bonus/Big Win modal.
+
+PASS CONDITION:
+All critical settlement, persistence, reel-stability, Curtain-label and popup tests must pass before shipping.

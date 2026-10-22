@@ -1,0 +1,24 @@
+THE BIG SHOW FLOW
+
+Scatter trigger / presentation trigger
+-> Base round finishes
+-> THE BIG SHOW in-reel intro popup
+-> player Space/tap/click
+-> bonusSession starts
+-> Free Spin loop
+   -> deterministic roundPlan
+   -> reel animation
+   -> Curtain resolve
+   -> payout evaluation
+   -> add win to bonusSession.totalWin (wallet unchanged)
+   -> update Encore / Applause Meter
+-> last free spin resolves
+-> Bonus Complete in-reel popup/presentation
+-> settle bonusSession.totalWin exactly once
+-> return to base game safely.
+
+Default trigger mapping:
+3 Scatter 10 FS
+4 Scatter 12 FS
+5 Scatter 15 FS
+6 Scatter 20 FS

@@ -1,0 +1,17 @@
+UPSIDE PAWS — CARD SYMBOL PAIRS
+
+Ranks: 10 J Q K A.
+
+NORMAL grid must use the bright playful pet-world set:
+../06_REFERENCES/UPSIDE_PAWS_card_symbols_NORMAL_variant.webp
+
+UPSIDE grid must use the dark rift-corrupted counterpart set:
+../06_REFERENCES/UPSIDE_PAWS_card_symbols_UPSIDE_variant.webp
+
+The two visual sets are not alternative themes for user selection.
+They are simultaneous world-specific counterparts:
+NORMAL WORLD => normal set.
+UPSIDE WORLD => upside set.
+
+Maintain exact rank identity and readability.
+Do not mix world skins.

@@ -1,0 +1,11 @@
+{
+  "seeds": 5000,
+  "passed": [
+    "full-reel trigger invariants",
+    "base RNG event/Scatter/height preservation",
+    "immutable legacy recovery",
+    "Ways / multiplier formulas",
+    "JSONB checkpoint ordering",
+    "payout tampering rejected"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "unchangedMathAndSharedPopupFiles": [
+    "swamp/config.js",
+    "swamp/model.js",
+    "swamp/config-v2.js",
+    "swamp/model-v1.js",
+    "swamp/config-v3.js",
+    "swamp/model-v2.js",
+    "upside-paws/config.js",
+    "upside-paws/model.js",
+    "slot-hud/hud.js",
+    "slot-hud/bonus-popup.js",
+    "slot-hud/bonus-popup.css"
+  ]
+}

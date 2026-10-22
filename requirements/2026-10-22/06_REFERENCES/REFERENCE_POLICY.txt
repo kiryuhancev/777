@@ -1,0 +1,33 @@
+REFERENCE POLICY — READ BEFORE USING IMAGES
+
+TEXT SPEC ALWAYS WINS OVER AN IMAGE.
+
+APPROVED CHARACTER SOURCE:
+BIG_TOP_APPROVED_BOMBO_SKINNY_source.webp
+Use this for BOMBO/SKINNY identity, silhouette and differentiation.
+
+CURTAIN SIZE REFERENCE:
+BIG_TOP_full_reel_curtain_width_height_reference.webp
+Use it to understand: one curtain stage = one reel width x full reel height.
+Do not treat any incidental prop placement as authoritative.
+
+TICKET/SEQUENCE COMPOSITION REFERENCE:
+BIG_TOP_ticket_sequence_composition_ONLY.webp
+Use ONLY for:
+- red/gold SHOW ticket idea;
+- ticket occupies one cell;
+- general sequence: ticket -> curtain close -> curtain open/showdown -> winner/result.
+DO NOT USE THE CLOWNS SHOWN IN THIS INTERMEDIATE IMAGE.
+They are random placeholder clowns and are explicitly rejected.
+Replace them with approved BOMBO and SKINNY.
+
+ORIGINAL PRODUCTION BOARD:
+BIG_TOP_original_production_board.webp
+Use for slot skin, variable-height reels, overall UI direction and original mechanics context.
+If it conflicts with current text spec, current text wins.
+
+SWAMP references:
+SWAMP_voodoo_style_reference.webp and SWAMP_bonus_popup_reference.webp define theme/popup direction, not permission to crop symbols.
+
+UPSIDE PAWS:
+NORMAL and UPSIDE card-symbol images are world-specific source references.

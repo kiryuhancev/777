@@ -1,0 +1,14 @@
+{
+  "rounds": 5000000,
+  "scale": 0.1102530765527087,
+  "rtpEstimate": 0.9599999999772539,
+  "confidence95": [
+    0.9013175237107485,
+    1.0186824762892515
+  ],
+  "bonusFrequency": 266.1273153076432,
+  "buySample": 100000,
+  "buyExpectedWinX": 234.00588743009473,
+  "suggestedBuyCostX": 244,
+  "note": "Calibration sample, must independently validate; Monte Carlo is not theoretical certification."
+}

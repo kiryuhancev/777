@@ -1,0 +1,13 @@
+{
+  "mode": "bonus",
+  "rounds": 500000,
+  "offset": 50000000,
+  "productionScale": 0.11025308,
+  "meanWeight": 0.9947930491692398,
+  "meanContribution": 0.8980291029172883,
+  "confidence95": [
+    0.8727791661504114,
+    0.9232790396841652
+  ],
+  "note": "Likelihood-corrected offline split estimator; production RNG unchanged."
+}

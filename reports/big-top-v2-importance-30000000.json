@@ -1,0 +1,18 @@
+{
+  "method": "Unbiased base-Scatter importance sampling, exact likelihood correction; production RNG/config unchanged",
+  "rounds": 1000000,
+  "seedOffset": 30000000,
+  "proposalBaseScatter": 0.3,
+  "productionBaseScatter": 0.06,
+  "meanWeight": 0.997444930221497,
+  "sampledBonus": 254954,
+  "estimatedNaturalBonusFrequency": 266.6247374905569,
+  "productionScale": 0.11025308,
+  "rtp": 1.0625737101790924,
+  "confidence95": [
+    0.9347658372721872,
+    1.1903815830859976
+  ],
+  "calibrationScale": 0.09517771514716347,
+  "note": "Statistical estimate with variance reduction, not theoretical certification."
+}

@@ -1,0 +1,12 @@
+SHARED VAULT RULES — DO NOT REGRESS
+
+1. Universal slot HUD semantics remain unchanged.
+2. Mobile reel containers remain dimensionally stable during animation.
+3. Use transform/opacity for motion; avoid flow/layout resizing.
+4. Bonus-session wins accumulate internally and credit wallet once at bonus end.
+5. Settlement is idempotent and reload-safe.
+6. Bonus Buy uses confirmation + one debit + visual trigger spin + in-reel intro.
+7. Feature/bonus popups are contained inside game/reel viewport; no page-level fullscreen takeover.
+8. One Space/click/tap = one transition; prevent double fire/click-through.
+9. Visual presentation does not modify RNG/pay result.
+10. Preserve all other VAULT games and routes.

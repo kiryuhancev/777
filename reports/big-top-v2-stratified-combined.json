@@ -1,0 +1,12 @@
+{
+  "method": "Independent split importance sampling, unchanged production RNG",
+  "roundsPerComponent": 500000,
+  "payoutScale": 0.11025308,
+  "rtpPercent": 98.75708133257001,
+  "confidence95Percent": [
+    96.23021374775385,
+    101.28394891738617
+  ],
+  "targetPercent": 96,
+  "note": "Monte Carlo estimate, not an exact theoretical certification; calibration used separate 5-million-round sample."
+}

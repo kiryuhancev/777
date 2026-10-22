@@ -1,0 +1,22 @@
+SWAMP FISHING — SYMBOL FIT CORRECTIVE SPEC
+
+Goal: eliminate all unintended crop/distortion without changing Voodoo/swamp identity or game math.
+
+Audit every symbol on desktop, 390px and 320px mobile in base and bonus modes.
+Important silhouettes/text must be fully visible.
+Use proportional contain-style scaling.
+Correct transparent source bounds if necessary.
+Never non-uniformly stretch.
+
+Explicitly inspect:
+- Collector/Fisherman;
+- Money Fish variants;
+- Scatter;
+- low/card symbols;
+- premium/special symbols;
+- win-highlight state;
+- reel spin strips;
+- settled cells;
+- late-load/cached image path.
+
+Preserve previously approved in-reel popups and deferred bonus settlement rules.

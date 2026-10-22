@@ -1,0 +1,14 @@
+{
+  "n": 2000000,
+  "rtp": 1.0272703749205074,
+  "confidence95": [
+    0.9269258401234871,
+    1.1276149097175279
+  ],
+  "bonusFrequency": 0.0037115,
+  "maximum": 10000,
+  "capped": 69,
+  "buySample": 10000,
+  "buyRtp": 1.0404344583766383,
+  "note": "Monte Carlo estimate, not a certified or guaranteed theoretical RTP; new-slot weights/paytable are configurable. Existing games unchanged."
+}

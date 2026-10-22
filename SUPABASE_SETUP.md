@@ -113,3 +113,7 @@ Run the complete **[supabase_mines.txt](supabase_mines.txt)** file (identical SQ
 https://supabase.com/dashboard/project/umccpdbopcgluwsnhlwj/sql/new
 
 Copy from the first comment/`begin;` through the final `commit;`, select all query text, then Run. Do not execute a selected middle fragment. The update preserves accounts/balances, extends the game registry and existing begin/settle/settings RPCs, and adds owned resumable Mines checkpoints. It keeps all previous games including Swamp registered. Reload VAULT afterward; MINES enables automatically after its capability check. No URL/key change is needed. Do not run earlier table-only/Swamp-only registry migrations afterward.
+
+## BIG TOP update — 2026-10-22
+
+After the previously installed BIG TOP / UPSIDE PAWS setup, run the complete `supabase_big_top_v2.txt`. Verify `select public.big_top_capabilities();`: `mathVersion` must be2 and `roundVersions` must include1 and2. Old version1 rounds keep their original payouts; new version2 rounds use full-reel SHOW TICKET features. See `VAULT_UPDATE_2026_10_22.md`. Do not rerun older setup scripts after this update.

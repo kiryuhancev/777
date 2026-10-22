@@ -1,0 +1,134 @@
+[
+  {
+    "command": "node tools/upside-paws-model-tests.cjs",
+    "exitCode": 0,
+    "stdout": " configurable 0/1/2/3/4+ ladder, applied once\nPASS Scatter all-normal, all-upside, split, <3 and 3/4/5/6+ entitlements\nPASS Bidirectional Echo derives only from primary wins; counterparts and one secondary depth\nPASS Portal copy same coordinate, correct skin, fixed final state and independent evaluation\nPASS Breach charge, queue next spin, reset on consumption and no event/no charge\nPASS Determinism, max payout, paired IDs, no recursion/cascade, recovery JSONB order, tamper rejection 3000 seeds\n",
+    "stderr": ""
+  },
+  {
+    "command": "node tools/big-top-model-tests.cjs",
+    "exitCode": 0,
+    "stdout": "PASS 46 acceptance IDs; 3000 seeded rounds, deterministic payouts and state continuity\n",
+    "stderr": ""
+  },
+  {
+    "command": "node tools/vault-update-2026-model-tests.cjs",
+    "exitCode": 0,
+    "stdout": "PASS5000 full-reel seeds; exact base trigger frequency/row/Scatter preservation; v1 snapshots; all multipliers; one trigger per reel; Ways and one multiplier per participating reel; no duplicate plan state\n",
+    "stderr": ""
+  },
+  {
+    "command": "node tools/magnet-math-tests.cjs",
+    "exitCode": 0,
+    "stdout": "nal grid evaluation is authoritative\nPASS 2000 seeded plans: no duplicate occupancy, every ordinary moved piece at most one cell per phase; no disappearances/tumbles\nPASS Overdrive is five earned spins with 1/1/2/3/5 progression; one UUID, fixed bet, payout once at final boundary\nPASS JSONB-key-order recovery reconstructs exact plans; corrupt seed/grid/payout/step/identity/NaN rejected\nPASS Simulator runs without DOM and reports paid cycles including bonuses\n12 MAGNET mathematical suites passed\n",
+    "stderr": ""
+  },
+  {
+    "command": "node tools/magnet-v2-tests.cjs",
+    "exitCode": 0,
+    "stdout": "PASS 3000 deterministic cycles, all 6 Wheel sectors, held values, no duplicate collection, 6\u201312 Chamber spins, charge ladder/final sweep, payout once, recovery corruption rejection; v1 model retained\n",
+    "stderr": ""
+  },
+  {
+    "command": "node tools/critter-math-tests.cjs",
+    "exitCode": 0,
+    "stdout": "PASS cluster threshold/orthogonal adjacency/Wild substitution/pure-Wild once; 3000 seeded round paths, 757 running Wild swaps, 20 bonuses; gravity anchors/Scatter identity/unique occupancy, cascade cap, exact restore and payout once\n",
+    "stderr": ""
+  },
+  {
+    "command": "node tools/critter-v2-math-tests.cjs",
+    "exitCode": 0,
+    "stdout": "PASS 5000 deterministic rounds; unchanged base RNG/symbol/refill/movement paths; 35 bonuses including 3 SUPER; x1\u2192x2\u2192x4\u2192x8; persistent positions/reset; exact payouts/cap; legacy recovery\n",
+    "stderr": ""
+  },
+  {
+    "command": "node tools/critter-v3-tests.cjs",
+    "exitCode": 0,
+    "stdout": "PASS unchanged base/paytable/weights/RNG;3000 paths, 20 natural bonuses, 3709 bonus Wild moves; persistent final positions and x1 reset; initial Scatter boost ratio 1.452;200 paid features with one cost, no fake base Scatters, exact validation and tamper rejection\n",
+    "stderr": ""
+  },
+  {
+    "command": "node tools/critter-v4-tests.cjs",
+    "exitCode": 0,
+    "stdout": "PASS 5000 base plans: no cascade, standard x1 Wild; 28 natural bonuses; 19767 deterministic moves; 15543 persistent upgrades; 7731 summed clusters; 400 bonus buys; saturated fields; stable progress/tamper; legacy1/2/3; Scatter ratio 1.468; unchanged PRNG/weights/raw paytable/payScale\n",
+    "stderr": ""
+  },
+  {
+    "command": "node tools/critter-v5-tests.cjs",
+    "exitCode": 0,
+    "stdout": "PASS v5 all modes: unchanged RNG/field/movement/Wild upgrades; explicit mode paytables; prices; old v4 restores; safe bonus cursor; no cascade\n",
+    "stderr": ""
+  },
+  {
+    "command": "node tools/critter-ways-check.cjs",
+    "exitCode": 0,
+    "stdout": "PASS: 3/4/5 reels, starts/gaps, 12 ways, additive Wilds, all-Wild uniqueness, Scatter columns, 100 bonus plans, persistence, no cascades, legacy recovery.\n",
+    "stderr": ""
+  },
+  {
+    "command": "node tools/slot-features-tests.cjs --modes-only",
+    "exitCode": 0,
+    "stdout": "PASS purchases freeze base bet and one paid cost; no fake Scatter outcome; free spins/collect/reload idempotence\nPASS Boost increases paid cost only; mode is immutable; bonus RNG unaffected; no stacked purchase surcharge\n",
+    "stderr": ""
+  },
+  {
+    "command": "node tools/heist-math-tests.cjs",
+    "exitCode": 0,
+    "stdout": "chable non-guaranteed effects\nPASS Choice waits; collect terminal and cannot collect twice\nPASS Alarm check is fixed before presentation and preserves ONLY base win\nPASS Successful deeper enters stage two with three spins, fixed bet and zero payout\nPASS Stage six automatically settles; capped total cannot exceed max\nPASS Risk ladder grows with depth; scene modifiers remain bounded\nPASS Business validation rejects corruption and replays decisions without reroll\n12 heist mathematics suites passed\n",
+    "stderr": ""
+  },
+  {
+    "command": "node tools/mines-math-tests.cjs",
+    "exitCode": 0,
+    "stdout": "d higher risk until cap\nPASS Exactly chosen mines, unique positions, deterministic seed\nPASS Cashout disabled at zero picks; one safe pick and exact payout\nPASS Mine bust pays zero and cannot cash out or click again\nPASS Repeated pick is ignored; snapshot validates same positions/picks\nPASS Corrupt or impossible recovery rejected\nPASS All safe cells auto cashout; cap auto cashout and no oversized payout\nPASS Simulation uses fixed boards, reports sampled and analytic return\n9 Mines suites passed\n",
+    "stderr": ""
+  },
+  {
+    "command": "node tools/swamp-math-tests.cjs",
+    "exitCode": 0,
+    "stdout": " max win includes triggering spin and terminates bonus\nPASS A configurable cap reached on the triggering spin grants no extra spins\nPASS Seeded scenes reproducible; all symbol/money types reachable; zero-win FS exist\nPASS Base never generates Collector; no more than one Scatter per reel\nPASS Business recovery rejects corrupt numbers/tier; preserves stable counters and feature identity\nPASS Version-2 natural bonus frequency is ~1/158 without a drought guarantee\n13 swamp mathematics suites passed\n",
+    "stderr": ""
+  },
+  {
+    "command": "node tools/swamp-levels-tests.cjs",
+    "exitCode": 0,
+    "stdout": "PASS 3+Scatter\u219215; deferred sequential four levels/60 spins; x1/x2/x3/x10; cumulative overflow; no immediate upgrade/retrigger; cap/complete; stable checkpoint; 4000 unchanged generated grids;100 purchased presentation triggers; one77x offer\n",
+    "stderr": ""
+  },
+  {
+    "command": "node tools/swamp-v4-tests.cjs",
+    "exitCode": 0,
+    "stdout": "PASS math4 state3, exact visible fish formula; legacy states1/2 preserve their own generation/payout/recovery; unchanged sequential-level rules\n",
+    "stderr": ""
+  },
+  {
+    "command": "node tools/table-rules-tests.cjs",
+    "exitCode": 0,
+    "stdout": "PASS Aces, soft to hard, multiple aces, natural vs drawn 21\nPASS Blackjack precedence, normal outcomes and payouts including DOUBLE\nPASS Fisher-Yates shoe: 52 unique cards; 6 decks have 6 of each face\nPASS Baccarat values and modulo 10\nPASS Entire official banker third-card matrix, and player stands\nPASS Natural prevents both draws; third cards consumed in correct order\nPASS All baccarat bet/outcome combinations including commissions and pushes\n7 table rules suites passed\n",
+    "stderr": ""
+  },
+  {
+    "command": "node tools/math-tests.cjs",
+    "exitCode": 0,
+    "stdout": " count cap\nPASS reject the one-base-cell Sticky trap even across different windows\nPASS Scatter falls, credits once and never requests a refill; growth preserves Sticky\nPASS 8x8 still grants +3 spins without growth\nPASS generation never replaces surviving symbols on refill\nPASS outcomes do not depend on past winnings; seeded runs are reproducible\nPASS generated bonus spins satisfy Wild invariants and remove real base symbols\nPASS simulation rejects invalid counts and bonus types\n15 tests passed\n",
+    "stderr": ""
+  },
+  {
+    "command": "node tools/bird-physics-tests.cjs",
+    "exitCode": 0,
+    "stdout": "tact generates translation and angular motion\nPASS bird rebounds from a wall and damages a second pig through another actual contact\nPASS falling stone beam delivers lethal impulse without a bird\nPASS rotated rectangle contacts exchange momentum and angular impulse\nPASS bird bounces repeatedly on ground, then the contact island sleeps\nPASS fast bird cannot tunnel through a thin rotated plank\nPASS all body shapes stay above the ground and settle without energy growth\n11 physical scenarios passed\n",
+    "stderr": ""
+  },
+  {
+    "command": "node tools/bird-round-tests.cjs",
+    "exitCode": 0,
+    "stdout": "llision thresholds distinguish glass, wood, stone and harmless resting contacts\nPASS Collected multipliers multiply without an arbitrary payout cap\nPASS Bomb pressure imparts physical velocities and damage to nearby bodies\nPASS Bonus positions remain fixed after launching and steering; no second launch\nPASS Real physics simulations terminate, are deterministic, have misses and varying destruction\nPASS Settlement is idempotent and scores only actual damage/destruction\n9 round/model checks passed\n",
+    "stderr": ""
+  },
+  {
+    "command": "node --check /tmp/digital-derby-release.js",
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

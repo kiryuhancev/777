@@ -1,0 +1,129 @@
+-- 2026-10-22 additive BIG TOP full-reel update. Run after prior BIG TOP and UPSIDE PAWS migrations.
+begin;
+create or replace function public.big_top_v2_grid_win(g jsonb) returns numeric language plpgsql immutable set search_path='' as $$
+declare ids text[]:=array['ten','j','q','k','a','dog','duck','boot','weight','skate','fish'];pay numeric[][]:=array[[.03,.06,.12,.25],[.035,.07,.14,.28],[.04,.08,.16,.32],[.045,.09,.18,.36],[.05,.1,.2,.4],[.06,.15,.35,.8],[.065,.17,.4,1],[.07,.19,.5,1.2],[.08,.22,.6,1.4],[.09,.25,.7,1.7],[.1,.3,.8,2]];i integer;r integer;len integer;pure_len integer:=0;n integer;ww numeric;pure numeric:=1;weight numeric;total numeric:=0;s jsonb;v text;
+begin
+ if jsonb_typeof(g) is distinct from 'array' or jsonb_array_length(g)<>6 then raise exception 'Invalid Big Top grid';end if;
+ for r in 0..5 loop
+  if jsonb_typeof(g->r) is distinct from 'array' or jsonb_array_length(g->r) not between 2 and 6 then raise exception 'Invalid Big Top rows';end if;
+  if (select count(*) from jsonb_array_elements(g->r) x where x->>'symbol'='scatter')>1 then raise exception 'Duplicate Scatter';end if;
+  for s in select * from jsonb_array_elements(g->r) loop
+   v:=s->>'symbol';if v is null or not(v=any(ids) or v in ('wild','scatter')) then raise exception 'Invalid Big Top symbol';end if;
+   if v='wild' and ((s->>'multiplier')::integer is null or (s->>'multiplier')::numeric not in (1,2,3,5,10)) then raise exception 'Invalid Curtain multiplier';end if;
+  end loop;
+ end loop;
+ for r in 0..5 loop select coalesce(sum((x->>'multiplier')::numeric),0) into weight from jsonb_array_elements(g->r) x where x->>'symbol'='wild';exit when weight=0;pure_len:=pure_len+1;pure:=pure*weight;end loop;
+ for i in 1..11 loop
+  len:=0;ww:=1;
+  for r in 0..5 loop select coalesce(sum(case when x->>'symbol'='wild' then (x->>'multiplier')::numeric else 1 end),0) into weight from jsonb_array_elements(g->r) x where x->>'symbol'=ids[i] or x->>'symbol'='wild';exit when weight=0;len:=len+1;ww:=ww*weight;end loop;
+  if len>=3 then if pure_len>=len then ww:=ww-pure;end if;if ww>0 then total:=total+round(pay[i][len-2]*ww*0.11025308,6);end if;end if;
+ end loop;
+ if pure_len>=3 then total:=total+round(pay[11][pure_len-2]*pure*0.11025308,6);end if;return round(total,6);
+end $$;
+revoke all on function public.big_top_v2_grid_win(jsonb) from public,anon,authenticated;
+
+create or replace function public.big_top_v2_validate_plan(p jsonb,is_bonus boolean,previous jsonb default null) returns numeric language plpgsql immutable set search_path='' as $$
+declare initial jsonb:=p->'initialGrid';final jsonb:=p->'finalGrid';expected jsonb;f jsonb;features jsonb:=p->'featurePlan';triggers jsonb:='[]';encore jsonb:='[]';r integer;row integer;height integer;seen integer[]:=array[]::integer[];sc integer:=0;meter integer:=0;armed boolean:=false;value numeric;spins integer;symbol text;
+begin
+ if jsonb_typeof(initial) is distinct from 'array' or jsonb_array_length(initial)<>6 or jsonb_typeof(features) is distinct from 'array' or jsonb_array_length(features)>6 then raise exception 'Invalid Curtain plan';end if;
+ expected:=initial;if is_bonus and p->'encoreBefore' is distinct from coalesce(previous->'encoreAfter','[]') then raise exception 'Encore boundary mismatch';end if;
+ for r in 0..5 loop
+  height:=jsonb_array_length(initial->r);if height not between 2 and 6 or height is distinct from (p->'reelHeights'->>r)::integer then raise exception 'Invalid reel geometry';end if;
+  if (select count(*) from jsonb_array_elements(initial->r) s where s->>'symbol'='scatter')>1 then raise exception 'Duplicate Scatter';end if;
+  if exists(select 1 from jsonb_array_elements(initial->r) s where s->>'symbol'='scatter') then sc:=sc+1;end if;
+ end loop;
+ if (p->>'potentialWays')::integer is distinct from (select exp(sum(ln((h#>>'{}')::numeric)))::integer from jsonb_array_elements(p->'reelHeights') h) then raise exception 'Ways mismatch';end if;
+ for f in select * from jsonb_array_elements(features) loop
+  r:=(f->>'reel')::integer;row:=(f->>'triggerCell')::integer;
+  if r is null or r not between 0 and 5 or r=any(seen) or (cardinality(seen)>0 and r<seen[cardinality(seen)]) or row is null or row not between 0 and jsonb_array_length(initial->r)-1 or (f->>'full')::boolean is distinct from true or f->>'winner' not in ('bombo','skinny') or (f->>'multiplier')::integer not in (1,2,3,5,10) then raise exception 'Invalid full-reel Curtain';end if;seen:=array_append(seen,r);
+  if coalesce((f->>'carried')::boolean,false) then
+   if not is_bonus or not coalesce(previous->'encoreAfter','[]') @> jsonb_build_array((f-'carried'-'triggerCell')||jsonb_build_object('encore',true,'remaining',1)) then
+    -- Compare the stable carried fields; triggerCell is preserved in v2 Encore.
+    if not is_bonus or not exists(select 1 from jsonb_array_elements(coalesce(previous->'encoreAfter','[]')) e where e->>'id'=f->>'id' and e->>'reel'=f->>'reel' and e->>'multiplier'=f->>'multiplier' and e->>'winner'=f->>'winner' and (e->>'remaining')::integer=1) then raise exception 'Invalid Encore carry';end if;
+   end if;
+  else
+   if initial->r->row->>'symbol' is distinct from 'show_ticket' then raise exception 'SHOW TICKET missing';end if;
+   triggers:=triggers||jsonb_build_array(jsonb_build_object('reelIndex',r,'triggerCell',row,'winner',f->>'winner','resultType',case when (f->>'multiplier')::integer=1 then 'WILD' else 'MULTIPLIER' end,'multiplier',(f->>'multiplier')::integer));
+  end if;
+  for row in 0..jsonb_array_length(initial->r)-1 loop expected:=jsonb_set(expected,array[r::text,row::text],(initial->r->row)||jsonb_build_object('symbol','wild','multiplier',(f->>'multiplier')::integer,'curtainId',f->>'id','clown',f->>'winner'));end loop;
+  if (f->>'encore')::boolean and not coalesce((f->>'carried')::boolean,false) then if not is_bonus or (f->>'multiplier')::integer=1 then raise exception 'Invalid Encore';end if;encore:=encore||jsonb_build_array(f||'{"remaining":1}');end if;
+ end loop;
+ if is_bonus and exists(select 1 from jsonb_array_elements(coalesce(previous->'encoreAfter','[]')) e where not exists(select 1 from jsonb_array_elements(features) ff where ff->>'id'=e->>'id' and coalesce((ff->>'carried')::boolean,false))) then raise exception 'Encore lost';end if;
+ if expected is distinct from final or triggers is distinct from p->'curtainTriggers' or encore is distinct from p->'encoreAfter' then raise exception 'Full reel final state mismatch';end if;
+ for r in 0..5 loop for row in 0..jsonb_array_length(initial->r)-1 loop symbol:=initial->r->row->>'symbol';
+  if symbol='show_ticket' and not exists(select 1 from jsonb_array_elements(features) e where (e->>'reel')::integer=r and (e->>'triggerCell')::integer=row and not coalesce((e->>'carried')::boolean,false)) then raise exception 'Unplanned ticket';end if;
+  if symbol='wild' and not exists(select 1 from jsonb_array_elements(features) e where (e->>'reel')::integer=r and coalesce((e->>'carried')::boolean,false)) then raise exception 'Unplanned carried Wild';end if;
+  if symbol not in ('ten','j','q','k','a','dog','duck','boot','weight','skate','fish','scatter','show_ticket','wild') then raise exception 'Unknown symbol';end if;
+ end loop;end loop;
+ if is_bonus then meter:=coalesce((previous->>'meterAfter')::integer,0);armed:=coalesce((previous->>'armedAfter')::boolean,false);end if;
+ if meter is distinct from (p->>'meterBefore')::integer or armed is distinct from (p->>'armedBefore')::boolean then raise exception 'Applause checkpoint mismatch';end if;
+ meter:=case when armed then 0 else meter end+case when is_bonus then 3*(select count(*)::integer from jsonb_array_elements(features) e where not coalesce((e->>'carried')::boolean,false)) else 0 end;
+ if meter is distinct from (p->>'meterAfter')::integer or (is_bonus and meter>=12) is distinct from (p->>'armedAfter')::boolean or (is_bonus and armed) is distinct from (p->>'standingOvation')::boolean or is_bonus and armed and jsonb_array_length(features)=0 then raise exception 'Invalid Applause';end if;
+ spins:=case sc when 3 then 10 when 4 then 12 when 5 then 15 when 6 then 20 else 0 end;if sc is distinct from (p->>'scatters')::integer or spins is distinct from (p->>'freeSpins')::integer then raise exception 'Scatter mismatch';end if;
+ value:=public.big_top_v2_grid_win(final);if (p->>'purchase')::boolean then if is_bonus or sc<>3 then raise exception 'Invalid purchase trigger';end if;value:=0;end if;
+ if value is distinct from (p->>'winX')::numeric then raise exception 'Invalid Big Top Ways payout';end if;return value;
+end $$;
+revoke all on function public.big_top_v2_validate_plan(jsonb,boolean,jsonb) from public,anon,authenticated;
+create or replace function public.settle_big_top_v1_round(p_round_id uuid,p_expected_revision bigint,p_checkpoint jsonb) returns jsonb language plpgsql security definer set search_path='' as $$
+declare u uuid:=auth.uid();c jsonb:=p_checkpoint;w public.wallets;r public.game_rounds;p jsonb;previous jsonb;stake numeric;base numeric;bonus numeric:=0;total numeric;pay numeric;count integer;progress jsonb;
+begin
+ if u is null then raise exception 'Authentication required';end if;
+ if c->>'version' is distinct from '1' or c->>'roundId' is distinct from p_round_id::text or c->>'status' is distinct from 'SETTLED' or octet_length(c::text)>1000000 or (c->>'seed')::bigint not between 0 and 4294967295 or (c->>'bet')::numeric<=0 or (c->>'bet')::numeric>1000000000 then raise exception 'Invalid Big Top round';end if;
+ stake:=round((c->>'bet')::numeric*case when (c->>'purchase')::boolean then 110 else 1 end,6);if stake is distinct from (c->>'cost')::numeric then raise exception 'Invalid purchase cost';end if;
+ base:=least(10000,public.big_top_validate_plan(c->'base',false));count:=(c->'base'->>'freeSpins')::integer;
+ if (count=0) is distinct from (c->'bonus'='null'::jsonb) or (c->>'purchase')::boolean is distinct from (c->'base'->>'purchase')::boolean then raise exception 'Invalid bonus entitlement';end if;
+ if count>0 and current_setting('vault.bigtop.escrow',true) is distinct from 'on' then raise exception 'Bonus escrow required';end if;
+ if count>0 then
+  if (c->'bonus'->>'spinCount')::integer is distinct from count or jsonb_array_length(c->'bonus'->'spins') is distinct from count then raise exception 'Invalid free spins';end if;
+  for p in select * from jsonb_array_elements(c->'bonus'->'spins') loop bonus:=bonus+public.big_top_validate_plan(p,true,previous);previous:=p;end loop;
+ end if;
+ bonus:=round(least(10000-base,bonus),6);total:=round(base+bonus,6);pay:=round(total*(c->>'bet')::numeric,6);
+ if base is distinct from (c->>'baseWinX')::numeric or bonus is distinct from (c->>'bonusWinX')::numeric or total is distinct from (c->>'winX')::numeric or pay is distinct from (c->>'payout')::numeric or count>0 and bonus is distinct from (c->'bonus'->>'totalWinX')::numeric then raise exception 'Invalid Big Top settlement';end if;
+ select * into w from public.wallets where user_id=u for update;if not found then raise exception 'Wallet missing';end if;
+ select * into r from public.game_rounds where round_id=p_round_id and user_id=u;if found then if r.game_id<>'big_top' or r.metadata->'bigTop' is distinct from c then raise exception 'VAULT_WALLET_CONFLICT';end if;return jsonb_build_object('balance',w.balance,'revision',w.revision,'duplicate',true);end if;
+ if exists(select 1 from public.game_rounds where round_id=p_round_id) or w.revision is distinct from p_expected_revision or w.balance<stake then raise exception 'VAULT_WALLET_CONFLICT';end if;
+ if not public.vault_game_access() then raise exception 'VAULT_ACCOUNT_DISABLED';end if;
+ if exists(select 1 from public.vault_bonus_sessions where user_id=u and game_id='big_top' and status='active') then raise exception 'Bonus active';end if;
+ progress:=jsonb_build_object('version',1,'roundId',p_round_id,'baseDone',false,'introDone',false,'nextSpin',0,'totalWinX',0,'encore','[]'::jsonb,'meter',0,'armed',false,'complete',false);
+ insert into public.game_rounds(round_id,user_id,game_id,bet,payout,multiplier,result,status,metadata,settled_at) values(p_round_id,u,'big_top',stake,pay,total,c->>'result','settled',jsonb_build_object('bigTop',c),now());
+ update public.wallets set balance=balance-stake+pay-round(base*(c->>'bet')::numeric,6),revision=revision+1,recovery=recovery||jsonb_build_object('bigTopRound',c,'bigTopProgress',progress),updated_at=now() where user_id=u returning * into w;
+ insert into public.game_stats(user_id,game_id,rounds_played,total_wagered,total_won,biggest_win,biggest_multiplier) values(u,'big_top',1,stake,pay,pay,total) on conflict(user_id,game_id) do update set rounds_played=public.game_stats.rounds_played+1,total_wagered=public.game_stats.total_wagered+excluded.total_wagered,total_won=public.game_stats.total_won+excluded.total_won,biggest_win=greatest(public.game_stats.biggest_win,excluded.biggest_win),biggest_multiplier=greatest(public.game_stats.biggest_multiplier,excluded.biggest_multiplier),updated_at=now();
+ update public.profiles set xp=xp+10,level=1+(xp+10)/1000 where id=u;
+ return jsonb_build_object('balance',w.balance,'revision',w.revision,'duplicate',false);
+end $$;
+revoke all on function public.settle_big_top_v1_round(uuid,bigint,jsonb) from public,anon;
+revoke all on function public.settle_big_top_v1_round(uuid,bigint,jsonb) from authenticated;
+
+create or replace function public.settle_big_top_round(p_round_id uuid,p_expected_revision bigint,p_checkpoint jsonb) returns jsonb language plpgsql security definer set search_path='' as $$
+declare u uuid:=auth.uid();c jsonb:=p_checkpoint;w public.wallets;r public.game_rounds;p jsonb;previous jsonb;stake numeric;base numeric;bonus numeric:=0;total numeric;pay numeric;count integer;progress jsonb;
+begin
+ if u is null then raise exception 'Authentication required';end if;if c->>'version'='1' then return public.settle_big_top_v1_round(p_round_id,p_expected_revision,p_checkpoint);end if;
+ if c->>'version' is distinct from '2' or c->>'roundId' is distinct from p_round_id::text or c->>'status' is distinct from 'SETTLED' or octet_length(c::text)>1000000 or (c->>'seed')::bigint not between 0 and 4294967295 or (c->>'bet')::numeric<=0 or (c->>'bet')::numeric>1000000000 then raise exception 'Invalid Big Top round';end if;
+ stake:=round((c->>'bet')::numeric*case when (c->>'purchase')::boolean then 244 else 1 end,6);if stake is distinct from (c->>'cost')::numeric then raise exception 'Invalid purchase cost';end if;
+ base:=least(10000,public.big_top_v2_validate_plan(c->'base',false));count:=(c->'base'->>'freeSpins')::integer;
+ if (count=0) is distinct from (c->'bonus'='null'::jsonb) or (c->>'purchase')::boolean is distinct from (c->'base'->>'purchase')::boolean then raise exception 'Invalid bonus entitlement';end if;
+ if count>0 and current_setting('vault.bigtop.escrow',true) is distinct from 'on' then raise exception 'Bonus escrow required';end if;
+ if count>0 then
+  if (c->'bonus'->>'spinCount')::integer is distinct from count or jsonb_array_length(c->'bonus'->'spins') is distinct from count then raise exception 'Invalid free spins';end if;
+  for p in select * from jsonb_array_elements(c->'bonus'->'spins') loop bonus:=bonus+public.big_top_v2_validate_plan(p,true,previous);previous:=p;end loop;
+ end if;
+ bonus:=round(least(10000-base,bonus),6);total:=round(base+bonus,6);pay:=round(total*(c->>'bet')::numeric,6);
+ if base is distinct from (c->>'baseWinX')::numeric or bonus is distinct from (c->>'bonusWinX')::numeric or total is distinct from (c->>'winX')::numeric or pay is distinct from (c->>'payout')::numeric or count>0 and bonus is distinct from (c->'bonus'->>'totalWinX')::numeric then raise exception 'Invalid Big Top settlement';end if;
+ select * into w from public.wallets where user_id=u for update;if not found then raise exception 'Wallet missing';end if;
+ select * into r from public.game_rounds where round_id=p_round_id and user_id=u;if found then if r.game_id<>'big_top' or r.metadata->'bigTop' is distinct from c then raise exception 'VAULT_WALLET_CONFLICT';end if;return jsonb_build_object('balance',w.balance,'revision',w.revision,'duplicate',true);end if;
+ if exists(select 1 from public.game_rounds where round_id=p_round_id) or w.revision is distinct from p_expected_revision or w.balance<stake then raise exception 'VAULT_WALLET_CONFLICT';end if;
+ if not public.vault_game_access() then raise exception 'VAULT_ACCOUNT_DISABLED';end if;
+ if exists(select 1 from public.vault_bonus_sessions where user_id=u and game_id='big_top' and status='active') then raise exception 'Bonus active';end if;
+ progress:=jsonb_build_object('version',1,'roundId',p_round_id,'baseDone',false,'introDone',false,'nextSpin',0,'totalWinX',0,'encore','[]'::jsonb,'meter',0,'armed',false,'complete',false);
+ insert into public.game_rounds(round_id,user_id,game_id,bet,payout,multiplier,result,status,metadata,settled_at) values(p_round_id,u,'big_top',stake,pay,total,c->>'result','settled',jsonb_build_object('bigTop',c),now());
+ update public.wallets set balance=balance-stake+pay-round(base*(c->>'bet')::numeric,6),revision=revision+1,recovery=recovery||jsonb_build_object('bigTopRound',c,'bigTopProgress',progress),updated_at=now() where user_id=u returning * into w;
+ insert into public.game_stats(user_id,game_id,rounds_played,total_wagered,total_won,biggest_win,biggest_multiplier) values(u,'big_top',1,stake,pay,pay,total) on conflict(user_id,game_id) do update set rounds_played=public.game_stats.rounds_played+1,total_wagered=public.game_stats.total_wagered+excluded.total_wagered,total_won=public.game_stats.total_won+excluded.total_won,biggest_win=greatest(public.game_stats.biggest_win,excluded.biggest_win),biggest_multiplier=greatest(public.game_stats.biggest_multiplier,excluded.biggest_multiplier),updated_at=now();
+ update public.profiles set xp=xp+10,level=1+(xp+10)/1000 where id=u;
+ return jsonb_build_object('balance',w.balance,'revision',w.revision,'duplicate',false);
+end $$;
+revoke all on function public.settle_big_top_round(uuid,bigint,jsonb) from public,anon;
+grant execute on function public.settle_big_top_round(uuid,bigint,jsonb) to authenticated;
+
+create or replace function public.big_top_capabilities() returns jsonb language sql stable set search_path='' as $$select '{"version":1,"mathVersion":2,"roundVersions":[1,2]}'::jsonb;$$;
+notify pgrst,'reload schema';
+commit;

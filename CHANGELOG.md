@@ -1,3 +1,11 @@
+## 2026-10-22 — full update (unpublished)
+
+- BIG TOP: one-cell SHOW TICKET, full-reel close/open stage, approved BOMBO/SKINNY duel and one final OPEN winner with WILD or xN; dynamic exact Ways.
+- Authorized version2 full-reel math recalibration toward96%, with immutable version1 recovery/SQL compatibility. High-volatility statistical limits are documented in the update report.
+- Swamp: complete Collector source, proportional safe symbol fit, Money Fish text space and stable progression-strip geometry.
+- UPSIDE PAWS: paired Normal/Upside10/J/Q/K/A reference art; math unchanged. Shared wallet/HUD/popup behavior retained.
+- Added `supabase_big_top_v2.txt`, current-package acceptance/SQL/browser tests and full reference archive.
+
 ## UPSIDE PAWS (unpublished)
 
 - Added a separate Dual Grid slot: paired4×4 worlds, deterministic Echo/Portal, one secondary evaluation, Resonance, Dimension Breach and queued Full Breach.
