@@ -1,3 +1,10 @@
+## Unpublished — CurtainOverlay correction
+
+- Replaced annotated ticket reference with existing clean standalone SHOW ticket asset.
+- Added dedicated CurtainOverlay with explicit left/right/top/stage/badge layers; real velvet repeats at uniform scale rather than stretching vertically.
+- Persistent bonus results remain OPEN between spins, with active/idle highlights only. Existing result DOM nodes are reused; no repeated opening or result loss.
+- Added six requested previews and actual purchase/reload/settlement checks. Math, wallet, canonical saved checkpoints and SQL unchanged.
+
 ## Unpublished — strict BIG TOP asset lock
 
 - Replaced CSS-made Curtain/fabric/plaque and assembled duo foregrounds with the exact provided WebP frame, complete duo scene, ticket and WILD/X2/X3/X5/X10 plaques. Original bytes retained and audited.
