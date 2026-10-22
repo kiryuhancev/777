@@ -1,0 +1,12 @@
+{
+  "passed": [
+    "loss: exact SQL Ways, single debit/stat, duplicate idempotency, escrow/end credit, progress identity/RLS",
+    "win: exact SQL Ways, single debit/stat, duplicate idempotency, escrow/end credit, progress identity/RLS",
+    "bonus: exact SQL Ways, single debit/stat, duplicate idempotency, escrow/end credit, progress identity/RLS",
+    "legacy2: exact SQL Ways, single debit/stat, duplicate idempotency, escrow/end credit, progress identity/RLS",
+    "legacy: exact SQL Ways, single debit/stat, duplicate idempotency, escrow/end credit, progress identity/RLS",
+    "buy: exact SQL Ways, single debit/stat, duplicate idempotency, escrow/end credit, progress identity/RLS",
+    "Server rejects forged persistent multiplier, reel ownership and playing/open decisions",
+    "Insufficient buy has no partial debit/row; direct bonus credit bypass denied; payout tampering and blocked-account stakes denied"
+  ]
+}

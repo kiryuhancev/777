@@ -1,0 +1,7 @@
+{
+  "passed": [
+    "BT-B/P/S: seeded mixed playing/non-playing curtains; non-playing stays fully closed/no clown/no label with pulse; playing opens stored winner; same-reel/session checkpoint survives mid-animation reload; fixed plan/payout; one terminal credit"
+  ],
+  "runtimeErrors": [],
+  "consoleErrors": []
+}

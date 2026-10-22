@@ -1,0 +1,5 @@
+Audit all Swamp Fishing symbol assets on desktop and mobile.
+All important artwork must remain fully visible and preserve aspect ratio.
+Use contain-style proportional fitting; correct transparent source padding/crop
+instead of stretching. Win highlight, bonus mode and late image loading must not
+change symbol geometry or crop.

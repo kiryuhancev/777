@@ -1,0 +1,819 @@
+BIG TOP WILDS + VAULT CORRECTIVE UPDATE
+FINAL AUTHORITATIVE IMPLEMENTATION SPECIFICATION
+Revision: 2026-10-22
+
+READ THIS DOCUMENT COMPLETELY BEFORE CHANGING CODE.
+
+=====================================================================
+0. AUTHORITY / NON-NEGOTIABLE RULE
+=====================================================================
+
+This package is the authoritative specification for the changes described
+below. It overrides any older conflicting interpretation in chat history,
+older screenshots, older concept art, or the baseline BIG TOP package.
+
+Do not improvise an alternative mechanic, character, trigger symbol,
+curtain geometry, popup behavior, bonus persistence rule, Wild label,
+mobile layout, or animation order.
+
+When a visual reference contains a random/generated clown that differs from
+BOMBO or SKINNY, IGNORE THAT CHARACTER. The reference may still be used for
+composition, curtain geometry or timing, but NOT character identity.
+
+The ONLY approved BIG TOP WILDS clowns are:
+- BOMBO — very large, round/heavy, warm physical-comedy clown.
+- SKINNY — extremely thin/tall, elastic, agile trickster clown.
+
+Use the exact approved character direction in:
+01_AUTHORITATIVE_VISUALS/APPROVED_BOMBO_SKINNY_REFERENCE.webp
+
+No third clown.
+No alternative clown.
+No random AI clown.
+No clown as a normal paying symbol.
+
+The current implementation screenshot:
+01_AUTHORITATIVE_VISUALS/CURRENT_IMPLEMENTATION_BEFORE_FIX.jpg
+is a BUG/BEFORE reference, not a target.
+
+=====================================================================
+1. SCOPE OF THIS UPDATE
+=====================================================================
+
+Implement all of the following:
+
+A. BIG TOP WILDS
+- correct full-reel curtain geometry;
+- SHOW TICKET one-cell trigger symbol;
+- exact curtain animation sequence;
+- duo scene with BOMBO + SKINNY inside the opened curtain;
+- final open scene with exactly one approved clown and WILD/xN;
+- full visual background inside all opened curtain scenes;
+- dynamic BIG TOP WAYS;
+- bonus curtain persistence;
+- open a persistent curtain only if it participates in the current win;
+- highlight a persistent non-playing curtain without opening it;
+- shared bonus settlement/popup/mobile rules.
+
+B. SWAMP FISHING
+- audit all symbol fitting;
+- remove unintended symbol cropping/distortion on desktop/mobile/bonus states.
+
+C. UPSIDE PAWS
+- use two explicitly different card-symbol art families:
+  Normal World and Upside World.
+- do not mix them indiscriminately.
+
+Do not alter unrelated game math, wallet/auth architecture, or other games.
+
+=====================================================================
+2. BIG TOP WILDS — FIXED REEL GEOMETRY
+=====================================================================
+
+Existing core geometry remains authoritative:
+
+- 6 reels.
+- Each reel independently has 2–6 visible symbol cells.
+- Reel viewport width is fixed for the current breakpoint.
+- Reel viewport height is fixed for the current breakpoint.
+- Each reel width is constant.
+- Only cell height changes according to reel row count.
+
+For reel i:
+
+cellHeight[i] = reelViewportHeight / rowCount[i]
+
+rowCount is determined BEFORE visual spin animation begins.
+
+During a spin:
+- do not change reel viewport width;
+- do not change reel viewport height;
+- do not change row count;
+- do not let image loading change geometry.
+
+The Curtain feature is NOT an expanding multi-column feature.
+
+A curtain ALWAYS occupies:
+- exactly ONE reel/column in width;
+- exactly 100% of that reel's visible height.
+
+It must never become wider than one reel.
+It must never cover adjacent reels.
+It must never remain a one-cell tile.
+
+This requirement applies at every row count:
+2 / 3 / 4 / 5 / 6 visible cells.
+
+Curtain overlay geometry:
+
+curtain.left = reel.left
+curtain.width = reel.width
+curtain.top = reel.top
+curtain.height = reel.height
+
+Conceptually:
+
+position: absolute;
+inset: 0;
+
+inside that reel's own positioning context.
+
+Do not insert a curtain as a normal grid row item.
+It is a reel-local overlay.
+
+=====================================================================
+3. SHOW TICKET — ONLY CURTAIN TRIGGER SYMBOL
+=====================================================================
+
+The approved trigger symbol is SHOW TICKET.
+
+SHOW TICKET:
+- occupies exactly ONE normal symbol cell;
+- behaves visually like a normal reel symbol during the spin;
+- is NOT a curtain;
+- is NOT rendered on top of the curtain;
+- is NOT a Wild;
+- is NOT the Scatter;
+- does NOT remain visible after the Curtain presentation starts;
+- only triggers the Curtain event on the reel where it landed.
+
+Do NOT use the previously generated spotlight as the trigger.
+The spotlight file is included only as DEPRECATED_DO_NOT_USE... so there is
+no ambiguity.
+
+When SHOW TICKET lands:
+1. all reels finish their normal stop animation;
+2. ticket cell is briefly highlighted;
+3. Curtain Feature starts on the SAME reel;
+4. the ticket is visually replaced/covered by the curtain sequence.
+
+If multiple SHOW TICKET symbols may be generated by configured math:
+- each affects only its own reel;
+- never stack more than one Curtain feature on the same reel;
+- resolve multiple affected reels in deterministic left-to-right order unless
+  the existing roundPlan explicitly stores a different approved sequence;
+- the entire feature plan must be known before presentation begins.
+
+The animation callback must never choose whether a ticket triggers.
+
+=====================================================================
+4. EXACT CURTAIN VISUAL STATE MACHINE
+=====================================================================
+
+This is the mandatory sequence.
+
+STATE 0 — FINAL REEL RESULT / TICKET VISIBLE
+The normal reel spin has completed.
+SHOW TICKET is visible in one cell.
+All reel geometry is already final.
+
+STATE 1 — REEL FOCUS
+Briefly emphasize the affected reel.
+Optional:
+- soft marquee glow;
+- neighboring reels slightly dimmed.
+Do not move/resize the reel.
+
+STATE 2 — CURTAINS CLOSE
+A pair of real theater curtains enters from the LEFT and RIGHT edges of that
+ONE reel and meets at the center.
+
+Required look:
+- red velvet;
+- gold trim;
+- top valance;
+- theatrical depth;
+- fills the entire reel height.
+
+The curtains are not a one-cell image.
+They are a full-height reel overlay.
+
+Preferred animation:
+leftCurtain: translateX(-100%) -> 0
+rightCurtain: translateX(+100%) -> 0
+
+Both halves meet at center.
+
+Do NOT animate the reel width/height.
+Animate internal curtain layers using transform.
+
+STATE 3 — CURTAINS OPEN TO DUO SCENE
+The same two curtain halves open horizontally.
+
+Behind them is a FULL-HEIGHT theatrical scene.
+
+The opened scene must:
+- occupy the entire reel width;
+- occupy the entire reel height;
+- have a finished circus/stage BACKGROUND;
+- contain no blank tan/transparent strip;
+- contain no visible original symbol-cell backgrounds;
+- look like one continuous full-reel illustration.
+
+The scene contains BOTH:
+- BOMBO
+- SKINNY
+
+Only these two.
+
+They must be composed together as one deliberate duo illustration/scene,
+not two unrelated crops pasted into separate cells.
+
+Both characters should be readable across the full height:
+- BOMBO lower/heavier;
+- SKINNY higher/taller;
+- interaction between them should be obvious.
+
+They must look like the approved characters, not the random clowns shown in
+some generated sequence mockups.
+
+STATE 4 — CLOWN SHOWDOWN
+Inside the already-open full-height curtain stage:
+- BOMBO and SKINNY perform a short comic rivalry/showdown;
+- all movement remains clipped to this reel;
+- no body part may overlap adjacent reels;
+- do not use fullscreen animation;
+- do not move the entire slot.
+
+Examples of acceptable comic motion:
+- tugging;
+- pointing;
+- pushing;
+- fake-out;
+- prop interaction;
+- exaggerated physical reaction.
+
+The result is ALREADY stored in featurePlan.
+Animation does not determine the winner.
+
+STATE 5 — CURTAINS CLOSE AGAIN
+After the duo scene/showdown:
+- left and right curtains close to center again;
+- they briefly hide the duo scene;
+- this creates a clear visual transition between "contest" and "result".
+
+STATE 6 — FINAL REVEAL
+Curtains open again.
+
+They remain OPEN in the final state.
+
+Behind them:
+- one and only one winner: BOMBO OR SKINNY;
+- full-height circus/stage background;
+- character integrated into the whole reel composition;
+- clear result plaque/text.
+
+Allowed result:
+x1 => show ONLY "WILD"
+x2 => show ONLY "x2"
+x3 => show ONLY "x3"
+x5 => show ONLY "x5"
+x10 => show ONLY "x10"
+
+Do NOT display:
+WILD + x3
+WILD x3
+a small black x3 badge over WILD
+two separate labels
+
+Multiplier text REPLACES WILD for multiplier states.
+
+The final reveal is a FULL REEL WILD logically.
+
+STATE 7 — RESULT READY
+Only after all final Curtain states have been resolved may the final paid
+win evaluation/presentation occur.
+
+=====================================================================
+5. FINAL CURTAIN ART / BACKGROUND REQUIREMENTS
+=====================================================================
+
+Current implementation has too much empty/flat curtain interior.
+
+Fix this.
+
+Every OPEN curtain scene must contain a complete theatrical background.
+
+DUO SCENE background:
+- entire reel height;
+- stage floor;
+- warm carnival lights;
+- depth/background bokeh;
+- subtle confetti/props;
+- clearly one continuous scene.
+
+FINAL WINNER background:
+- entire reel height;
+- same world/scene family;
+- stronger winner spotlight;
+- background still visible around character;
+- WILD/xN plaque integrated near lower part of composition.
+
+Do not:
+- put a character on a flat brown column;
+- reveal original reel cells behind the clown;
+- stretch the clown to fake a full-height fill;
+- distort body proportions.
+
+Character artwork maintains aspect ratio.
+Background stretches/crops appropriately to cover the reel.
+
+Use:
+background cover behavior
++
+foreground character contain behavior.
+
+=====================================================================
+6. APPROVED CHARACTER IDENTITY
+=====================================================================
+
+BOMBO:
+- huge round/heavy silhouette;
+- cheerful physical comedy;
+- short/heavy proportions;
+- warm, colorful circus wardrobe;
+- unmistakably different from Skinny.
+
+SKINNY:
+- extremely thin/tall;
+- elastic limbs;
+- agile/trickster energy;
+- very different silhouette;
+- no resemblance to Bombo beyond belonging to the same circus world.
+
+Reference:
+01_AUTHORITATIVE_VISUALS/APPROVED_BOMBO_SKINNY_REFERENCE.webp
+
+If a generated reference in this archive displays characters not matching these
+two, use ONLY its layout/curtain/composition idea.
+
+Never create a third clown.
+
+=====================================================================
+7. DYNAMIC BIG TOP WAYS
+=====================================================================
+
+The game already has variable row counts.
+
+The visible ways value must be DYNAMIC.
+
+For a round:
+
+BIG_TOP_WAYS =
+rowCount[0] *
+rowCount[1] *
+rowCount[2] *
+rowCount[3] *
+rowCount[4] *
+rowCount[5]
+
+Example:
+[4, 6, 3, 5, 4, 6]
+=> 8,640 BIG TOP WAYS
+
+Maximum:
+6^6 = 46,656 BIG TOP WAYS
+
+UI:
+- show current round's actual value;
+- never show a stale hardcoded value;
+- update after reelHeights/rowCounts have been determined for the spin;
+- preserve the same value through the entire presentation of that round;
+- in bonus, show the current free-spin ways value too.
+
+Visible wording:
+"1 920 BIG TOP WAYS"
+"8 640 BIG TOP WAYS"
+etc.
+
+Do NOT display the trademarked word MEGAWAYS.
+
+Do not recalculate from DOM pixel sizes.
+Use game state row counts.
+
+=====================================================================
+8. BASE-GAME CURTAIN / WIN TIMING
+=====================================================================
+
+Base round order:
+
+1. user starts paid spin;
+2. debit once;
+3. deterministic roundPlan is created;
+4. rowCounts/final symbols/featurePlan are frozen;
+5. reels animate;
+6. all reels settle;
+7. SHOW TICKET trigger presentation begins;
+8. curtain closes;
+9. curtain opens to BOMBO + SKINNY duo scene;
+10. showdown;
+11. curtain closes;
+12. curtain opens to one winner + WILD/xN;
+13. all Curtain features finish;
+14. final left-to-right ways evaluation/presentation;
+15. settle base win once.
+
+Do not calculate a win using the pre-Curtain ticket tile when the Curtain result
+is supposed to replace it.
+
+No cascade.
+
+=====================================================================
+9. BIG TOP BONUS — THE BIG SHOW
+=====================================================================
+
+Keep existing THE BIG SHOW bonus entry rules/math unless this update explicitly
+changes presentation/state behavior.
+
+Universal bonus wallet rule remains:
+- free-spin wins accumulate in bonusSession.totalWin;
+- wallet does not increase after every free spin;
+- one final idempotent bonus credit at end.
+
+=====================================================================
+10. BONUS CURTAINS — PERSISTENCE
+=====================================================================
+
+This is critical.
+
+When a Curtain Wild has PLAYED/participated in a winning bonus result,
+that Curtain becomes persistent for the bonus session.
+
+Persistent means:
+- it remains assigned to that reel between free spins;
+- it is restored after reload;
+- it is not replaced by ordinary reel symbols on the next free spin;
+- its logical Wild/multiplier state remains associated with it according to
+  the bonus state model.
+
+Do NOT randomly move or redistribute persistent Curtains.
+Do NOT add a vortex.
+Do NOT invent a new movement mechanic.
+
+A persistent curtain stays on its reel unless an explicit future specification
+changes that rule.
+
+Persist at minimum:
+- curtainId;
+- reelIndex;
+- winnerClownId;
+- multiplier;
+- persistent status;
+- bonusSessionId.
+
+=====================================================================
+11. WHEN A PERSISTENT BONUS CURTAIN OPENS
+=====================================================================
+
+A persistent Curtain must NOT sit permanently open.
+
+For each bonus spin:
+
+A. determine the final round result first;
+B. determine whether each persistent Curtain PARTICIPATES in the current win.
+
+IF the persistent Curtain participates in the current winning ways:
+- highlight it;
+- run its OPEN presentation;
+- reveal its approved winner clown and WILD/xN state;
+- it visually participates in the win.
+
+IF the persistent Curtain does NOT participate:
+- DO NOT open it;
+- keep it CLOSED;
+- emphasize it with a glow/pulse/highlight only;
+- do not run the clown duo/showdown;
+- do not show an open winner scene.
+
+Therefore:
+
+PLAYING CURTAIN:
+closed -> opens -> winner visible -> win presentation
+
+NON-PLAYING PERSISTENT CURTAIN:
+closed -> highlighted/pulsed -> remains closed
+
+Never open a curtain just because it exists.
+
+=====================================================================
+12. NEW CURTAIN TRIGGER DURING BONUS
+=====================================================================
+
+If a new SHOW TICKET appears on a reel that does not already contain a
+persistent Curtain:
+- use the full sequence:
+  Ticket -> Close -> Duo Scene -> Showdown -> Close -> Winner Reveal;
+- if its final Curtain participates in the qualifying win according to game
+  logic, it becomes persistent.
+
+If the reel already contains a persistent Curtain:
+- do not layer a second curtain on the same reel;
+- follow existing deterministic feature rules or suppress conflicting trigger
+  according to the roundPlan;
+- no overlapping curtain DOM nodes.
+
+One reel = maximum one active/persistent Curtain feature object.
+
+=====================================================================
+13. BONUS CURTAIN VISUAL STATES
+=====================================================================
+
+Implement explicit visual state values such as:
+
+CLOSED_IDLE
+CLOSED_HIGHLIGHTED
+OPENING
+OPEN_DUO
+SHOWDOWN
+CLOSING_AFTER_DUO
+OPEN_WINNER
+WIN_HIGHLIGHT
+PERSISTED
+
+Do not infer state from CSS class side effects.
+
+The data model owns the state.
+Presentation reflects it.
+
+On reload:
+- restore deterministic visual resting state;
+- do not replay already-settled payouts;
+- do not accidentally reopen every persistent curtain.
+
+=====================================================================
+14. BONUS POPUPS
+=====================================================================
+
+All feature popups remain inside the reel/game viewport.
+
+Required:
+- Bonus Intro;
+- Bonus Complete;
+- any stage/feature notification that blocks progress.
+
+No page-level fullscreen takeover.
+
+Backdrop:
+game/reel area only.
+
+Continue:
+- SPACE desktop;
+- click/tap game safe area.
+
+One input = one transition.
+No double-fire.
+
+Bonus intro waits for user input.
+Bonus does not auto-run through the intro.
+
+=====================================================================
+15. BONUS BUY
+=====================================================================
+
+Preserve shared VAULT flow:
+
+Feature menu
+-> choose THE BIG SHOW
+-> custom confirmation
+-> YES / NO
+
+YES:
+- validate funds;
+- debit ONCE;
+- play trigger presentation spin;
+- trigger spin visually produces required Scatter;
+- no extra normal wager debit;
+- show compact Bonus Intro;
+- wait for input;
+- start free spins.
+
+Never teleport directly from purchase confirmation to first free spin.
+
+=====================================================================
+16. UNIVERSAL VAULT HUD / POPUPS
+=====================================================================
+
+Do not redesign common control semantics.
+
+Maintain:
+Settings
+Balance
+Bet-
+Bet value
+Bet+
+Auto
+Max
+Spin
+Bonus
+
+Spin is primary.
+
+Popups must not move HUD.
+Opening/closing them must not change reel/game height.
+
+=====================================================================
+17. MOBILE STABILITY
+=====================================================================
+
+The user's current screenshot is mobile and shows the real target context.
+
+Critical:
+- no reel jump;
+- no column width change;
+- no full-height Curtain resizing its parent;
+- no image-load layout shift;
+- no popup layout shift.
+
+Use internal absolute overlays for Curtains.
+
+Animation:
+transform / opacity / clip-path / mask where appropriate.
+
+Do not animate layout dimensions to perform the Curtain movement.
+
+Test at minimum:
+320px
+390px
+430px logical mobile widths.
+
+At every breakpoint:
+curtain.width == owning reel width
+curtain.height == reel viewport height
+
+=====================================================================
+18. SWAMP FISHING — SYMBOL FIT AUDIT
+=====================================================================
+
+Audit EVERY Swamp Fishing symbol.
+
+All important symbol content must be visible.
+
+Check:
+- base game;
+- bonus game;
+- win highlight;
+- stopped reels;
+- mobile 320;
+- mobile 390;
+- desktop.
+
+No unintended clipping of:
+- fish;
+- fisherman/collector;
+- fins/tails;
+- lanterns;
+- Scatter label;
+- Wild/special label;
+- card symbols;
+- premium symbol details.
+
+Default fitting:
+width: 100%
+height: 100%
+object-fit: contain
+
+or equivalent proportional fitting.
+
+Do not use non-uniform stretching.
+
+If transparent padding in source asset causes bad scaling:
+- crop source bounds correctly;
+- do not compensate by stretching.
+
+Win highlight must not change symbol geometry.
+
+Late image decode/load must not change cell size.
+
+=====================================================================
+19. UPSIDE PAWS — CARD SYMBOLS
+=====================================================================
+
+Use two distinct art families supplied in:
+
+05_UPSIDE_PAWS/UPSIDE_PAWS_CARD_SYMBOLS_NORMAL.png
+05_UPSIDE_PAWS/UPSIDE_PAWS_CARD_SYMBOLS_UPSIDE.png
+
+Normal World:
+bright playful pet-world treatment.
+
+Upside World:
+distorted dark purple/blue alternate-world treatment.
+
+The same rank remains recognizable:
+10 / J / Q / K / A.
+
+Do not use the Normal card art in the Upside grid.
+Do not use the Upside art in the Normal grid.
+
+This update does not otherwise redesign UPSIDE PAWS mechanics.
+
+=====================================================================
+20. VISUAL REFERENCE PRIORITY
+=====================================================================
+
+Priority 1 — CHARACTER IDENTITY:
+APPROVED_BOMBO_SKINNY_REFERENCE.webp
+
+Priority 2 — CURTAIN COLUMN GEOMETRY / FLOW:
+CURTAIN_COLUMN_FLOW_REFERENCE.png
+CURTAIN_SHOWDOWN_REFERENCE.png
+FULL_REEL_DUO_SCENE_REFERENCE.png
+
+Priority 3 — BONUS PERSISTENCE:
+BONUS_PERSISTENT_CURTAINS_REFERENCE.png
+
+Priority 4 — CURRENT BUG STATE:
+CURRENT_IMPLEMENTATION_BEFORE_FIX.jpg
+Use only to identify what must be corrected.
+
+If a Priority 2/3 generated image contains a different clown design:
+replace it with approved Bombo/Skinny in implementation.
+
+=====================================================================
+21. THINGS CODEX MUST NOT INVENT
+=====================================================================
+
+Do not invent:
+- another trigger symbol;
+- Spotlight trigger;
+- another clown;
+- multiple curtains inside one reel;
+- curtain wider than one reel;
+- one-cell curtain;
+- vortex/moving persistent Curtains;
+- open non-playing persistent Curtains;
+- WILD + xN double labels;
+- fullscreen popup;
+- extra bonus minigame;
+- recursive cascade;
+- new wallet settlement path;
+- new Scatter behavior;
+- new row-count logic.
+
+=====================================================================
+22. IMPLEMENTATION ORDER
+=====================================================================
+
+Do work in this order:
+
+PHASE 1
+- inspect existing BIG TOP state/data model;
+- map reel container ownership;
+- add explicit reel-local Curtain overlay architecture.
+
+PHASE 2
+- SHOW TICKET trigger;
+- full-height close/open animation;
+- approved Bombo/Skinny duo composition;
+- final winner reveal;
+- exact WILD/xN labels.
+
+PHASE 3
+- dynamic BIG TOP WAYS UI.
+
+PHASE 4
+- bonus persistent Curtain state;
+- playing vs non-playing open/highlight logic;
+- reload restore.
+
+PHASE 5
+- Swamp Fishing fit corrections;
+- UPSIDE PAWS card art mapping.
+
+PHASE 6
+- run all tests;
+- fix all failed critical tests;
+- regression all games.
+
+Do not start speculative polish before phases 1–4 are correct.
+
+=====================================================================
+23. DEFINITION OF DONE
+=====================================================================
+
+Do not report completion until ALL release blockers in
+06_TESTS/TEST_CASES.txt pass.
+
+Final report must explicitly state:
+
+SHOW TICKET IS ONE-CELL TRIGGER ONLY
+CURTAIN WIDTH EQUALS ONE REEL
+CURTAIN HEIGHT EQUALS FULL REEL
+CURTAIN CLOSES FROM LEFT AND RIGHT
+DUO SCENE USES ONLY BOMBO AND SKINNY
+DUO SCENE FILLS FULL REEL WITH BACKGROUND
+CURTAIN CLOSES AGAIN AFTER SHOWDOWN
+FINAL REVEAL STAYS OPEN
+FINAL REVEAL SHOWS ONE APPROVED CLOWN
+MULTIPLIER REPLACES WILD LABEL
+BIG TOP WAYS IS DYNAMIC
+BONUS PLAYING CURTAINS PERSIST
+NON-PLAYING PERSISTENT CURTAINS STAY CLOSED AND HIGHLIGHT
+NO CURTAIN VORTEX OR RANDOM MOVEMENT
+BONUS WALLET SETTLES ONCE AT END
+POPUPS ARE GAME-CONTAINED
+MOBILE REEL GEOMETRY IS STABLE
+SWAMP SYMBOLS DO NOT CROP
+UPSIDE PAWS CARD ART IS WORLD-SPECIFIC
+NO RELEVANT CONSOLE ERRORS
+EXISTING VAULT GAMES REGRESSION PASS

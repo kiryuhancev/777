@@ -1,0 +1,364 @@
+
+BIG TOP WILDS — STRICT ASSET-LOCK IMPLEMENTATION PROMPT
+AUTHORITATIVE UPDATE
+
+This package exists to STOP visual improvisation.
+
+ABSOLUTE RULE:
+IF A REQUIRED VISUAL ASSET EXISTS IN THIS ARCHIVE, USE THAT FILE DIRECTLY.
+DO NOT REDRAW IT.
+DO NOT REGENERATE IT.
+DO NOT REBUILD IT FROM CSS SHAPES.
+DO NOT SUBSTITUTE A "SIMILAR" IMAGE.
+DO NOT CUT RANDOM CLOWNS FROM OTHER ART.
+DO NOT CREATE A NEW CURTAIN STYLE.
+
+The implementation must follow the asset-to-state mapping below exactly.
+
+======================================================================
+1. SOURCE PRIORITY
+======================================================================
+
+Priority order:
+1. This file: 00_READ_FIRST/MASTER_PROMPT.txt
+2. The exact image assets in this archive
+3. Old BIG_TOP_WILDS specifications only where they do not conflict
+4. Existing project code
+
+If an old spec or current implementation conflicts with this package, this package wins.
+
+======================================================================
+2. EXACT APPROVED FILES
+======================================================================
+
+OPEN CURTAIN FRAME / TEXTURE:
+01_CURTAIN_ASSETS/OPEN_CURTAIN_FRAME.png
+
+This is the approved curtain frame.
+Use its real velvet texture, folds, gold trim, tassels and proportions.
+DO NOT recreate the open curtain with flat rectangles, gradients, CSS borders or simplified fabric.
+
+DUO SCENE:
+02_CLOWN_ASSETS/DUO_SCENE_BOMBO_SKINNY.png
+
+This is the approved FULL scene when the curtain first opens.
+Use it directly.
+Do not cut Bombo and Skinny out separately and reassemble them.
+Do not replace either clown with any generated/random clown.
+
+APPROVED CHARACTER IDENTITY:
+02_CLOWN_ASSETS/APPROVED_CLOWN_IDENTITY_REFERENCE.webp
+
+The ONLY two Curtain feature characters are:
+- BOMBO: large, round, heavy comic clown.
+- SKINNY: extremely tall/thin, elastic agile clown.
+
+Any final single-clown state must preserve the exact approved identity and silhouette.
+No third clown. No recolored generic clown. No alternate family member.
+
+TRIGGER:
+03_TRIGGER/SHOW_TICKET_REFERENCE.png
+
+Trigger is a SHOW TICKET.
+It is a NORMAL ONE-CELL SYMBOL.
+It does NOT visually contain a curtain.
+It does NOT stretch to full reel.
+It ONLY triggers the Curtain Feature on its reel.
+
+FINAL LABEL ASSETS:
+04_WILD_BADGES/WILD.png
+04_WILD_BADGES/X2.png
+04_WILD_BADGES/X3.png
+04_WILD_BADGES/X5.png
+04_WILD_BADGES/X10.png
+
+Use these exact plaque images.
+Never replace them with text on a generic rectangle.
+Never create CSS badge approximations.
+
+======================================================================
+3. CURTAIN GEOMETRY
+======================================================================
+
+Curtain Feature is a FULL-REEL visual state.
+
+Width:
+EXACTLY one reel/column width.
+
+Height:
+EXACTLY 100% of the current visible reel viewport height.
+
+The reel may contain 2, 3, 4, 5 or 6 symbol cells.
+The Curtain Feature still covers the entire physical reel height.
+
+The curtain must never:
+- occupy one cell only;
+- extend into neighbor reels;
+- become thinner than the reel;
+- change reel layout dimensions;
+- resize the whole grid;
+- create vertical page jump.
+
+Implement Curtain as an absolutely positioned visual layer owned by the reel.
+
+The fixed reel viewport remains unchanged.
+
+======================================================================
+4. REQUIRED CURTAIN ANIMATION
+======================================================================
+
+The visual lifecycle is STRICT:
+
+STATE A — TRIGGER
+A SHOW TICKET lands as one normal cell symbol.
+All normal reels finish settling first.
+
+STATE B — CURTAIN CLOSE
+The feature reel becomes covered by real red velvet curtain halves.
+The left and right curtain panels move toward center and fully cover the reel.
+Preserve the approved velvet texture.
+
+Use transform / clipping / masking.
+Do not animate layout width/height.
+
+STATE C — FIRST OPEN
+Curtain halves pull apart like a real theater curtain.
+Inside the opening, show:
+02_CLOWN_ASSETS/DUO_SCENE_BOMBO_SKINNY.png
+
+The duo scene fills the entire inner stage opening.
+It must not appear as two stickers floating over a brown/empty background.
+
+Important:
+The actual OPEN_CURTAIN_FRAME must visually remain around the scene.
+The user must see the velvet side curtains, top drapery and gold trim.
+
+STATE D — DUEL
+The duel/presentation occurs INSIDE the open curtain stage.
+The duo artwork remains the visual basis.
+Effects may be added:
+- spotlight;
+- subtle shake;
+- glow;
+- confetti;
+- short emphasis animation.
+
+Do NOT replace the duo image with newly cut/random characters.
+
+STATE E — CURTAIN CLOSE AGAIN
+The curtain closes completely again.
+This hides the transition to the final state.
+
+STATE F — FINAL OPEN
+The curtain opens again.
+Now display:
+- ONE winning approved clown;
+- full circus/stage background;
+- the exact approved Wild/multiplier plaque at the bottom.
+
+The final open curtain STAYS OPEN after reveal.
+
+Final result states:
+x1 = WILD plaque
+x2 = X2 plaque
+x3 = X3 plaque
+x5 = X5 plaque
+x10 = X10 plaque
+
+Do not display "WILD + x3".
+The multiplier plaque replaces WILD.
+
+======================================================================
+5. FINAL SINGLE-CLOWN STATE
+======================================================================
+
+The final state must NOT look like:
+- a clown PNG pasted over a blank reel;
+- a cropped face;
+- a cutout over a flat brown gradient;
+- a character floating above the plaque.
+
+Instead:
+- use the same stage visual language as DUO_SCENE_BOMBO_SKINNY;
+- preserve circus lighting and depth;
+- place the approved winning clown as part of the stage composition;
+- keep the approved open curtain frame visible around it;
+- fit the result plaque into the lower stage area.
+
+Character identity must come ONLY from:
+APPROVED_CLOWN_IDENTITY_REFERENCE.webp
+
+BOMBO and SKINNY must remain visually recognizable.
+
+======================================================================
+6. BONUS PERSISTENCE
+======================================================================
+
+In THE BIG SHOW bonus:
+
+A Curtain that has become an active/persistent Curtain Wild is stored in bonus state.
+
+If that persistent Curtain participates in a win on a later free spin:
+- play its active/open presentation as required;
+- highlight the character and plaque.
+
+If that persistent Curtain does NOT participate in a win:
+- DO NOT replay the entire close/open/duel animation;
+- keep it visually present;
+- use only a light glow/highlight to indicate its state.
+
+Do not remove active Curtains accidentally between bonus spins.
+
+Persist:
+- reel index;
+- winning clown identity;
+- multiplier/result;
+- persistence duration/state according to current bonus math.
+
+Reload must restore it.
+
+======================================================================
+7. BIG TOP WAYS
+======================================================================
+
+Keep the existing dynamic BIG TOP WAYS behavior.
+
+The visible count must reflect:
+product(reelHeights)
+
+Example:
+[4, 6, 3, 5, 4, 2] => 4*6*3*5*4*2 = 2,880 BIG TOP WAYS.
+
+The physical reel viewport remains fixed.
+Only cell height changes.
+
+Display current BIG TOP WAYS in the existing information panel.
+Do not use the trademarked word "MEGAWAYS" in public UI.
+
+======================================================================
+8. MOBILE
+======================================================================
+
+This feature must be specifically tested on mobile widths.
+
+On mobile:
+- Curtain still equals exactly one reel width.
+- Curtain still equals full reel height.
+- No body/page jump.
+- No clipping of clown faces/bodies.
+- No result plaque overflow.
+- No separate full-screen animation.
+- Duo scene must use object-position/object-fit tuned for full visible composition.
+- Open curtain texture must remain visible and recognizable.
+
+======================================================================
+9. DO NOT USE THE CURRENT BAD IMPLEMENTATION
+======================================================================
+
+05_REFERENCES/CURRENT_BAD_IMPLEMENTATION_SCREEN.png
+exists only as a NEGATIVE reference.
+
+The current behavior shown there is explicitly rejected:
+- characters look like vertical cutouts;
+- curtain framing is missing/weak;
+- stage background is wrong;
+- result plaques look cheap.
+
+Do NOT copy any of those visual decisions.
+
+======================================================================
+10. REFERENCE IMAGES
+======================================================================
+
+05_REFERENCES/STRICT_VISUAL_REFERENCE_BOARD.png
+Shows the required state sequence and approved visual language.
+
+05_REFERENCES/CURTAIN_IN_REEL_REFERENCE.png
+Use only for full-reel proportion/composition reference.
+
+The standalone assets in 01/02/03/04 always take precedence over reference collages.
+
+======================================================================
+11. SWAMP FISHING CHECK
+======================================================================
+
+Also audit Swamp Fishing symbol fitting:
+
+Every symbol must fit fully inside its cell.
+No unintended head/tail/fins/lantern/text cropping.
+
+Check:
+- desktop;
+- 390px mobile;
+- 320px mobile;
+- base game;
+- bonus;
+- Scatter;
+- Collector/Fisherman;
+- Money Fish;
+- win highlight.
+
+Preserve aspect ratio.
+Prefer contain-style scaling.
+Do not stretch.
+
+======================================================================
+12. ACCEPTANCE TESTS
+======================================================================
+
+BT-01 SHOW TICKET occupies exactly one symbol cell.
+BT-02 Trigger does not visually contain curtain art.
+BT-03 Curtain Feature width equals exactly one reel width.
+BT-04 Curtain Feature height equals exactly full reel viewport height.
+BT-05 Curtain close uses real textured red velvet visual.
+BT-06 First open uses OPEN_CURTAIN_FRAME.
+BT-07 DUO_SCENE_BOMBO_SKINNY is rendered directly inside open curtain.
+BT-08 Only BOMBO and SKINNY are visible in Curtain duel.
+BT-09 No random/new clown is introduced.
+BT-10 Duo characters are not assembled as separate crude cutouts.
+BT-11 Curtain closes again after duo scene.
+BT-12 Final reveal opens same approved curtain frame.
+BT-13 Final reveal has exactly one approved clown.
+BT-14 Final reveal has full stage background, not empty gradient.
+BT-15 Final x1 uses exact WILD.png.
+BT-16 x2 uses exact X2.png.
+BT-17 x3 uses exact X3.png.
+BT-18 x5 uses exact X5.png.
+BT-19 x10 uses exact X10.png.
+BT-20 Result plaque is integrated into the bottom of the stage.
+BT-21 Final curtain remains open.
+BT-22 Persistent Curtain survives subsequent bonus spins.
+BT-23 Non-playing persistent Curtain only highlights.
+BT-24 Playing persistent Curtain gets active presentation.
+BT-25 Reload restores persistent curtain state.
+BT-26 BIG TOP WAYS value matches reel heights.
+BT-27 Mobile curtain causes zero layout shift.
+BT-28 Neighbor reels are never covered.
+BT-29 No console errors.
+
+SF-01 All Swamp base symbols fit.
+SF-02 All Swamp bonus symbols fit.
+SF-03 390px symbols fit.
+SF-04 320px symbols fit.
+SF-05 Collector/Fisherman fully visible.
+SF-06 Scatter fully visible.
+SF-07 Money Fish fully visible.
+SF-08 Win highlighting does not change crop.
+SF-09 No aspect-ratio distortion.
+SF-10 No layout shift from late artwork.
+
+======================================================================
+13. FINAL REPORT
+======================================================================
+
+After implementation report:
+- exact asset paths used;
+- where each asset is rendered;
+- confirmation that no replacement curtain/clown/badge art was created;
+- desktop screenshots;
+- mobile screenshots;
+- bonus persistence verification;
+- Swamp symbol-fit verification;
+- test results.
+
+DO NOT claim completion if any of the exact supplied visuals have been substituted.

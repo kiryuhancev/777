@@ -1,0 +1,9 @@
+{
+  "passed": [
+    "Delayed exact DUO decode: reel/HUD bounds unchanged; controls wait for preload",
+    "430/390/320 actual mobile sequence: whole immutable DUO scene, exact real frame/texture, proportional corner caps, no cutout assembly, second close and exact badge",
+    "Swamp late complete Collector request/decode: identical cell and frame bounds"
+  ],
+  "runtimeErrors": [],
+  "consoleErrors": []
+}

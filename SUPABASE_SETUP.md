@@ -117,3 +117,7 @@ Copy from the first comment/`begin;` through the final `commit;`, select all que
 ## BIG TOP update — 2026-10-22
 
 After the previously installed BIG TOP / UPSIDE PAWS setup, run the complete `supabase_big_top_v2.txt`. Verify `select public.big_top_capabilities();`: `mathVersion` must be2 and `roundVersions` must include1 and2. Old version1 rounds keep their original payouts; new version2 rounds use full-reel SHOW TICKET features. See `VAULT_UPDATE_2026_10_22.md`. Do not rerun older setup scripts after this update.
+
+## BIG TOP final handoff — mathVersion 3
+
+After the existing v2 migration, run the **entire `supabase_big_top_v3.txt`**. It ends with a verification SELECT. Expected: `{"version":1,"mathVersion":3,"roundVersions":[1,2,3]}`. This adds same-reel bonus Curtain persistence and validates calibrated bonus payouts. Existing balances are unchanged; old v1/v2 rounds remain supported. Do not rerun older migrations afterward.

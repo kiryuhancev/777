@@ -1,0 +1,2 @@
+Use the acceptance tests embedded in MASTER_PROMPT.txt as release blockers.
+All BT-01..BT-29 and SF-01..SF-10 must be checked before final sign-off.

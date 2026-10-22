@@ -1,0 +1,754 @@
+{
+  "cases": 147,
+  "blockers": 56,
+  "passed": 147,
+  "failed": 0,
+  "physicalDevices": "not tested",
+  "evidence": [
+    "reports/vault-update-2026-browser.json",
+    "reports/vault-update-2026-profiles.json",
+    "reports/bigtop-final-bonus.json",
+    "reports/bigtop-final-persistence.json",
+    "reports/bigtop-final-sql.json",
+    "reports/bigtop-final-model.json",
+    "reports/bigtop-final-regression.json",
+    "reports/bigtop-final-unchanged.json"
+  ],
+  "matrix": [
+    {
+      "id": "BT-T01",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-T02",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-T03",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-T04",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-T05",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-T06",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-T07",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-T08",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-T09",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-C01",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-C02",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-C03",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-C04",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-C05",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-C06",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-C07",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-C08",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-C09",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-C10",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-C11",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-A01",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-A02",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-A03",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-A04",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-A05",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-A06",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-A07",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-A08",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-A09",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-A10",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-A11",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-A12",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-V01",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-V02",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-V03",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-V04",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-V05",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-V06",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-V07",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-V08",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-V09",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-V10",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-W01",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-W02",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-W03",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-W04",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-W05",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-W06",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-W07",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-W08",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-W09",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-Y01",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-Y02",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-Y03",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-Y04",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-Y05",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-Y06",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-Y07",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-Y08",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-Y09",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-B01",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-B02",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-B03",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-B04",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-B05",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-B06",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-B07",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-B08",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-B09",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-B10",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-P01",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-P02",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-P03",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-P04",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-P05",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-P06",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-P07",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-P08",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-P09",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-P10",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-S01",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-S02",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-S03",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-S04",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-S05",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-S06",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-S07",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-S08",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-S09",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-S10",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-S11",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-BUY01",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-BUY02",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-BUY03",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-BUY04",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-BUY05",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-BUY06",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-BUY07",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-BUY08",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-M01",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-M02",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-M03",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-M04",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-M05",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-M06",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-M07",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-M08",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-M09",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-M10",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-M11",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "BT-M12",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "SF-F01",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "SF-F02",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "SF-F03",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "SF-F04",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "SF-F05",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "SF-F06",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "SF-F07",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "SF-F08",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "SF-F09",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "SF-F10",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "SF-F11",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "UP-C01",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "UP-C02",
+      "blocker": true,
+      "result": "PASS"
+    },
+    {
+      "id": "UP-C03",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "UP-C04",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "UP-C05",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "UP-C06",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "UP-C07",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "UP-C08",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "RG-01",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "RG-02",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "RG-03",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "RG-04",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "RG-05",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "RG-06",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "RG-07",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "RG-08",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "RG-09",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "RG-10",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "RG-11",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "RG-12",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "RG-13",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "RG-14",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "RG-15",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "RG-16",
+      "blocker": false,
+      "result": "PASS"
+    },
+    {
+      "id": "RG-17",
+      "blocker": false,
+      "result": "PASS"
+    }
+  ]
+}

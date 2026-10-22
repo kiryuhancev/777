@@ -1,0 +1,13 @@
+{
+  "rounds": 250000,
+  "offset": 70000000,
+  "sampledBonusSessions": 63989,
+  "bonusPayoutScale": 0.00169608,
+  "rtpPercent": 98.68578213158173,
+  "confidence95Percent": [
+    95.74993341052354,
+    101.62163085263994
+  ],
+  "baseMean": 0.0895417104084117,
+  "note": "Independent base estimator plus weighted bonus sample; production RNG unchanged. Confidence approximate Monte Carlo, not theoretical certification."
+}

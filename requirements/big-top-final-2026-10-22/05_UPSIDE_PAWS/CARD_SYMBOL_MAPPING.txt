@@ -1,0 +1,8 @@
+Normal World card symbols:
+UPSIDE_PAWS_CARD_SYMBOLS_NORMAL.png
+
+Upside World card symbols:
+UPSIDE_PAWS_CARD_SYMBOLS_UPSIDE.png
+
+The same ranks (10/J/Q/K/A) remain recognizable, but the world-specific art
+must never be swapped between grids.

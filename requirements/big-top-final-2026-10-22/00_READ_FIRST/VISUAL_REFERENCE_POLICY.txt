@@ -1,0 +1,36 @@
+VISUAL REFERENCE POLICY — READ BEFORE USING ART
+
+1. APPROVED_BOMBO_SKINNY_REFERENCE.webp
+   AUTHORITATIVE for character identity.
+   Only Bombo and Skinny are permitted.
+
+2. CURTAIN_COLUMN_FLOW_REFERENCE.png
+   AUTHORITATIVE for: one-column width, full-reel height, curtain staging order.
+   If its clowns differ from Bombo/Skinny, replace them with approved characters.
+
+3. CURTAIN_SHOWDOWN_REFERENCE.png
+   AUTHORITATIVE for: curtain contained inside one reel, duo-to-final reveal composition.
+   Character identity still comes from approved Bombo/Skinny reference.
+
+4. FULL_REEL_DUO_SCENE_REFERENCE.png
+   AUTHORITATIVE for: full-height open scene idea.
+   Not authoritative for any random/generated clown identity.
+
+5. BONUS_PERSISTENT_CURTAINS_REFERENCE.png
+   AUTHORITATIVE for: bonus visual states:
+   - persistent curtain;
+   - playing curtain opens;
+   - non-playing curtain stays closed and glows.
+   Do NOT implement any extra movement/vortex merely because an old image suggests it.
+
+6. CURRENT_IMPLEMENTATION_BEFORE_FIX.jpg
+   BUG REFERENCE ONLY.
+   Do not copy its flat/empty curtain interior.
+
+7. DEPRECATED_DO_NOT_USE_SPOTLIGHT_AS_TRIGGER.png
+   Explicitly deprecated.
+   Trigger is SHOW TICKET.
+
+When references conflict:
+MASTER_IMPLEMENTATION_SPEC.txt > this file > approved character reference >
+mechanic/layout refs > legacy baseline.

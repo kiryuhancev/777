@@ -1,0 +1,16 @@
+SHOW TICKET (one cell)
+-> reels settle
+-> affected reel focus
+-> full-height curtains close from left+right
+-> curtains open
+-> full-height duo scene: BOMBO + SKINNY
+-> showdown
+-> curtains close
+-> curtains open again
+-> exactly one winner + WILD or x2/x3/x5/x10
+-> final curtain remains open
+-> final win evaluation/presentation
+
+Curtain width = exactly one reel.
+Curtain height = exactly full reel viewport.
+Never use random clowns.

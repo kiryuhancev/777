@@ -1,0 +1,234 @@
+BIG TOP WILDS FINAL UPDATE — ACCEPTANCE / REGRESSION TESTS
+
+A failure in any RELEASE BLOCKER test means DO NOT report the task complete.
+
+=====================================================================
+A. SHOW TICKET
+=====================================================================
+
+BT-T01 [BLOCKER] SHOW TICKET occupies exactly one normal cell.
+BT-T02 [BLOCKER] SHOW TICKET does not span a full reel.
+BT-T03 [BLOCKER] SHOW TICKET is not rendered over the Curtain.
+BT-T04 [BLOCKER] Spotlight is not used as the Curtain trigger.
+BT-T05 SHOW TICKET starts feature only after base reels settle.
+BT-T06 Ticket on Reel N affects only Reel N.
+BT-T07 Multiple tickets on different reels resolve deterministically.
+BT-T08 No reel can own two simultaneous Curtain objects.
+BT-T09 Ticket animation callback performs no RNG selection.
+
+=====================================================================
+B. CURTAIN GEOMETRY
+=====================================================================
+
+BT-C01 [BLOCKER] Curtain width equals exactly one reel width.
+BT-C02 [BLOCKER] Curtain never overlaps left adjacent reel.
+BT-C03 [BLOCKER] Curtain never overlaps right adjacent reel.
+BT-C04 [BLOCKER] Curtain height equals 100% reel viewport at 2 rows.
+BT-C05 [BLOCKER] Curtain height equals 100% reel viewport at 3 rows.
+BT-C06 [BLOCKER] Curtain height equals 100% reel viewport at 4 rows.
+BT-C07 [BLOCKER] Curtain height equals 100% reel viewport at 5 rows.
+BT-C08 [BLOCKER] Curtain height equals 100% reel viewport at 6 rows.
+BT-C09 Curtain overlay does not modify row count.
+BT-C10 Curtain overlay does not modify reel width/height.
+BT-C11 Curtain uses reel-local clipping.
+
+=====================================================================
+C. CURTAIN ANIMATION ORDER
+=====================================================================
+
+BT-A01 [BLOCKER] Sequence begins only after reel settle.
+BT-A02 [BLOCKER] Curtains close from LEFT and RIGHT.
+BT-A03 [BLOCKER] Curtain closes full reel, not one cell.
+BT-A04 [BLOCKER] Curtains open to duo scene.
+BT-A05 [BLOCKER] Duo scene shows Bombo + Skinny.
+BT-A06 [BLOCKER] No third/random clown exists.
+BT-A07 Duo animation stays clipped to owning reel.
+BT-A08 [BLOCKER] Curtains close again after showdown.
+BT-A09 [BLOCKER] Curtains reopen to final single-winner scene.
+BT-A10 [BLOCKER] Final curtain remains open at settled feature result.
+BT-A11 Skip/Quick/Turbo cannot reorder states.
+BT-A12 Reduced Motion preserves the same semantic sequence.
+
+=====================================================================
+D. CHARACTER / ART
+=====================================================================
+
+BT-V01 [BLOCKER] Bombo matches approved character reference.
+BT-V02 [BLOCKER] Skinny matches approved character reference.
+BT-V03 [BLOCKER] Duo scene uses both approved clowns.
+BT-V04 [BLOCKER] Final scene uses exactly one approved clown.
+BT-V05 Duo scene has full-height circus background.
+BT-V06 Final scene has full-height circus background.
+BT-V07 No flat empty brown/transparent reel interior behind clown.
+BT-V08 Clown aspect ratio is preserved.
+BT-V09 Character is not stretched to fill reel height.
+BT-V10 Background covers reel cleanly at mobile/desktop.
+
+=====================================================================
+E. WILD / MULTIPLIER RESULT
+=====================================================================
+
+BT-W01 x1 displays ONLY WILD.
+BT-W02 x2 displays ONLY x2.
+BT-W03 x3 displays ONLY x3.
+BT-W04 x5 displays ONLY x5.
+BT-W05 x10 displays ONLY x10.
+BT-W06 [BLOCKER] No "WILD x3" combined label.
+BT-W07 [BLOCKER] No black generic multiplier badge.
+BT-W08 Final Curtain acts as Full Reel Wild.
+BT-W09 Reel multiplier applies per approved math, not once per Wild cell.
+
+=====================================================================
+F. DYNAMIC BIG TOP WAYS
+=====================================================================
+
+BT-Y01 [BLOCKER] Current ways value derives from game-state rowCounts.
+BT-Y02 [BLOCKER] [4,6,3,5,4,6] displays 8640.
+BT-Y03 [BLOCKER] [6,6,6,6,6,6] displays 46656.
+BT-Y04 [2,2,2,2,2,2] displays 64.
+BT-Y05 Ways updates for every new spin after rowCounts determined.
+BT-Y06 Ways does not change during presentation of same spin.
+BT-Y07 Bonus free spin displays that spin's current ways.
+BT-Y08 UI says BIG TOP WAYS, not MEGAWAYS.
+BT-Y09 DOM pixel heights are not used for ways math.
+
+=====================================================================
+G. BONUS CURTAIN PERSISTENCE
+=====================================================================
+
+BT-B01 [BLOCKER] Curtain that played in a qualifying bonus win becomes persistent.
+BT-B02 [BLOCKER] Persistent Curtain remains on same reel next bonus spin.
+BT-B03 [BLOCKER] Persistent Curtain is not replaced by normal symbols.
+BT-B04 [BLOCKER] Persistent Curtain state survives reload.
+BT-B05 [BLOCKER] Persistent Curtain does NOT randomly move reels.
+BT-B06 [BLOCKER] No vortex/redistribution exists.
+BT-B07 winnerClownId persists.
+BT-B08 multiplier persists according to stored bonus state.
+BT-B09 bonusSessionId owns persistent Curtain state.
+BT-B10 one reel owns at most one persistent Curtain.
+
+=====================================================================
+H. PLAYING VS NON-PLAYING BONUS CURTAIN
+=====================================================================
+
+BT-P01 [BLOCKER] Persistent Curtain participating in current win opens.
+BT-P02 [BLOCKER] Playing Curtain reveals correct winner clown.
+BT-P03 [BLOCKER] Playing Curtain reveals correct WILD/xN result.
+BT-P04 [BLOCKER] Persistent Curtain not participating in win stays CLOSED.
+BT-P05 [BLOCKER] Non-playing Curtain receives highlight/pulse only.
+BT-P06 [BLOCKER] Non-playing Curtain does not run duo scene.
+BT-P07 [BLOCKER] Non-playing Curtain does not show winner scene.
+BT-P08 Highlight does not change layout.
+BT-P09 Multiple persistent Curtains can independently be playing/non-playing.
+BT-P10 State is deterministic from the round plan.
+
+=====================================================================
+I. BONUS WALLET / POPUPS
+=====================================================================
+
+BT-S01 [BLOCKER] Bonus spin wins accumulate in bonusSession.totalWin.
+BT-S02 [BLOCKER] Wallet does not credit after each free spin.
+BT-S03 [BLOCKER] Bonus total settles exactly once at terminal completion.
+BT-S04 Reload cannot duplicate terminal bonus payout.
+BT-S05 Bonus Intro is inside game/reel area.
+BT-S06 Bonus Complete is inside game/reel area.
+BT-S07 Popup open does not move HUD.
+BT-S08 Popup close does not move HUD.
+BT-S09 SPACE triggers exactly one transition.
+BT-S10 Tap/click triggers exactly one transition.
+BT-S11 Blocking popup prevents click-through.
+
+=====================================================================
+J. BONUS BUY
+=====================================================================
+
+BT-BUY01 Confirmation NO = no debit.
+BT-BUY02 Insufficient balance = no bonus.
+BT-BUY03 [BLOCKER] YES debits purchase exactly once.
+BT-BUY04 Double tap cannot double debit.
+BT-BUY05 [BLOCKER] Purchased bonus plays trigger presentation spin.
+BT-BUY06 Trigger presentation spin has no extra normal wager.
+BT-BUY07 Trigger presentation visibly produces required bonus trigger.
+BT-BUY08 Intro waits for user input before first free spin.
+
+=====================================================================
+K. MOBILE STABILITY
+=====================================================================
+
+BT-M01 [BLOCKER] 320px: no horizontal overflow.
+BT-M02 [BLOCKER] 320px: curtain equals one reel width.
+BT-M03 [BLOCKER] 320px: curtain equals full reel height.
+BT-M04 390px: same geometry.
+BT-M05 430px: same geometry.
+BT-M06 No layout shift when Ticket appears.
+BT-M07 No layout shift when Curtain closes.
+BT-M08 No layout shift when duo scene opens.
+BT-M09 No layout shift when final winner opens.
+BT-M10 No layout shift from popup.
+BT-M11 Late artwork decoding does not change geometry.
+BT-M12 Touch interaction cannot start overlapping spins.
+
+=====================================================================
+L. SWAMP FISHING SYMBOL FIT
+=====================================================================
+
+SF-F01 [BLOCKER] Desktop: all symbols fully visible.
+SF-F02 [BLOCKER] 390px: all symbols fully visible.
+SF-F03 [BLOCKER] 320px: all symbols fully visible.
+SF-F04 Collector/Fisherman is not unintentionally cropped.
+SF-F05 Money Fish fins/tails are not cropped.
+SF-F06 Scatter label is fully readable.
+SF-F07 Premium symbols preserve aspect ratio.
+SF-F08 Card symbols preserve aspect ratio.
+SF-F09 Win highlight does not alter crop/size.
+SF-F10 Bonus state does not use different broken fit.
+SF-F11 Late image load causes no layout shift.
+
+=====================================================================
+M. UPSIDE PAWS CARD ART
+=====================================================================
+
+UP-C01 [BLOCKER] Normal grid uses Normal card-symbol family.
+UP-C02 [BLOCKER] Upside grid uses Upside card-symbol family.
+UP-C03 10 remains recognizable in both worlds.
+UP-C04 J remains recognizable in both worlds.
+UP-C05 Q remains recognizable in both worlds.
+UP-C06 K remains recognizable in both worlds.
+UP-C07 A remains recognizable in both worlds.
+UP-C08 No accidental cross-world asset mapping.
+
+=====================================================================
+N. REGRESSION / TECHNICAL
+=====================================================================
+
+RG-01 Existing VAULT wallet still works.
+RG-02 Auth/Supabase behavior unchanged.
+RG-03 Digital Derby route works.
+RG-04 Poker Blitz route works.
+RG-05 Vault Breakers route works.
+RG-06 Blackjack works.
+RG-07 Baccarat works.
+RG-08 Mines works.
+RG-09 Swamp Fishing works after fit fix.
+RG-10 Vault Heist works.
+RG-11 MAGNET works.
+RG-12 Critter Chaos works.
+RG-13 UPSIDE PAWS still loads after card mapping.
+RG-14 No global CSS collision.
+RG-15 No relevant console errors.
+RG-16 No duplicate settlement callback from animation.
+RG-17 No progressive DOM-node leak after repeated Curtain features.
+
+=====================================================================
+FINAL RELEASE BLOCKER POLICY
+=====================================================================
+
+Do not declare completion if ANY test marked [BLOCKER] fails.
+
+Do not "fix" a failed visual test by changing the specified mechanic.
+
+Final report must list:
+- passed blockers;
+- any non-blocking limitations;
+- exact files changed;
+- any device-specific test not actually run on physical hardware.

@@ -148,13 +148,13 @@ art='data:image/webp;base64,'+encoded_asset((ROOT/'assets/critter/references/02_
 s=re.sub(r'(<img id="critterLobbyArt")([^>]*)(>)',lambda m:m[1]+re.sub(r' src="[^"]*"','',m[2])+' src="'+art+'"'+m[3],s)
 # BIG TOP WILDS adds a module; existing game code and artwork remain untouched.
 def bigtop_assets(text):
- return re.sub(r'__BIGTOP_([^\s\x27"<>]+)__',lambda m:'data:image/png;base64,'+encoded_asset(ROOT/'assets/big-top'/m[1]),text)
+ return re.sub(r'__BIGTOP_([^\s\x27"<>]+)__',lambda m:'data:image/'+('webp' if m[1].endswith('.webp') else 'png')+';base64,'+encoded_asset(ROOT/'assets/big-top'/m[1]),text)
 card='<button class="game-card playable" id="openBigTopGame" data-category="slots" aria-label="Играть в BIG TOP WILDS"><div class="art"><img id="bigTopLobbyArt" alt="" loading="lazy"></div><span class="info"><strong>BIG TOP WILDS</strong><small>Big Top Ways · The Big Show</small></span><span class="lobby-play" aria-hidden="true">PLAY</span></button>'
 if 'id="openBigTopGame"' not in s:s=s.replace('<button class="game-card playable" id="openCritterGame"',card+'<button class="game-card playable" id="openCritterGame"',1)
 if "id:'big_top',element:'openBigTopGame'" not in s:s=s.replace("{id:'critter',element:'openCritterGame'","{id:'big_top',element:'openBigTopGame',category:'slots',isNew:true},{id:'critter',element:'openCritterGame'",1)
 art='data:image/png;base64,'+encoded_asset(ROOT/'assets/big-top/background.png')
 s=re.sub(r'(<img id="bigTopLobbyArt")([^>]*)(>)',lambda m:m[1]+re.sub(r' src="[^"]*"','',m[2])+' src="'+art+'"'+m[3],s)
-for name,text,tag in [('BIG TOP STYLES',bigtop_assets((ROOT/'big-top/presentation.css').read_text()),'style'),('BIG TOP SCREEN',(ROOT/'big-top/screen.html').read_text(),None),('BIG TOP MODULE',bigtop_assets('\n'.join((ROOT/'big-top'/f).read_text() for f in ['config-v1.js','model-v1.js','config.js','model.js','assets.js','game.js'])),'script')]:
+for name,text,tag in [('BIG TOP STYLES',bigtop_assets((ROOT/'big-top/presentation.css').read_text()),'style'),('BIG TOP SCREEN',(ROOT/'big-top/screen.html').read_text(),None),('BIG TOP MODULE',bigtop_assets('\n'.join((ROOT/'big-top'/f).read_text() for f in ['config-v1.js','model-v1.js','config-v2.js','model-v2.js','config.js','model.js','assets.js','game.js'])),'script')]:
  block=f'<!-- BEGIN {name} -->\n'+(f'<{tag}>\n{text}\n</{tag}>' if tag else text)+f'\n<!-- END {name} -->'
  pattern=rf'<!-- BEGIN {name} -->[\s\S]*?<!-- END {name} -->'
  if re.search(pattern,s):s=re.sub(pattern,lambda _:block,s)

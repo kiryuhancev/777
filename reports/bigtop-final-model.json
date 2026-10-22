@@ -1,0 +1,17 @@
+{
+  "seeds": 10000,
+  "playing": 13162,
+  "closed": 724,
+  "persist": 13886,
+  "mixed": true,
+  "samples": {
+    "nonplaying": {
+      "seed": 0,
+      "index": 1
+    },
+    "mixed": {
+      "seed": 0,
+      "index": 1
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "passed": [
+    "SH-K01\u201312: purchase YES/doubleYES one debit, no extra trigger wager, local input-gated intro, F5 intro/midbonus/summary/settled, running total without wallet credit, one terminal credit/stat",
+    "Final v3: persistentCurtains stored in stable checkpoint, exact owner/reel/winner/multiplier retained through midbonus F5",
+    "Legacy v1 active round F5: original seed/paytable/payout preserved, one debit/stat, no conversion to v3 financial state",
+    "Legacy v2 active round F5: original seed/paytable/payout preserved, one debit/stat, no conversion to v3 financial state",
+    "RG-L07\u201310: all prior routes, actual SDK session restoration, common wallet, unique IDs, no runtime/console errors"
+  ],
+  "runtimeErrors": [],
+  "consoleErrors": []
+}

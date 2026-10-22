@@ -1,0 +1,14 @@
+THE BIG SHOW BONUS
+
+A Curtain that participates in a qualifying bonus win becomes persistent.
+It remains on the SAME reel between bonus spins.
+
+On a later bonus spin:
+- if that Curtain participates in the current win -> OPEN it;
+- if it does not participate -> keep it CLOSED and only highlight/pulse it.
+
+Do not randomly move Curtains.
+Do not add a vortex.
+Do not open all persistent Curtains automatically.
+Persist state and restore it safely on reload.
+Wallet credits bonusSession.totalWin once at terminal bonus completion.

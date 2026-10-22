@@ -2,6 +2,7 @@
   "passed": [
     "quick: all close/open/duel/final stages retained, actual duration ratio correct, same seeded result and exact wallet settlement",
     "turbo: all close/open/duel/final stages retained, actual duration ratio correct, same seeded result and exact wallet settlement",
+    "reduced: all close/open/duel/final stages retained, actual duration ratio correct, same seeded result and exact wallet settlement",
     "320px SHOW TICKET: one source cell, proportional isolated approved ticket art, no curtain until settle/feature presentation"
   ],
   "runtimeErrors": [],

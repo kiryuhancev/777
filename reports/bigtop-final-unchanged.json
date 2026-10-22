@@ -1,0 +1,41 @@
+{
+  "configV2ExactLegacy": true,
+  "modelV2ExactLegacy": true,
+  "authCodeUnchanged": true,
+  "swamp/config.js": {
+    "sha256": "312657a8b433cf5a50d832483357a43f7751950fb59a0f2e0e3ccb5fcf371fdf",
+    "unchanged": true
+  },
+  "swamp/model.js": {
+    "sha256": "13fa622629bed9e1e36081940ffd85ccf3208bfa3bc69649f1b500a3ca91ba1e",
+    "unchanged": true
+  },
+  "swamp/assets.js": {
+    "sha256": "dfcfd511b3fc341c2825c5a7d245267a5ccddd7f9360a419915407c1aabb92ac",
+    "unchanged": true
+  },
+  "swamp/presentation.css": {
+    "sha256": "b44f32e5e46f4ccfe8a4f8ae78b78ea5006420fd13aee2c68abaf3a3f69efc71",
+    "unchanged": true
+  },
+  "upside-paws/config.js": {
+    "sha256": "d2c8e51b6c2bb0c64d8d9ef12d0cf4700ae5d1dd7088b93efe8e892cead240be",
+    "unchanged": true
+  },
+  "upside-paws/model.js": {
+    "sha256": "9f9b62244dd42f305c857858a3cfeec60912a349d8310b5ca4822a789d215e62",
+    "unchanged": true
+  },
+  "upside-paws/assets.js": {
+    "sha256": "35fcf957d4fea15b895c393ba22a0221e54cd3078acaf3919e8af5880bc51ec0",
+    "unchanged": true
+  },
+  "upside-paws/game.js": {
+    "sha256": "bffa95fbf2b10ced43c963445918e0d5c8f748e7fc94015835eaa3a28561c828",
+    "unchanged": true
+  },
+  "slot-hud/bonus-popup.js": {
+    "sha256": "dddf98386000404e705be9dd4c92bb05c5e39b1507987bc22fa62b7ba23bfd18",
+    "unchanged": true
+  }
+}

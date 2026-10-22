@@ -2,7 +2,7 @@
 from pathlib import Path
 import re
 R=Path(__file__).resolve().parent.parent
-config=(R/'big-top/config.js').read_text();scale=re.search(r'payoutScale:([\d.]+)',config)[1];cost=re.search(r'buyMultiplier:(\d+)',config)[1]
+config=(R/'big-top/config-v2.js').read_text();scale=re.search(r'payoutScale:([\d.]+)',config)[1];cost=re.search(r'buyMultiplier:(\d+)',config)[1]
 s=(R/'supabase_big_top.txt').read_text();a=s.index('create or replace function public.big_top_grid_win');b=s.index('create or replace function public.big_top_validate_plan');grid=s[a:b].replace('big_top_grid_win','big_top_v2_grid_win').replace('*2.55','*'+scale).replace('* 2.55','* '+scale)
 a=s.index('create or replace function public.settle_big_top_round');b=s.index('create or replace function public.credit_big_top_base');settle=s[a:b];legacy=settle.replace('settle_big_top_round','settle_big_top_v1_round');current=settle.replace("c->>'version' is distinct from '1'","c->>'version' is distinct from '2'").replace('public.big_top_validate_plan','public.big_top_v2_validate_plan').replace('then 110 else 1','then '+cost+' else 1')
 current=current.replace("if u is null then raise exception 'Authentication required';end if;", "if u is null then raise exception 'Authentication required';end if;if c->>'version'='1' then return public.settle_big_top_v1_round(p_round_id,p_expected_revision,p_checkpoint);end if;",1)

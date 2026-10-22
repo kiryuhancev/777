@@ -1,0 +1,171 @@
+{
+  "passed": 39,
+  "failed": 0,
+  "cases": [
+    {
+      "id": "BT-01",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-02",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-03",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-04",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-05",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-06",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-07",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-08",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-09",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-10",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-11",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-12",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-13",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-14",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-15",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-16",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-17",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-18",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-19",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-20",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-21",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-22",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-23",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-24",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-25",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-26",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-27",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-28",
+      "result": "PASS"
+    },
+    {
+      "id": "BT-29",
+      "result": "PASS"
+    },
+    {
+      "id": "SF-01",
+      "result": "PASS"
+    },
+    {
+      "id": "SF-02",
+      "result": "PASS"
+    },
+    {
+      "id": "SF-03",
+      "result": "PASS"
+    },
+    {
+      "id": "SF-04",
+      "result": "PASS"
+    },
+    {
+      "id": "SF-05",
+      "result": "PASS"
+    },
+    {
+      "id": "SF-06",
+      "result": "PASS"
+    },
+    {
+      "id": "SF-07",
+      "result": "PASS"
+    },
+    {
+      "id": "SF-08",
+      "result": "PASS"
+    },
+    {
+      "id": "SF-09",
+      "result": "PASS"
+    },
+    {
+      "id": "SF-10",
+      "result": "PASS"
+    }
+  ],
+  "evidence": [
+    "reports/bigtop-strict-browser.json",
+    "reports/bigtop-strict-focused.json",
+    "reports/bigtop-strict-persistence.json",
+    "reports/bigtop-strict-profiles.json",
+    "reports/bigtop-final-bonus.json"
+  ],
+  "physicalDevices": "not tested",
+  "published": false
+}

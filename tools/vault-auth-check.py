@@ -13,6 +13,8 @@ SDK_PATH=Path(os.environ.get('VAULT_TEST_SDK','/tmp/vault-supabase-sdk.js'))
 if not SDK_PATH.exists():SDK_PATH.write_bytes(urlopen(SDK_URL,timeout=30).read())
 SDK=SDK_PATH.read_text()
 HTML=(ROOT/'index.html').read_text()
+# Auth contracts do not exercise art; avoid repeatedly transferring the 74MB inline atlas.
+HTML=re.sub(r'data:image/[^;]+;base64,[A-Za-z0-9+/=]+','data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',HTML)
 def jwt(uid=None):
  def enc(x):return base64.urlsafe_b64encode(json.dumps(x).encode()).decode().rstrip('=')
  return enc({'alg':'HS256','typ':'JWT'})+'.'+enc({'role':'authenticated' if uid else 'anon','sub':uid or '', 'exp':int(time.time())+3600,'aud':'authenticated'})+'.fixture-only'
@@ -50,6 +52,9 @@ class Cloud:
   if uid not in self.rows:return response({'message':'Authentication required'},401)
   if path.startswith('/rest/v1/rpc/'):
    name=path.split('/')[-1];self.calls.append((uid,name,payload));wallet=self.rows[uid]['wallets']
+   if name=='vault_bonus_capabilities':return response({'version':1})
+   if name=='big_top_capabilities':return response({'version':1,'mathVersion':2,'roundVersions':[1,2]})
+   if name=='upside_paws_capabilities':return response({'version':1})
    if name=='mines_capabilities':return response({'version':1}) if self.mines_schema_ready else response({'message':'Function not found','code':'PGRST202'},404)
    if name=='swamp_slot_capabilities':return response({'version':2,'purchaseVersion':1,'siteAdminVersion':1,'boostVersion':1,'bonusVersion':2,'mathVersion':4}) if self.swamp_schema_ready else response({'message':'Function not found','code':'PGRST202'},404)
    if name=='table_games_capabilities':return response({'version':1}) if self.table_schema_ready else response({'message':'Function not found','code':'PGRST202'},404)

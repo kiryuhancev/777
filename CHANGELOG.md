@@ -1,3 +1,16 @@
+## Unpublished — strict BIG TOP asset lock
+
+- Replaced CSS-made Curtain/fabric/plaque and assembled duo foregrounds with the exact provided WebP frame, complete duo scene, ticket and WILD/X2/X3/X5/X10 plaques. Original bytes retained and audited.
+- Added only the two missing final single-clown scenes, explicitly authorized by the user, matching the latest identity reference. No replacement supplied-art generation.
+- Existing Curtain sequence, calibrated v3 bonus math, same-reel persistence, wallet/settlement and all other games unchanged.
+
+## Unpublished — BIG TOP final handoff (2026-10-22)
+
+- Real close → duo → close → winner sequence in one full-height reel, continuous circus stage background, approved Bombo/Skinny only.
+- Winning bonus Curtains persist on their own reel; only currently playing persistent Curtains open. Non-playing Curtains remain closed and glow.
+- Version3 deterministic plans, owner-bound stable persistence and SQL validation; old versions1/2 preserved. New bonus-only payout calibration and227× buy price; base math/RNG/weights unchanged.
+- Added complete v3 migration TXT with verification SELECT, acceptance/SQL/mobile/reload tests. Swamp fit and world-specific UPSIDE PAWS cards rechecked.
+
 ## 2026-10-22 — full update (unpublished)
 
 - BIG TOP: one-cell SHOW TICKET, full-reel close/open stage, approved BOMBO/SKINNY duel and one final OPEN winner with WILD or xN; dynamic exact Ways.

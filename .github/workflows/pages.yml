@@ -23,6 +23,7 @@ jobs:
           node tools/upside-paws-model-tests.cjs
           node tools/big-top-model-tests.cjs
           node tools/vault-update-2026-model-tests.cjs
+          node tools/bigtop-final-model-tests.cjs
           node tools/magnet-math-tests.cjs
           node tools/magnet-v2-tests.cjs
           node tools/critter-math-tests.cjs

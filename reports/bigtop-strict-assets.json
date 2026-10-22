@@ -1,0 +1,47 @@
+{
+  "frame": {
+    "source": "01_CURTAIN/OPEN_CURTAIN_FRAME.webp",
+    "path": "assets/big-top/strict/OPEN_CURTAIN_FRAME.webp",
+    "sha256": "9dc26203accae67214bf6a24bcfad2c323c9c5773d9c29689e9aca96c37b3751"
+  },
+  "duo": {
+    "source": "02_CLOWNS/DUO_SCENE_BOMBO_SKINNY.webp",
+    "path": "assets/big-top/strict/DUO_SCENE_BOMBO_SKINNY.webp",
+    "sha256": "0a9e7f53fca76236ce9404f52f3589d386e07213dd8e3e87b707a5fea9fcbd72"
+  },
+  "identity": {
+    "source": "02_CLOWNS/APPROVED_CLOWN_IDENTITY_REFERENCE.webp",
+    "path": "assets/big-top/strict/APPROVED_CLOWN_IDENTITY_REFERENCE.webp",
+    "sha256": "41e2178342df6d6b8ab0ab2427e9ef52c6059faedcf8b495b8e06420c8900672"
+  },
+  "ticket": {
+    "source": "03_TRIGGER/SHOW_TICKET_REFERENCE.webp",
+    "path": "assets/big-top/strict/SHOW_TICKET_REFERENCE.webp",
+    "sha256": "c49941a3ab7dc9fae7b8b36d112a10447b4dc9fc03c867f3e98c0da1ff8573ff"
+  },
+  "WILD": {
+    "source": "04_BADGES/WILD.webp",
+    "path": "assets/big-top/strict/WILD.webp",
+    "sha256": "8f4b25fc9ef4950113dd35ee3244349e1ea790d3183dc9c62583a66005008023"
+  },
+  "X2": {
+    "source": "04_BADGES/X2.webp",
+    "path": "assets/big-top/strict/X2.webp",
+    "sha256": "0bc64184a8501c6bcc29f29bd083428b0018850c229a979b5412a104937643af"
+  },
+  "X3": {
+    "source": "04_BADGES/X3.webp",
+    "path": "assets/big-top/strict/X3.webp",
+    "sha256": "8e0f9a90b617ff4dab5aab8c4f43fb08dcdfc3acd3ffeec0aff373d28e29786c"
+  },
+  "X5": {
+    "source": "04_BADGES/X5.webp",
+    "path": "assets/big-top/strict/X5.webp",
+    "sha256": "07d784d4a4af4de7827afec5ddadd773511f7fb2f3cae1812cc93387e7660cb4"
+  },
+  "X10": {
+    "source": "04_BADGES/X10.webp",
+    "path": "assets/big-top/strict/X10.webp",
+    "sha256": "bc91531ebfa862b081a1564133a25878da40d04b10da2a6a55da40e5ab38b0e2"
+  }
+}

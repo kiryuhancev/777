@@ -58,7 +58,7 @@ html_hash = hashlib.sha256(built).hexdigest()
 commit = os.environ.get('GITHUB_SHA') or subprocess.check_output(
     ['git', '-C', str(ROOT), 'rev-parse', 'HEAD'], text=True).strip()
 (site / 'version.json').write_text(json.dumps({
-    'version': 'v48', 'commit': commit,
+    'version': 'v50', 'commit': commit,
     'htmlSha256': html_hash, 'imageCount':len(assets), 'imageBytes':sum(assets.values()),
 }, indent=2) + '\n')
 print(f'Built {len(built)} HTML bytes + {len(assets)} unique images ({sum(assets.values())} bytes); standalone source {html.stat().st_size} bytes')
