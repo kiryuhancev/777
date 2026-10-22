@@ -1,0 +1,17 @@
+{
+  "passed": [
+    "losePlain: reel stop before gate, correct reveal visibility, unchanged exact payout",
+    "winTicket: reel stop before gate, correct reveal visibility, unchanged exact payout",
+    "loseTicket: reel stop before gate, correct reveal visibility, unchanged exact payout; F5 retains ticket/no curtain/no duplicate",
+    "winPlain: reel stop before gate, correct reveal visibility, unchanged exact payout",
+    "BOMBO/SKINNY slow mild lighting only, no composite movement/deformation/geometry change, system and shared reduced-motion disable idle"
+  ],
+  "seeds": {
+    "losePlain": 0,
+    "winTicket": 2,
+    "loseTicket": 3,
+    "winPlain": 7
+  },
+  "runtimeErrors": [],
+  "consoleErrors": []
+}

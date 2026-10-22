@@ -51,3 +51,11 @@ body #bigTopApp .bigtop-local-dialog>header{margin-bottom:8px;padding-bottom:6px
 .bigtop-label{position:absolute;z-index:6;left:4%;width:92%;height:44cqw;bottom:2%;pointer-events:none;visibility:hidden}
 .bigtop-label img{display:block;object-fit:contain;width:100%;height:100%}.bigtop-curtain.resolved .bigtop-label{visibility:visible}
 #bigTopWays{font-variant-numeric:tabular-nums;white-space:nowrap;max-width:100%;font-size:clamp(9px,1.4vw,13px)}
+
+/* Whole-scene assets: delicate light only, never move/deform the baked-in background. */
+@keyframes bigtop-bombo-idle-light{0%,35%,65%,100%{filter:brightness(1)}50%{filter:brightness(1.045)}}
+@keyframes bigtop-skinny-idle-light{0%,30%,70%,100%{filter:brightness(1)}45%{filter:brightness(1.025)}55%{filter:brightness(1.045)}}
+body.bigtop-active .bigtop-curtain.resolved[data-phase="FINAL_OPEN"][data-clown="bombo"] .bigtop-winner-scene{animation:bigtop-bombo-idle-light 6.8s ease-in-out infinite}
+body.bigtop-active .bigtop-curtain.resolved[data-phase="FINAL_OPEN"][data-clown="skinny"] .bigtop-winner-scene{animation:bigtop-skinny-idle-light 8.2s ease-in-out infinite;animation-delay:-2s}
+body.slot-reduced-motion .bigtop-curtain .bigtop-winner-scene{animation:none!important}
+@media(prefers-reduced-motion:reduce){body.bigtop-active .bigtop-curtain .bigtop-winner-scene{animation:none!important}}

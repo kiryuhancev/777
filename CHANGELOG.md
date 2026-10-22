@@ -1,3 +1,10 @@
+## Unpublished — BIG TOP base reveal gate and gentle idle lighting
+
+- Base Game curtain reveal requires an existing positive planned Ways win and landed SHOW TICKET. Check runs after all reel stops; losing ticket spins retain the ordinary initial grid, including after reload.
+- Bonus feature selection/persistent Curtains and immutable math/settlement plans are unchanged. Gate uses the existing financial result, not a new evaluation of initialGrid.
+- Whole-scene BOMBO/SKINNY assets receive only subtle slow brightness pulses; no movement/deformation, no reopening. Respect system and shared reduced-motion settings.
+- Real seeded browser checks cover all four base win/ticket combinations, exact wallet delta, losing ticket reload, idle geometry and reduced motion.
+
 ## Unpublished — BIG TOP large characters V5
 
 - Replace centered V2 poster/blurred continuation with supplied full-height V5 stages: MOBILE art at ≤760px, FULL art above 760px. Keep original proportions; clip horizontal overflow per reel only.
